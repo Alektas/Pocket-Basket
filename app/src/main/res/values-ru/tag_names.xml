@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="all">Все</string>
+    <string name="milky">Молочные</string>
+    <string name="vegetable">Овощи</string>
+    <string name="groats">Крупа</string>
+    <string name="fruit">Фрукты</string>
+    <string name="drink">Напитки</string>
+    <string name="floury">Выпечка</string>
+    <string name="sweets">Сладости</string>
+    <string name="seafood">Рыбные</string>
+    <string name="sauce_n_oil">Соусы/Масла</string>
+    <string name="other">Другое</string>
+    <string name="semis">Полуфабр.</string>
+    <string name="household">Хозтовары</string>
+    <string name="meat">Мясо</string>
+</resources>
