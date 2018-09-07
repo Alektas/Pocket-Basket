@@ -7,7 +7,6 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -25,9 +24,10 @@ import alektas.pocketbasket.R;
 import alektas.pocketbasket.model.Data;
 
 public class BasketAdapter extends BaseAdapter {
-    private static final String TAG = "BasketAdapter";
+    private static final String TAG = "CURRENT_APP_LOG";
     private final float EDGE = 0.6f;
-    private final float TAP_PADDING = 40f;
+    private final float TAP_PADDING = 0f;
+    private final float VIEW_PADDING = 0f;
     private Context mContext;
     private IPresenter mPresenter;
     private List<Data> mData;
@@ -68,43 +68,21 @@ public class BasketAdapter extends BaseAdapter {
 
     @SuppressLint("ClickableViewAccessibility")
     public View getView(int position, View convertView, ViewGroup parent) {
-        final ViewHolder viewHolder;
         RelativeLayout itemSlideWrapper = (RelativeLayout) convertView;
 
-        // inflate item View from resources and put it into wrapper for sliding
-        // or get ViewHolder from save if exist
+        ViewHolder viewHolder;
         if (itemSlideWrapper == null) {
-            LayoutInflater inflater =
-                    (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            assert inflater != null;
-            View itemView = inflater.inflate(R.layout.item_view, parent, false);
-
-            itemSlideWrapper = new RelativeLayout(mContext);
-            RelativeLayout.LayoutParams layoutParamsItem = new RelativeLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            layoutParamsItem.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
-            itemSlideWrapper.addView(itemView, layoutParamsItem);
-
+            itemSlideWrapper = (RelativeLayout) initView(parent);
             viewHolder = new ViewHolder(itemSlideWrapper);
             itemSlideWrapper.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        // get item and it's icon res
+        // get item and it's icon res and name
         final Data item = mData.get(position);
         int imgRes = item.getImgRes();
-
-        // get item name from resources or from key field if res is absent
-        int nameRes = item.getNameRes();
-        String itemName;
-        try {
-            itemName = mContext.getString(nameRes);
-        }
-        catch (Resources.NotFoundException e) {
-            itemName = item.getKey();
-        }
+        String itemName = getItemName(item);
 
         // hide item name in showcase mode and show in basket mode in "Basket"
         if (!mPresenter.isShowcaseMode()) {
@@ -129,6 +107,7 @@ public class BasketAdapter extends BaseAdapter {
             viewHolder.mCheckImage.setImageResource(0);
         }
 
+        // TODO: 07.09.2018 need to change gesture detector with click listener for checking items
         final GestureDetector gestureDetector =
                 new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener());
         gestureDetector.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
@@ -151,65 +130,110 @@ public class BasketAdapter extends BaseAdapter {
         });
 
         final View slidingView = itemSlideWrapper.getChildAt(0);
-        final float initialX = slidingView.getX();
         final float wrapperWidth = parent.getWidth();
-        itemSlideWrapper.setOnTouchListener(new View.OnTouchListener() {
+        itemSlideWrapper.
+                setOnTouchListener(getSwipeListener(slidingView, item.getKey(), wrapperWidth));
+
+        return itemSlideWrapper;
+    }
+
+    // inflate item View from resources and put it into wrapper for sliding
+    // or get ViewHolder from save if exist
+    private View initView(ViewGroup parent) {
+        LayoutInflater inflater =
+                (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        assert inflater != null;
+        View itemView = inflater.inflate(R.layout.item_view, parent, false);
+
+        RelativeLayout itemSlideWrapper = new RelativeLayout(mContext);
+        RelativeLayout.LayoutParams layoutParamsItem = new RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParamsItem.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+        itemSlideWrapper.addView(itemView, layoutParamsItem);
+
+        return itemSlideWrapper;
+    }
+
+    // get item name from resources or from key field if res is absent
+    private String getItemName(Data item) {
+        String itemName;
+        int nameRes = item.getNameRes();
+        try {
+            itemName = mContext.getString(nameRes);
+        }
+        catch (Resources.NotFoundException e) {
+            itemName = item.getKey();
+        }
+        return itemName;
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private View.OnTouchListener getSwipeListener(final View itemView,
+                                                  final String itemKey,
+                                                  final float parentWidth) {
+        return new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                gestureDetector.onTouchEvent(event);
+//                gestureDetector.onTouchEvent(event);
 
+                final float[] initialX = {0};
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
+                        initialX[0] = event.getX();
                         return true;
                     case MotionEvent.ACTION_MOVE:
-                        if (event.getX() > initialX + TAP_PADDING) {
-                            slidingView.setX(event.getX() - TAP_PADDING);
+                        if (event.getX() > VIEW_PADDING + TAP_PADDING) {
+                            itemView.setX(event.getX() - initialX[0] - TAP_PADDING);
                         }
                         if (event.getX() < TAP_PADDING) {
-                            slidingView.setX(initialX);
+                            itemView.setX(VIEW_PADDING);
                         }
                         return true;
                     case MotionEvent.ACTION_CANCEL:
-                        Log.d(TAG, "onTouch: cancel");
-                        ObjectAnimator.ofFloat(slidingView, View.X,
-                                slidingView.getX(), initialX)
-                                .setDuration(200).start();
+                        moveViewBack(itemView, VIEW_PADDING);
                         return true;
                     case MotionEvent.ACTION_UP:
-                        if (slidingView.getX() > wrapperWidth * EDGE) {
-
-                            ValueAnimator fadeAnim = ValueAnimator.ofFloat(1, 0);
-                            fadeAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                                    slidingView.setAlpha((float) valueAnimator.getAnimatedValue());
-                                }
-                            });
-
-                            fadeAnim.addListener(new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    super.onAnimationEnd(animation);
-                                    slidingView.setX(initialX);
-                                    slidingView.setAlpha(1f);
-                                    mPresenter.deleteData(item.getKey());
-                                }
-                            });
-
-                            fadeAnim.setDuration(200);
-                            fadeAnim.start();
-
-                        } else {
-                            ObjectAnimator.ofFloat(slidingView, View.X,
-                                    slidingView.getX(), initialX)
-                                    .setDuration(200).start();
+                        if (itemView.getX() > parentWidth * EDGE) {
+                            removeItem(itemView, itemKey);
+                        }
+                        else {
+                            moveViewBack(itemView, VIEW_PADDING);
                         }
                         return true;
                 }
                 return false;
             }
+        };
+    }
+
+    private void removeItem(final View view, final String key) {
+        ValueAnimator fadeAnim = ValueAnimator.ofFloat(1, 0);
+        fadeAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                view.setAlpha((float) valueAnimator.getAnimatedValue());
+            }
         });
 
-        return itemSlideWrapper;
+        fadeAnim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                view.setX(VIEW_PADDING);
+                view.setAlpha(1f);
+                mPresenter.deleteData(key);
+            }
+        });
+
+        fadeAnim.setDuration(200);
+        fadeAnim.start();
+    }
+
+
+    private void moveViewBack(View view, float toX) {
+        ObjectAnimator.ofFloat(view, View.X,
+                view.getX(), toX)
+                .setDuration(200).start();
     }
 }
