@@ -7,14 +7,12 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -27,7 +25,7 @@ public class BasketAdapter extends BaseAdapter {
     private static final String TAG = "CURRENT_APP_LOG";
     private final float EDGE = 0.6f;
     private final float TAP_PADDING = 0f;
-    private final float VIEW_PADDING = 0f;
+    private float VIEW_PADDING = 0;
     private Context mContext;
     private IPresenter mPresenter;
     private List<Data> mData;
@@ -67,20 +65,46 @@ public class BasketAdapter extends BaseAdapter {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    public View getView(int position, View convertView, ViewGroup parent) {
-        RelativeLayout itemSlideWrapper = (RelativeLayout) convertView;
+    public View getView(int position, View convertView, final ViewGroup parent) {
+        View itemView = convertView;
 
         ViewHolder viewHolder;
-        if (itemSlideWrapper == null) {
-            itemSlideWrapper = (RelativeLayout) initView(parent);
-            viewHolder = new ViewHolder(itemSlideWrapper);
-            itemSlideWrapper.setTag(viewHolder);
+        if (itemView == null) {
+            itemView = initView(parent);
+            viewHolder = new ViewHolder(itemView);
+            itemView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        // get item and it's icon res and name
+        // initialize items view padding at once
+        if (VIEW_PADDING == 0) VIEW_PADDING = itemView.getX();
+
         final Data item = mData.get(position);
+        bindViewWithData(viewHolder, item);
+
+        itemView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                parent.setOnTouchListener(getSwipeListener(view, item.getKey()));
+                return false; // need to be false to allow sliding at the item view zone
+            }
+        });
+
+        return itemView;
+    }
+
+    // inflate item View from resources
+    // or get ViewHolder from saves if exist
+    private View initView(ViewGroup parent) {
+        LayoutInflater inflater =
+                (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        assert inflater != null;
+        return inflater.inflate(R.layout.item_view, parent, false);
+    }
+
+    private void bindViewWithData(ViewHolder viewHolder, Data item) {
+        // get item's icon res and name
         int imgRes = item.getImgRes();
         String itemName = getItemName(item);
 
@@ -106,53 +130,6 @@ public class BasketAdapter extends BaseAdapter {
         else {
             viewHolder.mCheckImage.setImageResource(0);
         }
-
-        // TODO: 07.09.2018 need to change gesture detector with click listener for checking items
-        final GestureDetector gestureDetector =
-                new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener());
-        gestureDetector.setOnDoubleTapListener(new GestureDetector.OnDoubleTapListener() {
-            @Override
-            public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
-                mPresenter.checkItem(item.getKey());
-                return true;
-            }
-
-            @Override
-            public boolean onDoubleTap(MotionEvent motionEvent) {
-                mPresenter.deleteData(item.getKey());
-                return true;
-            }
-
-            @Override
-            public boolean onDoubleTapEvent(MotionEvent motionEvent) {
-                return false;
-            }
-        });
-
-        final View slidingView = itemSlideWrapper.getChildAt(0);
-        final float wrapperWidth = parent.getWidth();
-        itemSlideWrapper.
-                setOnTouchListener(getSwipeListener(slidingView, item.getKey(), wrapperWidth));
-
-        return itemSlideWrapper;
-    }
-
-    // inflate item View from resources and put it into wrapper for sliding
-    // or get ViewHolder from save if exist
-    private View initView(ViewGroup parent) {
-        LayoutInflater inflater =
-                (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        assert inflater != null;
-        View itemView = inflater.inflate(R.layout.item_view, parent, false);
-
-        RelativeLayout itemSlideWrapper = new RelativeLayout(mContext);
-        RelativeLayout.LayoutParams layoutParamsItem = new RelativeLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParamsItem.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
-        itemSlideWrapper.addView(itemView, layoutParamsItem);
-
-        return itemSlideWrapper;
     }
 
     // get item name from resources or from key field if res is absent
@@ -168,23 +145,20 @@ public class BasketAdapter extends BaseAdapter {
         return itemName;
     }
 
+    // ListView listener for processing items sliding and check
     @SuppressLint("ClickableViewAccessibility")
-    private View.OnTouchListener getSwipeListener(final View itemView,
-                                                  final String itemKey,
-                                                  final float parentWidth) {
+    private View.OnTouchListener getSwipeListener(final View itemView, final String itemKey ) {
         return new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-//                gestureDetector.onTouchEvent(event);
+                v.onTouchEvent(event); // for enable list view scrolling
 
-                final float[] initialX = {0};
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        initialX[0] = event.getX();
                         return true;
                     case MotionEvent.ACTION_MOVE:
                         if (event.getX() > VIEW_PADDING + TAP_PADDING) {
-                            itemView.setX(event.getX() - initialX[0] - TAP_PADDING);
+                            itemView.setX(event.getX() - TAP_PADDING);
                         }
                         if (event.getX() < TAP_PADDING) {
                             itemView.setX(VIEW_PADDING);
@@ -194,9 +168,10 @@ public class BasketAdapter extends BaseAdapter {
                         moveViewBack(itemView, VIEW_PADDING);
                         return true;
                     case MotionEvent.ACTION_UP:
-                        if (itemView.getX() > parentWidth * EDGE) {
+                        if (itemView.getX() > v.getWidth() * EDGE) {
                             removeItem(itemView, itemKey);
                         }
+                        else if (itemView.getX() == VIEW_PADDING) mPresenter.checkItem(itemKey);
                         else {
                             moveViewBack(itemView, VIEW_PADDING);
                         }
