@@ -24,8 +24,9 @@ import alektas.pocketbasket.model.Data;
 public class BasketAdapter extends BaseAdapter {
     private static final String TAG = "CURRENT_APP_LOG";
     private final float EDGE = 0.6f;
-    private final float TAP_PADDING = 0f;
-    private float VIEW_PADDING = 0;
+    private final float TAP_PADDING = 120f;
+    private final float CHECKABLE_ZONE = 90f;
+    private float VIEW_PADDING = 0; // initializes with first call getView method
     private Context mContext;
     private IPresenter mPresenter;
     private List<Data> mData;
@@ -160,7 +161,7 @@ public class BasketAdapter extends BaseAdapter {
                         if (event.getX() > VIEW_PADDING + TAP_PADDING) {
                             itemView.setX(event.getX() - TAP_PADDING);
                         }
-                        if (event.getX() < TAP_PADDING) {
+                        else {
                             itemView.setX(VIEW_PADDING);
                         }
                         return true;
@@ -171,10 +172,10 @@ public class BasketAdapter extends BaseAdapter {
                         if (itemView.getX() > v.getWidth() * EDGE) {
                             removeItem(itemView, itemKey);
                         }
-                        else if (itemView.getX() == VIEW_PADDING) mPresenter.checkItem(itemKey);
                         else {
                             moveViewBack(itemView, VIEW_PADDING);
                         }
+                        if (itemView.getX() < CHECKABLE_ZONE) mPresenter.checkItem(itemKey);
                         return true;
                 }
                 return false;
