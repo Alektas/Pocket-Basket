@@ -16,7 +16,7 @@ public class ShowcaseRepo implements Repository {
         addItem(R.string.tea, 0, R.string.drink);
         addItem(R.string.coffee, 0, R.string.drink);
         addItem(R.string.cacao, 0, R.string.drink);
-        addItem(R.string.milk, R.drawable.ic_milk, R.string.drink, R.string.milky);
+        addItem(R.string.milk, R.drawable.ic_milk, R.string.milky, R.string.drink);
         addItem(R.string.curd, 0, R.string.milky);
         addItem(R.string.sour_cream, 0, R.string.milky);
         addItem(R.string.ice_cream, R.drawable.ice_cream, R.string.sweets);

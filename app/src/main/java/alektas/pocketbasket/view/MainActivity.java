@@ -1,6 +1,5 @@
 package alektas.pocketbasket.view;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.support.constraint.ConstraintLayout;
@@ -22,8 +21,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-
-import com.squareup.leakcanary.LeakCanary;
 
 import java.util.Objects;
 
@@ -54,17 +51,8 @@ public class MainActivity extends AppCompatActivity implements IView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return;
-        }
-        LeakCanary.install((Application)getApplicationContext());
-
         setContentView(R.layout.main_layout);
-
         App.getComponent().inject(this);
-
         init();
     }
 

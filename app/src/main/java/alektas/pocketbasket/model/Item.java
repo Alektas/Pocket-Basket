@@ -2,7 +2,6 @@ package alektas.pocketbasket.model;
 
 public class Item implements Data{
     private String mName;
-    private String[] mTags;
     private int mNameRes;
     private int[] mTagsRes;
     private int mImgRes;
@@ -13,12 +12,6 @@ public class Item implements Data{
         mNameRes = 0;
         mImgRes = 0;
         mTagsRes = null;
-    }
-
-    public Item(String name, boolean checked, String[] tags) {
-        this(name);
-        mChecked = checked;
-        mTags = tags;
     }
 
     public Item(int nameRes, int imgRes, int[] tagsRes) {
