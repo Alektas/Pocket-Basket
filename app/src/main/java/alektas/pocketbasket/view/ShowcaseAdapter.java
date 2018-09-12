@@ -23,7 +23,7 @@ public class ShowcaseAdapter extends BaseAdapter {
     public ShowcaseAdapter(Context context, IPresenter presenter) {
         mContext = context;
         mPresenter = presenter;
-        mData = presenter.getAll();
+        mData = presenter.getShowcaseItems();
     }
 
     static class ViewHolder {

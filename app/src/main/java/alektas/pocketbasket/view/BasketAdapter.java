@@ -34,7 +34,7 @@ public class BasketAdapter extends BaseAdapter {
     public BasketAdapter(Context context, IPresenter presenter) {
         mContext = context;
         mPresenter = presenter;
-        mData = presenter.getSelected();
+        mData = presenter.getBasketItems();
     }
 
     static class ViewHolder {

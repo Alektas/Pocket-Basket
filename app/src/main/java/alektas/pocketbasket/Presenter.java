@@ -30,6 +30,11 @@ public class Presenter implements IPresenter {
     }
 
     @Override
+    public Model getModel() {
+        return mModel;
+    }
+
+    @Override
     public void attachView(IView view) {
         mView = view;
     }
@@ -52,7 +57,7 @@ public class Presenter implements IPresenter {
     @Override
     public void setCategory(int tag) {
         mTag = tag;
-        mFilteredItems = getAll();
+        mFilteredItems = getShowcaseItems();
         mView.updateShowcase();
     }
 
@@ -110,13 +115,13 @@ public class Presenter implements IPresenter {
     }
 
     @Override
-    public List<Data> getAll() {
+    public List<Data> getShowcaseItems() {
         mFilteredItems = filter(mModel.getAllItems());
         return mFilteredItems;
     }
 
     @Override
-    public List<Data> getSelected() {
+    public List<Data> getBasketItems() {
         return mModel.getBasketItems();
     }
 }
