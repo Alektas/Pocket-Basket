@@ -1,13 +1,11 @@
 package alektas.pocketbasket;
 
 import android.app.Application;
-import android.arch.persistence.room.Room;
 
-import alektas.pocketbasket.model.AppDatabase;
+import alektas.pocketbasket.db.AppDatabase;
 
 public class App extends Application {
     private static AppComponent sAppComponent;
-    private static AppDatabase sDatabase;
     public static AppComponent getComponent() {
         return sAppComponent;
     }
@@ -18,10 +16,8 @@ public class App extends Application {
         sAppComponent = buildComponent();
     }
 
-    protected AppDatabase getDatabase() {
-        if (sDatabase == null) sDatabase = Room.databaseBuilder(
-                getApplicationContext(), AppDatabase.class, "pocketbasket_db").build();
-        return sDatabase;
+    public AppDatabase getDatabase() {
+        return AppDatabase.getInstance(this);
     }
 
     protected AppComponent buildComponent() {

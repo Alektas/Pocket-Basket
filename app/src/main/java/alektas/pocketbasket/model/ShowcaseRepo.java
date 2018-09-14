@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import alektas.pocketbasket.R;
+import alektas.pocketbasket.db.entity.Item;
 
 public class ShowcaseRepo implements Repository {
     private List<Data> mShowcase;

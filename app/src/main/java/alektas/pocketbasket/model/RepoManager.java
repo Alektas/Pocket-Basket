@@ -1,6 +1,7 @@
 package alektas.pocketbasket.model;
 
 import alektas.pocketbasket.IPrefsManager;
+import alektas.pocketbasket.db.entity.Item;
 
 import java.util.List;
 import java.util.Map;

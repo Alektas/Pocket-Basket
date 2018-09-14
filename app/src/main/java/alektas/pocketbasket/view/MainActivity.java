@@ -1,7 +1,10 @@
 package alektas.pocketbasket.view;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -22,6 +25,7 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import java.util.List;
 import java.util.Objects;
 
 import javax.inject.Inject;
@@ -29,6 +33,9 @@ import javax.inject.Inject;
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.IPresenter;
 import alektas.pocketbasket.R;
+import alektas.pocketbasket.db.entity.BasketItem;
+import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.viewmodel.ItemsViewModel;
 
 public class MainActivity extends AppCompatActivity implements IView {
     private static final String TAG = "PocketBasketApp";
@@ -136,6 +143,20 @@ public class MainActivity extends AppCompatActivity implements IView {
 
         mShowcaseAdapter = new ShowcaseAdapter(this, mPresenter);
         ((ListView) mShowcase).setAdapter(mShowcaseAdapter);
+
+//        ItemsViewModel viewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
+//        viewModel.getBasketData().observe(this, new Observer<List<BasketItem>>() {
+//            @Override
+//            public void onChanged(@Nullable List<BasketItem> basketItems) {
+////                mBasketAdapter.notifyDataSetChanged();
+//            }
+//        });
+//        viewModel.getShowcaseData().observe(this, new Observer<List<Item>>() {
+//            @Override
+//            public void onChanged(@Nullable List<Item> items) {
+////                mShowcaseAdapter.notifyDataSetChanged();
+//            }
+//        });
     }
 
     private void initDisplayWidth() {

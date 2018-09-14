@@ -1,13 +1,16 @@
-package alektas.pocketbasket.model;
+package alektas.pocketbasket.db.entity;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
-@Entity(tableName = "showcase_items")
-public class Item implements Data{
+import alektas.pocketbasket.model.Data;
+
+@Entity(tableName = "basket_items", indices = {@Index(value = {"key"}, unique = true)})
+public class BasketItem implements Data {
     @PrimaryKey
     @ColumnInfo(name = "key")
     @NonNull
@@ -21,25 +24,26 @@ public class Item implements Data{
     @Ignore
     private int[] mTagsRes;
 
-    public Item(String name) {
+    public BasketItem(@NonNull String name) {
         mName = name;
         mNameRes = 0;
         mImgRes = 0;
         mTagsRes = new int[1];
     }
 
-    public Item(int nameRes, int imgRes, int[] tagsRes) {
+    public BasketItem(int nameRes, int imgRes, int[] tagsRes) {
         mNameRes = nameRes;
         mName = "" + nameRes;
         mImgRes = imgRes;
         mTagsRes = tagsRes;
     }
 
+    @NonNull
     public String getName() {
         return mName;
     }
 
-    public void setName(String name) {
+    public void setName(@NonNull String name) {
         mName = name;
     }
 
