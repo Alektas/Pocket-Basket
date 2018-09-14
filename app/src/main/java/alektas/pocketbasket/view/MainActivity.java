@@ -138,11 +138,6 @@ public class MainActivity extends AppCompatActivity implements IView {
         mNameField = findViewById(R.id.add_item_field);
         mAddBtn = findViewById(R.id.add_item_btn);
 
-        mBasketAdapter = new BasketAdapter(this, mPresenter);
-        ((ListView) mBasket).setAdapter(mBasketAdapter);
-
-        mShowcaseAdapter = new ShowcaseAdapter(this, mPresenter);
-        ((ListView) mShowcase).setAdapter(mShowcaseAdapter);
 
 //        ItemsViewModel viewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
 //        viewModel.getBasketData().observe(this, new Observer<List<BasketItem>>() {
@@ -151,12 +146,18 @@ public class MainActivity extends AppCompatActivity implements IView {
 ////                mBasketAdapter.notifyDataSetChanged();
 //            }
 //        });
-//        viewModel.getShowcaseData().observe(this, new Observer<List<Item>>() {
+//        viewModel.getShowcaseData().observe(this, new Observer<List<Data>>() {
 //            @Override
-//            public void onChanged(@Nullable List<Item> items) {
+//            public void onChanged(@Nullable List<Data> items) {
 ////                mShowcaseAdapter.notifyDataSetChanged();
 //            }
 //        });
+
+        mBasketAdapter = new BasketAdapter(this, mPresenter);
+        ((ListView) mBasket).setAdapter(mBasketAdapter);
+
+        mShowcaseAdapter = new ShowcaseAdapter(this, mPresenter);
+        ((ListView) mShowcase).setAdapter(mShowcaseAdapter);
     }
 
     private void initDisplayWidth() {

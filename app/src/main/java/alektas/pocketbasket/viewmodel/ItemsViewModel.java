@@ -21,7 +21,7 @@ public class ItemsViewModel extends AndroidViewModel {
     public ItemsViewModel(@NonNull Application application) {
         super(application);
         mApp = application;
-        insertItems();
+//        insertItems();
     }
 
     public LiveData<List<Item>> getShowcaseData() {

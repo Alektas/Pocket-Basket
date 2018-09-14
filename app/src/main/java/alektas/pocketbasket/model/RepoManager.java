@@ -34,7 +34,7 @@ public class RepoManager implements Model {
     }
 
     /* Add item to "Basket" and save it to prefs.
-     * Item copied from "Showcase" repo. If it absent, create new.
+     * Data copied from "Showcase" repo. If it absent, create new.
      * If already exist, don't put item again.
      */
     @Override
