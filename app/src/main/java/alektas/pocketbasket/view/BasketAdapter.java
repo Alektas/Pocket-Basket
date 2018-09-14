@@ -28,17 +28,17 @@ public class BasketAdapter extends BaseAdapter {
     private final float VIEW_PADDING;
     private Context mContext;
     private IPresenter mPresenter;
-    private List<Data> mData;
+    private List<Data> mItems;
 
-    public BasketAdapter(Context context, IPresenter presenter) {
+    BasketAdapter(Context context, IPresenter presenter) {
         mContext = context;
         mPresenter = presenter;
-        mData = presenter.getSelected();
+        mItems = presenter.getSelected();
 
-        float paddings = getPaddings();
+        float padding = getPadding();
         float iconSize = getIconSize();
-        VIEW_PADDING = paddings;
-        CHECKABLE_ZONE = 2*paddings + iconSize;
+        VIEW_PADDING = padding;
+        CHECKABLE_ZONE = 2*padding + iconSize;
         TAP_PADDING = CHECKABLE_ZONE + 30f;
     }
 
@@ -59,11 +59,11 @@ public class BasketAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        return mData.size();
+        return mItems.size();
     }
 
     public Object getItem(int position) {
-        return mData.get(position);
+        return mItems.get(position);
     }
 
     public long getItemId(int position) {
@@ -83,7 +83,7 @@ public class BasketAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        final Data item = mData.get(position);
+        final Data item = mItems.get(position);
         bindViewWithData(viewHolder, item);
 
         itemView.setOnTouchListener(new View.OnTouchListener() {
@@ -180,6 +180,12 @@ public class BasketAdapter extends BaseAdapter {
                         if (event.getX() < CHECKABLE_ZONE && event.getX() > VIEW_PADDING) {
                             mPresenter.checkItem(itemKey);
                         }
+                        v.setOnTouchListener(new View.OnTouchListener() {
+                            @Override
+                            public boolean onTouch(View view, MotionEvent motionEvent) {
+                                return false;
+                            }
+                        });
                         return true;
                 }
                 return false;
@@ -216,7 +222,7 @@ public class BasketAdapter extends BaseAdapter {
                 .setDuration(200).start();
     }
 
-    private float getPaddings() {
+    private float getPadding() {
         return mContext.getResources().getDimension(R.dimen.padding);
     }
 

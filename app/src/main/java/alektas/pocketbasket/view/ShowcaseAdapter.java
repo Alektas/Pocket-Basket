@@ -16,14 +16,14 @@ import alektas.pocketbasket.R;
 import alektas.pocketbasket.model.Data;
 
 public class ShowcaseAdapter extends BaseAdapter {
-    private List<Data> mData;
+    private List<Data> mItems;
     private IPresenter mPresenter;
     private Context mContext;
 
-    public ShowcaseAdapter(Context context, IPresenter presenter) {
+    ShowcaseAdapter(Context context, IPresenter presenter) {
         mContext = context;
         mPresenter = presenter;
-        mData = presenter.getAll();
+        mItems = presenter.getAll();
     }
 
     static class ViewHolder {
@@ -43,11 +43,11 @@ public class ShowcaseAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        return mData.size();
+        return mItems.size();
     }
 
     public Object getItem(int position) {
-        return mData.get(position);
+        return mItems.get(position);
     }
 
     public long getItemId(int position) {
@@ -58,33 +58,45 @@ public class ShowcaseAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         View itemView = convertView;
 
-        // inflate View from resources or get Holder from saved if exist
         ViewHolder viewHolder;
         if (itemView == null) {
-            LayoutInflater inflater =
-                    (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            assert inflater != null;
-            itemView = inflater.inflate(R.layout.item_view, parent, false);
-
+            itemView = initView(parent);
             viewHolder = new ViewHolder(itemView);
             itemView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        // get item and it's icon res
-        final Data item = mData.get(position);
-        int imgRes = item.getImgRes();
+        final Data item = mItems.get(position);
+        bindViewWithData(viewHolder, item);
 
-        // get item name from resources or from key field if res is absent
-        int nameRes = item.getNameRes();
-        String itemName;
-        try {
-            itemName = mContext.getString(nameRes);
-        }
-        catch (Resources.NotFoundException e) {
-            itemName = item.getKey();
-        }
+        viewHolder.mItemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mPresenter.getData(item.getKey()) == null) {
+                    mPresenter.addData(item.getKey());
+                }
+                else {
+                    mPresenter.deleteData(item.getKey());
+                }
+            }
+        });
+        return itemView;
+    }
+
+    // inflate item View from resources
+    // or get ViewHolder from saves if exist
+    private View initView(ViewGroup parent) {
+        LayoutInflater inflater =
+                (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        assert inflater != null;
+        return inflater.inflate(R.layout.item_view, parent, false);
+    }
+
+    private void bindViewWithData(ViewHolder viewHolder, Data item) {
+        // get item's icon res and name
+        int imgRes = item.getImgRes();
+        String itemName = getItemName(item);
 
         // show item name in showcase mode and hide in basket mode in "Showcase"
         if (mPresenter.isShowcaseMode()) {
@@ -108,18 +120,18 @@ public class ShowcaseAdapter extends BaseAdapter {
         else {
             viewHolder.mCheckImage.setImageResource(0);
         }
+    }
 
-        viewHolder.mItemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mPresenter.getData(item.getKey()) == null) {
-                    mPresenter.addData(item.getKey());
-                }
-                else {
-                    mPresenter.deleteData(item.getKey());
-                }
-            }
-        });
-        return itemView;
+    // get item name from resources or from key field if res is absent
+    private String getItemName(Data item) {
+        String itemName;
+        int nameRes = item.getNameRes();
+        try {
+            itemName = mContext.getString(nameRes);
+        }
+        catch (Resources.NotFoundException e) {
+            itemName = item.getKey();
+        }
+        return itemName;
     }
 }
