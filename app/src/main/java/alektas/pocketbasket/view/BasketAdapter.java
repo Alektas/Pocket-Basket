@@ -22,11 +22,10 @@ import alektas.pocketbasket.R;
 import alektas.pocketbasket.model.Data;
 
 public class BasketAdapter extends BaseAdapter {
-    private static final String TAG = "CURRENT_APP_LOG";
-    private final float EDGE = 0.6f;
-    private final float TAP_PADDING = 120f;
-    private final float CHECKABLE_ZONE = 90f;
-    private float VIEW_PADDING = 0; // initializes with first call getView method
+    private final float DEL_EDGE = 0.6f;
+    private final float TAP_PADDING;
+    private final float CHECKABLE_ZONE;
+    private final float VIEW_PADDING;
     private Context mContext;
     private IPresenter mPresenter;
     private List<Data> mData;
@@ -35,6 +34,12 @@ public class BasketAdapter extends BaseAdapter {
         mContext = context;
         mPresenter = presenter;
         mData = presenter.getBasketItems();
+
+        float paddings = getPaddings();
+        float iconSize = getIconSize();
+        VIEW_PADDING = paddings;
+        CHECKABLE_ZONE = 2*paddings + iconSize;
+        TAP_PADDING = CHECKABLE_ZONE + 30f;
     }
 
     static class ViewHolder {
@@ -77,9 +82,6 @@ public class BasketAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-
-        // initialize items view padding at once
-        if (VIEW_PADDING == 0) VIEW_PADDING = itemView.getX();
 
         final Data item = mData.get(position);
         bindViewWithData(viewHolder, item);
@@ -169,13 +171,15 @@ public class BasketAdapter extends BaseAdapter {
                         moveViewBack(itemView, VIEW_PADDING);
                         return true;
                     case MotionEvent.ACTION_UP:
-                        if (itemView.getX() > v.getWidth() * EDGE) {
+                        if (itemView.getX() > v.getWidth() * DEL_EDGE) {
                             removeItem(itemView, itemKey);
                         }
                         else {
                             moveViewBack(itemView, VIEW_PADDING);
                         }
-                        if (itemView.getX() < CHECKABLE_ZONE) mPresenter.checkItem(itemKey);
+                        if (event.getX() < CHECKABLE_ZONE && event.getX() > VIEW_PADDING) {
+                            mPresenter.checkItem(itemKey);
+                        }
                         return true;
                 }
                 return false;
@@ -206,10 +210,17 @@ public class BasketAdapter extends BaseAdapter {
         fadeAnim.start();
     }
 
-
     private void moveViewBack(View view, float toX) {
         ObjectAnimator.ofFloat(view, View.X,
                 view.getX(), toX)
                 .setDuration(200).start();
+    }
+
+    private float getPaddings() {
+        return mContext.getResources().getDimension(R.dimen.padding);
+    }
+
+    private float getIconSize() {
+        return mContext.getResources().getDimension(R.dimen.item_ic_size);
     }
 }
