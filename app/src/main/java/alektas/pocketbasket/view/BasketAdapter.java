@@ -39,7 +39,7 @@ public class BasketAdapter extends BaseAdapter {
         float iconSize = getIconSize();
         VIEW_PADDING = padding;
         CHECKABLE_ZONE = 2*padding + iconSize;
-        TAP_PADDING = CHECKABLE_ZONE + 30f;
+        TAP_PADDING = CHECKABLE_ZONE;
     }
 
     static class ViewHolder {
