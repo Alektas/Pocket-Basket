@@ -117,7 +117,7 @@ public class BasketAdapter extends BaseAdapter {
         String itemName = getItemName(item);
 
         // hide item name in showcase mode and show in basket mode in "Basket"
-        if (!mModel.isShowcaseMode()) {
+        if (mModel.isBasketNamesShow()) {
             viewHolder.mName.setText(itemName);
         }
         else viewHolder.mName.setText("");

@@ -11,4 +11,13 @@
         <item name="colorControlActivated">@color/colorAccent</item>
     </style>
 
+    <style name="CategButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/ic_categ_size</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:background">@drawable/categ_bg</item>
+        <item name="android:onClick">onFilterClick</item>
+    </style>
+
 </resources>

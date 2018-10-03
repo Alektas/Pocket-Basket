@@ -161,7 +161,8 @@ public class MainActivity extends AppCompatActivity {
         resizeRadioText(mCategories, 14f);
         mNameField.setVisibility(View.VISIBLE);
         mAddBtn.setVisibility(View.VISIBLE);
-        mViewModel.setShowcaseMode(false); // need to show text of items' names in basket
+        mViewModel.setBasketNamesShow(true);
+        mViewModel.setShowcaseNamesShow(true);
     }
 
     private void setBasketMode() {
@@ -172,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
 
         mNameField.setVisibility(View.VISIBLE);
         mAddBtn.setVisibility(View.VISIBLE);
+        mViewModel.setBasketNamesShow(true);
+        mViewModel.setShowcaseNamesShow(false);
         mViewModel.setShowcaseMode(false);
     }
 
@@ -183,6 +186,8 @@ public class MainActivity extends AppCompatActivity {
 
         mNameField.setVisibility(View.GONE);
         mAddBtn.setVisibility(View.GONE);
+        mViewModel.setBasketNamesShow(false);
+        mViewModel.setShowcaseNamesShow(true);
         mViewModel.setShowcaseMode(true);
     }
 
