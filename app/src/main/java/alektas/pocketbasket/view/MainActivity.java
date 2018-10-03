@@ -1,10 +1,8 @@
 package alektas.pocketbasket.view;
 
-import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.res.Configuration;
-import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,26 +16,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import java.util.List;
-import java.util.Objects;
-
-import javax.inject.Inject;
 
 import alektas.pocketbasket.App;
-import alektas.pocketbasket.IPresenter;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.db.entity.BasketItem;
 import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 
-public class MainActivity extends AppCompatActivity implements IView {
+public class MainActivity extends AppCompatActivity {
     private static final String TAG = "PocketBasketApp";
     private int mDisplayWidth;
     private TransitionSet mTransitionSet;
@@ -46,14 +37,13 @@ public class MainActivity extends AppCompatActivity implements IView {
     private RadioGroup mCategories;
     private EditText mNameField;
     private View mAddBtn;
-    private BaseAdapter mBasketAdapter;
-    private BaseAdapter mShowcaseAdapter;
+    private ItemsViewModel mViewModel;
+    private BasketAdapter mBasketAdapter;
+    private ShowcaseAdapter mShowcaseAdapter;
+    private LiveData<List<Item>> mShowcaseItems;
 
     private GestureDetector mGestureDetector;
     private ConstraintLayout mConstraintLayout;
-
-    @Inject
-    IPresenter mPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +54,11 @@ public class MainActivity extends AppCompatActivity implements IView {
     }
 
     class SlideListener extends GestureDetector.SimpleOnGestureListener {
+        private static final double MIN_FLING_X = 150d;
+        private static final double MAX_FLING_Y = 100d;
+        private static final double LEFT_FLING_EDGE = 0.3d; // 1d = display width
+        private static final double RIGHT_FLING_EDGE = 0.7d;
+
         private ViewGroup.LayoutParams categParams;
         private ViewGroup.LayoutParams showcaseParams;
 
@@ -79,16 +74,16 @@ public class MainActivity extends AppCompatActivity implements IView {
 
             double dY = Math.abs(e2.getY() - e1.getY());
             double dX = Math.abs(e2.getX() - e1.getX());
-            if (dY < 100 && dX > 150) {
+            if (dY < MAX_FLING_Y && dX > MIN_FLING_X) {
                 TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
-                if (mPresenter.isShowcaseMode() &&
+                if (mViewModel.isShowcaseMode() &&
                         velocityX < 0 &&
-                        e1.getX() > 0.9* mDisplayWidth) {
+                        e1.getX() > RIGHT_FLING_EDGE*mDisplayWidth) {
                     setBasketMode();
                 }
-                else if (!mPresenter.isShowcaseMode() &&
+                else if (!mViewModel.isShowcaseMode() &&
                         velocityX > 0 &&
-                        e1.getX() < 0.1* mDisplayWidth){
+                        e1.getX() < LEFT_FLING_EDGE*mDisplayWidth){
                     setShowcaseMode();
                 }
                 mCategories.setLayoutParams(categParams);
@@ -106,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements IView {
             resizeRadioText(mCategories, 0f);
             mNameField.setVisibility(View.VISIBLE);
             mAddBtn.setVisibility(View.VISIBLE);
-            mPresenter.setShowcaseMode(false);
+            mViewModel.setShowcaseMode(false);
         }
 
         private void setShowcaseMode() {
@@ -117,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements IView {
             resizeRadioText(mCategories, 14f);
             mNameField.setVisibility(View.GONE);
             mAddBtn.setVisibility(View.GONE);
-            mPresenter.setShowcaseMode(true);
+            mViewModel.setShowcaseMode(true);
         }
     }
 
@@ -129,8 +124,6 @@ public class MainActivity extends AppCompatActivity implements IView {
         mGestureDetector =
                 new GestureDetector(this, new SlideListener());
 
-        mPresenter.attachView(this);
-
         mBasket = findViewById(R.id.basket_list);
         mShowcase = findViewById(R.id.showcase_list);
         mCategories = findViewById(R.id.categ_group);
@@ -139,25 +132,19 @@ public class MainActivity extends AppCompatActivity implements IView {
         mAddBtn = findViewById(R.id.add_item_btn);
 
 
-//        ItemsViewModel viewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
-//        viewModel.getBasketData().observe(this, new Observer<List<BasketItem>>() {
-//            @Override
-//            public void onChanged(@Nullable List<BasketItem> basketItems) {
-////                mBasketAdapter.notifyDataSetChanged();
-//            }
-//        });
-//        viewModel.getShowcaseData().observe(this, new Observer<List<Data>>() {
-//            @Override
-//            public void onChanged(@Nullable List<Data> items) {
-////                mShowcaseAdapter.notifyDataSetChanged();
-//            }
-//        });
+        mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
 
-        mBasketAdapter = new BasketAdapter(this, mPresenter);
+        mBasketAdapter = new BasketAdapter(this, mViewModel);
         ((ListView) mBasket).setAdapter(mBasketAdapter);
-
-        mShowcaseAdapter = new ShowcaseAdapter(this, mPresenter);
+        mShowcaseAdapter = new ShowcaseAdapter(this, mViewModel);
         ((ListView) mShowcase).setAdapter(mShowcaseAdapter);
+
+        mViewModel.getBasketData().observe(this,
+                mBasketAdapter::setItems);
+        mShowcaseItems = mViewModel.getShowcaseData();
+        mShowcaseItems.observe(this,
+                mShowcaseAdapter::setItems);
+
     }
 
     private void initDisplayWidth() {
@@ -180,21 +167,24 @@ public class MainActivity extends AppCompatActivity implements IView {
         }
     }
 
+    private void setFilter(int tag) {
+        mShowcaseItems.removeObservers(this);
+        mShowcaseItems = mViewModel.getByTag(tag);
+        mShowcaseItems.observe(this, mShowcaseAdapter::setItems);
+    }
+
     public void onAddBtnClick(View view) {
         String itemName = mNameField.getText().toString();
         mNameField.setText("");
-        mNameField.clearFocus();
-        InputMethodManager imm =
-                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null) {
-            imm.hideSoftInputFromWindow(Objects.requireNonNull(getCurrentFocus())
-                    .getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        if (mViewModel.getBasketItem(itemName) == null) {
+            Item item = new Item(itemName);
+            item.setInBasket(true);
+            mViewModel.insertItem(item);
         }
-        mPresenter.addData(itemName);
     }
 
     public void onClearBtnClick(View view) {
-        mPresenter.deleteAll();
+        mViewModel.clearBasket();
     }
 
     public void onFilterClick(View view) {
@@ -205,71 +195,61 @@ public class MainActivity extends AppCompatActivity implements IView {
         switch (view.getId()) {
             case R.id.all_rb:
                 if (checked)
-                    mPresenter.setCategory(0);
+                    setFilter(0);
                 break;
             case R.id.drink_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.drink);
+                    setFilter(R.string.drink);
                 break;
             case R.id.fruits_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.fruit);
+                    setFilter(R.string.fruit);
                 break;
             case R.id.veg_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.vegetable);
+                    setFilter(R.string.vegetable);
                 break;
             case R.id.groats_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.groats);
+                    setFilter(R.string.groats);
                 break;
             case R.id.milky_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.milky);
+                    setFilter(R.string.milky);
                 break;
             case R.id.floury_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.floury);
+                    setFilter(R.string.floury);
                 break;
             case R.id.sweets_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.sweets);
+                    setFilter(R.string.sweets);
                 break;
             case R.id.meat_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.meat);
+                    setFilter(R.string.meat);
                 break;
             case R.id.seafood_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.seafood);
+                    setFilter(R.string.seafood);
                 break;
             case R.id.semis_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.semis);
+                    setFilter(R.string.semis);
                 break;
             case R.id.sauce_n_oil_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.sauce_n_oil);
+                    setFilter(R.string.sauce_n_oil);
                 break;
             case R.id.household_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.household);
+                    setFilter(R.string.household);
                 break;
             case R.id.other_rb:
                 if (checked)
-                    mPresenter.setCategory(R.string.other);
+                    setFilter(R.string.other);
                 break;
         }
-    }
-
-    @Override
-    public void updateBasket() {
-        mBasketAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void updateShowcase() {
-        mShowcaseAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -282,11 +262,5 @@ public class MainActivity extends AppCompatActivity implements IView {
     public boolean onTouchEvent(MotionEvent event) {
         mGestureDetector.onTouchEvent(event);
         return super.onTouchEvent(event);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mPresenter.detachView(this);
     }
 }

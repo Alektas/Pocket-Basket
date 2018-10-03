@@ -1,105 +1,138 @@
 package alektas.pocketbasket.model;
 
-import alektas.pocketbasket.IPrefsManager;
+import android.app.Application;
+import android.arch.lifecycle.LiveData;
+import android.os.AsyncTask;
+import android.support.annotation.NonNull;
+import android.util.Log;
+
+import alektas.pocketbasket.db.AppDatabase;
+import alektas.pocketbasket.db.dao.ItemsDao;
 import alektas.pocketbasket.db.entity.Item;
 
 import java.util.List;
-import java.util.Map;
 
 public class RepoManager implements Model {
-    private Repository mBasketRepo;
-    private Repository mShowcaseRepo;
-    private IPrefsManager mPrefsManager;
+    private static final String TAG = "RepoManager";
+    private ItemsDao mItemsDao;
+    private LiveData<List<Item>> mShowcaseItems;
+    private LiveData<List<Item>> mBasketItems;
 
-    /**
-     * @param basketRepo Mutable repository of items. Also: "Basket".
-     * @param showcaseRepo Immutable repository of items. Also: "Showcase".
-     * @param prefsManager Help to edit preferences, where "Basket" items saved.
-     */
-    public RepoManager(Repository basketRepo, Repository showcaseRepo, IPrefsManager prefsManager) {
-        mPrefsManager = prefsManager;
-        mBasketRepo = basketRepo;
-        mShowcaseRepo = showcaseRepo;
-
-        // load data to "Basket" from preferences
-        for (Map.Entry<String, Boolean> entry :
-                mPrefsManager.getAll().entrySet()) {
-            String key = entry.getKey();
-            boolean checkState = entry.getValue();
-            Data data = mShowcaseRepo.getData(key);
-            if (data == null) { data = new Item(key); }
-            data.check(checkState);
-            mBasketRepo.addData(data);
-        }
+    public RepoManager(Application application) {
+        mItemsDao = AppDatabase.getInstance(application).getDao();
+        mShowcaseItems = mItemsDao.getAll();
+        mBasketItems = mItemsDao.getBasketItems();
     }
 
-    /* Add item to "Basket" and save it to prefs.
-     * Data copied from "Showcase" repo. If it absent, create new.
-     * If already exist, don't put item again.
-     */
+    // Add item to "Basket".
     @Override
-    public void addData(String key) {
-        if (!isItemExist(key)) {
-            Data data = mShowcaseRepo.getData(key);
-            if (data == null) data = new Item(key);
-            mBasketRepo.addData(data);
-            mPrefsManager.add(key, false);
-        }
+    public void addBasketItem(@NonNull Item item) {
+        item.setInBasket(true);
+        new updateAsync(mItemsDao).execute(item);
     }
 
-    // Check if there is an item in "Basket"
-    private boolean isItemExist(String key) {
-        for (Data item :
-                mBasketRepo.getAll()) {
-            if (item.getKey().equals(key)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // Change item state in "Basket" and save it
+    // Change item state in "Basket"
     @Override
-    public void changeDataState(String key) {
-        Data item = getData(key);
+    public void changeItemState(String key) {
+        Item item = getBasketItem(key);
         if (item != null) {
-            item.check(!item.isChecked());
-            mPrefsManager.add(key, item.isChecked());
+            item.setChecked(!item.isChecked());
+            new updateAsync(mItemsDao).execute(item);
         }
     }
 
-    // Delete item from "Basket" and prefs.
+    // Delete item from "Basket"
     @Override
-    public void deleteData(String key) {
-        mBasketRepo.deleteData(key);
-        mPrefsManager.remove(key);
+    public void deleteBasketItem(String key) {
+        Item item = getBasketItem(key);
+        if (item != null) {
+            item.setInBasket(false);
+            new updateAsync(mItemsDao).execute(item);
+        }
     }
 
-    // Delete all items from "Basket" and prefs.
+    // Delete all items from "Basket"
     @Override
-    public void clearAll() {
-        mBasketRepo.clear();
-        mPrefsManager.clear();
+    public void clearBasket() {
+        new clearAsync(mItemsDao).execute();
     }
 
-    // Return item from "Basket" or null if item with this key is absent
+    // Return item from "Basket"
     @Override
-    public Data getData(String key) {
-        for (Data data: mBasketRepo.getAll()) {
-            if (data.getKey().equals(key)) return data;
+    public Item getBasketItem(String key) {
+        List<Item> items = mBasketItems.getValue();
+        if (items == null) return null;
+        for (Item item : items) {
+            if (item.getName().equals(key)
+                    && item.isInBasket()) {
+                return item;
+            }
         }
         return null;
     }
 
+    @Override
+    public void insertItem(Item item) {
+        new insertAsync(mItemsDao).execute(item);
+    }
+
+    @Override
+    public void setFilter(int tag) {
+        if (tag == 0) mShowcaseItems = mItemsDao.getAll();
+        else mShowcaseItems = getByTag(tag);
+    }
+
     // Return list of items from "Showcase"
     @Override
-    public List<Data> getAllItems() {
-        return mShowcaseRepo.getAll();
+    public LiveData<List<Item>> getAllItems() {
+        return mShowcaseItems;
+    }
+
+    @Override
+    public LiveData<List<Item>> getByTag(int tag) {
+        if (tag == 0) return mItemsDao.getAll();
+        return mItemsDao.getByTag(tag);
     }
 
     // Return list of items from "Basket"
     @Override
-    public List<Data> getBasketItems() {
-        return mBasketRepo.getAll();
+    public LiveData<List<Item>> getBasketItems() {
+        return mBasketItems;
+    }
+
+    private static class updateAsync extends AsyncTask<Item, Void, Void> {
+        private ItemsDao mDao;
+
+        updateAsync(ItemsDao dao) { mDao = dao; }
+
+        @Override
+        protected Void doInBackground(Item... items) {
+            mDao.update(items[0]);
+            return null;
+        }
+    }
+
+    private static class clearAsync extends AsyncTask<Void, Void, Void> {
+        private ItemsDao mDao;
+
+        clearAsync(ItemsDao dao) { mDao = dao; }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mDao.clearBasket();
+            return null;
+        }
+    }
+
+    private static class insertAsync extends AsyncTask<Item, Void, Void> {
+        private ItemsDao mDao;
+
+        insertAsync(ItemsDao dao) { mDao = dao; }
+
+        @Override
+        protected final Void doInBackground(Item... items) {
+            mDao.insert(items[0]);
+            return null;
+        }
     }
 }

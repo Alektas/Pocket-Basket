@@ -7,12 +7,10 @@ import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
-import alektas.pocketbasket.model.Data;
-
-@Entity(tableName = "showcase_items", indices = {@Index(value = {"key"}, unique = true)})
-public class Item implements Data {
+@Entity(tableName = "items", indices = {@Index(value = {"name"}, unique = true)})
+public class Item {
     @PrimaryKey
-    @ColumnInfo(name = "key")
+    @ColumnInfo(name = "name")
     @NonNull
     private String mName;
     @ColumnInfo(name = "name_res")
@@ -20,29 +18,31 @@ public class Item implements Data {
     @ColumnInfo(name = "img_res")
     private int mImgRes;
     @ColumnInfo(name = "checked")
-    private boolean mChecked = false;
-    @Ignore
-    private int[] mTagsRes;
+    private int mChecked = 0;
+    @ColumnInfo(name = "in_basket")
+    private int inBasket = 0;
+    @ColumnInfo(name = "tag_res")
+    private int mTagRes;
 
+    @Ignore
     public Item(@NonNull String name) {
         mName = name;
         mNameRes = 0;
         mImgRes = 0;
-        mTagsRes = new int[1];
+        mTagRes = 0;
     }
 
-    public Item(int nameRes, int imgRes, int[] tagsRes) {
+    public Item(int nameRes, int imgRes, int tagRes) {
         mNameRes = nameRes;
         mName = "" + nameRes;
         mImgRes = imgRes;
-        mTagsRes = tagsRes;
+        mTagRes = tagRes;
     }
 
     @NonNull
     public String getName() {
         return mName;
     }
-
     public void setName(@NonNull String name) {
         mName = name;
     }
@@ -50,51 +50,37 @@ public class Item implements Data {
     public void setNameRes(int nameRes) {
         mNameRes = nameRes;
     }
-
-    public void setImgRes(int imgRes) {
-        mImgRes = imgRes;
-    }
-
-    public void setChecked(boolean checked) {
-        mChecked = checked;
-    }
-
-    public void setTagsRes(int[] tagsRes) {
-        mTagsRes = tagsRes;
-    }
-
-    @Override
-    public int getImgRes() {
-        return mImgRes;
-    }
-
-    @Override
-    public int[] getTagsRes() {
-        return mTagsRes;
-    }
-
-    @Override
-    public String getKey() {
-        return mName;
-    }
-
-    @Override
     public int getNameRes() {
         return mNameRes;
     }
 
-    @Override
-    public boolean isChecked() {
-        return mChecked;
+    public void setImgRes(int imgRes) {
+        mImgRes = imgRes;
+    }
+    public int getImgRes() {
+        return mImgRes;
     }
 
-    @Override
-    public void check(boolean checkState) {
-        mChecked = checkState;
+    public void setTagRes(int tagRes) {
+        mTagRes = tagRes;
+    }
+    public int getTagRes() {
+        return mTagRes;
     }
 
-    @Override
-    public String toString() {
-        return mName;
-    }
+    public int getChecked() { return mChecked; }
+    public void setChecked(int checked) { mChecked = checked; }
+
+    public void setInBasket(int inBasket) { this.inBasket = inBasket; }
+    public int getInBasket() { return inBasket; }
+
+    /* API for the rest application (work with boolean) */
+    public boolean isInBasket() { return inBasket == 1; }
+    public void setInBasket(boolean inBasket) { this.inBasket = inBasket ? 1 : 0; }
+    public boolean isChecked() { return mChecked == 1; }
+    public void setChecked(boolean checked) { mChecked = checked ? 1 : 0; }
+
+    public String toString() { return mName
+            + ": inBasket = " + isInBasket()
+            + ", checked = " + isChecked(); }
 }

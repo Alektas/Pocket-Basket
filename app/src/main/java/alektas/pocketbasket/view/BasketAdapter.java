@@ -7,6 +7,7 @@ import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,23 +18,23 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import alektas.pocketbasket.IPresenter;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.model.Data;
+import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.viewmodel.ItemsViewModel;
 
 public class BasketAdapter extends BaseAdapter {
+    private static final String TAG = "BasketAdapter";
     private final float DEL_EDGE = 0.6f;
     private final float TAP_PADDING;
     private final float CHECKABLE_ZONE;
     private final float VIEW_PADDING;
     private Context mContext;
-    private IPresenter mPresenter;
-    private List<Data> mItems;
+    private ItemsViewModel mModel;
+    private List<Item> mItems;
 
-    BasketAdapter(Context context, IPresenter presenter) {
+    BasketAdapter(Context context, ItemsViewModel model) {
         mContext = context;
-        mPresenter = presenter;
-        mItems = presenter.getBasketItems();
+        mModel = model;
 
         float padding = getPadding();
         float iconSize = getIconSize();
@@ -59,7 +60,8 @@ public class BasketAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        return mItems.size();
+        if (mItems != null) return mItems.size();
+        return 0;
     }
 
     public Object getItem(int position) {
@@ -83,18 +85,21 @@ public class BasketAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        final Data item = mItems.get(position);
+        final Item item = mItems.get(position);
         bindViewWithData(viewHolder, item);
 
-        itemView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                parent.setOnTouchListener(getSwipeListener(view, item.getKey()));
-                return false; // need to be false to allow sliding at the item view zone
-            }
+        itemView.setOnTouchListener((view, motionEvent) -> {
+            parent.setOnTouchListener(getSwipeListener(view, item.getName()));
+            return false; // need to be false to allow sliding at the item view zone
         });
 
         return itemView;
+    }
+
+    public void setItems(List<Item> items) {
+        mItems = items;
+        notifyDataSetChanged();
+        Log.d(TAG, "setItems: basket is notified");
     }
 
     // inflate item View from resources
@@ -106,13 +111,13 @@ public class BasketAdapter extends BaseAdapter {
         return inflater.inflate(R.layout.item_view, parent, false);
     }
 
-    private void bindViewWithData(ViewHolder viewHolder, Data item) {
+    private void bindViewWithData(ViewHolder viewHolder, Item item) {
         // get item's icon res and name
         int imgRes = item.getImgRes();
         String itemName = getItemName(item);
 
         // hide item name in showcase mode and show in basket mode in "Basket"
-        if (!mPresenter.isShowcaseMode()) {
+        if (!mModel.isShowcaseMode()) {
             viewHolder.mName.setText(itemName);
         }
         else viewHolder.mName.setText("");
@@ -136,14 +141,14 @@ public class BasketAdapter extends BaseAdapter {
     }
 
     // get item name from resources or from key field if res is absent
-    private String getItemName(Data item) {
+    private String getItemName(Item item) {
         String itemName;
         int nameRes = item.getNameRes();
         try {
             itemName = mContext.getString(nameRes);
         }
         catch (Resources.NotFoundException e) {
-            itemName = item.getKey();
+            itemName = item.getName();
         }
         return itemName;
     }
@@ -151,56 +156,44 @@ public class BasketAdapter extends BaseAdapter {
     // ListView listener for processing items sliding and check
     @SuppressLint("ClickableViewAccessibility")
     private View.OnTouchListener getSwipeListener(final View itemView, final String itemKey ) {
-        return new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                v.onTouchEvent(event); // for enable list view scrolling
+        return (v, event) -> {
+            v.onTouchEvent(event); // for enable list view scrolling
 
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        return true;
-                    case MotionEvent.ACTION_MOVE:
-                        if (event.getX() > VIEW_PADDING + TAP_PADDING) {
-                            itemView.setX(event.getX() - TAP_PADDING);
-                        }
-                        else {
-                            itemView.setX(VIEW_PADDING);
-                        }
-                        return true;
-                    case MotionEvent.ACTION_CANCEL:
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    return true;
+                case MotionEvent.ACTION_MOVE:
+                    if (event.getX() > VIEW_PADDING + TAP_PADDING) {
+                        itemView.setX(event.getX() - TAP_PADDING);
+                    }
+                    else {
+                        itemView.setX(VIEW_PADDING);
+                    }
+                    return true;
+                case MotionEvent.ACTION_CANCEL:
+                    moveViewBack(itemView, VIEW_PADDING);
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    if (itemView.getX() > v.getWidth() * DEL_EDGE) {
+                        removeItem(itemView, itemKey);
+                    }
+                    else {
                         moveViewBack(itemView, VIEW_PADDING);
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        if (itemView.getX() > v.getWidth() * DEL_EDGE) {
-                            removeItem(itemView, itemKey);
-                        }
-                        else {
-                            moveViewBack(itemView, VIEW_PADDING);
-                        }
-                        if (event.getX() < CHECKABLE_ZONE && event.getX() > VIEW_PADDING) {
-                            mPresenter.checkItem(itemKey);
-                        }
-                        v.setOnTouchListener(new View.OnTouchListener() {
-                            @Override
-                            public boolean onTouch(View view, MotionEvent motionEvent) {
-                                return false;
-                            }
-                        });
-                        return true;
-                }
-                return false;
+                    }
+                    if (event.getX() < CHECKABLE_ZONE && event.getX() > VIEW_PADDING) {
+                        mModel.checkItem(itemKey);
+                    }
+                    v.setOnTouchListener((view, motionEvent) -> false);
+                    return true;
             }
+            return false;
         };
     }
 
     private void removeItem(final View view, final String key) {
         ValueAnimator fadeAnim = ValueAnimator.ofFloat(1, 0);
-        fadeAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                view.setAlpha((float) valueAnimator.getAnimatedValue());
-            }
-        });
+        fadeAnim.addUpdateListener(valueAnimator ->
+                view.setAlpha((float) valueAnimator.getAnimatedValue()));
 
         fadeAnim.addListener(new AnimatorListenerAdapter() {
             @Override
@@ -208,7 +201,7 @@ public class BasketAdapter extends BaseAdapter {
                 super.onAnimationEnd(animation);
                 view.setX(VIEW_PADDING);
                 view.setAlpha(1f);
-                mPresenter.deleteData(key);
+                mModel.deleteItem(key);
             }
         });
 
