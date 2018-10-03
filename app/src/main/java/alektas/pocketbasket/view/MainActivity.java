@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "PocketBasketApp";
     private int mDisplayWidth;
     private TransitionSet mTransitionSet;
+    private ViewGroup mBasketContainer;
     private ViewGroup mBasket;
     private ViewGroup mShowcase;
     private RadioGroup mCategories;
@@ -41,6 +42,11 @@ public class MainActivity extends AppCompatActivity {
     private BasketAdapter mBasketAdapter;
     private ShowcaseAdapter mShowcaseAdapter;
     private LiveData<List<Item>> mShowcaseItems;
+    private float mCategWideWidth;
+    private float mCategNarrowWidth;
+    private float mShowcaseWideWidth;
+    private float mShowcaseNarrowWidth;
+    private float mBasketNarrowWidth;
 
     private GestureDetector mGestureDetector;
     private ConstraintLayout mConstraintLayout;
@@ -59,18 +65,13 @@ public class MainActivity extends AppCompatActivity {
         private static final double LEFT_FLING_EDGE = 0.3d; // 1d = display width
         private static final double RIGHT_FLING_EDGE = 0.7d;
 
-        private ViewGroup.LayoutParams categParams;
-        private ViewGroup.LayoutParams showcaseParams;
-
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             if (getResources().getConfiguration().orientation
                     == Configuration.ORIENTATION_LANDSCAPE) {
+                setLandscapeLayout();
                 return false;
             }
-
-            categParams = mCategories.getLayoutParams();
-            showcaseParams = mShowcase.getLayoutParams();
 
             double dY = Math.abs(e2.getY() - e1.getY());
             double dX = Math.abs(e2.getX() - e1.getX());
@@ -86,44 +87,22 @@ public class MainActivity extends AppCompatActivity {
                         e1.getX() < LEFT_FLING_EDGE*mDisplayWidth){
                     setShowcaseMode();
                 }
-                mCategories.setLayoutParams(categParams);
-                mShowcase.setLayoutParams(showcaseParams);
                 return true;
             }
             return false;
-        }
-
-        private void setBasketMode() {
-            categParams.width = getResources()
-                    .getDimensionPixelSize(R.dimen.categ_basket_mode_size);
-            showcaseParams.width = getResources()
-                    .getDimensionPixelSize(R.dimen.showcase_basket_mode_size);
-            resizeRadioText(mCategories, 0f);
-            mNameField.setVisibility(View.VISIBLE);
-            mAddBtn.setVisibility(View.VISIBLE);
-            mViewModel.setShowcaseMode(false);
-        }
-
-        private void setShowcaseMode() {
-            categParams.width = getResources()
-                    .getDimensionPixelSize(R.dimen.categ_sc_mode_size);
-            showcaseParams.width = getResources()
-                    .getDimensionPixelSize(R.dimen.showcase_sc_mode_size);
-            resizeRadioText(mCategories, 14f);
-            mNameField.setVisibility(View.GONE);
-            mAddBtn.setVisibility(View.GONE);
-            mViewModel.setShowcaseMode(true);
         }
     }
 
     private void init() {
         initDisplayWidth();
         initAnimTransition();
+        initDimensions();
 
         mConstraintLayout = findViewById(R.id.root_layout);
         mGestureDetector =
                 new GestureDetector(this, new SlideListener());
 
+        mBasketContainer = findViewById(R.id.basket_container);
         mBasket = findViewById(R.id.basket_list);
         mShowcase = findViewById(R.id.showcase_list);
         mCategories = findViewById(R.id.categ_group);
@@ -145,6 +124,12 @@ public class MainActivity extends AppCompatActivity {
         mShowcaseItems.observe(this,
                 mShowcaseAdapter::setItems);
 
+        if (getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) {
+            setLandscapeLayout();
+        } else {
+            setShowcaseMode();
+        }
     }
 
     private void initDisplayWidth() {
@@ -159,6 +144,60 @@ public class MainActivity extends AppCompatActivity {
         mTransitionSet.addTransition(new ChangeBounds());
         mTransitionSet.setInterpolator(new DecelerateInterpolator());
         mTransitionSet.setDuration(200);
+    }
+
+    private void initDimensions() {
+        mCategNarrowWidth = getResources().getDimension(R.dimen.categ_narrow_size);
+        mCategWideWidth = getResources().getDimension(R.dimen.categ_wide_size);
+        mShowcaseNarrowWidth = getResources().getDimension(R.dimen.showcase_narrow_size);
+        mShowcaseWideWidth = getResources().getDimension(R.dimen.showcase_wide_size);
+        mBasketNarrowWidth = getResources().getDimension(R.dimen.basket_narrow_size);
+    }
+
+    private void setLandscapeLayout() {
+        changeLayoutsWidth(mCategWideWidth,
+                mShowcaseWideWidth,
+                0);
+        resizeRadioText(mCategories, 14f);
+        mNameField.setVisibility(View.VISIBLE);
+        mAddBtn.setVisibility(View.VISIBLE);
+        mViewModel.setShowcaseMode(false); // need to show text of items' names in basket
+    }
+
+    private void setBasketMode() {
+        changeLayoutsWidth(mCategNarrowWidth,
+                mShowcaseNarrowWidth,
+                0);
+        resizeRadioText(mCategories, 0f);
+
+        mNameField.setVisibility(View.VISIBLE);
+        mAddBtn.setVisibility(View.VISIBLE);
+        mViewModel.setShowcaseMode(false);
+    }
+
+    private void setShowcaseMode() {
+        changeLayoutsWidth(mCategWideWidth,
+                0,
+                mBasketNarrowWidth);
+        resizeRadioText(mCategories, 14f);
+
+        mNameField.setVisibility(View.GONE);
+        mAddBtn.setVisibility(View.GONE);
+        mViewModel.setShowcaseMode(true);
+    }
+
+    private void changeLayoutsWidth(float categWidth, float showcaseWidth, float basketWidth) {
+        ViewGroup.LayoutParams categParams = mCategories.getLayoutParams();
+        ViewGroup.LayoutParams showcaseParams = mShowcase.getLayoutParams();
+        ViewGroup.LayoutParams basketParams = mBasketContainer.getLayoutParams();
+
+        categParams.width = (int) categWidth;
+        showcaseParams.width = (int) showcaseWidth;
+        basketParams.width = (int) basketWidth;
+
+        mCategories.setLayoutParams(categParams);
+        mShowcase.setLayoutParams(showcaseParams);
+        mBasketContainer.setLayoutParams(basketParams);
     }
 
     private void resizeRadioText(RadioGroup group, float textSize) {

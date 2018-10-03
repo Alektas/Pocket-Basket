@@ -9,7 +9,7 @@
 
     <LinearLayout
         android:id="@+id/basket_container"
-        android:layout_width="0dp"
+        android:layout_width="@dimen/basket_narrow_size"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="end"
@@ -24,7 +24,8 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:divider="@color/colorPrimary"
-            android:paddingStart="@dimen/padding"/>
+            android:paddingStart="@dimen/padding"
+            android:paddingEnd="@dimen/padding"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,12 +41,13 @@
                 android:hint="@string/item_name"
                 android:inputType="text"
                 android:visibility="gone"
-                android:lines="1"/>
+                android:lines="1"
+                android:importantForAutofill="no"/>
 
             <Button
                 android:id="@+id/add_item_btn"
-                android:layout_width="@dimen/categ_ic_size"
-                android:layout_height="@dimen/categ_ic_size"
+                android:layout_width="@dimen/ic_categ_size"
+                android:layout_height="@dimen/ic_categ_size"
                 android:layout_margin="@dimen/padding"
                 android:background="@drawable/add_btn_bg"
                 android:onClick="onAddBtnClick"
@@ -53,8 +55,8 @@
 
             <Button
                 android:id="@+id/clear_btn"
-                android:layout_width="@dimen/categ_ic_size"
-                android:layout_height="@dimen/categ_ic_size"
+                android:layout_width="@dimen/ic_categ_size"
+                android:layout_height="@dimen/ic_categ_size"
                 android:layout_margin="@dimen/padding"
                 android:background="@drawable/del_btn_bg"
                 android:onClick="onClearBtnClick"/>
@@ -67,11 +69,12 @@
         layout="@layout/categories_layout"
         app:layout_constraintEnd_toStartOf="@+id/showcase_list"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <ListView
         android:id="@+id/showcase_list"
-        android:layout_width="160dp"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:background="@color/colorPrimary"
         android:divider="@color/colorPrimary"

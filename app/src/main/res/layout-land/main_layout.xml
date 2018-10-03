@@ -44,8 +44,8 @@
 
             <Button
                 android:id="@+id/add_item_btn"
-                android:layout_width="@dimen/categ_ic_size"
-                android:layout_height="@dimen/categ_ic_size"
+                android:layout_width="@dimen/ic_categ_size"
+                android:layout_height="@dimen/ic_categ_size"
                 android:layout_margin="@dimen/padding"
                 android:background="@drawable/add_btn_bg"
                 android:onClick="onAddBtnClick"
@@ -53,8 +53,8 @@
 
             <Button
                 android:id="@+id/clear_btn"
-                android:layout_width="@dimen/categ_ic_size"
-                android:layout_height="@dimen/categ_ic_size"
+                android:layout_width="@dimen/ic_categ_size"
+                android:layout_height="@dimen/ic_categ_size"
                 android:layout_margin="@dimen/padding"
                 android:background="@drawable/del_btn_bg"
                 android:onClick="onClearBtnClick"/>
@@ -79,7 +79,7 @@
 
     <ListView
         android:id="@+id/showcase_list"
-        android:layout_width="160dp"
+        android:layout_width="@dimen/showcase_wide_size"
         android:layout_height="match_parent"
         android:background="@color/colorPrimary"
         android:divider="@color/colorPrimary"

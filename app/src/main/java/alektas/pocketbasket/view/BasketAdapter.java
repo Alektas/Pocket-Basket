@@ -220,6 +220,6 @@ public class BasketAdapter extends BaseAdapter {
     }
 
     private float getIconSize() {
-        return mContext.getResources().getDimension(R.dimen.item_ic_size);
+        return mContext.getResources().getDimension(R.dimen.ic_item_size);
     }
 }
