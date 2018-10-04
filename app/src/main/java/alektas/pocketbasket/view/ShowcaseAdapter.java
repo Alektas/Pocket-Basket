@@ -2,6 +2,7 @@ package alektas.pocketbasket.view;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,14 +31,14 @@ public class ShowcaseAdapter extends BaseAdapter {
     static class ViewHolder {
         final View mItemView;
         final ImageView mImage;
-        final TextView mText;
+        final TextView mIconText;
         final ImageView mCheckImage;
         final TextView mName;
 
         ViewHolder(View view) {
             mItemView = view;
             mImage = mItemView.findViewById(R.id.item_image);
-            mText = mItemView.findViewById(R.id.info_text);
+            mIconText = mItemView.findViewById(R.id.info_text);
             mCheckImage = mItemView.findViewById(R.id.check_image);
             mName = mItemView.findViewById(R.id.item_name);
         }
@@ -106,6 +107,8 @@ public class ShowcaseAdapter extends BaseAdapter {
         int imgRes = item.getImgRes();
         String itemName = getItemName(item);
 
+        viewHolder.mName.setTextColor(Color.WHITE);
+
         // show item name in showcase mode and hide in basket mode in "Showcase"
         if (mModel.isShowcaseNamesShow()) {
             viewHolder.mName.setText(itemName);
@@ -115,10 +118,10 @@ public class ShowcaseAdapter extends BaseAdapter {
         // set item icon (or name instead)
         if (imgRes > 0) {
             viewHolder.mImage.setImageResource(imgRes);
-            viewHolder.mText.setText("");
+            viewHolder.mIconText.setText("");
         } else {
             viewHolder.mImage.setImageResource(0);
-            viewHolder.mText.setText(itemName);
+            viewHolder.mIconText.setText(itemName);
         }
 
         // add choose image to icon of item in showcase if item is present in basket

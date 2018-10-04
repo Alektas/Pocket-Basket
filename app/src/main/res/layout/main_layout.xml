@@ -22,15 +22,12 @@
             android:id="@+id/basket_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:divider="@color/colorPrimary"
-            android:paddingStart="@dimen/padding"
-            android:paddingEnd="@dimen/padding"/>
+            android:layout_weight="1"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorSecondary"
+            android:background="@color/colorPrimary"
             android:gravity="center">
 
             <EditText
@@ -39,6 +36,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:hint="@string/item_name"
+                android:textColor="@color/colorAccent"
+                android:textColorHint="@color/colorAccent"
                 android:inputType="text"
                 android:visibility="gone"
                 android:lines="1"
@@ -48,7 +47,7 @@
                 android:id="@+id/add_item_btn"
                 android:layout_width="@dimen/ic_categ_size"
                 android:layout_height="@dimen/ic_categ_size"
-                android:layout_margin="@dimen/padding"
+                android:layout_margin="@dimen/padding_8"
                 android:background="@drawable/add_btn_bg"
                 android:onClick="onAddBtnClick"
                 android:visibility="gone"/>
@@ -57,7 +56,7 @@
                 android:id="@+id/clear_btn"
                 android:layout_width="@dimen/ic_categ_size"
                 android:layout_height="@dimen/ic_categ_size"
-                android:layout_margin="@dimen/padding"
+                android:layout_margin="@dimen/padding_8"
                 android:background="@drawable/del_btn_bg"
                 android:onClick="onClearBtnClick"/>
         </LinearLayout>
@@ -69,9 +68,9 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:fillViewport="true"
-        android:paddingTop="@dimen/padding"
-        android:paddingBottom="@dimen/padding"
-        android:background="@color/colorSecondary"
+        android:paddingTop="@dimen/padding_8"
+        android:paddingBottom="@dimen/padding_8"
+        android:background="@color/colorPrimary"
         app:layout_constraintEnd_toStartOf="@+id/showcase_list"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -86,9 +85,8 @@
         android:id="@+id/showcase_list"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimary"
-        android:divider="@color/colorPrimary"
-        android:padding="@dimen/padding"
+        android:background="@color/colorPrimaryLight"
+        android:divider="@color/colorPrimaryLight"
         app:layout_constraintEnd_toStartOf="@+id/basket_container"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/categories_wrapper"

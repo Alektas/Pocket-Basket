@@ -27,7 +27,6 @@ public class BasketAdapter extends BaseAdapter {
     private final float DEL_EDGE = 0.6f;
     private final float TAP_PADDING;
     private final float CHECKABLE_ZONE;
-    private final float VIEW_PADDING;
     private Context mContext;
     private ItemsViewModel mModel;
     private List<Item> mItems;
@@ -38,7 +37,6 @@ public class BasketAdapter extends BaseAdapter {
 
         float padding = getPadding();
         float iconSize = getIconSize();
-        VIEW_PADDING = padding;
         CHECKABLE_ZONE = 2*padding + iconSize;
         TAP_PADDING = CHECKABLE_ZONE;
     }
@@ -163,24 +161,24 @@ public class BasketAdapter extends BaseAdapter {
                 case MotionEvent.ACTION_DOWN:
                     return true;
                 case MotionEvent.ACTION_MOVE:
-                    if (event.getX() > VIEW_PADDING + TAP_PADDING) {
+                    if (event.getX() > TAP_PADDING) {
                         itemView.setX(event.getX() - TAP_PADDING);
                     }
                     else {
-                        itemView.setX(VIEW_PADDING);
+                        itemView.setX(0);
                     }
                     return true;
                 case MotionEvent.ACTION_CANCEL:
-                    moveViewBack(itemView, VIEW_PADDING);
+                    moveViewBack(itemView);
                     return true;
                 case MotionEvent.ACTION_UP:
                     if (itemView.getX() > v.getWidth() * DEL_EDGE) {
                         removeItem(itemView, itemKey);
                     }
                     else {
-                        moveViewBack(itemView, VIEW_PADDING);
+                        moveViewBack(itemView);
                     }
-                    if (event.getX() < CHECKABLE_ZONE && event.getX() > VIEW_PADDING) {
+                    if (event.getX() < CHECKABLE_ZONE && event.getX() > 0) {
                         mModel.checkItem(itemKey);
                     }
                     v.setOnTouchListener((view, motionEvent) -> false);
@@ -191,17 +189,17 @@ public class BasketAdapter extends BaseAdapter {
     }
 
     private void removeItem(final View view, final String key) {
-        ValueAnimator fadeAnim = ValueAnimator.ofFloat(1, 0);
+        ValueAnimator fadeAnim = ValueAnimator.ofFloat(view.getX(),
+                ((ViewGroup)view.getParent()).getWidth());
         fadeAnim.addUpdateListener(valueAnimator ->
-                view.setAlpha((float) valueAnimator.getAnimatedValue()));
+                view.setX((float) valueAnimator.getAnimatedValue()));
 
         fadeAnim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                view.setX(VIEW_PADDING);
-                view.setAlpha(1f);
                 mModel.deleteItem(key);
+                view.setX(0);
             }
         });
 
@@ -209,14 +207,14 @@ public class BasketAdapter extends BaseAdapter {
         fadeAnim.start();
     }
 
-    private void moveViewBack(View view, float toX) {
+    private void moveViewBack(View view) {
         ObjectAnimator.ofFloat(view, View.X,
-                view.getX(), toX)
+                view.getX(), 0)
                 .setDuration(200).start();
     }
 
     private float getPadding() {
-        return mContext.getResources().getDimension(R.dimen.padding);
+        return mContext.getResources().getDimension(R.dimen.padding_8);
     }
 
     private float getIconSize() {
