@@ -1,11 +1,12 @@
 package alektas.pocketbasket.db.entity;
 
-import android.arch.persistence.room.ColumnInfo;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
-import android.arch.persistence.room.Index;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+import androidx.annotation.NonNull;
 
 @Entity(tableName = "items", indices = {@Index(value = {"name"}, unique = true)})
 public class Item {
@@ -83,4 +84,10 @@ public class Item {
     public String toString() { return mName
             + ": inBasket = " + isInBasket()
             + ", checked = " + isChecked(); }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj.getClass() != Item.class) return false;
+        return ((Item) obj).getName().equals(this.mName);
+    }
 }

@@ -1,10 +1,9 @@
 package alektas.pocketbasket.model;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.util.Log;
+import androidx.annotation.NonNull;
 
 import alektas.pocketbasket.db.AppDatabase;
 import alektas.pocketbasket.db.dao.ItemsDao;
@@ -43,12 +42,18 @@ public class RepoManager implements Model {
 
     // Delete item from "Basket"
     @Override
-    public void deleteBasketItem(String key) {
+    public void removeBasketItem(String key) {
         Item item = getBasketItem(key);
         if (item != null) {
             item.setInBasket(false);
+            item.setChecked(false);
             new updateAsync(mItemsDao).execute(item);
         }
+    }
+
+    @Override
+    public void deleteItem(Item item) {
+        new deleteAsync(mItemsDao).execute(item);
     }
 
     // Delete all items from "Basket"
@@ -132,6 +137,18 @@ public class RepoManager implements Model {
         @Override
         protected final Void doInBackground(Item... items) {
             mDao.insert(items[0]);
+            return null;
+        }
+    }
+
+    private static class deleteAsync extends AsyncTask<Item, Void, Void> {
+        private ItemsDao mDao;
+
+        deleteAsync(ItemsDao dao) { mDao = dao; }
+
+        @Override
+        protected final Void doInBackground(Item... items) {
+            mDao.delete(items[0]);
             return null;
         }
     }

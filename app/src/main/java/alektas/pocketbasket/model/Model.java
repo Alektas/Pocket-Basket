@@ -1,6 +1,6 @@
 package alektas.pocketbasket.model;
 
-import android.arch.lifecycle.LiveData;
+import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
@@ -9,7 +9,8 @@ import alektas.pocketbasket.db.entity.Item;
 public interface Model {
     void addBasketItem(Item item);
     void insertItem(Item item);
-    void deleteBasketItem(String key);
+    void removeBasketItem(String key);
+    void deleteItem(Item item);
     void changeItemState(String key);
     void clearBasket();
     void setFilter(int tag);

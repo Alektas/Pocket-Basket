@@ -1,10 +1,10 @@
 package alektas.pocketbasket.view;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModelProviders;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProviders;
 import android.content.res.Configuration;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.ChangeBounds;
 import android.transition.TransitionManager;
@@ -35,9 +35,11 @@ public class MainActivity extends AppCompatActivity {
     private ViewGroup mBasketContainer;
     private ViewGroup mBasket;
     private ViewGroup mShowcase;
+    private ViewGroup mDelModePanel;
     private RadioGroup mCategories;
     private EditText mNameField;
     private View mAddBtn;
+    private View mCancelDmBtn;
     private ItemsViewModel mViewModel;
     private BasketAdapter mBasketAdapter;
     private ShowcaseAdapter mShowcaseAdapter;
@@ -107,9 +109,12 @@ public class MainActivity extends AppCompatActivity {
         mShowcase = findViewById(R.id.showcase_list);
         mCategories = findViewById(R.id.categ_group);
 
+        mDelModePanel = findViewById(R.id.del_mode_panel);
+        mCancelDmBtn = findViewById(R.id.cancel_dm_btn);
+
+//        mBasketToolsPanel = findViewById(R.id.basket_tools_panel);
         mNameField = findViewById(R.id.add_item_field);
         mAddBtn = findViewById(R.id.add_item_btn);
-
 
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
 
@@ -155,43 +160,51 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setLandscapeLayout() {
-        changeLayoutsWidth(mCategWideWidth,
+        changeLayoutState(mCategWideWidth,
                 mShowcaseWideWidth,
                 0);
         resizeRadioText(mCategories, 14f);
-        mNameField.setVisibility(View.VISIBLE);
         mAddBtn.setVisibility(View.VISIBLE);
+        mNameField.setVisibility(View.VISIBLE);
+        mCancelDmBtn.setVisibility(View.VISIBLE);
+
         mViewModel.setBasketNamesShow(true);
         mViewModel.setShowcaseNamesShow(true);
     }
 
     private void setBasketMode() {
-        changeLayoutsWidth(mCategNarrowWidth,
+        changeLayoutState(mCategNarrowWidth,
                 mShowcaseNarrowWidth,
                 0);
         resizeRadioText(mCategories, 0f);
 
-        mNameField.setVisibility(View.VISIBLE);
         mAddBtn.setVisibility(View.VISIBLE);
+        mNameField.setVisibility(View.VISIBLE);
+        mCancelDmBtn.setVisibility(View.GONE);
+
         mViewModel.setBasketNamesShow(true);
         mViewModel.setShowcaseNamesShow(false);
+
         mViewModel.setShowcaseMode(false);
     }
 
     private void setShowcaseMode() {
-        changeLayoutsWidth(mCategWideWidth,
+        changeLayoutState(mCategWideWidth,
                 0,
                 mBasketNarrowWidth);
         resizeRadioText(mCategories, 14f);
 
-        mNameField.setVisibility(View.GONE);
         mAddBtn.setVisibility(View.GONE);
+        mNameField.setVisibility(View.GONE);
+        mCancelDmBtn.setVisibility(View.VISIBLE);
+
         mViewModel.setBasketNamesShow(false);
         mViewModel.setShowcaseNamesShow(true);
+
         mViewModel.setShowcaseMode(true);
     }
 
-    private void changeLayoutsWidth(float categWidth, float showcaseWidth, float basketWidth) {
+    private void changeLayoutState(float categWidth, float showcaseWidth, float basketWidth) {
         ViewGroup.LayoutParams categParams = mCategories.getLayoutParams();
         ViewGroup.LayoutParams showcaseParams = mShowcase.getLayoutParams();
         ViewGroup.LayoutParams basketParams = mBasketContainer.getLayoutParams();
@@ -203,6 +216,8 @@ public class MainActivity extends AppCompatActivity {
         mCategories.setLayoutParams(categParams);
         mShowcase.setLayoutParams(showcaseParams);
         mBasketContainer.setLayoutParams(basketParams);
+
+        if (mViewModel.isDelMode()) { mDelModePanel.setVisibility(View.VISIBLE); }
     }
 
     private void resizeRadioText(RadioGroup group, float textSize) {
@@ -225,10 +240,6 @@ public class MainActivity extends AppCompatActivity {
             item.setInBasket(true);
             mViewModel.insertItem(item);
         }
-    }
-
-    public void onClearBtnClick(View view) {
-        mViewModel.clearBasket();
     }
 
     public void onFilterClick(View view) {
@@ -294,6 +305,22 @@ public class MainActivity extends AppCompatActivity {
                     setFilter(R.string.other);
                 break;
         }
+    }
+
+    public void onDelModeEnable() {
+        mDelModePanel.setVisibility(View.VISIBLE);
+    }
+
+    public void onDelModeDisable() {
+        mDelModePanel.setVisibility(View.GONE);
+    }
+
+    public void onDelDmBtnClick(View view) {
+        mShowcaseAdapter.deleteItems();
+    }
+
+    public void onCancelDmBtnClick(View view) {
+        mShowcaseAdapter.cancelDel();
     }
 
     @Override

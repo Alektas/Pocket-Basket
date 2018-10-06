@@ -44,14 +44,14 @@ public class BasketAdapter extends BaseAdapter {
     static class ViewHolder {
         final View mItemView;
         final ImageView mImage;
-        final TextView mText;
+        final TextView mIconText;
         final ImageView mCheckImage;
         final TextView mName;
 
         ViewHolder(View view) {
             mItemView = view;
             mImage = mItemView.findViewById(R.id.item_image);
-            mText = mItemView.findViewById(R.id.info_text);
+            mIconText = mItemView.findViewById(R.id.info_text);
             mCheckImage = mItemView.findViewById(R.id.check_image);
             mName = mItemView.findViewById(R.id.item_name);
         }
@@ -83,7 +83,10 @@ public class BasketAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        final Item item = mItems.get(position);
+        final Item item;
+        if (mItems != null) { item = mItems.get(position); }
+        else item = new Item("Item");
+
         bindViewWithData(viewHolder, item);
 
         itemView.setOnTouchListener((view, motionEvent) -> {
@@ -110,26 +113,32 @@ public class BasketAdapter extends BaseAdapter {
     }
 
     private void bindViewWithData(ViewHolder viewHolder, Item item) {
-        // get item's icon res and name
-        int imgRes = item.getImgRes();
-        String itemName = getItemName(item);
+        setItemText(viewHolder, item);
+        setItemIcon(viewHolder, item);
+        setChooseIcon(viewHolder, item);
+    }
 
-        // hide item name in showcase mode and show in basket mode in "Basket"
+    // hide item name in showcase mode and show in basket mode in "Basket"
+    private void setItemText(ViewHolder viewHolder, Item item) {
         if (mModel.isBasketNamesShow()) {
-            viewHolder.mName.setText(itemName);
+            viewHolder.mName.setText(getItemName(item));
         }
         else viewHolder.mName.setText("");
+    }
 
-        // set item icon (or name instead)
-        if (imgRes > 0) {
-            viewHolder.mImage.setImageResource(imgRes);
-            viewHolder.mText.setText("");
+    // set item icon (or name instead)
+    private void setItemIcon(ViewHolder viewHolder, Item item) {
+        if (item.getImgRes() > 0) {
+            viewHolder.mImage.setImageResource(item.getImgRes());
+            viewHolder.mIconText.setText("");
         } else {
             viewHolder.mImage.setImageResource(0);
-            viewHolder.mText.setText(itemName);
+            viewHolder.mIconText.setText(getItemName(item));
         }
+    }
 
-        // add check image to icon of item in basket if item is checked
+    // add check image to icon of item in basket if item is checked
+    private void setChooseIcon(ViewHolder viewHolder, Item item) {
         if (item.isChecked()) {
             viewHolder.mCheckImage.setImageResource(R.drawable.ic_checked);
         }
@@ -198,7 +207,7 @@ public class BasketAdapter extends BaseAdapter {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                mModel.deleteItem(key);
+                mModel.removeBasketItem(key);
                 view.setX(0);
             }
         });

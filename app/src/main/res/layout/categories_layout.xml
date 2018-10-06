@@ -11,7 +11,7 @@
         android:id="@+id/all_rb"
         style="@style/CategButton"
         android:text="@string/all"
-        android:button="@drawable/ic_done_all_black_24dp"/>
+        android:button="@drawable/ic_done_all_white_24dp"/>
     <RadioButton
         android:id="@+id/drink_rb"
         style="@style/CategButton"
@@ -76,5 +76,5 @@
         android:id="@+id/other_rb"
         style="@style/CategButton"
         android:text="@string/other"
-        android:button="@drawable/ic_more_horiz_black_24dp"/>
+        android:button="@drawable/ic_more_horiz_white_24dp"/>
 </RadioGroup>

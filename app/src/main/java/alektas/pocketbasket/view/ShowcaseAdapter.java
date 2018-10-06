@@ -19,13 +19,17 @@ import alektas.pocketbasket.viewmodel.ItemsViewModel;
 
 public class ShowcaseAdapter extends BaseAdapter {
     private static final String TAG = "ShowcaseAdapter";
-    private List<Item> mItems;
+    private MainActivity mActivity;
     private Context mContext;
     private ItemsViewModel mModel;
+    private List<Item> mItems;
+    private List<Item> mDelItems;
 
-    ShowcaseAdapter(Context context, ItemsViewModel model) {
-        mContext = context;
+    ShowcaseAdapter(MainActivity activity, ItemsViewModel model) {
+        mActivity = activity;
+        mContext = activity.getApplicationContext();
         mModel = model;
+        mDelItems = model.getDelItems();
     }
 
     static class ViewHolder {
@@ -33,6 +37,7 @@ public class ShowcaseAdapter extends BaseAdapter {
         final ImageView mImage;
         final TextView mIconText;
         final ImageView mCheckImage;
+        final ImageView mDelImage;
         final TextView mName;
 
         ViewHolder(View view) {
@@ -41,6 +46,7 @@ public class ShowcaseAdapter extends BaseAdapter {
             mIconText = mItemView.findViewById(R.id.info_text);
             mCheckImage = mItemView.findViewById(R.id.check_image);
             mName = mItemView.findViewById(R.id.item_name);
+            mDelImage = mItemView.findViewById(R.id.del_image);
         }
     }
 
@@ -74,14 +80,27 @@ public class ShowcaseAdapter extends BaseAdapter {
         if (mItems != null) { item = mItems.get(position); }
         else item = new Item("Item");
 
+        viewHolder.mName.setTextColor(Color.WHITE);
+
         bindViewWithData(viewHolder, item);
 
+        viewHolder.mItemView.setOnLongClickListener(view -> {
+            enableDelMode();
+            prepareToDel(item);
+            return true;
+        });
+
         viewHolder.mItemView.setOnClickListener(view -> {
-            if (mModel.getBasketItem(item.getName()) == null) {
-                mModel.putItem(item);
-            }
-            else {
-                mModel.deleteItem(item.getName());
+            if (mModel.isDelMode()) {
+                if (mDelItems.contains(item)) { removeFromDel(item); }
+                else { prepareToDel(item); }
+            } else {
+                if (mModel.getBasketItem(item.getName()) == null) {
+                    mModel.putItem(item);
+                }
+                else {
+                    mModel.removeBasketItem(item.getName());
+                }
             }
         });
         return itemView;
@@ -103,33 +122,47 @@ public class ShowcaseAdapter extends BaseAdapter {
     }
 
     private void bindViewWithData(ViewHolder viewHolder, Item item) {
-        // get item's icon res and name
-        int imgRes = item.getImgRes();
-        String itemName = getItemName(item);
+        setItemText(viewHolder, item);
+        setItemIcon(viewHolder, item);
+        setChooseIcon(viewHolder, item);
+        setDelIcon(viewHolder, item);
+    }
 
-        viewHolder.mName.setTextColor(Color.WHITE);
-
-        // show item name in showcase mode and hide in basket mode in "Showcase"
+    // show item name in showcase mode and hide in basket mode in "Showcase"
+    private void setItemText(ViewHolder viewHolder, Item item) {
         if (mModel.isShowcaseNamesShow()) {
-            viewHolder.mName.setText(itemName);
+            viewHolder.mName.setText(getItemName(item));
         }
         else viewHolder.mName.setText("");
+    }
 
-        // set item icon (or name instead)
-        if (imgRes > 0) {
-            viewHolder.mImage.setImageResource(imgRes);
+    // set item icon (or name instead)
+    private void setItemIcon(ViewHolder viewHolder, Item item) {
+        if (item.getImgRes() > 0) {
+            viewHolder.mImage.setImageResource(item.getImgRes());
             viewHolder.mIconText.setText("");
         } else {
             viewHolder.mImage.setImageResource(0);
-            viewHolder.mIconText.setText(itemName);
+            viewHolder.mIconText.setText(getItemName(item));
         }
+    }
 
-        // add choose image to icon of item in showcase if item is present in basket
+    // add choose image to icon of item in showcase if item is present in basket
+    private void setChooseIcon(ViewHolder viewHolder, Item item) {
         if (item.isInBasket()) {
             viewHolder.mCheckImage.setImageResource(R.drawable.ic_choosed);
         }
         else {
             viewHolder.mCheckImage.setImageResource(0);
+        }
+    }
+
+    // add delete image to icon of item in showcase if item is choosed in Delete Mode
+    private void setDelIcon(ViewHolder viewHolder, Item item) {
+        if (mModel.isDelMode() && mDelItems.contains(item)) {
+            viewHolder.mDelImage.setImageResource(R.drawable.ic_deleting);
+        } else {
+            viewHolder.mDelImage.setImageResource(0);
         }
     }
 
@@ -144,5 +177,36 @@ public class ShowcaseAdapter extends BaseAdapter {
             itemName = item.getName();
         }
         return itemName;
+    }
+
+    public void deleteItems() {
+        mModel.deleteAll(mDelItems);
+        cancelDel();
+    }
+
+    public void cancelDel() {
+        disableDelMode();
+        mDelItems.clear();
+        notifyDataSetChanged();
+    }
+
+    private void prepareToDel(Item item) {
+        mDelItems.add(item);
+        notifyDataSetChanged();
+    }
+
+    private void removeFromDel(Item item) {
+        mDelItems.remove(item);
+        notifyDataSetChanged();
+    }
+
+    private void enableDelMode() {
+        mModel.setDelMode(true);
+        mActivity.onDelModeEnable();
+    }
+
+    private void disableDelMode() {
+        mModel.setDelMode(false);
+        mActivity.onDelModeDisable();
     }
 }
