@@ -4,35 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
-
-    <LinearLayout
-        android:id="@+id/basket_container"
-        android:layout_width="@dimen/basket_narrow_size"
-        android:layout_height="match_parent"
-        android:gravity="end"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/showcase_list"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ListView
-            android:id="@+id/basket_list"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
-
-        <include
-            android:id="@+id/basket_tools_panel"
-            layout="@layout/basket_tools_panel"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/showcase_list"/>
-
-    </LinearLayout>
+    android:layout_height="match_parent" >
 
     <ScrollView
         android:id="@+id/categories_wrapper"
@@ -55,27 +27,49 @@
     <ListView
         android:id="@+id/showcase_list"
         android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:background="@color/colorPrimaryLight"
         android:divider="@color/colorPrimaryLight"
         app:layout_constraintBottom_toTopOf="@+id/del_mode_panel"
-        app:layout_constraintEnd_toStartOf="@+id/basket_container"
+        app:layout_constraintEnd_toStartOf="@+id/basket_list"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/categories_wrapper"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
         app:layout_constraintVertical_chainStyle="packed"/>
 
     <include
         android:id="@+id/del_mode_panel"
         layout="@layout/del_mode_panel"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="gone"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/showcase_list"
         app:layout_constraintStart_toStartOf="@+id/showcase_list"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/showcase_list"
         app:layout_constraintVertical_bias="1.0"/>
+
+    <ListView
+        android:id="@+id/basket_list"
+        android:layout_width="@dimen/basket_narrow_size"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/showcase_list"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_item_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/padding_16"
+        android:layout_gravity="end|bottom"
+        android:onClick="onAddItemBtnClick"
+        android:src="@drawable/ic_edit_24dp"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/showcase_list"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

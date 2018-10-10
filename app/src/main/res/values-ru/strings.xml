@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">Pocket Basket</string>
     <string name="clear">Очистить</string>
     <string name="item_name">Название</string>
 

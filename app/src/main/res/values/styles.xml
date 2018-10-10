@@ -14,10 +14,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/ic_categ_size</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:paddingStart">@dimen/padding_16</item>
-        <item name="android:paddingEnd">@dimen/padding_16</item>
-        <item name="android:paddingTop">@dimen/padding_8</item>
-        <item name="android:paddingBottom">@dimen/padding_8</item>
+        <item name="android:padding">@dimen/padding_8</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@drawable/categ_bg</item>
         <item name="android:onClick">onFilterClick</item>

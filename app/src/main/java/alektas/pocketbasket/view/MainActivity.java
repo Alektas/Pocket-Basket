@@ -1,12 +1,16 @@
 package alektas.pocketbasket.view;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
+
+import android.content.Intent;
 import android.content.res.Configuration;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.transition.ChangeBounds;
+import android.transition.Fade;
 import android.transition.TransitionManager;
 import android.transition.TransitionSet;
 import android.util.DisplayMetrics;
@@ -16,7 +20,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -28,30 +31,31 @@ import alektas.pocketbasket.R;
 import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "PocketBasketApp";
+    private static final int ADD_ITEM_REQUEST = 101;
     private int mDisplayWidth;
-    private TransitionSet mTransitionSet;
-    private ViewGroup mBasketContainer;
-    private ViewGroup mBasket;
-    private ViewGroup mShowcase;
-    private ViewGroup mDelModePanel;
-    private RadioGroup mCategories;
-    private EditText mNameField;
-    private View mAddBtn;
-    private View mCancelDmBtn;
-    private ItemsViewModel mViewModel;
-    private BasketAdapter mBasketAdapter;
-    private ShowcaseAdapter mShowcaseAdapter;
-    private LiveData<List<Item>> mShowcaseItems;
-    private float mCategWideWidth;
     private float mCategNarrowWidth;
     private float mShowcaseWideWidth;
     private float mShowcaseNarrowWidth;
     private float mBasketNarrowWidth;
 
+    private ViewGroup mBasket;
+    private ViewGroup mShowcase;
+    private ViewGroup mDelModePanel;
+    private RadioGroup mCategories;
+    private View mAddBtn;
+    private View mCancelDmBtn;
+    private BasketAdapter mBasketAdapter;
+    private ShowcaseAdapter mShowcaseAdapter;
+    private TransitionSet mTransitionSet;
     private GestureDetector mGestureDetector;
     private ConstraintLayout mConstraintLayout;
+
+    private ItemsViewModel mViewModel;
+    private LiveData<List<Item>> mShowcaseItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
         mGestureDetector =
                 new GestureDetector(this, new SlideListener());
 
-        mBasketContainer = findViewById(R.id.basket_container);
         mBasket = findViewById(R.id.basket_list);
         mShowcase = findViewById(R.id.showcase_list);
         mCategories = findViewById(R.id.categ_group);
@@ -112,8 +115,6 @@ public class MainActivity extends AppCompatActivity {
         mDelModePanel = findViewById(R.id.del_mode_panel);
         mCancelDmBtn = findViewById(R.id.cancel_dm_btn);
 
-//        mBasketToolsPanel = findViewById(R.id.basket_tools_panel);
-        mNameField = findViewById(R.id.add_item_field);
         mAddBtn = findViewById(R.id.add_item_btn);
 
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
@@ -147,25 +148,24 @@ public class MainActivity extends AppCompatActivity {
     private void initAnimTransition() {
         mTransitionSet = new TransitionSet();
         mTransitionSet.addTransition(new ChangeBounds());
+        mTransitionSet.addTransition(new Fade());
         mTransitionSet.setInterpolator(new DecelerateInterpolator());
         mTransitionSet.setDuration(200);
     }
 
     private void initDimensions() {
         mCategNarrowWidth = getResources().getDimension(R.dimen.categ_narrow_size);
-        mCategWideWidth = getResources().getDimension(R.dimen.categ_wide_size);
         mShowcaseNarrowWidth = getResources().getDimension(R.dimen.showcase_narrow_size);
         mShowcaseWideWidth = getResources().getDimension(R.dimen.showcase_wide_size);
         mBasketNarrowWidth = getResources().getDimension(R.dimen.basket_narrow_size);
     }
 
     private void setLandscapeLayout() {
-        changeLayoutState(mCategWideWidth,
+        changeLayoutState(WRAP_CONTENT,
                 mShowcaseWideWidth,
                 0);
         resizeRadioText(mCategories, 14f);
         mAddBtn.setVisibility(View.VISIBLE);
-        mNameField.setVisibility(View.VISIBLE);
         mCancelDmBtn.setVisibility(View.VISIBLE);
 
         mViewModel.setBasketNamesShow(true);
@@ -179,7 +179,6 @@ public class MainActivity extends AppCompatActivity {
         resizeRadioText(mCategories, 0f);
 
         mAddBtn.setVisibility(View.VISIBLE);
-        mNameField.setVisibility(View.VISIBLE);
         mCancelDmBtn.setVisibility(View.GONE);
 
         mViewModel.setBasketNamesShow(true);
@@ -189,13 +188,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setShowcaseMode() {
-        changeLayoutState(mCategWideWidth,
+        changeLayoutState(WRAP_CONTENT,
                 0,
                 mBasketNarrowWidth);
         resizeRadioText(mCategories, 14f);
 
         mAddBtn.setVisibility(View.GONE);
-        mNameField.setVisibility(View.GONE);
         mCancelDmBtn.setVisibility(View.VISIBLE);
 
         mViewModel.setBasketNamesShow(false);
@@ -207,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
     private void changeLayoutState(float categWidth, float showcaseWidth, float basketWidth) {
         ViewGroup.LayoutParams categParams = mCategories.getLayoutParams();
         ViewGroup.LayoutParams showcaseParams = mShowcase.getLayoutParams();
-        ViewGroup.LayoutParams basketParams = mBasketContainer.getLayoutParams();
+        ViewGroup.LayoutParams basketParams = mBasket.getLayoutParams();
 
         categParams.width = (int) categWidth;
         showcaseParams.width = (int) showcaseWidth;
@@ -215,9 +213,11 @@ public class MainActivity extends AppCompatActivity {
 
         mCategories.setLayoutParams(categParams);
         mShowcase.setLayoutParams(showcaseParams);
-        mBasketContainer.setLayoutParams(basketParams);
+        mBasket.setLayoutParams(basketParams);
 
-        if (mViewModel.isDelMode()) { mDelModePanel.setVisibility(View.VISIBLE); }
+        if (mViewModel.isDelMode()) {
+            mDelModePanel.setVisibility(View.VISIBLE);
+        }
     }
 
     private void resizeRadioText(RadioGroup group, float textSize) {
@@ -232,13 +232,26 @@ public class MainActivity extends AppCompatActivity {
         mShowcaseItems.observe(this, mShowcaseAdapter::setItems);
     }
 
-    public void onAddBtnClick(View view) {
-        String itemName = mNameField.getText().toString();
-        mNameField.setText("");
-        if (mViewModel.getBasketItem(itemName) == null) {
-            Item item = new Item(itemName);
-            item.setInBasket(true);
-            mViewModel.insertItem(item);
+    public void onAddItemBtnClick(View view) {
+        Intent intent = new Intent(this, AddItemActivity.class);
+        startActivityForResult(intent, ADD_ITEM_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == ADD_ITEM_REQUEST) {
+            if (resultCode == RESULT_OK && data != null) {
+                String itemName = data.getStringExtra(AddItemActivity.ITEM_NAME);
+                if (mViewModel.getBasketItem(itemName) == null) {
+                    Item item = new Item(itemName);
+                    item.setInBasket(true);
+                    item.setImgRes(data.getIntExtra(AddItemActivity.ITEM_IMG_RES, 0));
+                    item.setTagRes(data.getIntExtra(AddItemActivity.ITEM_CATEGORY_RES, 0));
+                    mViewModel.insertItem(item);
+                }
+            }
         }
     }
 
@@ -308,10 +321,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onDelModeEnable() {
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
         mDelModePanel.setVisibility(View.VISIBLE);
     }
 
     public void onDelModeDisable() {
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
         mDelModePanel.setVisibility(View.GONE);
     }
 

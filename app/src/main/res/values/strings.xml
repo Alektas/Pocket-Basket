@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Pocket Basket</string>
-    <string name="items_prefs">items_prefs</string>
     <string name="clear">Clear</string>
     <string name="item_name">Item</string>
 

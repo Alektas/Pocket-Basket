@@ -5,24 +5,12 @@
               android:background="@color/colorPrimary"
               android:gravity="center">
 
-    <EditText
-        android:id="@+id/add_item_field"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:hint="@string/item_name"
-        android:textColor="@color/colorAccent"
-        android:textColorHint="@color/colorAccent"
-        android:inputType="text"
-        android:lines="1"
-        android:importantForAutofill="no"/>
-
     <Button
-        android:id="@+id/add_item_btn"
-        android:layout_width="@dimen/ic_categ_size"
-        android:layout_height="@dimen/ic_categ_size"
-        android:layout_margin="@dimen/padding_8"
-        android:background="@drawable/add_btn_bg"
-        android:onClick="onAddBtnClick"/>
+    android:id="@+id/add_item_btn"
+    android:layout_width="@dimen/ic_categ_size"
+    android:layout_height="@dimen/ic_categ_size"
+    android:layout_margin="@dimen/padding_8"
+    android:background="@drawable/add_btn_bg"
+    android:onClick="onAddItemBtnClick"/>
 
 </LinearLayout>
