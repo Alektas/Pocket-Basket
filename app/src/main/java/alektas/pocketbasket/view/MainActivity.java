@@ -20,7 +20,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
@@ -30,6 +29,8 @@ import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -42,14 +43,14 @@ public class MainActivity extends AppCompatActivity {
     private float mShowcaseNarrowWidth;
     private float mBasketNarrowWidth;
 
-    private ViewGroup mBasket;
-    private ViewGroup mShowcase;
+    private RecyclerView mBasket;
+    private RecyclerView mShowcase;
     private ViewGroup mDelModePanel;
     private RadioGroup mCategories;
     private View mAddBtn;
     private View mCancelDmBtn;
-    private BasketAdapter mBasketAdapter;
-    private ShowcaseAdapter mShowcaseAdapter;
+    private BasketRvAdapter mBasketAdapter;
+    private ShowcaseRvAdapter mShowcaseAdapter;
     private TransitionSet mTransitionSet;
     private GestureDetector mGestureDetector;
     private ConstraintLayout mConstraintLayout;
@@ -109,7 +110,9 @@ public class MainActivity extends AppCompatActivity {
                 new GestureDetector(this, new SlideListener());
 
         mBasket = findViewById(R.id.basket_list);
+        mBasket.setLayoutManager(new LinearLayoutManager(this));
         mShowcase = findViewById(R.id.showcase_list);
+        mShowcase.setLayoutManager(new LinearLayoutManager(this));
         mCategories = findViewById(R.id.categ_group);
 
         mDelModePanel = findViewById(R.id.del_mode_panel);
@@ -119,10 +122,10 @@ public class MainActivity extends AppCompatActivity {
 
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
 
-        mBasketAdapter = new BasketAdapter(this, mViewModel);
-        ((ListView) mBasket).setAdapter(mBasketAdapter);
-        mShowcaseAdapter = new ShowcaseAdapter(this, mViewModel);
-        ((ListView) mShowcase).setAdapter(mShowcaseAdapter);
+        mBasketAdapter = new BasketRvAdapter(this, mViewModel);
+        mBasket.setAdapter(mBasketAdapter);
+        mShowcaseAdapter = new ShowcaseRvAdapter(this, mViewModel);
+        mShowcase.setAdapter(mShowcaseAdapter);
 
         mViewModel.getBasketData().observe(this,
                 mBasketAdapter::setItems);
@@ -185,6 +188,8 @@ public class MainActivity extends AppCompatActivity {
         mViewModel.setShowcaseNamesShow(false);
 
         mViewModel.setShowcaseMode(false);
+        mBasketAdapter.notifyDataSetChanged();
+        mShowcaseAdapter.notifyDataSetChanged();
     }
 
     private void setShowcaseMode() {
@@ -200,6 +205,8 @@ public class MainActivity extends AppCompatActivity {
         mViewModel.setShowcaseNamesShow(true);
 
         mViewModel.setShowcaseMode(true);
+        mBasketAdapter.notifyDataSetChanged();
+        mShowcaseAdapter.notifyDataSetChanged();
     }
 
     private void changeLayoutState(float categWidth, float showcaseWidth, float basketWidth) {
@@ -331,7 +338,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onDelDmBtnClick(View view) {
-        mShowcaseAdapter.deleteItems();
+        mShowcaseAdapter.deleteChoosedItems();
     }
 
     public void onCancelDmBtnClick(View view) {
