@@ -31,6 +31,7 @@ import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -111,8 +112,12 @@ public class MainActivity extends AppCompatActivity {
 
         mBasket = findViewById(R.id.basket_list);
         mBasket.setLayoutManager(new LinearLayoutManager(this));
+//        ((SimpleItemAnimator) mBasket.getItemAnimator()).setSupportsChangeAnimations(false);
+
         mShowcase = findViewById(R.id.showcase_list);
         mShowcase.setLayoutManager(new LinearLayoutManager(this));
+//        ((SimpleItemAnimator) mShowcase.getItemAnimator()).setSupportsChangeAnimations(false);
+
         mCategories = findViewById(R.id.categ_group);
 
         mDelModePanel = findViewById(R.id.del_mode_panel);

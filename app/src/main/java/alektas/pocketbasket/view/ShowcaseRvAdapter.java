@@ -2,8 +2,11 @@ package alektas.pocketbasket.view;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.R;
@@ -18,7 +21,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     private List<Item> mDelItems;
 
     ShowcaseRvAdapter(MainActivity activity, ItemsViewModel model) {
-        super(activity.getApplicationContext());
+        super(activity.getApplicationContext(), model);
         mActivity = activity;
         mModel = model;
         mDelItems = model.getDelItems();

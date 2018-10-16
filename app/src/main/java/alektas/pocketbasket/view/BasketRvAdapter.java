@@ -25,7 +25,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
     private ItemsViewModel mModel;
 
     BasketRvAdapter(Context context, ItemsViewModel model) {
-        super(context);
+        super(context, model);
         mContext = context;
         mModel = model;
 
@@ -54,6 +54,17 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
             viewHolder.mName.setText(getItemName(item));
         }
         else viewHolder.mName.setText("");
+    }
+
+    // add check image to icon of item in basket if item is checked
+    @Override
+    public void setChooseIcon(ViewHolder viewHolder, Item item) {
+        if (item.isChecked()) {
+            viewHolder.mCheckImage.setImageResource(R.drawable.ic_checked);
+        }
+        else {
+            viewHolder.mCheckImage.setImageResource(0);
+        }
     }
 
     // ListView listener for processing items sliding and check
