@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.db.entity.Item;
@@ -68,11 +69,9 @@ public class BasketAdapter extends BaseItemAdapter {
     }
 
     // ListView listener for processing items sliding and check
-    @SuppressLint("ClickableViewAccessibility")
     private View.OnTouchListener getSwipeListener(final View itemView, final String itemKey ) {
         return (v, event) -> {
             v.onTouchEvent(event); // for enable list view scrolling
-
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     return true;
@@ -94,10 +93,15 @@ public class BasketAdapter extends BaseItemAdapter {
                     else {
                         moveViewBack(itemView);
                     }
-                    if (event.getX() < CHECKABLE_ZONE && event.getX() > 0) {
+                    if (event.getX() < CHECKABLE_ZONE
+                            && event.getX() > 0
+                            && event.getY() > itemView.getY()
+                            && event.getY() < itemView.getY() + CHECKABLE_ZONE) {
                         mModel.checkItem(itemKey);
+                        itemView.performClick();
                     }
-                    v.setOnTouchListener((view, motionEvent) -> false);
+                    // remove listener from parent to avoid unnecessary swiping
+                    v.setOnTouchListener(null);
                     return true;
             }
             return false;
@@ -107,6 +111,7 @@ public class BasketAdapter extends BaseItemAdapter {
     private void removeItem(final View view, final String key) {
         ValueAnimator fadeAnim = ValueAnimator.ofFloat(view.getX(),
                 ((ViewGroup)view.getParent()).getWidth());
+        fadeAnim.setInterpolator(new AccelerateInterpolator());
         fadeAnim.addUpdateListener(valueAnimator ->
                 view.setX((float) valueAnimator.getAnimatedValue()));
 
