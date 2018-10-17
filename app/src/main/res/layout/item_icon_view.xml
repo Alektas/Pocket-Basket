@@ -1,33 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
-    android:layout_gravity="center"
-    android:layout_width="@dimen/ic_item_size"
-    android:layout_height="@dimen/ic_item_size"
-    android:layout_margin="@dimen/padding_8"
-    card_view:cardCornerRadius="@dimen/ic_item_corner_rad"
-    card_view:cardPreventCornerOverlap="true">
+<layout>
+    <data>
+        <variable
+            name="item"
+            type="alektas.pocketbasket.db.entity.Item" />
 
-    <ImageView
-        android:id="@+id/item_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="@dimen/padding_8"/>
+        <variable
+            name="model"
+            type="alektas.pocketbasket.viewmodel.ItemsViewModel" />
+    </data>
 
-    <ImageView
-    android:id="@+id/check_image"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    <androidx.cardview.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/item_icon_view"
+        android:layout_gravity="center"
+        android:layout_width="@dimen/ic_item_size"
+        android:layout_height="@dimen/ic_item_size"
+        android:layout_margin="@dimen/padding_8"
+        card_view:cardCornerRadius="@dimen/ic_item_corner_rad"
+        card_view:cardPreventCornerOverlap="true">
 
-    <ImageView
-        android:id="@+id/del_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        <ImageView
+            android:id="@+id/item_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/padding_8"
+            android:src="@{item.imgRes}"/>
 
-    <TextView
-        android:id="@+id/info_text"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"/>
-</androidx.cardview.widget.CardView>
+        <ImageView
+            android:id="@+id/check_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <ImageView
+            android:id="@+id/del_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <TextView
+            android:id="@+id/info_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@{item.imgRes == 0 ? item.name : null}"/>
+    </androidx.cardview.widget.CardView>
+</layout>

@@ -1,36 +1,46 @@
 package alektas.pocketbasket.view;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
+import androidx.annotation.NonNull;
 
-public class ShowcaseAdapter extends BaseItemAdapter {
+public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     private static final String TAG = "ShowcaseAdapter";
     private MainActivity mActivity;
     private ItemsViewModel mModel;
     private List<Item> mDelItems;
 
-    ShowcaseAdapter(MainActivity activity, ItemsViewModel model) {
-        super(activity.getApplicationContext());
+    ShowcaseRvAdapter(MainActivity activity, ItemsViewModel model) {
+        super(activity.getApplicationContext(), model);
         mActivity = activity;
         mModel = model;
         mDelItems = model.getDelItems();
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View itemView = super.getView(position, convertView, parent);
-        ViewHolder viewHolder = (ViewHolder) itemView.getTag();
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        ViewHolder viewHolder = super.onCreateViewHolder(parent, viewType);
         viewHolder.mName.setTextColor(Color.WHITE);
+        return viewHolder;
+    }
 
-        Item item = (Item) getItem(position);
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
+        super.onBindViewHolder(viewHolder, position);
+
+        Item item = getItems().get(position);
         setDelIcon(viewHolder, item);
 
         viewHolder.mItemView.setOnLongClickListener(view -> {
@@ -52,27 +62,36 @@ public class ShowcaseAdapter extends BaseItemAdapter {
                 }
             }
         });
-        return itemView;
     }
 
     // show item name in showcase mode and hide in basket mode in "Showcase"
     @Override
-    void setItemText(ViewHolder viewHolder, Item item) {
+    public void setItemText(ViewHolder viewHolder, Item item) {
         if (mModel.isShowcaseNamesShow()) {
             viewHolder.mName.setText(getItemName(item));
         }
         else viewHolder.mName.setText("");
     }
 
-    // add choose image to icon of item in showcase if item is present in basket
     @Override
-    void setChooseIcon(ViewHolder viewHolder, Item item) {
-        if (item.isInBasket()) {
+    public void setChooseIcon(ViewHolder viewHolder, Item item) {
+        if(item.isInBasket()) {
             viewHolder.mCheckImage.setImageResource(R.drawable.ic_choosed);
         }
         else {
             viewHolder.mCheckImage.setImageResource(0);
         }
+    }
+
+    public void deleteChoosedItems() {
+        mModel.deleteAll(mDelItems);
+        cancelDel();
+    }
+
+    public void cancelDel() {
+        disableDelMode();
+        mDelItems.clear();
+        notifyDataSetChanged();
     }
 
     // add delete image to icon of item in showcase if item is choosed in Delete Mode
@@ -82,17 +101,6 @@ public class ShowcaseAdapter extends BaseItemAdapter {
         } else {
             viewHolder.mDelImage.setImageResource(0);
         }
-    }
-
-    public void deleteItems() {
-        mModel.deleteAll(mDelItems);
-        cancelDel();
-    }
-
-    public void cancelDel() {
-        disableDelMode();
-        mDelItems.clear();
-        notifyDataSetChanged();
     }
 
     private void prepareToDel(Item item) {

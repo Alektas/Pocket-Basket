@@ -24,7 +24,7 @@
             layout="@layout/categories_layout"/>
     </ScrollView>
 
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/showcase_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -50,7 +50,7 @@
         app:layout_constraintTop_toBottomOf="@id/showcase_list"
         app:layout_constraintVertical_bias="1.0"/>
 
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/basket_list"
         android:layout_width="@dimen/basket_narrow_size"
         android:layout_height="match_parent"

@@ -15,8 +15,9 @@ import android.view.animation.AccelerateInterpolator;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
+import androidx.annotation.NonNull;
 
-public class BasketAdapter extends BaseItemAdapter {
+public class BasketRvAdapter extends BaseRecyclerAdapter {
     private static final String TAG = "BasketAdapter";
     private final float DEL_EDGE = 0.6f;
     private final float TAP_PADDING;
@@ -24,8 +25,8 @@ public class BasketAdapter extends BaseItemAdapter {
     private Context mContext;
     private ItemsViewModel mModel;
 
-    BasketAdapter(Context context, ItemsViewModel model) {
-        super(context);
+    BasketRvAdapter(Context context, ItemsViewModel model) {
+        super(context, model);
         mContext = context;
         mModel = model;
 
@@ -37,15 +38,14 @@ public class BasketAdapter extends BaseItemAdapter {
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
-    public View getView(int position, View convertView, final ViewGroup parent) {
-        View itemView = super.getView(position, convertView, parent);
-        itemView.setOnTouchListener((view, motionEvent) -> {
-            parent.setOnTouchListener(
-                    getSwipeListener(view, ((Item)getItem(position)).getName()));
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
+        super.onBindViewHolder(viewHolder, position);
+        Item item = getItems().get(position);
+        viewHolder.mItemView.setOnTouchListener((view, motionEvent) -> {
+            ((ViewGroup) view.getParent())
+                    .setOnTouchListener(getSwipeListener(view, item.getName()));
             return false; // need to be false to allow sliding at the item view zone
         });
-
-        return itemView;
     }
 
     // hide item name in showcase mode and show in basket mode in "Basket"

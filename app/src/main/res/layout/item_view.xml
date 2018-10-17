@@ -1,17 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="item"
+            type="alektas.pocketbasket.db.entity.Item" />
 
-    <include layout="@layout/item_icon_view"/>
+        <variable
+            name="model"
+            type="alektas.pocketbasket.viewmodel.ItemsViewModel" />
+    </data>
 
-    <TextView
-        android:id="@+id/item_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginStart="@dimen/padding_8"
-        android:layout_marginEnd="@dimen/padding_8"
-        android:textColor="@android:color/black"/>
-</LinearLayout>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/item_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <include layout="@layout/item_icon_view"
+            app:item="@{item}"
+            app:model="@{model}"/>
+
+        <TextView
+            android:id="@+id/item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/padding_8"
+            android:layout_marginEnd="@dimen/padding_8"
+            android:textColor="@android:color/black" />
+    </LinearLayout>
+</layout>
