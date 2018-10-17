@@ -27,6 +27,7 @@ public abstract class BaseRecyclerAdapter
     BaseRecyclerAdapter(Context context, ItemsViewModel model) {
         mContext = context;
         mModel = model;
+        setHasStableIds(true);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
@@ -57,6 +58,13 @@ public abstract class BaseRecyclerAdapter
     public int getItemCount() {
         if (mItems != null) return mItems.size();
         return 0;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        int nameRes = mItems.get(position).getNameRes();
+        if (nameRes != 0) return nameRes;
+        else return mItems.get(position).getName().hashCode();
     }
 
     @NonNull
