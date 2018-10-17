@@ -120,7 +120,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 mModel.removeBasketItem(key);
-                view.setX(0);
+//                view.setX(0); // uncomment when setHasStableIds(false) in BaseRecyclerAdapter
             }
         });
 

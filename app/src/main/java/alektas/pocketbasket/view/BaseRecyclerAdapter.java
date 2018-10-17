@@ -94,9 +94,9 @@ public abstract class BaseRecyclerAdapter
         notifyDataSetChanged();
     }
 
-    public abstract void setItemText(ViewHolder viewHolder, Item item);
+    abstract void setItemText(ViewHolder viewHolder, Item item);
 
-    public abstract void setChooseIcon(ViewHolder viewHolder, Item item);
+    abstract void setChooseIcon(ViewHolder viewHolder, Item item);
 
     // get item name from resources or from key field if res is absent
     String getItemName(Item item) {
