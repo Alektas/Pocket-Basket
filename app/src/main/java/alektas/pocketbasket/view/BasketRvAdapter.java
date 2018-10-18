@@ -86,6 +86,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
                     return true;
                 case MotionEvent.ACTION_CANCEL:
                     moveViewBack(itemView);
+                    itemView.performClick();
                     return true;
                 case MotionEvent.ACTION_UP:
                     if (itemView.getX() > v.getWidth() * DEL_EDGE) {

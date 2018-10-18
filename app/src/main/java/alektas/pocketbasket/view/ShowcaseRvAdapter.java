@@ -43,7 +43,9 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
         setDelIcon(viewHolder, item);
 
         viewHolder.mItemView.setOnLongClickListener(view -> {
-            enableDelMode();
+            if (!mModel.isDelMode()) {
+                enableDelMode();
+            }
             prepareToDel(item);
             return true;
         });
