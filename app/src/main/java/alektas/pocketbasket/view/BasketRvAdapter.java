@@ -51,10 +51,11 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
     // hide item name in showcase mode and show in basket mode in "Basket"
     @Override
     void setItemText(ViewHolder viewHolder, Item item) {
+        super.setItemText(viewHolder, item);
         if (mModel.isBasketNamesShow()) {
-            viewHolder.mName.setText(getItemName(item));
+            viewHolder.mName.setVisibility(View.VISIBLE);
         }
-        else viewHolder.mName.setText("");
+        else viewHolder.mName.setVisibility(View.GONE);
     }
 
     // add check image to icon of item in basket if item is checked
@@ -120,7 +121,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 mModel.removeBasketItem(key);
-//                view.setX(0); // uncomment when setHasStableIds(false) in BaseRecyclerAdapter
+                view.setX(0); // uncomment when setHasStableIds(false) in BaseRecyclerAdapter
             }
         });
 

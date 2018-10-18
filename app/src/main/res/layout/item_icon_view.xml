@@ -43,6 +43,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="@{item.imgRes == 0 ? item.name : null}"/>
+            android:text="@{item.imgRes == 0 ? item : null}"/>
     </androidx.cardview.widget.CardView>
 </layout>

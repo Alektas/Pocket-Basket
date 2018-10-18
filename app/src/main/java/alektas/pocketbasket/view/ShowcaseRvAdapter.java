@@ -3,6 +3,7 @@ package alektas.pocketbasket.view;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -65,10 +66,11 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     // show item name in showcase mode and hide in basket mode in "Showcase"
     @Override
     void setItemText(ViewHolder viewHolder, Item item) {
+        super.setItemText(viewHolder, item);
         if (mModel.isShowcaseNamesShow()) {
-            viewHolder.mName.setText(getItemName(item));
+            viewHolder.mName.setVisibility(View.VISIBLE);
         }
-        else viewHolder.mName.setText("");
+        else viewHolder.mName.setVisibility(View.GONE);
     }
 
     @Override
