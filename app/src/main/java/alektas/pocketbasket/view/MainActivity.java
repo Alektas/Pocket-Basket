@@ -9,17 +9,12 @@ import android.content.res.Configuration;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import android.transition.ChangeBounds;
-import android.transition.Fade;
-import android.transition.TransitionManager;
-import android.transition.TransitionSet;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
@@ -31,7 +26,9 @@ import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
+import android.transition.TransitionManager;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -52,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private View mCancelDmBtn;
     private BasketRvAdapter mBasketAdapter;
     private ShowcaseRvAdapter mShowcaseAdapter;
-    private TransitionSet mTransitionSet;
+    private Transition mTransitionSet;
     private GestureDetector mGestureDetector;
     private ConstraintLayout mConstraintLayout;
 
@@ -152,11 +149,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initAnimTransition() {
-        mTransitionSet = new TransitionSet();
-        mTransitionSet.addTransition(new ChangeBounds());
-        mTransitionSet.addTransition(new Fade());
-        mTransitionSet.setInterpolator(new DecelerateInterpolator());
-        mTransitionSet.setDuration(200);
+        mTransitionSet = TransitionInflater.from(this)
+                .inflateTransition(R.transition.change_mode_transition);
     }
 
     private void initDimensions() {

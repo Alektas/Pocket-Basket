@@ -49,4 +49,12 @@
     <string name="greens">Зелень</string>
     <string name="cheese">Сыр</string>
     <string name="sausage">Колбаса</string>
+
+    <string name="chicory">Цикорий</string>
+    <string name="peas">Горох</string>
+    <string name="sponges">Губки</string>
+    <string name="deodorant">Дезодорант</string>
+    <string name="gloves">Перчатки</string>
+    <string name="rags">Тряпки</string>
+
 </resources>

@@ -49,4 +49,12 @@
     <string name="greens">Greens</string>
     <string name="cheese">Cheese</string>
     <string name="sausage">Sausage</string>
+
+    <string name="chicory">Сhicory</string>
+    <string name="peas">Peas</string>
+    <string name="sponges">Sponges</string>
+    <string name="deodorant">Deodorant</string>
+    <string name="gloves">Gloves</string>
+    <string name="rags">Rags</string>
+
 </resources>

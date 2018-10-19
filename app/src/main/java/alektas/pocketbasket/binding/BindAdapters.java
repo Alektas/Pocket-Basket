@@ -1,4 +1,4 @@
-package alektas.pocketbasket.bind;
+package alektas.pocketbasket.binding;
 
 import android.widget.ImageView;
 import android.widget.TextView;
