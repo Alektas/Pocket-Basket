@@ -1,13 +1,16 @@
 package alektas.pocketbasket.view;
 
-import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
 
-import android.content.Intent;
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
 import android.content.res.Configuration;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Display;
@@ -30,9 +33,12 @@ import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements ResetDialog.NoticeDialogListener, AddItemDialog.AddItemDialogListener {
     private static final String TAG = "PocketBasketApp";
     private static final int ADD_ITEM_REQUEST = 101;
     private int mDisplayWidth;
@@ -40,12 +46,16 @@ public class MainActivity extends AppCompatActivity {
     private float mShowcaseWideWidth;
     private float mShowcaseNarrowWidth;
     private float mBasketNarrowWidth;
+    private boolean isMenuShown;
 
     private RecyclerView mBasket;
     private RecyclerView mShowcase;
     private ViewGroup mDelModePanel;
     private RadioGroup mCategories;
-    private View mAddBtn;
+    private FloatingActionButton mAddBtn;
+    private View mDelAllBtn;
+    private View mCheckAllBtn;
+    private View mResetBtn;
     private View mCancelDmBtn;
     private BasketRvAdapter mBasketAdapter;
     private ShowcaseRvAdapter mShowcaseAdapter;
@@ -62,6 +72,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_layout);
         App.getComponent().inject(this);
         init();
+    }
+
+    @Override
+    public void onDialogPositiveClick() {
+        mViewModel.resetShowcase();
+    }
+
+    @Override
+    public void onDialogAddItem(String itemName, int tagRes) {
+        mViewModel.addNewItem(itemName, tagRes);
     }
 
     class SlideListener extends GestureDetector.SimpleOnGestureListener {
@@ -119,6 +139,14 @@ public class MainActivity extends AppCompatActivity {
         mCancelDmBtn = findViewById(R.id.cancel_dm_btn);
 
         mAddBtn = findViewById(R.id.add_item_btn);
+        mCheckAllBtn = findViewById(R.id.check_all_btn);
+        mResetBtn = findViewById(R.id.reset_btn);
+        mAddBtn.setOnLongClickListener(view -> {
+            if (!isMenuShown) showMenu();
+            return true;
+        });
+
+        mDelAllBtn = findViewById(R.id.del_all_btn);
 
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
 
@@ -165,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                 mShowcaseWideWidth,
                 0);
         resizeRadioText(mCategories, 14f);
-        mAddBtn.setVisibility(View.VISIBLE);
+        ((View)mAddBtn).setVisibility(View.VISIBLE);
         mCancelDmBtn.setVisibility(View.VISIBLE);
 
         mViewModel.setBasketNamesShow(true);
@@ -178,7 +206,8 @@ public class MainActivity extends AppCompatActivity {
                 0);
         resizeRadioText(mCategories, 0f);
 
-        mAddBtn.setVisibility(View.VISIBLE);
+        ((View)mAddBtn).setVisibility(View.VISIBLE);
+        if (isMenuShown) { hideMenu(); }
         mCancelDmBtn.setVisibility(View.GONE);
 
         mViewModel.setBasketNamesShow(true);
@@ -195,7 +224,8 @@ public class MainActivity extends AppCompatActivity {
                 mBasketNarrowWidth);
         resizeRadioText(mCategories, 14f);
 
-        mAddBtn.setVisibility(View.GONE);
+        ((View)mAddBtn).setVisibility(View.GONE);
+        if (isMenuShown) { hideMenu(); }
         mCancelDmBtn.setVisibility(View.VISIBLE);
 
         mViewModel.setBasketNamesShow(false);
@@ -236,27 +266,67 @@ public class MainActivity extends AppCompatActivity {
         mShowcaseItems.observe(this, mShowcaseAdapter::setItems);
     }
 
-    public void onAddItemBtnClick(View view) {
-        Intent intent = new Intent(this, AddItemActivity.class);
-        startActivityForResult(intent, ADD_ITEM_REQUEST);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == ADD_ITEM_REQUEST) {
-            if (resultCode == RESULT_OK && data != null) {
-                String itemName = data.getStringExtra(AddItemActivity.ITEM_NAME);
-                if (mViewModel.getBasketItem(itemName) == null) {
-                    Item item = new Item(itemName);
-                    item.setInBasket(true);
-                    item.setImgRes(data.getIntExtra(AddItemActivity.ITEM_IMG_RES, 0));
-                    item.setTagRes(data.getIntExtra(AddItemActivity.ITEM_CATEGORY_RES, 0));
-                    mViewModel.insertItem(item);
-                }
+    public void onBtnClick(View view) {
+        if (isMenuShown) {
+            if (view.getId() == R.id.add_item_btn) {
+                hideMenu();
+            }
+            if (view.getId() == R.id.del_all_btn) {
+                mViewModel.clearBasket();
+                hideMenu();
+            }
+            if (view.getId() == R.id.check_all_btn) {
+                mViewModel.checkAll();
+            }
+            if (view.getId() == R.id.reset_btn) {
+                DialogFragment dialog = new ResetDialog();
+                dialog.show(getSupportFragmentManager(), "ResetDialog");
+                hideMenu();
             }
         }
+        else if (view.getId() == R.id.add_item_btn){
+            DialogFragment dialog = new AddItemDialog();
+            dialog.show(getSupportFragmentManager(), "AddItemDialog");
+        }
+    }
+
+    private void showMenu() {
+        mAddBtn.setImageResource(R.drawable.ic_close_white_24dp);
+
+        runVisibilityAnim(mCheckAllBtn, 0, R.animator.check_all_show_anim);
+        runVisibilityAnim(mDelAllBtn, 0, R.animator.delete_all_show_anim);
+        runVisibilityAnim(mResetBtn, 0, R.animator.reset_show_anim);
+
+        isMenuShown = true;
+    }
+
+    private void hideMenu() {
+        mAddBtn.setImageResource(R.drawable.ic_edit_24dp);
+
+        runVisibilityAnim(mCheckAllBtn, View.INVISIBLE, R.animator.check_all_hide_anim);
+        runVisibilityAnim(mDelAllBtn, View.INVISIBLE, R.animator.delete_all_hide_anim);
+        runVisibilityAnim(mResetBtn, View.INVISIBLE, R.animator.reset_hide_anim);
+
+        isMenuShown = false;
+    }
+
+    private void runVisibilityAnim(View view, int endVis, int animId) {
+        Animator anim = AnimatorInflater.loadAnimator(this, animId);
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                view.setVisibility(endVis);
+            }
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                view.setVisibility(View.VISIBLE);
+            }
+        });
+        anim.setTarget(view);
+        anim.start();
     }
 
     public void onFilterClick(View view) {

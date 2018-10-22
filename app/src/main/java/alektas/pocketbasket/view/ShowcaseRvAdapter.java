@@ -2,7 +2,6 @@ package alektas.pocketbasket.view;
 
 import android.annotation.SuppressLint;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -56,7 +55,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
                 else { prepareToDel(item); }
             } else {
                 if (mModel.getBasketItem(item.getName()) == null) {
-                    mModel.putItem(item);
+                    mModel.putItemToBasket(item);
                 }
                 else {
                     mModel.removeBasketItem(item.getName());
@@ -86,7 +85,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     }
 
     public void deleteChoosedItems() {
-        mModel.deleteAll(mDelItems);
+        mModel.deleteItems(mDelItems);
         cancelDel();
     }
 

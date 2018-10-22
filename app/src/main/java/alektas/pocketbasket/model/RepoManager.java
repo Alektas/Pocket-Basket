@@ -40,6 +40,16 @@ public class RepoManager implements Model {
         }
     }
 
+    @Override
+    public void checkAll(boolean state) {
+        List<Item> items = mBasketItems.getValue();
+        for (Item item :
+                items) {
+            item.setChecked(state);
+            new updateAsync(mItemsDao).execute(item);
+        }
+    }
+
     // Delete item from "Basket"
     @Override
     public void removeBasketItem(String key) {

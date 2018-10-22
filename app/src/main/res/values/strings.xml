@@ -2,5 +2,9 @@
     <string name="app_name">Pocket Basket</string>
     <string name="clear">Clear</string>
     <string name="item_name">Item</string>
+    <string name="reset_msg">Back to the original showcase?</string>
+    <string name="cancel">Cancel</string>
+    <string name="accept">Accept</string>
+    <string name="add">Add</string>
 
 </resources>

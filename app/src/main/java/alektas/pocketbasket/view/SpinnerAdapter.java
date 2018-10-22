@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.R;
@@ -18,12 +19,10 @@ public class SpinnerAdapter extends ArrayAdapter<Integer> {
     private Context mContext;
     private List<Integer> mTagsRes;
 
-    public SpinnerAdapter(@NonNull Context context,
-                          int resource,
-                          @NonNull List<Integer> tagsRes) {
-        super(context, resource, tagsRes);
+    public SpinnerAdapter(@NonNull Context context, int resource) {
+        super(context, resource);
         mContext = context;
-        mTagsRes = tagsRes;
+        mTagsRes = getTags();
     }
 
     @Nullable
@@ -119,5 +118,24 @@ public class SpinnerAdapter extends ArrayAdapter<Integer> {
         }
 
         return row;
+    }
+
+    private List<Integer> getTags() {
+        List<Integer> tags = new ArrayList<>();
+        tags.add(R.string.all);
+        tags.add(R.string.drink);
+        tags.add(R.string.fruit);
+        tags.add(R.string.vegetable);
+        tags.add(R.string.floury);
+        tags.add(R.string.milky);
+        tags.add(R.string.groats);
+        tags.add(R.string.sweets);
+        tags.add(R.string.meat);
+        tags.add(R.string.seafood);
+        tags.add(R.string.semis);
+        tags.add(R.string.sauce_n_oil);
+        tags.add(R.string.household);
+        tags.add(R.string.other);
+        return tags;
     }
 }

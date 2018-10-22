@@ -29,7 +29,7 @@ public interface ItemsDao {
     @Query("SELECT * FROM items WHERE name = :name AND in_basket = 1 LIMIT 1")
     LiveData<Item> getBasketItem(String name);
 
-    @Query("UPDATE items SET in_basket = 0 WHERE in_basket = 1")
+    @Query("UPDATE items SET in_basket = 0, checked = 0 WHERE in_basket = 1 AND checked = 1")
     void clearBasket();
 
     @Insert

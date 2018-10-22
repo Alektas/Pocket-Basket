@@ -20,6 +20,7 @@ public class ItemsViewModel extends AndroidViewModel {
     private boolean isShowcaseMode = true;
     private boolean isBasketNamesShow = false;
     private boolean isShowcaseNamesShow = true;
+    private boolean isCheckedAll = false;
 
     public ItemsViewModel(@NonNull Application application) {
         super(application);
@@ -28,8 +29,6 @@ public class ItemsViewModel extends AndroidViewModel {
         mBasketData = mRepoManager.getBasketItems();
         mDelItems = new ArrayList<>();
     }
-
-    public List<Item> getDelItems() { return mDelItems; }
 
     public LiveData<List<Item>> getShowcaseData() {
         return mShowcaseData;
@@ -41,16 +40,27 @@ public class ItemsViewModel extends AndroidViewModel {
         return mBasketData;
     }
 
+    public List<Item> getDelItems() { return mDelItems; }
+
     public Item getBasketItem(String key) {
         return mRepoManager.getBasketItem(key);
     }
 
-    public void putItem(Item item) {
+    public void putItemToBasket(Item item) {
         mRepoManager.addBasketItem(item);
     }
 
     public void insertItem(Item item) {
         mRepoManager.insertItem(item);
+    }
+
+    public void addNewItem(String name, int tagRes) {
+        if (getBasketItem(name) == null) {
+            Item item = new Item(name);
+            item.setTagRes(tagRes);
+            item.setInBasket(true);
+            insertItem(item);
+        }
     }
 
     public void removeBasketItem(String key) {
@@ -61,13 +71,34 @@ public class ItemsViewModel extends AndroidViewModel {
         mRepoManager.deleteItem(item);
     }
 
-    public void deleteAll(List<Item> items) {
+    public void deleteItems(List<Item> items) {
         for (Item item : items) {
             mRepoManager.deleteItem(item);
         }
     }
 
     public void clearBasket() { mRepoManager.clearBasket(); }
+
+    public void checkItem(String key) {
+        mRepoManager.changeItemState(key);
+    }
+
+    public void checkAll() {
+        if (isCheckedAll) {
+            mRepoManager.checkAll(false);
+            isCheckedAll = false;
+        }
+        else {
+            mRepoManager.checkAll(true);
+            isCheckedAll = true;
+        }
+    }
+
+    public void resetShowcase() {
+
+    }
+
+    /* Application state methods */
 
     public boolean isDelMode() {
         return isDelMode;
@@ -99,9 +130,5 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public void setShowcaseNamesShow(boolean showcaseNamesShow) {
         isShowcaseNamesShow = showcaseNamesShow;
-    }
-
-    public void checkItem(String key) {
-        mRepoManager.changeItemState(key);
     }
 }

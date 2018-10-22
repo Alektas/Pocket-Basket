@@ -12,6 +12,7 @@ public interface Model {
     void removeBasketItem(String key);
     void deleteItem(Item item);
     void changeItemState(String key);
+    void checkAll(boolean state);
     void clearBasket();
     void setFilter(int tag);
     Item getBasketItem(String key);
