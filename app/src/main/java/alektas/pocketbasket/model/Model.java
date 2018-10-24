@@ -7,16 +7,17 @@ import java.util.List;
 import alektas.pocketbasket.db.entity.Item;
 
 public interface Model {
-    void addBasketItem(Item item);
-    void insertItem(Item item);
-    void removeBasketItem(String key);
-    void deleteItem(Item item);
-    void changeItemState(String key);
-    void checkAll(boolean state);
-    void clearBasket();
-    void setFilter(int tag);
     Item getBasketItem(String key);
-    LiveData<List<Item>> getAllItems();
-    LiveData<List<Item>> getByTag(int tag);
-    LiveData<List<Item>> getBasketItems();
+    void addBasketItem(Item item);
+    void changeItemState(Item item);
+    void checkAll(boolean state);
+    void removeBasketItem(Item item);
+    void clearBasket();
+
+    void insertItem(Item item);
+    void deleteItems(List<Item> item);
+    void setFilter(int tag);
+
+    LiveData<List<Item>> getAllData();
+    LiveData<List<Item>> getBasketData();
 }

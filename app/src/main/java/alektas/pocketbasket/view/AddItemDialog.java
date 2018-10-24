@@ -23,18 +23,18 @@ public class AddItemDialog extends DialogFragment {
     // Use this instance of the interface to deliver action events
     private AddItemDialogListener mListener;
 
-    // Override the Fragment.onAttach() method to instantiate the NoticeDialogListener
+    // Override the Fragment.onAttach() method to instantiate the ResetDialogListener
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         // Verify that the host activity implements the callback interface
         try {
-            // Instantiate the NoticeDialogListener so we can send events to the host
+            // Instantiate the ResetDialogListener so we can send events to the host
             mListener = (AddItemDialogListener) context;
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
             throw new ClassCastException(context.toString()
-                    + " must implement NoticeDialogListener");
+                    + " must implement ResetDialogListener");
         }
     }
 

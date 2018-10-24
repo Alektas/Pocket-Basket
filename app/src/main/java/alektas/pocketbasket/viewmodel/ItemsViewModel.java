@@ -20,27 +20,16 @@ public class ItemsViewModel extends AndroidViewModel {
     private boolean isShowcaseMode = true;
     private boolean isBasketNamesShow = false;
     private boolean isShowcaseNamesShow = true;
-    private boolean isCheckedAll = false;
 
     public ItemsViewModel(@NonNull Application application) {
         super(application);
         mRepoManager = new RepoManager(application);
-        mShowcaseData = mRepoManager.getAllItems();
-        mBasketData = mRepoManager.getBasketItems();
+        mShowcaseData = mRepoManager.getAllData();
+        mBasketData = mRepoManager.getBasketData();
         mDelItems = new ArrayList<>();
     }
 
-    public LiveData<List<Item>> getShowcaseData() {
-        return mShowcaseData;
-    }
-
-    public LiveData<List<Item>> getByTag(int tag) { return mRepoManager.getByTag(tag); }
-
-    public LiveData<List<Item>> getBasketData() {
-        return mBasketData;
-    }
-
-    public List<Item> getDelItems() { return mDelItems; }
+    /* Basket methods */
 
     public Item getBasketItem(String key) {
         return mRepoManager.getBasketItem(key);
@@ -50,52 +39,72 @@ public class ItemsViewModel extends AndroidViewModel {
         mRepoManager.addBasketItem(item);
     }
 
-    public void insertItem(Item item) {
-        mRepoManager.insertItem(item);
+    public void checkItem(Item item) {
+        mRepoManager.changeItemState(item);
     }
+
+    // Check all items in Basket (or uncheck if already all items are checked)
+    public void checkAll() {
+        if (isAllChecked()) {
+            mRepoManager.checkAll(false);
+        }
+        else {
+            mRepoManager.checkAll(true);
+        }
+    }
+
+    public void removeBasketItem(Item item) {
+        mRepoManager.removeBasketItem(item);
+    }
+
+    public void clearBasket() { mRepoManager.clearBasket(); }
+
+    /* Showcase methods */
 
     public void addNewItem(String name, int tagRes) {
         if (getBasketItem(name) == null) {
             Item item = new Item(name);
             item.setTagRes(tagRes);
             item.setInBasket(true);
-            insertItem(item);
+            mRepoManager.insertItem(item);
         }
-    }
-
-    public void removeBasketItem(String key) {
-        mRepoManager.removeBasketItem(key);
-    }
-
-    public void deleteItem(Item item) {
-        mRepoManager.deleteItem(item);
     }
 
     public void deleteItems(List<Item> items) {
-        for (Item item : items) {
-            mRepoManager.deleteItem(item);
-        }
+        mRepoManager.deleteItems(items);
     }
 
-    public void clearBasket() { mRepoManager.clearBasket(); }
-
-    public void checkItem(String key) {
-        mRepoManager.changeItemState(key);
+    // Show in Showcase only items with specified tag
+    public void setFilter(int tag) {
+        mRepoManager.setFilter(tag);
     }
 
-    public void checkAll() {
-        if (isCheckedAll) {
-            mRepoManager.checkAll(false);
-            isCheckedAll = false;
-        }
-        else {
-            mRepoManager.checkAll(true);
-            isCheckedAll = true;
-        }
-    }
-
+    // Return default showcase items
     public void resetShowcase() {
 
+    }
+
+    /* Data getters */
+
+    public LiveData<List<Item>> getShowcaseData() {
+        return mShowcaseData;
+    }
+
+    public LiveData<List<Item>> getBasketData() {
+        return mBasketData;
+    }
+
+    public List<Item> getDelItems() { return mDelItems; }
+
+    /* Private */
+
+    // Return 'true' if all items in Basket are checked
+    private boolean isAllChecked() {
+        if (mBasketData.getValue() == null) return false;
+        for(Item item : mBasketData.getValue()) {
+            if (!item.isChecked()) return false;
+        }
+        return true;
     }
 
     /* Application state methods */

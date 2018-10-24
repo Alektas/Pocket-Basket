@@ -6,7 +6,6 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
         Item item = getItems().get(position);
         viewHolder.mItemView.setOnTouchListener((view, motionEvent) -> {
             ((ViewGroup) view.getParent())
-                    .setOnTouchListener(getSwipeListener(view, item.getName()));
+                    .setOnTouchListener(getSwipeListener(view, item));
             return false; // need to be false to allow sliding at the item view zone
         });
     }
@@ -70,7 +69,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
     }
 
     // ListView listener for processing items sliding and check
-    private View.OnTouchListener getSwipeListener(final View itemView, final String itemKey ) {
+    private View.OnTouchListener getSwipeListener(final View itemView, final Item item) {
         return (v, event) -> {
             v.onTouchEvent(event); // for enable list view scrolling
             switch (event.getAction()) {
@@ -90,7 +89,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
                     return true;
                 case MotionEvent.ACTION_UP:
                     if (itemView.getX() > v.getWidth() * DEL_EDGE) {
-                        removeItem(itemView, itemKey);
+                        removeItem(itemView, item);
                     }
                     else {
                         moveViewBack(itemView);
@@ -99,7 +98,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
                             && event.getX() > 0
                             && event.getY() > itemView.getY()
                             && event.getY() < itemView.getY() + CHECKABLE_ZONE) {
-                        mModel.checkItem(itemKey);
+                        mModel.checkItem(item);
                         itemView.performClick();
                     }
                     // remove listener from parent to avoid unnecessary swiping
@@ -110,7 +109,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
         };
     }
 
-    private void removeItem(final View view, final String key) {
+    private void removeItem(final View view, final Item item) {
         ValueAnimator fadeAnim = ValueAnimator.ofFloat(view.getX(),
                 ((ViewGroup)view.getParent()).getWidth());
         fadeAnim.setInterpolator(new AccelerateInterpolator());
@@ -121,7 +120,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                mModel.removeBasketItem(key);
+                mModel.removeBasketItem(item);
                 view.setX(0); // uncomment when setHasStableIds(false) in BaseRecyclerAdapter
             }
         });

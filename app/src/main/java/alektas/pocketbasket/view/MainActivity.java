@@ -1,7 +1,6 @@
 package alektas.pocketbasket.view;
 
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.animation.Animator;
@@ -21,14 +20,12 @@ import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import java.util.List;
-
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
@@ -38,9 +35,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class MainActivity extends AppCompatActivity
-        implements ResetDialog.NoticeDialogListener, AddItemDialog.AddItemDialogListener {
+        implements ResetDialog.ResetDialogListener,
+        AddItemDialog.AddItemDialogListener,
+        DeleteModeListener {
     private static final String TAG = "PocketBasketApp";
-    private static final int ADD_ITEM_REQUEST = 101;
     private int mDisplayWidth;
     private float mCategNarrowWidth;
     private float mShowcaseWideWidth;
@@ -64,7 +62,6 @@ public class MainActivity extends AppCompatActivity
     private ConstraintLayout mConstraintLayout;
 
     private ItemsViewModel mViewModel;
-    private LiveData<List<Item>> mShowcaseItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,49 +71,7 @@ public class MainActivity extends AppCompatActivity
         init();
     }
 
-    @Override
-    public void onDialogPositiveClick() {
-        mViewModel.resetShowcase();
-    }
-
-    @Override
-    public void onDialogAddItem(String itemName, int tagRes) {
-        mViewModel.addNewItem(itemName, tagRes);
-    }
-
-    class SlideListener extends GestureDetector.SimpleOnGestureListener {
-        private static final double MIN_FLING_X = 150d;
-        private static final double MAX_FLING_Y = 100d;
-        private static final double LEFT_FLING_EDGE = 0.3d; // 1d = display width
-        private static final double RIGHT_FLING_EDGE = 0.7d;
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if (getResources().getConfiguration().orientation
-                    == Configuration.ORIENTATION_LANDSCAPE) {
-                setLandscapeLayout();
-                return false;
-            }
-
-            double dY = Math.abs(e2.getY() - e1.getY());
-            double dX = Math.abs(e2.getX() - e1.getX());
-            if (dY < MAX_FLING_Y && dX > MIN_FLING_X) {
-                TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
-                if (mViewModel.isShowcaseMode() &&
-                        velocityX < 0 &&
-                        e1.getX() > RIGHT_FLING_EDGE*mDisplayWidth) {
-                    setBasketMode();
-                }
-                else if (!mViewModel.isShowcaseMode() &&
-                        velocityX > 0 &&
-                        e1.getX() < LEFT_FLING_EDGE*mDisplayWidth){
-                    setShowcaseMode();
-                }
-                return true;
-            }
-            return false;
-        }
-    }
+    /* Init methods */
 
     private void init() {
         initDisplayWidth();
@@ -152,13 +107,12 @@ public class MainActivity extends AppCompatActivity
 
         mBasketAdapter = new BasketRvAdapter(this, mViewModel);
         mBasket.setAdapter(mBasketAdapter);
-        mShowcaseAdapter = new ShowcaseRvAdapter(this, mViewModel);
+        mShowcaseAdapter = new ShowcaseRvAdapter(this, this, mViewModel);
         mShowcase.setAdapter(mShowcaseAdapter);
 
         mViewModel.getBasketData().observe(this,
                 mBasketAdapter::setItems);
-        mShowcaseItems = mViewModel.getShowcaseData();
-        mShowcaseItems.observe(this,
+        mViewModel.getShowcaseData().observe(this,
                 mShowcaseAdapter::setItems);
 
         if (getResources().getConfiguration().orientation
@@ -187,6 +141,8 @@ public class MainActivity extends AppCompatActivity
         mShowcaseWideWidth = getResources().getDimension(R.dimen.showcase_wide_size);
         mBasketNarrowWidth = getResources().getDimension(R.dimen.basket_narrow_size);
     }
+
+    /* Layout changes methods */
 
     private void setLandscapeLayout() {
         changeLayoutState(WRAP_CONTENT,
@@ -260,36 +216,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void setFilter(int tag) {
-        mShowcaseItems.removeObservers(this);
-        mShowcaseItems = mViewModel.getByTag(tag);
-        mShowcaseItems.observe(this, mShowcaseAdapter::setItems);
-    }
-
-    public void onBtnClick(View view) {
-        if (isMenuShown) {
-            if (view.getId() == R.id.add_item_btn) {
-                hideMenu();
-            }
-            if (view.getId() == R.id.del_all_btn) {
-                mViewModel.clearBasket();
-                hideMenu();
-            }
-            if (view.getId() == R.id.check_all_btn) {
-                mViewModel.checkAll();
-            }
-            if (view.getId() == R.id.reset_btn) {
-                DialogFragment dialog = new ResetDialog();
-                dialog.show(getSupportFragmentManager(), "ResetDialog");
-                hideMenu();
-            }
-        }
-        else if (view.getId() == R.id.add_item_btn){
-            DialogFragment dialog = new AddItemDialog();
-            dialog.show(getSupportFragmentManager(), "AddItemDialog");
-        }
-    }
-
     private void showMenu() {
         mAddBtn.setImageResource(R.drawable.ic_close_white_24dp);
 
@@ -327,6 +253,60 @@ public class MainActivity extends AppCompatActivity
         });
         anim.setTarget(view);
         anim.start();
+    }
+
+    private void setFilter(int tag) {
+        mViewModel.setFilter(tag);
+    }
+
+    /* Interfaces methods */
+
+    @Override
+    public void onDialogAcceptReset() {
+        mViewModel.resetShowcase();
+    }
+
+    @Override
+    public void onDialogAddItem(String itemName, int tagRes) {
+        mViewModel.addNewItem(itemName, tagRes);
+    }
+
+    @Override
+    public void onDelModeEnable() {
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
+        mDelModePanel.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDelModeDisable() {
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
+        mDelModePanel.setVisibility(View.GONE);
+    }
+
+    /* On buttons click methods */
+
+    public void onBtnClick(View view) {
+        if (isMenuShown) {
+            if (view.getId() == R.id.add_item_btn) {
+                hideMenu();
+            }
+            if (view.getId() == R.id.del_all_btn) {
+                mViewModel.clearBasket();
+                hideMenu();
+            }
+            if (view.getId() == R.id.check_all_btn) {
+                mViewModel.checkAll();
+            }
+            if (view.getId() == R.id.reset_btn) {
+                DialogFragment dialog = new ResetDialog();
+                dialog.show(getSupportFragmentManager(), "ResetDialog");
+                hideMenu();
+            }
+        }
+        else if (view.getId() == R.id.add_item_btn){
+            DialogFragment dialog = new AddItemDialog();
+            dialog.show(getSupportFragmentManager(), "AddItemDialog");
+        }
     }
 
     public void onFilterClick(View view) {
@@ -394,22 +374,48 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void onDelModeEnable() {
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
-        mDelModePanel.setVisibility(View.VISIBLE);
-    }
-
-    public void onDelModeDisable() {
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
-        mDelModePanel.setVisibility(View.GONE);
-    }
-
     public void onDelDmBtnClick(View view) {
         mShowcaseAdapter.deleteChoosedItems();
     }
 
     public void onCancelDmBtnClick(View view) {
         mShowcaseAdapter.cancelDel();
+    }
+
+    /* Touch events */
+
+    class SlideListener extends GestureDetector.SimpleOnGestureListener {
+        private static final double MIN_FLING_X = 150d;
+        private static final double MAX_FLING_Y = 100d;
+        private static final double LEFT_FLING_EDGE = 0.3d; // 1d = display width
+        private static final double RIGHT_FLING_EDGE = 0.7d;
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            if (getResources().getConfiguration().orientation
+                    == Configuration.ORIENTATION_LANDSCAPE) {
+                setLandscapeLayout();
+                return false;
+            }
+
+            double dY = Math.abs(e2.getY() - e1.getY());
+            double dX = Math.abs(e2.getX() - e1.getX());
+            if (dY < MAX_FLING_Y && dX > MIN_FLING_X) {
+                TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
+                if (mViewModel.isShowcaseMode() &&
+                        velocityX < 0 &&
+                        e1.getX() > RIGHT_FLING_EDGE*mDisplayWidth) {
+                    setBasketMode();
+                }
+                else if (!mViewModel.isShowcaseMode() &&
+                        velocityX > 0 &&
+                        e1.getX() < LEFT_FLING_EDGE*mDisplayWidth){
+                    setShowcaseMode();
+                }
+                return true;
+            }
+            return false;
+        }
     }
 
     @Override
