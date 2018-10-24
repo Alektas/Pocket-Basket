@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -418,15 +419,11 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /* If fling occurred, don't dispatch touch event further
+     * to avoid conflict with scrolling in recyclerviews */
     @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        onTouchEvent(ev);
-        return super.dispatchTouchEvent(ev);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        mGestureDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (mGestureDetector.onTouchEvent(event)) return true;
+        else return super.dispatchTouchEvent(event);
     }
 }
