@@ -12,7 +12,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -263,8 +262,8 @@ public class MainActivity extends AppCompatActivity
     /* Interfaces methods */
 
     @Override
-    public void onDialogAcceptReset() {
-        mViewModel.resetShowcase();
+    public void onDialogAcceptReset(boolean fullReset) {
+        mViewModel.resetShowcase(fullReset);
     }
 
     @Override

@@ -17,6 +17,7 @@ public interface Model {
     void insertItem(Item item);
     void deleteItems(List<Item> item);
     void setFilter(int tag);
+    void resetShowcase(boolean fullReset);
 
     LiveData<List<Item>> getAllData();
     LiveData<List<Item>> getBasketData();

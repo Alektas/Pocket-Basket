@@ -1,6 +1,8 @@
 package alektas.pocketbasket.model;
 
 import android.app.Application;
+
+import alektas.pocketbasket.async.insertAllAsync;
 import androidx.lifecycle.LiveData;
 import android.os.AsyncTask;
 
@@ -105,6 +107,17 @@ public class RepoManager implements Model {
         mShowcaseItems.setValue(getItems(tag));
     }
 
+    @Override
+    public void resetShowcase(boolean fullReset) {
+        if (fullReset) {
+            new resetAsync(mItemsDao).execute(ItemGenerator.getAll());
+            mShowcaseItems.setValue(getItems(mTag));
+        } else {
+            new insertAllAsync(mItemsDao).execute(ItemGenerator.getAll());
+            mShowcaseItems.setValue(getItems(mTag));
+        }
+    }
+
     /* Data getters */
 
     // Return list of items from "Showcase"
@@ -193,6 +206,18 @@ public class RepoManager implements Model {
         }
     }
 
+    private static class resetAsync extends AsyncTask<List<Item>, Void, Void> {
+        private ItemsDao mDao;
+
+        resetAsync(ItemsDao dao) { mDao = dao; }
+
+        @Override
+        protected final Void doInBackground(List<Item>... items) {
+            mDao.fullReset(items[0]);
+            return null;
+        }
+    }
+
     private static class getAllAsync extends AsyncTask<Integer, Void, List<Item>> {
         private ItemsDao mDao;
 
@@ -205,3 +230,10 @@ public class RepoManager implements Model {
         }
     }
 }
+
+
+
+
+
+
+

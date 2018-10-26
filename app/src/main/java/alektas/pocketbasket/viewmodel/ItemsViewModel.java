@@ -80,8 +80,8 @@ public class ItemsViewModel extends AndroidViewModel {
     }
 
     // Return default showcase items
-    public void resetShowcase() {
-
+    public void resetShowcase(boolean fullReset) {
+        mRepoManager.resetShowcase(fullReset);
     }
 
     /* Data getters */

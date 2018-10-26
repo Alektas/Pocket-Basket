@@ -1,14 +1,13 @@
 package alektas.pocketbasket.db;
 
+import alektas.pocketbasket.async.insertAllAsync;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import android.content.Context;
-import android.os.AsyncTask;
-import androidx.annotation.NonNull;
 
-import java.util.List;
+import androidx.annotation.NonNull;
 
 import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.db.dao.ItemsDao;
@@ -45,16 +44,4 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
-    private static class insertAllAsync extends AsyncTask<List<Item>, Void, Void> {
-        private ItemsDao mDao;
-
-        insertAllAsync(ItemsDao dao) { mDao = dao; }
-
-        @SafeVarargs
-        @Override
-        protected final Void doInBackground(List<Item>... items) {
-            mDao.insertAll(items[0]);
-            return null;
-        }
-    }
 }

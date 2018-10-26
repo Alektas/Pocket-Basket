@@ -121,7 +121,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 mModel.removeBasketItem(item);
-                view.setX(0); // uncomment when setHasStableIds(false) in BaseRecyclerAdapter
+                view.setX(0); // TODO: need solution to avoid item blinking on deleting
             }
         });
 
