@@ -70,11 +70,12 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
 
     // ListView listener for processing items sliding and check
     private View.OnTouchListener getSwipeListener(final View itemView, final Item item) {
-        return (v, event) -> {
-            v.onTouchEvent(event); // for enable list view scrolling
+        return (parentView, event) -> {
+            parentView.onTouchEvent(event); // for enable list view scrolling
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    return true;
+                    break;
+//                    return true;
                 case MotionEvent.ACTION_MOVE:
                     if (event.getX() > TAP_PADDING) {
                         itemView.setX(event.getX() - TAP_PADDING);
@@ -82,13 +83,16 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
                     else {
                         itemView.setX(0);
                     }
-                    return true;
+                    break;
+//                    return true;
                 case MotionEvent.ACTION_CANCEL:
                     moveViewBack(itemView);
+                    parentView.setOnTouchListener(null);
                     itemView.performClick();
-                    return true;
+                    break;
+//                    return true;
                 case MotionEvent.ACTION_UP:
-                    if (itemView.getX() > v.getWidth() * DEL_EDGE) {
+                    if (itemView.getX() > parentView.getWidth() * DEL_EDGE) {
                         removeItem(itemView, item);
                     }
                     else {
@@ -102,8 +106,9 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
                         itemView.performClick();
                     }
                     // remove listener from parent to avoid unnecessary swiping
-                    v.setOnTouchListener(null);
-                    return true;
+                    parentView.setOnTouchListener(null);
+                    break;
+//                    return true;
             }
             return false;
         };

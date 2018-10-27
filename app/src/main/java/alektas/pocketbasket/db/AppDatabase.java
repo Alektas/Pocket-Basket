@@ -1,6 +1,7 @@
 package alektas.pocketbasket.db;
 
 import alektas.pocketbasket.async.insertAllAsync;
+import alektas.pocketbasket.model.Observer;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.room.Database;
 import androidx.room.Room;
@@ -21,7 +22,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract ItemsDao getDao();
 
-    public static AppDatabase getInstance(final Context context) {
+    public static AppDatabase getInstance(final Context context, Observer observer) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
@@ -32,7 +33,9 @@ public abstract class AppDatabase extends RoomDatabase {
                                 @Override
                                 public void onCreate(@NonNull SupportSQLiteDatabase db) {
                                     super.onCreate(db);
-                                    new insertAllAsync(getInstance(context).getDao())
+                                    new insertAllAsync(
+                                            getInstance(context, observer).getDao(),
+                                            observer)
                                             .execute(ItemGenerator.getAll());
                                 }
                             })

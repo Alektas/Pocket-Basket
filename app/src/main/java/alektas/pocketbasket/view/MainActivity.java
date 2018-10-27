@@ -420,9 +420,15 @@ public class MainActivity extends AppCompatActivity
 
     /* If fling occurred, don't dispatch touch event further
      * to avoid conflict with scrolling in recyclerviews */
+//    @Override
+//    public boolean dispatchTouchEvent(MotionEvent event) {
+//        if (mGestureDetector.onTouchEvent(event)) return true;
+//        else return super.dispatchTouchEvent(event);
+//    }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        if (mGestureDetector.onTouchEvent(event)) return true;
-        else return super.dispatchTouchEvent(event);
+        mGestureDetector.onTouchEvent(event);
+        return super.dispatchTouchEvent(event);
     }
 }

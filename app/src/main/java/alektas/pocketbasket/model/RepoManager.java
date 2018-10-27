@@ -5,6 +5,7 @@ import android.app.Application;
 import alektas.pocketbasket.async.insertAllAsync;
 import androidx.lifecycle.LiveData;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -16,17 +17,17 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class RepoManager implements Model {
+public class RepoManager implements Model, Observer {
     private static final String TAG = "RepoManager";
-    private int mTag;
+    private int mTag = 0;
     private ItemsDao mItemsDao;
     private MutableLiveData<List<Item>> mShowcaseItems;
     private LiveData<List<Item>> mBasketItems;
 
     public RepoManager(Application application) {
-        mItemsDao = AppDatabase.getInstance(application).getDao();
         mShowcaseItems = new MutableLiveData<>();
-        mShowcaseItems.setValue(getItems(0));
+        mItemsDao = AppDatabase.getInstance(application, this).getDao();
+        update();
         mBasketItems = mItemsDao.getBasketData();
     }
 
@@ -51,7 +52,7 @@ public class RepoManager implements Model {
     public void addBasketItem(@NonNull Item item) {
         item.setInBasket(true);
         new updateAsync(mItemsDao).execute(item);
-        mShowcaseItems.setValue(getItems(mTag));
+        update();
     }
 
     // Change item state in "Basket"
@@ -77,45 +78,46 @@ public class RepoManager implements Model {
         item.setInBasket(false);
         item.setChecked(false);
         new updateAsync(mItemsDao).execute(item);
-        mShowcaseItems.setValue(getItems(mTag));
+        update();
     }
 
     // Delete all items from "Basket"
     @Override
     public void clearBasket() {
-        new clearAsync(mItemsDao).execute();
-        mShowcaseItems.setValue(getItems(mTag));
+        new clearAsync(mItemsDao, this).execute();
     }
 
     /* Showcase methods */
 
     @Override
     public void insertItem(Item item) {
-        new insertAsync(mItemsDao).execute(item);
-        mShowcaseItems.setValue(getItems(mTag));
+        new insertAsync(mItemsDao, this).execute(item);
     }
 
     @Override
     public void deleteItems(List<Item> items) {
-        new deleteAllAsync(mItemsDao).execute(items);
-        mShowcaseItems.setValue(getItems(mTag));
+        new deleteAllAsync(mItemsDao, this).execute(items);
     }
 
     @Override
     public void setFilter(int tag) {
         mTag = tag;
-        mShowcaseItems.setValue(getItems(tag));
+        update();
     }
 
     @Override
     public void resetShowcase(boolean fullReset) {
         if (fullReset) {
-            new resetAsync(mItemsDao).execute(ItemGenerator.getAll());
-            mShowcaseItems.setValue(getItems(mTag));
+            new resetAsync(mItemsDao, this).execute(ItemGenerator.getAll());
         } else {
-            new insertAllAsync(mItemsDao).execute(ItemGenerator.getAll());
-            mShowcaseItems.setValue(getItems(mTag));
+            new insertAllAsync(mItemsDao, this).execute(ItemGenerator.getAll());
         }
+    }
+
+    @Override
+    public void update() {
+        Log.d(TAG, "update: items = " + getItems(mTag));
+        mShowcaseItems.setValue(getItems(mTag));
     }
 
     /* Data getters */
@@ -163,8 +165,9 @@ public class RepoManager implements Model {
 
         updateAllAsync(ItemsDao dao) { mDao = dao; }
 
+        @SafeVarargs
         @Override
-        protected Void doInBackground(List<Item>... items) {
+        protected final Void doInBackground(List<Item>... items) {
             mDao.update(items[0]);
             return null;
         }
@@ -172,49 +175,95 @@ public class RepoManager implements Model {
 
     private static class clearAsync extends AsyncTask<Void, Void, Void> {
         private ItemsDao mDao;
+        private Observer mObserver;
 
         clearAsync(ItemsDao dao) { mDao = dao; }
+
+        clearAsync(ItemsDao dao, Observer observer) {
+            this(dao);
+            mObserver = observer;
+        }
 
         @Override
         protected Void doInBackground(Void... voids) {
             mDao.clearBasket();
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mObserver != null) mObserver.update();
+        }
     }
 
     private static class insertAsync extends AsyncTask<Item, Void, Void> {
         private ItemsDao mDao;
+        private Observer mObserver;
 
         insertAsync(ItemsDao dao) { mDao = dao; }
+
+        insertAsync(ItemsDao dao, Observer observer) {
+            this(dao);
+            mObserver = observer;
+        }
 
         @Override
         protected final Void doInBackground(Item... items) {
             mDao.insert(items[0]);
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mObserver != null) mObserver.update();
+        }
     }
 
     private static class deleteAllAsync extends AsyncTask<List<Item>, Void, Void> {
         private ItemsDao mDao;
+        private Observer mObserver;
 
         deleteAllAsync(ItemsDao dao) { mDao = dao; }
 
+        deleteAllAsync(ItemsDao dao, Observer observer) {
+            this(dao);
+            mObserver = observer;
+        }
+
+        @SafeVarargs
         @Override
         protected final Void doInBackground(List<Item>... items) {
             mDao.delete(items[0]);
             return null;
         }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mObserver != null) mObserver.update();
+        }
     }
 
     private static class resetAsync extends AsyncTask<List<Item>, Void, Void> {
         private ItemsDao mDao;
+        private Observer mObserver;
 
         resetAsync(ItemsDao dao) { mDao = dao; }
 
+        resetAsync(ItemsDao dao, Observer observer) {
+            this(dao);
+            mObserver = observer;
+        }
+
+        @SafeVarargs
         @Override
         protected final Void doInBackground(List<Item>... items) {
             mDao.fullReset(items[0]);
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mObserver != null) mObserver.update();
         }
     }
 
