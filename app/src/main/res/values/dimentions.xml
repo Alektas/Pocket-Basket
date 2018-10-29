@@ -19,4 +19,11 @@
     <dimen name="padding_rb">10dp</dimen>
 
     <dimen name="text_size">14sp</dimen>
+
+    <dimen name="change_mode_left_edge">56dp</dimen>
+    <dimen name="change_mode_right_edge">72dp</dimen>
+    <dimen name="fling_X_min">72dp</dimen>
+    <dimen name="fling_Y_max">100dp</dimen>
+
+    <dimen name="del_distance">72dp</dimen>
 </resources>

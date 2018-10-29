@@ -11,6 +11,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.transition.Slide;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -385,10 +386,17 @@ public class MainActivity extends AppCompatActivity
     /* Touch events */
 
     class SlideListener extends GestureDetector.SimpleOnGestureListener {
-        private static final double MIN_FLING_X = 150d;
-        private static final double MAX_FLING_Y = 100d;
-        private static final double LEFT_FLING_EDGE = 0.3d; // 1d = display width
-        private static final double RIGHT_FLING_EDGE = 0.7d;
+        private final double MIN_FLING_X;
+        private final double MAX_FLING_Y;
+        private final double LEFT_FLING_EDGE;
+        private final double RIGHT_FLING_EDGE;
+
+        SlideListener() {
+            LEFT_FLING_EDGE = getResources().getDimension(R.dimen.change_mode_left_edge);
+            RIGHT_FLING_EDGE = getResources().getDimension(R.dimen.change_mode_right_edge);
+            MIN_FLING_X = getResources().getDimension(R.dimen.fling_X_min);
+            MAX_FLING_Y = getResources().getDimension(R.dimen.fling_Y_max);
+        }
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
@@ -404,12 +412,12 @@ public class MainActivity extends AppCompatActivity
                 TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
                 if (mViewModel.isShowcaseMode() &&
                         velocityX < 0 &&
-                        e1.getX() > RIGHT_FLING_EDGE*mDisplayWidth) {
+                        e1.getX() > mDisplayWidth - RIGHT_FLING_EDGE) {
                     setBasketMode();
                 }
                 else if (!mViewModel.isShowcaseMode() &&
                         velocityX > 0 &&
-                        e1.getX() < LEFT_FLING_EDGE*mDisplayWidth){
+                        e1.getX() < LEFT_FLING_EDGE){
                     setShowcaseMode();
                 }
                 return true;
@@ -426,6 +434,7 @@ public class MainActivity extends AppCompatActivity
 //        else return super.dispatchTouchEvent(event);
 //    }
 
+    /* !!! Cause conflict with scrolling in recyclerviews */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         mGestureDetector.onTouchEvent(event);

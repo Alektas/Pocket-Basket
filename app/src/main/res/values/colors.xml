@@ -4,4 +4,7 @@
     <color name="colorPrimaryLight">#60ad5e</color>
     <color name="colorPrimaryDark">#005005</color>
     <color name="colorAccent">@color/colorPrimaryDark</color>
+
+    <color name="item_bg">#fafafa</color>
+    <color name="item_bg_del">#f44336</color>
 </resources>

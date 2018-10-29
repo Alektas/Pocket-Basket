@@ -6,6 +6,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,14 +16,18 @@ import alektas.pocketbasket.R;
 import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 public class BasketRvAdapter extends BaseRecyclerAdapter {
     private static final String TAG = "BasketAdapter";
-    private final float DEL_EDGE = 0.6f;
-    private final float TAP_PADDING;
+    private final float DEL_DISTANCE;
     private final float CHECKABLE_ZONE;
     private Context mContext;
     private ItemsViewModel mModel;
+    private float mTouchX;
+    private boolean mItemColored;
+    private int mItemBgColor;
+    private int mItemBgDelColor;
 
     BasketRvAdapter(Context context, ItemsViewModel model) {
         super(context, model);
@@ -32,7 +37,10 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
         float padding = getPadding();
         float iconSize = getIconSize();
         CHECKABLE_ZONE = 2*padding + iconSize;
-        TAP_PADDING = CHECKABLE_ZONE;
+        DEL_DISTANCE = getDelDistance();
+
+        mItemBgColor = ContextCompat.getColor(mContext, R.color.item_bg);
+        mItemBgDelColor = ContextCompat.getColor(mContext, R.color.item_bg_del);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -74,25 +82,35 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
             parentView.onTouchEvent(event); // for enable list view scrolling
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
+                    mTouchX = event.getX();
                     break;
-//                    return true;
                 case MotionEvent.ACTION_MOVE:
-                    if (event.getX() > TAP_PADDING) {
-                        itemView.setX(event.getX() - TAP_PADDING);
+                    if (event.getX() > mTouchX) {
+                        itemView.setX(event.getX() - mTouchX);
+
+                        if ( (itemView.getX() - mTouchX) > DEL_DISTANCE) {
+                            if (!mItemColored) {
+                                paintView(itemView, true);
+                            }
+                        }
+                        else {
+                            if (mItemColored) {
+                                paintView(itemView, false);
+                            }
+                        }
+
                     }
                     else {
                         itemView.setX(0);
                     }
                     break;
-//                    return true;
                 case MotionEvent.ACTION_CANCEL:
                     moveViewBack(itemView);
                     parentView.setOnTouchListener(null);
                     itemView.performClick();
                     break;
-//                    return true;
                 case MotionEvent.ACTION_UP:
-                    if (itemView.getX() > parentView.getWidth() * DEL_EDGE) {
+                    if ( (itemView.getX() - mTouchX) > DEL_DISTANCE) {
                         removeItem(itemView, item);
                     }
                     else {
@@ -108,25 +126,25 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
                     // remove listener from parent to avoid unnecessary swiping
                     parentView.setOnTouchListener(null);
                     break;
-//                    return true;
             }
             return false;
         };
     }
 
-    private void removeItem(final View view, final Item item) {
-        ValueAnimator fadeAnim = ValueAnimator.ofFloat(view.getX(),
-                ((ViewGroup)view.getParent()).getWidth());
+    private void removeItem(final View itemView, final Item item) {
+        ValueAnimator fadeAnim = ValueAnimator.ofFloat(itemView.getX(),
+                ((ViewGroup)itemView.getParent()).getWidth());
         fadeAnim.setInterpolator(new AccelerateInterpolator());
         fadeAnim.addUpdateListener(valueAnimator ->
-                view.setX((float) valueAnimator.getAnimatedValue()));
+                itemView.setX((float) valueAnimator.getAnimatedValue()));
 
         fadeAnim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 mModel.removeBasketItem(item);
-                view.setX(0); // TODO: need solution to avoid item blinking on deleting
+                itemView.setX(0); // TODO: need solution to avoid item blinking on deleting
+                itemView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.item_bg));
             }
         });
 
@@ -134,17 +152,48 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
         fadeAnim.start();
     }
 
-    private void moveViewBack(View view) {
-        ObjectAnimator.ofFloat(view, View.X,
-                view.getX(), 0)
+    private void moveViewBack(View itemView) {
+        ObjectAnimator.ofFloat(itemView, View.X,
+                itemView.getX(), 0)
                 .setDuration(200).start();
+        if (mItemColored) {
+            paintView(itemView, false);
+        }
     }
+
+    private void paintView(View view, boolean colorful) {
+        mItemColored = colorful;
+        if (colorful) {
+            runColorAnim(view, mItemBgColor, mItemBgDelColor);
+        }
+        else {
+            runColorAnim(view, mItemBgDelColor, mItemBgColor);
+        }
+    }
+
+    private void runColorAnim(View view, int fromColor, int toColor) {
+        ValueAnimator animation = ValueAnimator.ofObject(
+                new android.animation.ArgbEvaluator(),
+                fromColor,
+                toColor);
+        animation.addUpdateListener(updatedAnimation -> {
+            int animatedValue = (int)updatedAnimation.getAnimatedValue();
+            view.setBackgroundColor(animatedValue);
+        });
+        animation.setDuration(200);
+        animation.start();
+    }
+
 
     private float getPadding() {
         return mContext.getResources().getDimension(R.dimen.padding_8);
     }
 
     private float getIconSize() {
+        return mContext.getResources().getDimension(R.dimen.ic_item_size);
+    }
+
+    private float getDelDistance() {
         return mContext.getResources().getDimension(R.dimen.ic_item_size);
     }
 }

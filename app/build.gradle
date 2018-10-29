@@ -6,7 +6,7 @@ android {
         applicationId "alektas.pocketbasket"
         minSdkVersion 19
         targetSdkVersion 28
-        versionName '0.1'
+        versionName '0.1.2'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         versionNameSuffix 'alpha'
     }
