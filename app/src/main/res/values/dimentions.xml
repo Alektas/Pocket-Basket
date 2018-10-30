@@ -10,7 +10,7 @@
     <dimen name="showcase_wide_size">160dp</dimen>
     <dimen name="showcase_narrow_size">72dp</dimen>
 
-    <dimen name="basket_wide_size">72dp</dimen>
+    <dimen name="basket_wide_size">150dp</dimen>
     <dimen name="basket_narrow_size">72dp</dimen>
 
     <dimen name="padding_8">8dp</dimen>
@@ -25,5 +25,5 @@
     <dimen name="fling_X_min">72dp</dimen>
     <dimen name="fling_Y_max">100dp</dimen>
 
-    <dimen name="del_distance">72dp</dimen>
+    <dimen name="del_distance">100dp</dimen>
 </resources>

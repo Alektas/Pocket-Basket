@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity
 
         mBasketAdapter = new BasketRvAdapter(this, mViewModel);
         mBasket.setAdapter(mBasketAdapter);
+
         mShowcaseAdapter = new ShowcaseRvAdapter(this, this, mViewModel);
         mShowcase.setAdapter(mShowcaseAdapter);
 

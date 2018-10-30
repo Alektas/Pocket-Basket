@@ -6,9 +6,9 @@ android {
         applicationId "alektas.pocketbasket"
         minSdkVersion 19
         targetSdkVersion 28
-        versionName '0.1.2'
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        versionName '0.2.0'
         versionNameSuffix 'alpha'
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -53,7 +53,7 @@ dependencies {
     implementation 'com.google.dagger:dagger:2.16'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0-beta01'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-beta01'
+    androidTestImplementation 'androidx.test:runner:1.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     implementation 'com.google.android.material:material:1.0.0'
 }
