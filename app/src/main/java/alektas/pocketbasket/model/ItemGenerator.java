@@ -1,9 +1,12 @@
 package alektas.pocketbasket.model;
 
+import android.content.res.Resources;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.R;
+import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.db.entity.Item;
 
 public class ItemGenerator {
@@ -65,7 +68,15 @@ public class ItemGenerator {
     }
 
     private static void addItem(List<Item> items, int nameRes, int imgRes, int tags) {
-        Item item = new Item(nameRes, imgRes, tags);
+        Item item;
+        try {
+            String name = Utils.getString(nameRes);
+            item = new Item(name, nameRes, imgRes, tags);
+        }
+        catch (Resources.NotFoundException e) {
+            e.printStackTrace();
+            item = new Item(nameRes, imgRes, tags);
+        }
         items.add(item);
     }
 }

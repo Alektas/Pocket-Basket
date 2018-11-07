@@ -22,8 +22,14 @@ public abstract class ItemsDao {
     @Query("SELECT * FROM items WHERE tag_res = :tag ORDER BY name ASC")
     public abstract List<Item> getByTag(int tag);
 
+    @Query("SELECT * FROM items WHERE name LIKE :query")
+    public abstract List<Item> search(String query);
+
     @Query("SELECT * FROM items WHERE in_basket = 1 ORDER BY tag_res, name ASC")
     public abstract LiveData<List<Item>> getBasketData();
+
+    @Query("UPDATE items SET in_basket = 1 WHERE name = :name")
+    public abstract void putItemToBasket(String name);
 
     @Query("UPDATE items SET in_basket = 0, checked = 0 WHERE in_basket = 1 AND checked = 1")
     public abstract void clearBasket();

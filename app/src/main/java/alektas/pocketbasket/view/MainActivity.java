@@ -6,13 +6,16 @@ import androidx.lifecycle.ViewModelProviders;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.transition.Slide;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -30,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
+import android.widget.SearchView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -39,7 +43,9 @@ public class MainActivity extends AppCompatActivity
         implements ResetDialog.ResetDialogListener,
         AddItemDialog.AddItemDialogListener,
         DeleteModeListener {
+
     private static final String TAG = "PocketBasketApp";
+
     private int mDisplayWidth;
     private float mCategNarrowWidth;
     private float mShowcaseWideWidth;
@@ -51,6 +57,7 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView mShowcase;
     private ViewGroup mDelModePanel;
     private RadioGroup mCategories;
+    private SearchView mSearchView;
     private FloatingActionButton mAddBtn;
     private View mDelAllBtn;
     private View mCheckAllBtn;
@@ -70,6 +77,30 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.main_layout);
         App.getComponent().inject(this);
         init();
+        handleSearch(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleSearch(intent);
+    }
+
+    private void handleSearch(Intent intent) {
+        String query = intent.getStringExtra(SearchManager.QUERY);
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            addItem(query);
+        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            String itemName = intent.getDataString();
+            addItem(itemName);
+        }
+    }
+
+    private void addItem(String query) {
+        Log.d(TAG, "addItem: query = " + query);
+        mViewModel.addItem(query, R.string.other);
     }
 
     /* Init methods */
@@ -116,6 +147,10 @@ public class MainActivity extends AppCompatActivity
                 mBasketAdapter::setItems);
         mViewModel.getShowcaseData().observe(this,
                 mShowcaseAdapter::setItems);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        mSearchView = findViewById(R.id.search_view);
+        mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
         if (getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE) {
@@ -165,6 +200,7 @@ public class MainActivity extends AppCompatActivity
         resizeRadioText(mCategories, 0f);
 
         ((View)mAddBtn).setVisibility(View.VISIBLE);
+        mSearchView.setVisibility(View.VISIBLE);
         if (isMenuShown) { hideMenu(); }
         mCancelDmBtn.setVisibility(View.GONE);
 
@@ -183,6 +219,7 @@ public class MainActivity extends AppCompatActivity
         resizeRadioText(mCategories, 14f);
 
         ((View)mAddBtn).setVisibility(View.GONE);
+        mSearchView.setVisibility(View.GONE);
         if (isMenuShown) { hideMenu(); }
         mCancelDmBtn.setVisibility(View.VISIBLE);
 
@@ -270,7 +307,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDialogAddItem(String itemName, int tagRes) {
-        mViewModel.addNewItem(itemName, tagRes);
+        mViewModel.addItem(itemName, tagRes);
     }
 
     @Override
@@ -308,6 +345,7 @@ public class MainActivity extends AppCompatActivity
         else if (view.getId() == R.id.add_item_btn){
             DialogFragment dialog = new AddItemDialog();
             dialog.show(getSupportFragmentManager(), "AddItemDialog");
+//            onSearchRequested();
         }
     }
 

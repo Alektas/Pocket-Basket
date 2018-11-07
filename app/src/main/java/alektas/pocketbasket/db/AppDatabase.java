@@ -33,8 +33,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                 @Override
                                 public void onCreate(@NonNull SupportSQLiteDatabase db) {
                                     super.onCreate(db);
-                                    new insertAllAsync(
-                                            getInstance(context, observer).getDao(),
+                                    new insertAllAsync(getInstance(context, observer).getDao(),
                                             observer)
                                             .execute(ItemGenerator.getAll());
                                 }

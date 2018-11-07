@@ -57,7 +57,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
                 else { prepareToDel(item, viewHolder); }
             } else {
                 if (mModel.getBasketItem(item.getName()) == null) {
-                    mModel.putItemToBasket(item);
+                    mModel.putToBasket(item);
                     notifyItemChanged(viewHolder.getAdapterPosition());
                 }
                 else {

@@ -1,6 +1,8 @@
 package alektas.pocketbasket.viewmodel;
 
 import android.app.Application;
+import android.util.Log;
+
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.annotation.NonNull;
@@ -12,6 +14,7 @@ import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.model.RepoManager;
 
 public class ItemsViewModel extends AndroidViewModel {
+    private static final String TAG = "ItemsViewModel";
     private LiveData<List<Item>> mShowcaseData;
     private LiveData<List<Item>> mBasketData;
     private List<Item> mDelItems;
@@ -35,8 +38,8 @@ public class ItemsViewModel extends AndroidViewModel {
         return mRepoManager.getBasketItem(key);
     }
 
-    public void putItemToBasket(Item item) {
-        mRepoManager.addBasketItem(item);
+    public void putToBasket(Item item) {
+        mRepoManager.putToBasket(item);
     }
 
     public void checkItem(Item item) {
@@ -61,13 +64,19 @@ public class ItemsViewModel extends AndroidViewModel {
 
     /* Showcase methods */
 
-    public void addNewItem(String name, int tagRes) {
-        if (getBasketItem(name) == null) {
-            Item item = new Item(name);
-            item.setTagRes(tagRes);
-            item.setInBasket(true);
-            mRepoManager.insertItem(item);
+    public void addItem(String name, int tagRes) {
+        if (name == null) { return; }
+        for (Item item : mRepoManager.getItems(0)) {
+            if ( (name.toLowerCase())
+                    .equals(item.getName().toLowerCase()) ) {
+                mRepoManager.putToBasket(item);
+                return;
+            }
         }
+        Item item = new Item(name);
+        item.setTagRes(tagRes);
+        item.setInBasket(true);
+        mRepoManager.insertItem(item);
     }
 
     public void deleteItems(List<Item> items) {

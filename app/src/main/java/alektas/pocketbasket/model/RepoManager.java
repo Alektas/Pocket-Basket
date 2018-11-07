@@ -2,7 +2,9 @@ package alektas.pocketbasket.model;
 
 import android.app.Application;
 
+import alektas.pocketbasket.async.getAllAsync;
 import alektas.pocketbasket.async.insertAllAsync;
+import alektas.pocketbasket.async.searchAsync;
 import androidx.lifecycle.LiveData;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -49,10 +51,8 @@ public class RepoManager implements Model, Observer {
 
     // Add item to "Basket".
     @Override
-    public void addBasketItem(@NonNull Item item) {
-        item.setInBasket(true);
-        new updateAsync(mItemsDao).execute(item);
-        update();
+    public void putToBasket(@NonNull Item item) {
+        new putToBasketAsync(mItemsDao, this).execute(item.getName());
     }
 
     // Change item state in "Basket"
@@ -116,7 +116,6 @@ public class RepoManager implements Model, Observer {
 
     @Override
     public void update() {
-        Log.d(TAG, "update: items = " + getItems(mTag));
         mShowcaseItems.setValue(getItems(mTag));
     }
 
@@ -136,7 +135,8 @@ public class RepoManager implements Model, Observer {
 
     /* Private */
 
-    private List<Item> getItems(int tag) {
+    @Override
+    public List<Item> getItems(int tag) {
         try {
             return new getAllAsync(mItemsDao).execute(tag).get();
         }
@@ -157,6 +157,29 @@ public class RepoManager implements Model, Observer {
         protected Void doInBackground(Item... items) {
             mDao.update(items[0]);
             return null;
+        }
+    }
+
+    private static class putToBasketAsync extends AsyncTask<String, Void, Void> {
+        private ItemsDao mDao;
+        private Observer mObserver;
+
+        putToBasketAsync(ItemsDao dao) { mDao = dao; }
+
+        putToBasketAsync(ItemsDao dao, Observer observer) {
+            this(dao);
+            mObserver = observer;
+        }
+
+        @Override
+        protected final Void doInBackground(String... names) {
+            mDao.putItemToBasket(names[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mObserver != null) mObserver.update();
         }
     }
 
@@ -264,18 +287,6 @@ public class RepoManager implements Model, Observer {
         @Override
         protected void onPostExecute(Void aVoid) {
             if (mObserver != null) mObserver.update();
-        }
-    }
-
-    private static class getAllAsync extends AsyncTask<Integer, Void, List<Item>> {
-        private ItemsDao mDao;
-
-        getAllAsync(ItemsDao dao) { mDao = dao; }
-
-        @Override
-        protected List<Item> doInBackground(Integer... tags) {
-            if (tags[0] == 0) return mDao.getItems();
-            else return mDao.getByTag(tags[0]);
         }
     }
 }

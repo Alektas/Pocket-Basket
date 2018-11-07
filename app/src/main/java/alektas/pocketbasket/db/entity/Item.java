@@ -33,9 +33,17 @@ public class Item {
         mTagRes = 0;
     }
 
+    @Ignore
     public Item(int nameRes, int imgRes, int tagRes) {
         mNameRes = nameRes;
         mName = "" + nameRes;
+        mImgRes = imgRes;
+        mTagRes = tagRes;
+    }
+
+    public Item(String name, int nameRes, int imgRes, int tagRes) {
+        mName = name;
+        mNameRes = nameRes;
         mImgRes = imgRes;
         mTagRes = tagRes;
     }

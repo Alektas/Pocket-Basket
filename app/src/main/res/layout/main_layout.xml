@@ -59,6 +59,18 @@
         app:layout_constraintStart_toEndOf="@+id/showcase_list"
         app:layout_constraintTop_toTopOf="parent"/>
 
+    <SearchView
+        android:id="@+id/search_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="@dimen/basket_wide_size"
+        android:iconifiedByDefault="true"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintEnd_toStartOf="@+id/add_item_btn"
+        app:layout_constraintStart_toEndOf="@+id/showcase_list"
+        app:layout_constraintTop_toTopOf="@+id/add_item_btn"
+        app:layout_constraintBottom_toBottomOf="@+id/add_item_btn"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_item_btn"
         android:layout_width="wrap_content"
