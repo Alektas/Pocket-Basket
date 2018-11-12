@@ -1,8 +1,5 @@
 package alektas.pocketbasket.view;
 
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProviders;
-
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
@@ -10,10 +7,8 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -23,19 +18,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-
-import alektas.pocketbasket.App;
-import alektas.pocketbasket.R;
-import alektas.pocketbasket.viewmodel.ItemsViewModel;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.widget.SearchView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import alektas.pocketbasket.App;
+import alektas.pocketbasket.R;
+import alektas.pocketbasket.viewmodel.ItemsViewModel;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -57,8 +57,8 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView mShowcase;
     private ViewGroup mDelModePanel;
     private RadioGroup mCategories;
-    private SearchView mSearchView;
     private FloatingActionButton mAddBtn;
+    private SearchView mSearchView;
     private View mDelAllBtn;
     private View mCheckAllBtn;
     private View mResetBtn;
@@ -76,8 +76,19 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
         App.getComponent().inject(this);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         init();
         handleSearch(getIntent());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mSearchView.setQuery("", false);
+        View root = findViewById(R.id.root_layout);
+        root.requestFocus();
     }
 
     @Override
@@ -99,7 +110,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void addItem(String query) {
-        Log.d(TAG, "addItem: query = " + query);
         mViewModel.addItem(query, R.string.other);
     }
 
@@ -109,6 +119,7 @@ public class MainActivity extends AppCompatActivity
         initDisplayWidth();
         initAnimTransition();
         initDimensions();
+        initSearch();
 
         mConstraintLayout = findViewById(R.id.root_layout);
         mGestureDetector =
@@ -148,10 +159,6 @@ public class MainActivity extends AppCompatActivity
         mViewModel.getShowcaseData().observe(this,
                 mShowcaseAdapter::setItems);
 
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        mSearchView = findViewById(R.id.search_view);
-        mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
         if (getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE) {
             setLandscapeLayout();
@@ -179,6 +186,13 @@ public class MainActivity extends AppCompatActivity
         mBasketNarrowWidth = getResources().getDimension(R.dimen.basket_narrow_size);
     }
 
+    private void initSearch() {
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        mSearchView = findViewById(R.id.menu_search);
+        mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        mSearchView.setIconified(false);
+    }
+
     /* Layout changes methods */
 
     private void setLandscapeLayout() {
@@ -200,7 +214,6 @@ public class MainActivity extends AppCompatActivity
         resizeRadioText(mCategories, 0f);
 
         ((View)mAddBtn).setVisibility(View.VISIBLE);
-        mSearchView.setVisibility(View.VISIBLE);
         if (isMenuShown) { hideMenu(); }
         mCancelDmBtn.setVisibility(View.GONE);
 
@@ -219,7 +232,6 @@ public class MainActivity extends AppCompatActivity
         resizeRadioText(mCategories, 14f);
 
         ((View)mAddBtn).setVisibility(View.GONE);
-        mSearchView.setVisibility(View.GONE);
         if (isMenuShown) { hideMenu(); }
         mCancelDmBtn.setVisibility(View.VISIBLE);
 
@@ -343,9 +355,14 @@ public class MainActivity extends AppCompatActivity
             }
         }
         else if (view.getId() == R.id.add_item_btn){
-            DialogFragment dialog = new AddItemDialog();
-            dialog.show(getSupportFragmentManager(), "AddItemDialog");
-//            onSearchRequested();
+            if (mSearchView.hasFocus()) {
+                if (!TextUtils.isEmpty(mSearchView.getQuery())) {
+                    addItem(mSearchView.getQuery().toString());
+                }
+                cancelSearch();
+            } else {
+                mSearchView.setIconified(false);
+            }
         }
     }
 
@@ -478,5 +495,12 @@ public class MainActivity extends AppCompatActivity
     public boolean dispatchTouchEvent(MotionEvent event) {
         mGestureDetector.onTouchEvent(event);
         return super.dispatchTouchEvent(event);
+    }
+
+    /* Private methods */
+
+    private void cancelSearch() {
+        mSearchView.setQuery("", false);
+        mSearchView.clearFocus();
     }
 }

@@ -3,7 +3,6 @@ package alektas.pocketbasket;
 import android.app.SearchManager;
 import android.content.ContentProvider;
 import android.content.ContentValues;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
@@ -37,7 +36,6 @@ public class ItemsProvider extends ContentProvider {
                         @Nullable String sortOrder) {
 
         String query = uri.getLastPathSegment();
-        Log.d(TAG, "query: " + query);
         MatrixCursor cursor = new MatrixCursor(ItemsContract.SEARCH_COLUMNS);
         List<Item> items = new ArrayList<>();
         ItemsDao dao = AppDatabase.getInstance(getContext(), null).getDao();
@@ -63,15 +61,8 @@ public class ItemsProvider extends ContentProvider {
     private Cursor fillCursor(MatrixCursor cursor, List<Item> items) {
         int i = 0;
         for (Item item : items) {
-            String name;
-            try {
-                name = Utils.getString(item.getNameRes());
-            } catch (Resources.NotFoundException e) {
-                e.printStackTrace();
-                name = item.getName();
-            }
-            // ID, name and image resource ID
-            cursor.addRow(new Object[] {i, name, item.getImgRes(), name});
+            // ID, name, image resource ID and data(name)
+            cursor.addRow(new Object[] {i, item.getName(), item.getImgRes(), item.getName()});
             i++;
         }
         return cursor;

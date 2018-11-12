@@ -1,6 +1,7 @@
 package alektas.pocketbasket.model;
 
 import android.content.res.Resources;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,8 @@ import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.db.entity.Item;
 
 public class ItemGenerator {
+    private static final String TAG = "ItemGenerator";
+
     private static List<Item> sItems;
 
     public static List<Item> getAll() {
@@ -75,6 +78,7 @@ public class ItemGenerator {
         }
         catch (Resources.NotFoundException e) {
             e.printStackTrace();
+            Log.e(TAG, "addItem: item has no image resource.", e);
             item = new Item(nameRes, imgRes, tags);
         }
         items.add(item);
