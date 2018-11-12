@@ -1,18 +1,16 @@
 package alektas.pocketbasket.view;
 
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProviders;
-
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.transition.Slide;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -20,18 +18,24 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
+import android.transition.TransitionManager;
+import android.widget.SearchView;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.transition.Transition;
-import android.transition.TransitionInflater;
-import android.transition.TransitionManager;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -39,7 +43,9 @@ public class MainActivity extends AppCompatActivity
         implements ResetDialog.ResetDialogListener,
         AddItemDialog.AddItemDialogListener,
         DeleteModeListener {
+
     private static final String TAG = "PocketBasketApp";
+
     private int mDisplayWidth;
     private float mCategNarrowWidth;
     private float mShowcaseWideWidth;
@@ -52,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     private ViewGroup mDelModePanel;
     private RadioGroup mCategories;
     private FloatingActionButton mAddBtn;
+    private SearchView mSearchView;
     private View mDelAllBtn;
     private View mCheckAllBtn;
     private View mResetBtn;
@@ -69,7 +76,41 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
         App.getComponent().inject(this);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         init();
+        handleSearch(getIntent());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mSearchView.setQuery("", false);
+        View root = findViewById(R.id.root_layout);
+        root.requestFocus();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleSearch(intent);
+    }
+
+    private void handleSearch(Intent intent) {
+        String query = intent.getStringExtra(SearchManager.QUERY);
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            addItem(query);
+        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            String itemName = intent.getDataString();
+            addItem(itemName);
+        }
+    }
+
+    private void addItem(String query) {
+        mViewModel.addItem(query, R.string.other);
     }
 
     /* Init methods */
@@ -78,6 +119,7 @@ public class MainActivity extends AppCompatActivity
         initDisplayWidth();
         initAnimTransition();
         initDimensions();
+        initSearch();
 
         mConstraintLayout = findViewById(R.id.root_layout);
         mGestureDetector =
@@ -142,6 +184,13 @@ public class MainActivity extends AppCompatActivity
         mShowcaseNarrowWidth = getResources().getDimension(R.dimen.showcase_narrow_size);
         mShowcaseWideWidth = getResources().getDimension(R.dimen.showcase_wide_size);
         mBasketNarrowWidth = getResources().getDimension(R.dimen.basket_narrow_size);
+    }
+
+    private void initSearch() {
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        mSearchView = findViewById(R.id.menu_search);
+        mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        mSearchView.setIconified(false);
     }
 
     /* Layout changes methods */
@@ -270,7 +319,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDialogAddItem(String itemName, int tagRes) {
-        mViewModel.addNewItem(itemName, tagRes);
+        mViewModel.addItem(itemName, tagRes);
     }
 
     @Override
@@ -306,8 +355,14 @@ public class MainActivity extends AppCompatActivity
             }
         }
         else if (view.getId() == R.id.add_item_btn){
-            DialogFragment dialog = new AddItemDialog();
-            dialog.show(getSupportFragmentManager(), "AddItemDialog");
+            if (mSearchView.hasFocus()) {
+                if (!TextUtils.isEmpty(mSearchView.getQuery())) {
+                    addItem(mSearchView.getQuery().toString());
+                }
+                cancelSearch();
+            } else {
+                mSearchView.setIconified(false);
+            }
         }
     }
 
@@ -440,5 +495,12 @@ public class MainActivity extends AppCompatActivity
     public boolean dispatchTouchEvent(MotionEvent event) {
         mGestureDetector.onTouchEvent(event);
         return super.dispatchTouchEvent(event);
+    }
+
+    /* Private methods */
+
+    private void cancelSearch() {
+        mSearchView.setQuery("", false);
+        mSearchView.clearFocus();
     }
 }
