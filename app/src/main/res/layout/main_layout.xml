@@ -126,19 +126,4 @@
         app:layout_constraintStart_toStartOf="@id/check_all_btn"
         app:layout_constraintBottom_toTopOf="@id/check_all_btn" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/reset_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/padding_16"
-        android:layout_gravity="end|bottom"
-        app:fabSize="mini"
-        android:visibility="invisible"
-        android:onClick="onBtnClick"
-        android:src="@drawable/ic_reset_white_24dp"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintEnd_toEndOf="@id/del_all_btn"
-        app:layout_constraintStart_toStartOf="@id/del_all_btn"
-        app:layout_constraintBottom_toTopOf="@id/del_all_btn" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

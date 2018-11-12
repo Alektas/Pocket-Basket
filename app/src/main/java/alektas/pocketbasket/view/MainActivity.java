@@ -10,9 +10,10 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +62,6 @@ public class MainActivity extends AppCompatActivity
     private SearchView mSearchView;
     private View mDelAllBtn;
     private View mCheckAllBtn;
-    private View mResetBtn;
     private View mCancelDmBtn;
     private BasketRvAdapter mBasketAdapter;
     private ShowcaseRvAdapter mShowcaseAdapter;
@@ -89,6 +89,23 @@ public class MainActivity extends AppCompatActivity
         mSearchView.setQuery("", false);
         View root = findViewById(R.id.root_layout);
         root.requestFocus();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (R.id.reset_btn == item.getItemId()) {
+            DialogFragment dialog = new ResetDialog();
+            dialog.show(getSupportFragmentManager(), "ResetDialog");
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -138,7 +155,6 @@ public class MainActivity extends AppCompatActivity
 
         mAddBtn = findViewById(R.id.add_item_btn);
         mCheckAllBtn = findViewById(R.id.check_all_btn);
-        mResetBtn = findViewById(R.id.reset_btn);
         mAddBtn.setOnLongClickListener(view -> {
             if (!isMenuShown) showMenu();
             return true;
@@ -214,7 +230,7 @@ public class MainActivity extends AppCompatActivity
         resizeRadioText(mCategories, 0f);
 
         ((View)mAddBtn).setVisibility(View.VISIBLE);
-        if (isMenuShown) { hideMenu(); }
+        if (isMenuShown) { hideFloatingMenu(); }
         mCancelDmBtn.setVisibility(View.GONE);
 
         mViewModel.setBasketNamesShow(true);
@@ -232,7 +248,7 @@ public class MainActivity extends AppCompatActivity
         resizeRadioText(mCategories, 14f);
 
         ((View)mAddBtn).setVisibility(View.GONE);
-        if (isMenuShown) { hideMenu(); }
+        if (isMenuShown) { hideFloatingMenu(); }
         mCancelDmBtn.setVisibility(View.VISIBLE);
 
         mViewModel.setBasketNamesShow(false);
@@ -272,17 +288,15 @@ public class MainActivity extends AppCompatActivity
 
         runVisibilityAnim(mCheckAllBtn, 0, R.animator.check_all_show_anim);
         runVisibilityAnim(mDelAllBtn, 0, R.animator.delete_all_show_anim);
-        runVisibilityAnim(mResetBtn, 0, R.animator.reset_show_anim);
 
         isMenuShown = true;
     }
 
-    private void hideMenu() {
+    private void hideFloatingMenu() {
         mAddBtn.setImageResource(R.drawable.ic_edit_24dp);
 
         runVisibilityAnim(mCheckAllBtn, View.INVISIBLE, R.animator.check_all_hide_anim);
         runVisibilityAnim(mDelAllBtn, View.INVISIBLE, R.animator.delete_all_hide_anim);
-        runVisibilityAnim(mResetBtn, View.INVISIBLE, R.animator.reset_hide_anim);
 
         isMenuShown = false;
     }
@@ -339,19 +353,14 @@ public class MainActivity extends AppCompatActivity
     public void onBtnClick(View view) {
         if (isMenuShown) {
             if (view.getId() == R.id.add_item_btn) {
-                hideMenu();
+                hideFloatingMenu();
             }
             if (view.getId() == R.id.del_all_btn) {
                 mViewModel.clearBasket();
-                hideMenu();
+                hideFloatingMenu();
             }
             if (view.getId() == R.id.check_all_btn) {
                 mViewModel.checkAll();
-            }
-            if (view.getId() == R.id.reset_btn) {
-                DialogFragment dialog = new ResetDialog();
-                dialog.show(getSupportFragmentManager(), "ResetDialog");
-                hideMenu();
             }
         }
         else if (view.getId() == R.id.add_item_btn){
