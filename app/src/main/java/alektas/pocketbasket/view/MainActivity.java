@@ -99,10 +99,20 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (R.id.reset_btn == item.getItemId()) {
-            DialogFragment dialog = new ResetDialog();
-            dialog.show(getSupportFragmentManager(), "ResetDialog");
-            return true;
+
+        switch (item.getItemId()) {
+
+            case R.id.menu_reset: {
+                DialogFragment dialog = new ResetDialog();
+                dialog.show(getSupportFragmentManager(), "ResetDialog");
+                return true;
+            }
+
+            case R.id.menu_about: {
+                DialogFragment dialog = new AboutDialog();
+                dialog.show(getSupportFragmentManager(), "AboutDialog");
+                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);

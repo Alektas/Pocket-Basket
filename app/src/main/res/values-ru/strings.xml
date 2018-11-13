@@ -10,5 +10,8 @@
     <string name="search_hint">Добавить предмет</string>
     <string name="reset">Сброс</string>
     <string name="about_app">О приложении</string>
+    <string name="about_msg">Pocket Basket это приложение для составления списка продуктов.</string>
+    <string name="about_title">\@string/app_name</string>
+    <string name="version">"Версия: %s"</string>
 
 </resources>

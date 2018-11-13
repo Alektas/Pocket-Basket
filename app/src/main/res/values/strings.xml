@@ -10,5 +10,8 @@
     <string name="search_hint">Add item</string>
     <string name="reset">Reset</string>
     <string name="about_app">About app</string>
+    <string name="about_msg">Pocket Basket is app for product list creation.</string>
+    <string name="about_title">@string/app_name</string>
+    <string name="version">Version: %s</string>
 
 </resources>

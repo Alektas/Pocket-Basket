@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/reset_btn"
+    <item android:id="@+id/menu_reset"
           android:orderInCategory="10"
           android:title="@string/reset"
           android:icon="@drawable/ic_reset_white_24dp"
