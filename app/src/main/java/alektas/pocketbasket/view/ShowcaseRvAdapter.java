@@ -19,7 +19,9 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     private ItemsViewModel mModel;
     private List<Item> mDelItems;
 
-    ShowcaseRvAdapter(Context context, DeleteModeListener delModeListener, ItemsViewModel model) {
+    ShowcaseRvAdapter(Context context,
+                      DeleteModeListener delModeListener,
+                      @NonNull ItemsViewModel model) {
         super(context, model);
         mDMListener = delModeListener;
         mModel = model;
