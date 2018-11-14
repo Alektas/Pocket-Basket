@@ -9,8 +9,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,11 +22,13 @@ import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.widget.SearchView;
 
+import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = "PocketBasketApp";
 
-    private int mDisplayWidth;
     private float mCategNarrowWidth;
     private float mShowcaseWideWidth;
     private float mShowcaseNarrowWidth;
@@ -143,42 +142,24 @@ public class MainActivity extends AppCompatActivity
     /* Init methods */
 
     private void init() {
-        initDisplayWidth();
         initAnimTransition();
         initDimensions();
         initSearch();
+        initFloatingActionMenu();
 
         mConstraintLayout = findViewById(R.id.root_layout);
         mGestureDetector =
                 new GestureDetector(this, new SlideListener());
-
-        mBasket = findViewById(R.id.basket_list);
-        mBasket.setLayoutManager(new LinearLayoutManager(this));
-
-        mShowcase = findViewById(R.id.showcase_list);
-        mShowcase.setLayoutManager(new LinearLayoutManager(this));
 
         mCategories = findViewById(R.id.categ_group);
 
         mDelModePanel = findViewById(R.id.del_mode_panel);
         mCancelDmBtn = findViewById(R.id.cancel_dm_btn);
 
-        mAddBtn = findViewById(R.id.add_item_btn);
-        mCheckAllBtn = findViewById(R.id.check_all_btn);
-        mAddBtn.setOnLongClickListener(view -> {
-            if (!isMenuShown) showMenu();
-            return true;
-        });
-
-        mDelAllBtn = findViewById(R.id.del_all_btn);
-
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
 
-        mBasketAdapter = new BasketRvAdapter(this, mViewModel);
-        mBasket.setAdapter(mBasketAdapter);
-
-        mShowcaseAdapter = new ShowcaseRvAdapter(this, this, mViewModel);
-        mShowcase.setAdapter(mShowcaseAdapter);
+        initBasket();
+        initShowcase();
 
         mViewModel.getBasketData().observe(this,
                 mBasketAdapter::setItems);
@@ -191,13 +172,6 @@ public class MainActivity extends AppCompatActivity
         } else {
             setShowcaseMode();
         }
-    }
-
-    private void initDisplayWidth() {
-        Display display = getWindowManager().getDefaultDisplay();
-        DisplayMetrics metrics = new DisplayMetrics();
-        display.getMetrics(metrics);
-        mDisplayWidth = metrics.widthPixels;
     }
 
     private void initAnimTransition() {
@@ -217,6 +191,38 @@ public class MainActivity extends AppCompatActivity
         mSearchView = findViewById(R.id.menu_search);
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         mSearchView.setIconified(false);
+    }
+
+    private void initFloatingActionMenu() {
+        mAddBtn = findViewById(R.id.add_item_btn);
+        mCheckAllBtn = findViewById(R.id.check_all_btn);
+        mDelAllBtn = findViewById(R.id.del_all_btn);
+        mAddBtn.setOnLongClickListener(view -> {
+            if (!isMenuShown) showMenu();
+            return true;
+        });
+    }
+
+    private void initBasket() {
+        mBasket = findViewById(R.id.basket_list);
+        mBasket.setLayoutManager(new LinearLayoutManager(this));
+        mBasketAdapter = new BasketRvAdapter(this, mViewModel);
+        mBasket.setAdapter(mBasketAdapter);
+
+        ItemTouchHelper.Callback callback = new ItemTouchCallback(mBasketAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(mBasket);
+
+        mBasket.addOnItemTouchListener(new ItemTouchListener());
+    }
+
+    private void initShowcase() {
+        mShowcase = findViewById(R.id.showcase_list);
+        mShowcase.setLayoutManager(new LinearLayoutManager(this));
+        mShowcaseAdapter = new ShowcaseRvAdapter(this, this, mViewModel);
+        mShowcase.setAdapter(mShowcaseAdapter);
+
+        mShowcase.addOnItemTouchListener(new ItemTouchListener());
     }
 
     /* Layout changes methods */
@@ -270,6 +276,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void changeLayoutState(float categWidth, float showcaseWidth, float basketWidth) {
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
+
         ViewGroup.LayoutParams categParams = mCategories.getLayoutParams();
         ViewGroup.LayoutParams showcaseParams = mShowcase.getLayoutParams();
         ViewGroup.LayoutParams basketParams = mBasket.getLayoutParams();
@@ -460,15 +468,18 @@ public class MainActivity extends AppCompatActivity
 
     /* Touch events */
 
+    class ItemTouchListener extends RecyclerView.SimpleOnItemTouchListener {
+        @Override
+        public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+            return mGestureDetector.onTouchEvent(e);
+        }
+    }
+
     class SlideListener extends GestureDetector.SimpleOnGestureListener {
         private final double MIN_FLING_X;
         private final double MAX_FLING_Y;
-        private final double LEFT_FLING_EDGE;
-        private final double RIGHT_FLING_EDGE;
 
         SlideListener() {
-            LEFT_FLING_EDGE = getResources().getDimension(R.dimen.change_mode_left_edge);
-            RIGHT_FLING_EDGE = getResources().getDimension(R.dimen.change_mode_right_edge);
             MIN_FLING_X = getResources().getDimension(R.dimen.fling_X_min);
             MAX_FLING_Y = getResources().getDimension(R.dimen.fling_Y_max);
         }
@@ -477,43 +488,22 @@ public class MainActivity extends AppCompatActivity
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             if (getResources().getConfiguration().orientation
                     == Configuration.ORIENTATION_LANDSCAPE) {
-                setLandscapeLayout();
                 return false;
             }
 
             double dY = Math.abs(e2.getY() - e1.getY());
             double dX = Math.abs(e2.getX() - e1.getX());
             if (dY < MAX_FLING_Y && dX > MIN_FLING_X) {
-                TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
-                if (mViewModel.isShowcaseMode() &&
-                        velocityX < 0 &&
-                        e1.getX() > mDisplayWidth - RIGHT_FLING_EDGE) {
+                if (mViewModel.isShowcaseMode() && velocityX < 0) {
                     setBasketMode();
                 }
-                else if (!mViewModel.isShowcaseMode() &&
-                        velocityX > 0 &&
-                        e1.getX() < LEFT_FLING_EDGE){
+                else if (!mViewModel.isShowcaseMode() && velocityX > 0){
                     setShowcaseMode();
                 }
                 return true;
             }
             return false;
         }
-    }
-
-    /* If fling occurred, don't dispatch touch event further
-     * to avoid conflict with scrolling in recyclerviews */
-//    @Override
-//    public boolean dispatchTouchEvent(MotionEvent event) {
-//        if (mGestureDetector.onTouchEvent(event)) return true;
-//        else return super.dispatchTouchEvent(event);
-//    }
-
-    /* !!! Cause conflict with scrolling in recyclerviews */
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        mGestureDetector.onTouchEvent(event);
-        return super.dispatchTouchEvent(event);
     }
 
     /* Private methods */
