@@ -11,6 +11,7 @@
     </style>
 
     <style name="AppBar" parent="AppTheme">
+        <item name="colorAccent">@android:color/white</item>
         <item name="colorControlNormal">@android:color/white</item>
         <item name="colorControlActivated">@android:color/white</item>
         <item name="android:editTextColor">@android:color/white</item>

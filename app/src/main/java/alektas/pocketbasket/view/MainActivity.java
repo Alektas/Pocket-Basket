@@ -7,6 +7,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.GestureDetector;
@@ -175,8 +176,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initAnimTransition() {
-        mTransitionSet = TransitionInflater.from(this)
-                .inflateTransition(R.transition.change_mode_transition);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mTransitionSet = TransitionInflater.from(this)
+                    .inflateTransition(R.transition.change_mode_transition);
+        } else {
+            mTransitionSet = TransitionInflater.from(this)
+                    .inflateTransition(R.transition.change_mode_transition_compat);
+        }
     }
 
     private void initDimensions() {

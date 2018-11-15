@@ -14,6 +14,6 @@ public class searchAsync extends AsyncTask<String, Void, List<Item>> {
 
     @Override
     protected List<Item> doInBackground(String... query) {
-        return mDao.search("%"+query[0]+"%");
+        return mDao.search(query[0]+"%");
     }
 }

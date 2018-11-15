@@ -8,7 +8,9 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.annotation.NonNull;
 
-@Entity(tableName = "items", indices = {@Index(value = {"name"}, unique = true)})
+@Entity(tableName = "items", indices = {
+        @Index(value = {"name"}, unique = true),
+        @Index("tag_res")})
 public class Item {
     @PrimaryKey
     @ColumnInfo(name = "name")
