@@ -6,8 +6,11 @@ android {
         applicationId "alektas.pocketbasket"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+
+        versionName '0.3.0'
+        versionNameSuffix '_alpha'
+        project.ext.set("archivesBaseName", "PocketBasket_" + defaultConfig.versionName)
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -16,6 +19,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
+            applicationIdSuffix ".debug"
+//            versionNameSuffix "_debug"
         }
     }
     compileOptions {
@@ -24,6 +29,8 @@ android {
     }
     dataBinding {
         enabled = true
+    }
+    productFlavors {
     }
 }
 
@@ -38,24 +45,20 @@ buildscript {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'androidx.annotation:annotation:1.0.0'
-
     implementation 'androidx.room:room-runtime:2.0.0'
     annotationProcessor 'androidx.room:room-compiler:2.0.0'
-
     // ViewModel and LiveData
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
-
     implementation 'com.google.dagger:dagger:2.16'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
-
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0-beta01'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-beta01'
+    androidTestImplementation 'androidx.test:runner:1.1.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     implementation 'com.google.android.material:material:1.0.0'
 }

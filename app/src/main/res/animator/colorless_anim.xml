@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <objectAnimator
+        android:propertyName="backgroundColor"
+        android:duration="200"
+        android:valueFrom="@color/item_bg_del"
+        android:valueTo="@color/item_bg"
+        android:valueType="colorType"/>
+</set>

@@ -1,139 +1,170 @@
 package alektas.pocketbasket.view;
 
-import androidx.annotation.Nullable;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.ViewModelProviders;
-
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.appcompat.app.AppCompatActivity;
+import android.os.Build;
 import android.os.Bundle;
-import android.transition.ChangeBounds;
-import android.transition.Fade;
-import android.transition.TransitionManager;
-import android.transition.TransitionSet;
-import android.util.DisplayMetrics;
-import android.view.Display;
+import android.text.TextUtils;
 import android.view.GestureDetector;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
+import android.transition.TransitionManager;
+import android.widget.SearchView;
 
-import java.util.List;
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.SimpleItemAnimator;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements ResetDialog.ResetDialogListener,
+        AddItemDialog.AddItemDialogListener,
+        DeleteModeListener {
+
     private static final String TAG = "PocketBasketApp";
-    private static final int ADD_ITEM_REQUEST = 101;
-    private int mDisplayWidth;
+
     private float mCategNarrowWidth;
     private float mShowcaseWideWidth;
     private float mShowcaseNarrowWidth;
     private float mBasketNarrowWidth;
+    private boolean isMenuShown;
 
     private RecyclerView mBasket;
     private RecyclerView mShowcase;
     private ViewGroup mDelModePanel;
     private RadioGroup mCategories;
-    private View mAddBtn;
+    private FloatingActionButton mAddBtn;
+    private SearchView mSearchView;
+    private View mDelAllBtn;
+    private View mCheckAllBtn;
     private View mCancelDmBtn;
     private BasketRvAdapter mBasketAdapter;
     private ShowcaseRvAdapter mShowcaseAdapter;
-    private TransitionSet mTransitionSet;
+    private Transition mTransitionSet;
     private GestureDetector mGestureDetector;
     private ConstraintLayout mConstraintLayout;
 
     private ItemsViewModel mViewModel;
-    private LiveData<List<Item>> mShowcaseItems;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
         App.getComponent().inject(this);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         init();
+        handleSearch(getIntent());
     }
 
-    class SlideListener extends GestureDetector.SimpleOnGestureListener {
-        private static final double MIN_FLING_X = 150d;
-        private static final double MAX_FLING_Y = 100d;
-        private static final double LEFT_FLING_EDGE = 0.3d; // 1d = display width
-        private static final double RIGHT_FLING_EDGE = 0.7d;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mSearchView.setQuery("", false);
+        View root = findViewById(R.id.root_layout);
+        root.requestFocus();
+    }
 
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if (getResources().getConfiguration().orientation
-                    == Configuration.ORIENTATION_LANDSCAPE) {
-                setLandscapeLayout();
-                return false;
-            }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return true;
+    }
 
-            double dY = Math.abs(e2.getY() - e1.getY());
-            double dX = Math.abs(e2.getX() - e1.getX());
-            if (dY < MAX_FLING_Y && dX > MIN_FLING_X) {
-                TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
-                if (mViewModel.isShowcaseMode() &&
-                        velocityX < 0 &&
-                        e1.getX() > RIGHT_FLING_EDGE*mDisplayWidth) {
-                    setBasketMode();
-                }
-                else if (!mViewModel.isShowcaseMode() &&
-                        velocityX > 0 &&
-                        e1.getX() < LEFT_FLING_EDGE*mDisplayWidth){
-                    setShowcaseMode();
-                }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.menu_reset: {
+                DialogFragment dialog = new ResetDialog();
+                dialog.show(getSupportFragmentManager(), "ResetDialog");
                 return true;
             }
-            return false;
+
+            case R.id.menu_about: {
+                DialogFragment dialog = new AboutDialog();
+                dialog.show(getSupportFragmentManager(), "AboutDialog");
+                return true;
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleSearch(intent);
+    }
+
+    private void handleSearch(Intent intent) {
+        String query = intent.getStringExtra(SearchManager.QUERY);
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            addItem(query);
+        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            String itemName = intent.getDataString();
+            addItem(itemName);
         }
     }
 
+    private void addItem(String query) {
+        mViewModel.addItem(query, R.string.other);
+    }
+
+    /* Init methods */
+
     private void init() {
-        initDisplayWidth();
         initAnimTransition();
         initDimensions();
+        initSearch();
+        initFloatingActionMenu();
 
         mConstraintLayout = findViewById(R.id.root_layout);
         mGestureDetector =
                 new GestureDetector(this, new SlideListener());
-
-        mBasket = findViewById(R.id.basket_list);
-        mBasket.setLayoutManager(new LinearLayoutManager(this));
-
-        mShowcase = findViewById(R.id.showcase_list);
-        mShowcase.setLayoutManager(new LinearLayoutManager(this));
 
         mCategories = findViewById(R.id.categ_group);
 
         mDelModePanel = findViewById(R.id.del_mode_panel);
         mCancelDmBtn = findViewById(R.id.cancel_dm_btn);
 
-        mAddBtn = findViewById(R.id.add_item_btn);
-
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
 
-        mBasketAdapter = new BasketRvAdapter(this, mViewModel);
-        mBasket.setAdapter(mBasketAdapter);
-        mShowcaseAdapter = new ShowcaseRvAdapter(this, mViewModel);
-        mShowcase.setAdapter(mShowcaseAdapter);
+        initBasket();
+        initShowcase();
 
         mViewModel.getBasketData().observe(this,
                 mBasketAdapter::setItems);
-        mShowcaseItems = mViewModel.getShowcaseData();
-        mShowcaseItems.observe(this,
+        mViewModel.getShowcaseData().observe(this,
                 mShowcaseAdapter::setItems);
 
         if (getResources().getConfiguration().orientation
@@ -144,19 +175,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initDisplayWidth() {
-        Display display = getWindowManager().getDefaultDisplay();
-        DisplayMetrics metrics = new DisplayMetrics();
-        display.getMetrics(metrics);
-        mDisplayWidth = metrics.widthPixels;
-    }
-
     private void initAnimTransition() {
-        mTransitionSet = new TransitionSet();
-        mTransitionSet.addTransition(new ChangeBounds());
-        mTransitionSet.addTransition(new Fade());
-        mTransitionSet.setInterpolator(new DecelerateInterpolator());
-        mTransitionSet.setDuration(200);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mTransitionSet = TransitionInflater.from(this)
+                    .inflateTransition(R.transition.change_mode_transition);
+        } else {
+            mTransitionSet = TransitionInflater.from(this)
+                    .inflateTransition(R.transition.change_mode_transition_compat);
+        }
     }
 
     private void initDimensions() {
@@ -166,12 +192,53 @@ public class MainActivity extends AppCompatActivity {
         mBasketNarrowWidth = getResources().getDimension(R.dimen.basket_narrow_size);
     }
 
+    private void initSearch() {
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        mSearchView = findViewById(R.id.menu_search);
+        mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        mSearchView.setIconified(false);
+    }
+
+    private void initFloatingActionMenu() {
+        mAddBtn = findViewById(R.id.add_item_btn);
+        mCheckAllBtn = findViewById(R.id.check_all_btn);
+        mDelAllBtn = findViewById(R.id.del_all_btn);
+        mAddBtn.setOnLongClickListener(view -> {
+            if (!isMenuShown) showMenu();
+            return true;
+        });
+    }
+
+    private void initBasket() {
+        mBasket = findViewById(R.id.basket_list);
+        mBasket.setLayoutManager(new LinearLayoutManager(this));
+        mBasketAdapter = new BasketRvAdapter(this, mViewModel);
+        mBasket.setAdapter(mBasketAdapter);
+
+        ItemTouchHelper.Callback callback = new ItemTouchCallback(mBasketAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(mBasket);
+
+        mBasket.addOnItemTouchListener(new ItemTouchListener());
+    }
+
+    private void initShowcase() {
+        mShowcase = findViewById(R.id.showcase_list);
+        mShowcase.setLayoutManager(new LinearLayoutManager(this));
+        mShowcaseAdapter = new ShowcaseRvAdapter(this, this, mViewModel);
+        mShowcase.setAdapter(mShowcaseAdapter);
+
+        mShowcase.addOnItemTouchListener(new ItemTouchListener());
+    }
+
+    /* Layout changes methods */
+
     private void setLandscapeLayout() {
         changeLayoutState(WRAP_CONTENT,
                 mShowcaseWideWidth,
                 0);
         resizeRadioText(mCategories, 14f);
-        mAddBtn.setVisibility(View.VISIBLE);
+        ((View)mAddBtn).setVisibility(View.VISIBLE);
         mCancelDmBtn.setVisibility(View.VISIBLE);
 
         mViewModel.setBasketNamesShow(true);
@@ -184,7 +251,8 @@ public class MainActivity extends AppCompatActivity {
                 0);
         resizeRadioText(mCategories, 0f);
 
-        mAddBtn.setVisibility(View.VISIBLE);
+        ((View)mAddBtn).setVisibility(View.VISIBLE);
+        if (isMenuShown) { hideFloatingMenu(); }
         mCancelDmBtn.setVisibility(View.GONE);
 
         mViewModel.setBasketNamesShow(true);
@@ -201,7 +269,8 @@ public class MainActivity extends AppCompatActivity {
                 mBasketNarrowWidth);
         resizeRadioText(mCategories, 14f);
 
-        mAddBtn.setVisibility(View.GONE);
+        ((View)mAddBtn).setVisibility(View.GONE);
+        if (isMenuShown) { hideFloatingMenu(); }
         mCancelDmBtn.setVisibility(View.VISIBLE);
 
         mViewModel.setBasketNamesShow(false);
@@ -213,6 +282,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void changeLayoutState(float categWidth, float showcaseWidth, float basketWidth) {
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
+
         ViewGroup.LayoutParams categParams = mCategories.getLayoutParams();
         ViewGroup.LayoutParams showcaseParams = mShowcase.getLayoutParams();
         ViewGroup.LayoutParams basketParams = mBasket.getLayoutParams();
@@ -236,31 +307,94 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setFilter(int tag) {
-        mShowcaseItems.removeObservers(this);
-        mShowcaseItems = mViewModel.getByTag(tag);
-        mShowcaseItems.observe(this, mShowcaseAdapter::setItems);
+    private void showMenu() {
+        mAddBtn.setImageResource(R.drawable.ic_close_white_24dp);
+
+        runVisibilityAnim(mCheckAllBtn, 0, R.animator.check_all_show_anim);
+        runVisibilityAnim(mDelAllBtn, 0, R.animator.delete_all_show_anim);
+
+        isMenuShown = true;
     }
 
-    public void onAddItemBtnClick(View view) {
-        Intent intent = new Intent(this, AddItemActivity.class);
-        startActivityForResult(intent, ADD_ITEM_REQUEST);
+    private void hideFloatingMenu() {
+        mAddBtn.setImageResource(R.drawable.ic_edit_24dp);
+
+        runVisibilityAnim(mCheckAllBtn, View.INVISIBLE, R.animator.check_all_hide_anim);
+        runVisibilityAnim(mDelAllBtn, View.INVISIBLE, R.animator.delete_all_hide_anim);
+
+        isMenuShown = false;
+    }
+
+    private void runVisibilityAnim(View view, int endVis, int animId) {
+        Animator anim = AnimatorInflater.loadAnimator(this, animId);
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                view.setVisibility(endVis);
+            }
+
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                view.setVisibility(View.VISIBLE);
+            }
+        });
+        anim.setTarget(view);
+        anim.start();
+    }
+
+    private void setFilter(int tag) {
+        mViewModel.setFilter(tag);
+    }
+
+    /* Interfaces methods */
+
+    @Override
+    public void onDialogAcceptReset(boolean fullReset) {
+        mViewModel.resetShowcase(fullReset);
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onDialogAddItem(String itemName, int tagRes) {
+        mViewModel.addItem(itemName, tagRes);
+    }
 
-        if (requestCode == ADD_ITEM_REQUEST) {
-            if (resultCode == RESULT_OK && data != null) {
-                String itemName = data.getStringExtra(AddItemActivity.ITEM_NAME);
-                if (mViewModel.getBasketItem(itemName) == null) {
-                    Item item = new Item(itemName);
-                    item.setInBasket(true);
-                    item.setImgRes(data.getIntExtra(AddItemActivity.ITEM_IMG_RES, 0));
-                    item.setTagRes(data.getIntExtra(AddItemActivity.ITEM_CATEGORY_RES, 0));
-                    mViewModel.insertItem(item);
+    @Override
+    public void onDelModeEnable() {
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
+        mDelModePanel.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDelModeDisable() {
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
+        mDelModePanel.setVisibility(View.GONE);
+    }
+
+    /* On buttons click methods */
+
+    public void onBtnClick(View view) {
+        if (isMenuShown) {
+            if (view.getId() == R.id.add_item_btn) {
+                hideFloatingMenu();
+            }
+            if (view.getId() == R.id.del_all_btn) {
+                mViewModel.clearBasket();
+                hideFloatingMenu();
+            }
+            if (view.getId() == R.id.check_all_btn) {
+                mViewModel.checkAll();
+            }
+        }
+        else if (view.getId() == R.id.add_item_btn){
+            if (mSearchView.hasFocus()) {
+                if (!TextUtils.isEmpty(mSearchView.getQuery())) {
+                    addItem(mSearchView.getQuery().toString());
                 }
+                cancelSearch();
+            } else {
+                mSearchView.setIconified(false);
             }
         }
     }
@@ -330,16 +464,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onDelModeEnable() {
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
-        mDelModePanel.setVisibility(View.VISIBLE);
-    }
-
-    public void onDelModeDisable() {
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
-        mDelModePanel.setVisibility(View.GONE);
-    }
-
     public void onDelDmBtnClick(View view) {
         mShowcaseAdapter.deleteChoosedItems();
     }
@@ -348,15 +472,50 @@ public class MainActivity extends AppCompatActivity {
         mShowcaseAdapter.cancelDel();
     }
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        onTouchEvent(ev);
-        return super.dispatchTouchEvent(ev);
+    /* Touch events */
+
+    class ItemTouchListener extends RecyclerView.SimpleOnItemTouchListener {
+        @Override
+        public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
+            return mGestureDetector.onTouchEvent(e);
+        }
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        mGestureDetector.onTouchEvent(event);
-        return super.onTouchEvent(event);
+    class SlideListener extends GestureDetector.SimpleOnGestureListener {
+        private final double MIN_FLING_X;
+        private final double MAX_FLING_Y;
+
+        SlideListener() {
+            MIN_FLING_X = getResources().getDimension(R.dimen.fling_X_min);
+            MAX_FLING_Y = getResources().getDimension(R.dimen.fling_Y_max);
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            if (getResources().getConfiguration().orientation
+                    == Configuration.ORIENTATION_LANDSCAPE) {
+                return false;
+            }
+
+            double dY = Math.abs(e2.getY() - e1.getY());
+            double dX = Math.abs(e2.getX() - e1.getX());
+            if (dY < MAX_FLING_Y && dX > MIN_FLING_X) {
+                if (mViewModel.isShowcaseMode() && velocityX < 0) {
+                    setBasketMode();
+                }
+                else if (!mViewModel.isShowcaseMode() && velocityX > 0){
+                    setShowcaseMode();
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    /* Private methods */
+
+    private void cancelSearch() {
+        mSearchView.setQuery("", false);
+        mSearchView.clearFocus();
     }
 }

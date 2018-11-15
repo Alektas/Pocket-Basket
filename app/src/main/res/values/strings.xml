@@ -2,5 +2,19 @@
     <string name="app_name">Pocket Basket</string>
     <string name="clear">Clear</string>
     <string name="item_name">Item</string>
+    <string name="reset_msg">Back to the original showcase?</string>
+    <string name="cancel">Cancel</string>
+    <string name="accept">Accept</string>
+    <string name="add">Add</string>
+    <string name="del_user_items">Delete user items</string>
+    <string name="search_hint">Add item</string>
+    <string name="reset">Reset</string>
+    <string name="about_app">About app</string>
+    <string name="about_msg">Pocket Basket is app for product list creation.</string>
+    <string name="about_title">@string/app_name</string>
+    <string name="version">Version: %s</string>
+    <string name="garlic">Garlic</string>
+    <string name="pepper">Pepper</string>
+    <string name="grapes">Grapes</string>
 
 </resources>

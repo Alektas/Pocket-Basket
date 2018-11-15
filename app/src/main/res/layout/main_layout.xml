@@ -4,12 +4,33 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:focusableInTouchMode="true">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:contentInsetStart="0dp"
+        app:contentInsetLeft="0dp"
+        android:gravity="center"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/AppBar"
+        app:popupTheme="@style/AppBar">
+
+        <SearchView
+            android:id="@+id/menu_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:iconifiedByDefault="false"
+            android:imeOptions="actionDone"/>
+    </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
         android:id="@+id/categories_wrapper"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:background="@color/colorPrimary"
         android:fillViewport="true"
         android:paddingTop="@dimen/padding_8"
@@ -17,7 +38,8 @@
         app:layout_constraintEnd_toStartOf="@+id/showcase_list"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <include
             android:id="@+id/categ_group"
@@ -34,7 +56,7 @@
         app:layout_constraintEnd_toStartOf="@+id/basket_list"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/categories_wrapper"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:layout_constraintVertical_chainStyle="packed"/>
 
     <include
@@ -53,11 +75,12 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/basket_list"
         android:layout_width="@dimen/basket_narrow_size"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/showcase_list"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_item_btn"
@@ -65,11 +88,42 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/padding_16"
         android:layout_gravity="end|bottom"
-        android:onClick="onAddItemBtnClick"
+        android:onClick="onBtnClick"
+        android:longClickable="true"
         android:src="@drawable/ic_edit_24dp"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/showcase_list"
         app:layout_constraintBottom_toBottomOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/check_all_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_16"
+        android:layout_gravity="end|bottom"
+        app:fabSize="mini"
+        android:visibility="invisible"
+        android:onClick="onBtnClick"
+        android:src="@drawable/ic_check_all_white_24dp"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintEnd_toEndOf="@id/add_item_btn"
+        app:layout_constraintStart_toStartOf="@id/add_item_btn"
+        app:layout_constraintBottom_toTopOf="@id/add_item_btn" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/del_all_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_16"
+        android:layout_gravity="end|bottom"
+        app:fabSize="mini"
+        android:visibility="invisible"
+        android:onClick="onBtnClick"
+        android:src="@drawable/ic_delete_forever_white_24dp"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintEnd_toEndOf="@id/check_all_btn"
+        app:layout_constraintStart_toStartOf="@id/check_all_btn"
+        app:layout_constraintBottom_toTopOf="@id/check_all_btn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

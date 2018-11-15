@@ -8,7 +8,9 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.annotation.NonNull;
 
-@Entity(tableName = "items", indices = {@Index(value = {"name"}, unique = true)})
+@Entity(tableName = "items", indices = {
+        @Index(value = {"name"}, unique = true),
+        @Index("tag_res")})
 public class Item {
     @PrimaryKey
     @ColumnInfo(name = "name")
@@ -33,9 +35,17 @@ public class Item {
         mTagRes = 0;
     }
 
+    @Ignore
     public Item(int nameRes, int imgRes, int tagRes) {
         mNameRes = nameRes;
         mName = "" + nameRes;
+        mImgRes = imgRes;
+        mTagRes = tagRes;
+    }
+
+    public Item(String name, int nameRes, int imgRes, int tagRes) {
+        mName = name;
+        mNameRes = nameRes;
         mImgRes = imgRes;
         mTagRes = tagRes;
     }

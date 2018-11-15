@@ -16,6 +16,7 @@ import alektas.pocketbasket.databinding.ItemViewBinding;
 import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,6 +34,7 @@ public abstract class BaseRecyclerAdapter
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         final View mItemView;
+        final CardView mIconView;
         final ImageView mCheckImage;
         final ImageView mDelImage;
         final TextView mName;
@@ -44,6 +46,7 @@ public abstract class BaseRecyclerAdapter
             mItemBinding = binding;
 
             mItemView = itemView;
+            mIconView = mItemView.findViewById(R.id.item_icon_view);
             mCheckImage = mItemView.findViewById(R.id.check_image);
             mName = mItemView.findViewById(R.id.item_name);
             mDelImage = mItemView.findViewById(R.id.del_image);

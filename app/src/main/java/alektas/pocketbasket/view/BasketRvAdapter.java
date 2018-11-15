@@ -1,50 +1,32 @@
 package alektas.pocketbasket.view;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
+
+import java.util.Collections;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
+
 import androidx.annotation.NonNull;
 
-public class BasketRvAdapter extends BaseRecyclerAdapter {
+public class BasketRvAdapter extends BaseRecyclerAdapter
+        implements ItemTouchAdapter {
+
     private static final String TAG = "BasketAdapter";
-    private final float DEL_EDGE = 0.6f;
-    private final float TAP_PADDING;
-    private final float CHECKABLE_ZONE;
-    private Context mContext;
     private ItemsViewModel mModel;
 
     BasketRvAdapter(Context context, ItemsViewModel model) {
         super(context, model);
-        mContext = context;
         mModel = model;
-
-        float padding = getPadding();
-        float iconSize = getIconSize();
-        CHECKABLE_ZONE = 2*padding + iconSize;
-        TAP_PADDING = CHECKABLE_ZONE;
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         super.onBindViewHolder(viewHolder, position);
-        Item item = getItems().get(position);
-        viewHolder.mItemView.setOnTouchListener((view, motionEvent) -> {
-            ((ViewGroup) view.getParent())
-                    .setOnTouchListener(getSwipeListener(view, item.getName()));
-            return false; // need to be false to allow sliding at the item view zone
+        viewHolder.mIconView.setOnClickListener(v -> {
+            mModel.checkItem(getItems().get(position));
         });
     }
 
@@ -69,77 +51,23 @@ public class BasketRvAdapter extends BaseRecyclerAdapter {
         }
     }
 
-    // ListView listener for processing items sliding and check
-    private View.OnTouchListener getSwipeListener(final View itemView, final String itemKey ) {
-        return (v, event) -> {
-            v.onTouchEvent(event); // for enable list view scrolling
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    return true;
-                case MotionEvent.ACTION_MOVE:
-                    if (event.getX() > TAP_PADDING) {
-                        itemView.setX(event.getX() - TAP_PADDING);
-                    }
-                    else {
-                        itemView.setX(0);
-                    }
-                    return true;
-                case MotionEvent.ACTION_CANCEL:
-                    moveViewBack(itemView);
-                    return true;
-                case MotionEvent.ACTION_UP:
-                    if (itemView.getX() > v.getWidth() * DEL_EDGE) {
-                        removeItem(itemView, itemKey);
-                    }
-                    else {
-                        moveViewBack(itemView);
-                    }
-                    if (event.getX() < CHECKABLE_ZONE
-                            && event.getX() > 0
-                            && event.getY() > itemView.getY()
-                            && event.getY() < itemView.getY() + CHECKABLE_ZONE) {
-                        mModel.checkItem(itemKey);
-                        itemView.performClick();
-                    }
-                    // remove listener from parent to avoid unnecessary swiping
-                    v.setOnTouchListener(null);
-                    return true;
+    @Override
+    public void onItemDismiss(int position) {
+        mModel.removeBasketItem(getItems().get(position));
+    }
+
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(getItems(), i, i + 1);
             }
-            return false;
-        };
-    }
-
-    private void removeItem(final View view, final String key) {
-        ValueAnimator fadeAnim = ValueAnimator.ofFloat(view.getX(),
-                ((ViewGroup)view.getParent()).getWidth());
-        fadeAnim.setInterpolator(new AccelerateInterpolator());
-        fadeAnim.addUpdateListener(valueAnimator ->
-                view.setX((float) valueAnimator.getAnimatedValue()));
-
-        fadeAnim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                mModel.removeBasketItem(key);
-                view.setX(0); // uncomment when setHasStableIds(false) in BaseRecyclerAdapter
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(getItems(), i, i - 1);
             }
-        });
-
-        fadeAnim.setDuration(200);
-        fadeAnim.start();
-    }
-
-    private void moveViewBack(View view) {
-        ObjectAnimator.ofFloat(view, View.X,
-                view.getX(), 0)
-                .setDuration(200).start();
-    }
-
-    private float getPadding() {
-        return mContext.getResources().getDimension(R.dimen.padding_8);
-    }
-
-    private float getIconSize() {
-        return mContext.getResources().getDimension(R.dimen.ic_item_size);
+        }
+        notifyItemMoved(fromPosition, toPosition);
+        return true;
     }
 }

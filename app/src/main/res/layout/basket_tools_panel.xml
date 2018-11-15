@@ -11,6 +11,6 @@
     android:layout_height="@dimen/ic_categ_size"
     android:layout_margin="@dimen/padding_8"
     android:background="@drawable/add_btn_bg"
-    android:onClick="onAddItemBtnClick"/>
+    android:onClick="onBtnClick"/>
 
 </LinearLayout>

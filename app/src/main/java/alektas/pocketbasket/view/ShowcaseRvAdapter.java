@@ -1,8 +1,8 @@
 package alektas.pocketbasket.view;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -15,13 +15,15 @@ import androidx.annotation.NonNull;
 
 public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     private static final String TAG = "ShowcaseAdapter";
-    private MainActivity mActivity;
+    private DeleteModeListener mDMListener;
     private ItemsViewModel mModel;
     private List<Item> mDelItems;
 
-    ShowcaseRvAdapter(MainActivity activity, ItemsViewModel model) {
-        super(activity.getApplicationContext(), model);
-        mActivity = activity;
+    ShowcaseRvAdapter(Context context,
+                      DeleteModeListener delModeListener,
+                      @NonNull ItemsViewModel model) {
+        super(context, model);
+        mDMListener = delModeListener;
         mModel = model;
         mDelItems = model.getDelItems();
     }
@@ -43,21 +45,25 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
         setDelIcon(viewHolder, item);
 
         viewHolder.mItemView.setOnLongClickListener(view -> {
-            enableDelMode();
-            prepareToDel(item);
+            if (!mModel.isDelMode()) {
+                enableDelMode();
+            }
+            prepareToDel(item, viewHolder);
             return true;
         });
 
         viewHolder.mItemView.setOnClickListener(view -> {
             if (mModel.isDelMode()) {
-                if (mDelItems.contains(item)) { removeFromDel(item); }
-                else { prepareToDel(item); }
+                if (mDelItems.contains(item)) { removeFromDel(item, viewHolder); }
+                else { prepareToDel(item, viewHolder); }
             } else {
                 if (mModel.getBasketItem(item.getName()) == null) {
-                    mModel.putItem(item);
+                    mModel.putToBasket(item);
+                    notifyItemChanged(viewHolder.getAdapterPosition());
                 }
                 else {
-                    mModel.removeBasketItem(item.getName());
+                    mModel.removeBasketItem(item);
+                    notifyItemChanged(viewHolder.getAdapterPosition());
                 }
             }
         });
@@ -84,7 +90,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     }
 
     public void deleteChoosedItems() {
-        mModel.deleteAll(mDelItems);
+        mModel.deleteItems(mDelItems);
         cancelDel();
     }
 
@@ -103,23 +109,23 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
         }
     }
 
-    private void prepareToDel(Item item) {
+    private void prepareToDel(Item item, ViewHolder holder) {
         mDelItems.add(item);
-        notifyDataSetChanged();
+        notifyItemChanged(holder.getAdapterPosition());
     }
 
-    private void removeFromDel(Item item) {
+    private void removeFromDel(Item item, ViewHolder holder) {
         mDelItems.remove(item);
-        notifyDataSetChanged();
+        notifyItemChanged(holder.getAdapterPosition());
     }
 
     private void enableDelMode() {
         mModel.setDelMode(true);
-        mActivity.onDelModeEnable();
+        mDMListener.onDelModeEnable();
     }
 
     private void disableDelMode() {
         mModel.setDelMode(false);
-        mActivity.onDelModeDisable();
+        mDMListener.onDelModeDisable();
     }
 }

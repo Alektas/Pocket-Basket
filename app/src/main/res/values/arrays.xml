@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="reset_choices">
+        <item>@string/del_user_items</item>
+    </string-array>
+</resources>
