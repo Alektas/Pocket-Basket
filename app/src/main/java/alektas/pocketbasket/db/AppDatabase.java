@@ -2,6 +2,7 @@ package alektas.pocketbasket.db;
 
 import alektas.pocketbasket.async.insertAllAsync;
 import alektas.pocketbasket.model.Observer;
+import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.room.Database;
 import androidx.room.Room;
@@ -14,7 +15,7 @@ import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.db.dao.ItemsDao;
 import alektas.pocketbasket.model.ItemGenerator;
 
-@Database(entities = {Item.class}, version = 4)
+@Database(entities = {Item.class}, version = 5)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String TAG = "AppDatabase";
     private static volatile AppDatabase INSTANCE;
@@ -38,12 +39,19 @@ public abstract class AppDatabase extends RoomDatabase {
                                             .execute(ItemGenerator.getAll());
                                 }
                             })
-                            .fallbackToDestructiveMigration()
+                            .addMigrations(MIGRATION_4_5)
                             .build();
                 }
             }
         }
         return INSTANCE;
     }
+
+    private static final Migration MIGRATION_4_5 = new Migration(4, 5) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            // Since we didn't alter the table, there's nothing else to do here.
+        }
+    };
 
 }

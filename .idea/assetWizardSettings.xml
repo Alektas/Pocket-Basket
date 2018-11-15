@@ -35,7 +35,7 @@
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="backgroundColor" value="ffffff" />
-                                      <entry key="foregroundImage" value="C:\Users\kriow\AndroidStudioProjects\PocketBasket\app\src\main\res\drawable\ic_basket.xml" />
+                                      <entry key="foregroundImage" value="C:\Users\kriow\AndroidStudioProjects\PocketBasket\app\src\main\res\drawable\ic_basket.svg" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -76,10 +76,13 @@
                         </option>
                         <option name="values">
                           <map>
+                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="ffffff" />
-                            <entry key="outputName" value="ic_reset_white_24dp" />
+                            <entry key="height" value="91" />
+                            <entry key="outputName" value="ic_white_bread" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="C:\Users\kriow" />
+                            <entry key="sourceFile" value="C:\Users\kriow\AndroidStudioProjects\PocketBasket\app\src\main\res\svg\ic_white_bread.svg" />
+                            <entry key="width" value="91" />
                           </map>
                         </option>
                       </PersistentState>
