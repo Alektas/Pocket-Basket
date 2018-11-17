@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,9 +25,11 @@ import android.transition.TransitionManager;
 import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.ShareActionProvider;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -35,9 +38,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.List;
+
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
+import alektas.pocketbasket.db.entity.Item;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -68,6 +74,7 @@ public class MainActivity extends AppCompatActivity
     private Transition mTransitionSet;
     private GestureDetector mGestureDetector;
     private ConstraintLayout mConstraintLayout;
+    private ShareActionProvider mShareActionProvider;
 
     private ItemsViewModel mViewModel;
 
@@ -94,6 +101,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+
+        // Locate MenuItem with ShareActionProvider
+        MenuItem shareItem = menu.findItem(R.id.menu_share);
+
+        // Fetch and store ShareActionProvider
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+        updateShareIntent(mViewModel.getBasketData().getValue());
+
         return true;
     }
 
@@ -162,8 +177,10 @@ public class MainActivity extends AppCompatActivity
         initBasket();
         initShowcase();
 
-        mViewModel.getBasketData().observe(this,
-                mBasketAdapter::setItems);
+        mViewModel.getBasketData().observe(this, (items -> {
+            mBasketAdapter.setItems(items);
+            updateShareIntent(items);
+        }));
         mViewModel.getShowcaseData().observe(this,
                 mShowcaseAdapter::setItems);
 
@@ -517,5 +534,21 @@ public class MainActivity extends AppCompatActivity
     private void cancelSearch() {
         mSearchView.setQuery("", false);
         mSearchView.clearFocus();
+    }
+
+    private void updateShareIntent(List<Item> items) {
+        if (mShareActionProvider != null) {
+
+            StringBuilder sb = new StringBuilder("Нужны продукты: \n");
+            for (Item item : items) {
+                sb.append(" - ").append(item.getName()).append("\n");
+            }
+
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
+
+            mShareActionProvider.setShareIntent(shareIntent);
+        }
     }
 }
