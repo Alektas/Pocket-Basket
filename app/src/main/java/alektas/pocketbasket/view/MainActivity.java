@@ -539,9 +539,9 @@ public class MainActivity extends AppCompatActivity
     private void updateShareIntent(List<Item> items) {
         if (mShareActionProvider != null) {
 
-            StringBuilder sb = new StringBuilder("Нужны продукты: \n");
+            StringBuilder sb = new StringBuilder(getString(R.string.share_intro));
             for (Item item : items) {
-                sb.append(" - ").append(item.getName()).append("\n");
+                sb.append("\n - ").append(item.getName());
             }
 
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
