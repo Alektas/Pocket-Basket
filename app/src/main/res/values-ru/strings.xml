@@ -17,5 +17,7 @@
     <string name="garlic">Чеснок</string>
     <string name="pepper">Перец</string>
     <string name="share">Поделиться</string>
+    <string name="update">Обновить</string>
+    <string name="share_intro">Нужны продукты:</string>
 
 </resources>

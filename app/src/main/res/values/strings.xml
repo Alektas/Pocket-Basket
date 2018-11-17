@@ -17,5 +17,7 @@
     <string name="pepper">Pepper</string>
     <string name="grapes">Grapes</string>
     <string name="share">Share</string>
+    <string name="update">Update</string>
+    <string name="share_intro">Need items:</string>
 
 </resources>
