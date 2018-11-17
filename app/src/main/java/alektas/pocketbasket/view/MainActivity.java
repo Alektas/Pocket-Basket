@@ -7,6 +7,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -123,6 +124,11 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
 
+            case R.id.menu_load_new_ver: {
+                loadNewVersion();
+                return true;
+            }
+
             case R.id.menu_about: {
                 DialogFragment dialog = new AboutDialog();
                 dialog.show(getSupportFragmentManager(), "AboutDialog");
@@ -138,21 +144,6 @@ public class MainActivity extends AppCompatActivity
         super.onNewIntent(intent);
         setIntent(intent);
         handleSearch(intent);
-    }
-
-    private void handleSearch(Intent intent) {
-        String query = intent.getStringExtra(SearchManager.QUERY);
-
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            addItem(query);
-        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-            String itemName = intent.getDataString();
-            addItem(itemName);
-        }
-    }
-
-    private void addItem(String query) {
-        mViewModel.addItem(query, R.string.other);
     }
 
     /* Init methods */
@@ -531,9 +522,30 @@ public class MainActivity extends AppCompatActivity
 
     /* Private methods */
 
+    private void handleSearch(Intent intent) {
+        String query = intent.getStringExtra(SearchManager.QUERY);
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            addItem(query);
+        } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+            String itemName = intent.getDataString();
+            addItem(itemName);
+        }
+    }
+
     private void cancelSearch() {
         mSearchView.setQuery("", false);
         mSearchView.clearFocus();
+    }
+
+    private void addItem(String query) {
+        mViewModel.addItem(query, R.string.other);
+    }
+
+    private void loadNewVersion() {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse("https://drive.google.com/open?id=1HPHjTYmi7xlY6XO6w2QozXg8c_lyh2-9"));
+        startActivity(browserIntent);
     }
 
     private void updateShareIntent(List<Item> items) {
