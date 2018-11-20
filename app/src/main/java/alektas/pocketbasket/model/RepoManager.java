@@ -4,7 +4,7 @@ import android.app.Application;
 
 import alektas.pocketbasket.async.getAllAsync;
 import alektas.pocketbasket.async.insertAllAsync;
-import alektas.pocketbasket.async.searchAsync;
+import alektas.pocketbasket.db.entity.BasketMeta;
 import androidx.lifecycle.LiveData;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -37,61 +37,69 @@ public class RepoManager implements Model, Observer {
 
     // Return item from "Basket"
     @Override
-    public Item getBasketItem(String key) {
-        List<Item> items = mBasketItems.getValue();
-        if (items == null) { return null; }
-        for (Item item : items) {
-            if (item.getName().equals(key)
-                    && item.isInBasket()) {
-                return item;
-            }
+    public BasketMeta getBasketMeta(String key) {
+        try {
+            return new getItemMetaAsync(mItemsDao).execute(key).get();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public List<BasketMeta> getBasketMeta() {
+        try {
+            return new getAllMetaAsync(mItemsDao).execute().get();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
         }
         return null;
     }
 
     // Add item to "Basket".
     @Override
-    public void putToBasket(@NonNull Item item) {
-        new putToBasketAsync(mItemsDao, this).execute(item.getName());
+    public void putToBasket(@NonNull String name) {
+        new putToBasketAsync(mItemsDao, this).execute(name);
     }
 
     // Change item state in "Basket"
     @Override
-    public void changeItemState(@NonNull Item item) {
-        item.setChecked(!item.isChecked());
-        new updateAsync(mItemsDao).execute(item);
+    public void checkItem(@NonNull String name) {
+        new checkAsync(mItemsDao).execute(name);
+    }
+
+    public boolean isChecked(String name) {
+        try {
+            return (new isCheckedAsync(mItemsDao).execute(name).get()) != 0;
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
     public void checkAll(boolean state) {
-        List<Item> items = mBasketItems.getValue();
-        for (Item item :
-                items) {
-            item.setChecked(state);
-        }
-        new updateAllAsync(mItemsDao).execute(items);
+        if (state) new checkAllAsync(mItemsDao).execute(1);
+        else new checkAllAsync(mItemsDao).execute(0);
     }
 
     // Delete item from "Basket"
     @Override
-    public void removeBasketItem(@NonNull Item item) {
-        item.setInBasket(false);
-        item.setChecked(false);
-        new updateAsync(mItemsDao).execute(item);
-        update();
+    public void removeBasketItem(@NonNull String name) {
+        new removeBasketItemAsync(mItemsDao, this).execute(name);
     }
 
     // Delete all items from "Basket"
     @Override
-    public void clearBasket() {
-        new clearAsync(mItemsDao, this).execute();
+    public void deleteChecked() {
+        new deleteCheckedAsync(mItemsDao, this).execute();
     }
 
     /* Showcase methods */
 
     @Override
-    public void insertItem(Item item) {
-        new insertAsync(mItemsDao, this).execute(item);
+    public void addNewItem(Item item) {
+        new addNewItem(mItemsDao, this).execute(item);
     }
 
     @Override
@@ -148,15 +156,48 @@ public class RepoManager implements Model, Observer {
 
     /* AsyncTasks */
 
-    private static class updateAsync extends AsyncTask<Item, Void, Void> {
+    private static class getItemMetaAsync extends AsyncTask<String, Void, BasketMeta> {
         private ItemsDao mDao;
 
-        updateAsync(ItemsDao dao) { mDao = dao; }
+        getItemMetaAsync(ItemsDao dao) { mDao = dao; }
 
         @Override
-        protected Void doInBackground(Item... items) {
-            mDao.update(items[0]);
+        protected BasketMeta doInBackground(String... meta) {
+            return mDao.getItemMeta(meta[0]);
+        }
+    }
+
+    private static class getAllMetaAsync extends AsyncTask<Void, Void, List<BasketMeta>> {
+        private ItemsDao mDao;
+
+        getAllMetaAsync(ItemsDao dao) { mDao = dao; }
+
+        @Override
+        protected List<BasketMeta> doInBackground(Void... meta) {
+            return mDao.getBasketItems();
+        }
+    }
+
+    private static class checkAllAsync extends AsyncTask<Integer, Void, Void> {
+        private ItemsDao mDao;
+
+        checkAllAsync(ItemsDao dao) { mDao = dao; }
+
+        @Override
+        protected Void doInBackground(Integer... state) {
+            mDao.checkAll(state[0]);
             return null;
+        }
+    }
+
+    private static class isCheckedAsync extends AsyncTask<String, Void, Integer> {
+        private ItemsDao mDao;
+
+        isCheckedAsync(ItemsDao dao) { mDao = dao; }
+
+        @Override
+        protected Integer doInBackground(String... name) {
+            return mDao.isChecked(name[0]);
         }
     }
 
@@ -183,33 +224,32 @@ public class RepoManager implements Model, Observer {
         }
     }
 
-    private static class updateAllAsync extends AsyncTask<List<Item>, Void, Void> {
+    private static class checkAsync extends AsyncTask<String, Void, Void> {
         private ItemsDao mDao;
 
-        updateAllAsync(ItemsDao dao) { mDao = dao; }
+        checkAsync(ItemsDao dao) { mDao = dao; }
 
-        @SafeVarargs
         @Override
-        protected final Void doInBackground(List<Item>... items) {
-            mDao.update(items[0]);
+        protected final Void doInBackground(String... state) {
+            mDao.check(state[0]);
             return null;
         }
     }
 
-    private static class clearAsync extends AsyncTask<Void, Void, Void> {
+    private static class deleteCheckedAsync extends AsyncTask<Void, Void, Void> {
         private ItemsDao mDao;
         private Observer mObserver;
 
-        clearAsync(ItemsDao dao) { mDao = dao; }
+        deleteCheckedAsync(ItemsDao dao) { mDao = dao; }
 
-        clearAsync(ItemsDao dao, Observer observer) {
+        deleteCheckedAsync(ItemsDao dao, Observer observer) {
             this(dao);
             mObserver = observer;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            mDao.clearBasket();
+            mDao.deleteChecked();
             return null;
         }
 
@@ -219,20 +259,43 @@ public class RepoManager implements Model, Observer {
         }
     }
 
-    private static class insertAsync extends AsyncTask<Item, Void, Void> {
+    private static class removeBasketItemAsync extends AsyncTask<String, Void, Void> {
         private ItemsDao mDao;
         private Observer mObserver;
 
-        insertAsync(ItemsDao dao) { mDao = dao; }
+        removeBasketItemAsync(ItemsDao dao) { mDao = dao; }
 
-        insertAsync(ItemsDao dao, Observer observer) {
+        removeBasketItemAsync(ItemsDao dao, Observer observer) {
+            this(dao);
+            mObserver = observer;
+        }
+
+        @Override
+        protected final Void doInBackground(String... name) {
+            mDao.deleteBasketItem(name[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mObserver != null) mObserver.update();
+        }
+    }
+
+    private static class addNewItem extends AsyncTask<Item, Void, Void> {
+        private ItemsDao mDao;
+        private Observer mObserver;
+
+        addNewItem(ItemsDao dao) { mDao = dao; }
+
+        addNewItem(ItemsDao dao, Observer observer) {
             this(dao);
             mObserver = observer;
         }
 
         @Override
         protected final Void doInBackground(Item... items) {
-            mDao.insert(items[0]);
+            mDao.addNewItem(items[0]);
             return null;
         }
 

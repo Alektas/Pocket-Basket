@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -365,7 +364,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDialogAddItem(String itemName, int tagRes) {
-        mViewModel.addItem(itemName, tagRes);
+        mViewModel.addNewItem(itemName, tagRes);
     }
 
     @Override
@@ -388,7 +387,7 @@ public class MainActivity extends AppCompatActivity
                 hideFloatingMenu();
             }
             if (view.getId() == R.id.del_all_btn) {
-                mViewModel.clearBasket();
+                mViewModel.deleteChecked();
                 hideFloatingMenu();
             }
             if (view.getId() == R.id.check_all_btn) {
@@ -539,7 +538,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void addItem(String query) {
-        mViewModel.addItem(query, R.string.other);
+        mViewModel.addNewItem(query, R.string.other);
     }
 
     private void loadNewVersion() {

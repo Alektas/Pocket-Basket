@@ -1,6 +1,7 @@
 package alektas.pocketbasket.view;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 
 import java.util.Collections;
@@ -26,7 +27,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         super.onBindViewHolder(viewHolder, position);
         viewHolder.mIconView.setOnClickListener(v -> {
-            mModel.checkItem(getItems().get(position));
+            mModel.checkItem(getItems().get(position).getName());
         });
     }
 
@@ -43,7 +44,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     // add check image to icon of item in basket if item is checked
     @Override
     void setChooseIcon(ViewHolder viewHolder, Item item) {
-        if (item.isChecked()) {
+        if (mModel.isChecked(item.getName())) {
             viewHolder.mCheckImage.setImageResource(R.drawable.ic_checked);
         }
         else {
@@ -53,7 +54,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
 
     @Override
     public void onItemDismiss(int position) {
-        mModel.removeBasketItem(getItems().get(position));
+        mModel.removeFromBasket(getItems().get(position).getName());
     }
 
     @Override
