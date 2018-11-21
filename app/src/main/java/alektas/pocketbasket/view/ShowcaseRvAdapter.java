@@ -57,12 +57,12 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
                 if (mDelItems.contains(item)) { removeFromDel(item, viewHolder); }
                 else { prepareToDel(item, viewHolder); }
             } else {
-                if (mModel.getBasketItem(item.getName()) == null) {
-                    mModel.putToBasket(item);
+                if (mModel.getBasketMeta(item.getName()) == null) {
+                    mModel.putToBasket(item.getName());
                     notifyItemChanged(viewHolder.getAdapterPosition());
                 }
                 else {
-                    mModel.removeBasketItem(item);
+                    mModel.removeFromBasket(item.getName());
                     notifyItemChanged(viewHolder.getAdapterPosition());
                 }
             }
@@ -81,7 +81,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
 
     @Override
     void setChooseIcon(ViewHolder viewHolder, Item item) {
-        if(item.isInBasket()) {
+        if(mModel.isInBasket(item)) {
             viewHolder.mCheckImage.setImageResource(R.drawable.ic_choosed);
         }
         else {

@@ -1,5 +1,6 @@
 package alektas.pocketbasket.model;
 
+import alektas.pocketbasket.db.entity.BasketMeta;
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
@@ -7,14 +8,16 @@ import java.util.List;
 import alektas.pocketbasket.db.entity.Item;
 
 public interface Model {
-    Item getBasketItem(String key);
-    void putToBasket(Item item);
-    void changeItemState(Item item);
+    BasketMeta getBasketMeta(String key);
+    List<BasketMeta> getBasketMeta();
+    void putToBasket(String name);
+    void checkItem(String name);
+    boolean isChecked(String name);
     void checkAll(boolean state);
-    void removeBasketItem(Item item);
-    void clearBasket();
+    void removeBasketItem(String name);
+    void deleteChecked();
 
-    void insertItem(Item item);
+    void addNewItem(Item item);
     void deleteItems(List<Item> item);
     void setFilter(int tag);
     void resetShowcase(boolean fullReset);
