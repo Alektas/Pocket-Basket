@@ -50,7 +50,8 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 public class MainActivity extends AppCompatActivity
         implements ResetDialog.ResetDialogListener,
         AddItemDialog.AddItemDialogListener,
-        DeleteModeListener {
+        DeleteModeListener,
+        OnStartDragListener {
 
     private static final String TAG = "PocketBasketApp";
 
@@ -75,6 +76,7 @@ public class MainActivity extends AppCompatActivity
     private GestureDetector mGestureDetector;
     private ConstraintLayout mConstraintLayout;
     private ShareActionProvider mShareActionProvider;
+    private ItemTouchHelper mTouchHelper;
 
     private ItemsViewModel mViewModel;
 
@@ -168,6 +170,7 @@ public class MainActivity extends AppCompatActivity
         initShowcase();
 
         mViewModel.getBasketData().observe(this, (items -> {
+
             mBasketAdapter.setItems(items);
             updateShareIntent(items);
         }));
@@ -219,12 +222,12 @@ public class MainActivity extends AppCompatActivity
     private void initBasket() {
         mBasket = findViewById(R.id.basket_list);
         mBasket.setLayoutManager(new LinearLayoutManager(this));
-        mBasketAdapter = new BasketRvAdapter(this, mViewModel);
+        mBasketAdapter = new BasketRvAdapter(this, mViewModel, this);
         mBasket.setAdapter(mBasketAdapter);
 
         ItemTouchHelper.Callback callback = new ItemTouchCallback(mBasketAdapter);
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(mBasket);
+        mTouchHelper = new ItemTouchHelper(callback);
+        mTouchHelper.attachToRecyclerView(mBasket);
 
         mBasket.addOnItemTouchListener(new ItemTouchListener());
     }
@@ -379,6 +382,11 @@ public class MainActivity extends AppCompatActivity
         mDelModePanel.setVisibility(View.GONE);
     }
 
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        mTouchHelper.startDrag(viewHolder);
+    }
+
     /* On buttons click methods */
 
     public void onBtnClick(View view) {
@@ -481,6 +489,7 @@ public class MainActivity extends AppCompatActivity
 
     /* Touch events */
 
+    // Handle change mode gesture
     class ItemTouchListener extends RecyclerView.SimpleOnItemTouchListener {
         @Override
         public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {

@@ -13,7 +13,7 @@ import static androidx.room.ForeignKey.CASCADE;
 @Entity(tableName = "basket_items",
         indices = {
             @Index(value = "item_name", unique = true),
-            @Index(value = "position", unique = true)},
+            @Index(value = "position")},
         foreignKeys = @ForeignKey(
                 entity = Item.class,
                 parentColumns = "name",
@@ -81,7 +81,7 @@ public class BasketMeta {
         else this.checked = 0;
     }
 
-    public String toString() { return (itemName + ": pos=" + position + ", checked=" + checked); }
+    public String toString() { return (itemName + ": pos=" + position + " checked=" + checked); }
 
     @Override
     public boolean equals(@Nullable Object obj) {

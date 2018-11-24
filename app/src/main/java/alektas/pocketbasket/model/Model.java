@@ -11,6 +11,7 @@ public interface Model {
     BasketMeta getBasketMeta(String key);
     List<BasketMeta> getBasketMeta();
     void putToBasket(String name);
+    void moveItem(String name, int fromPosition, int toPosition);
     void checkItem(String name);
     boolean isChecked(String name);
     void checkAll(boolean state);

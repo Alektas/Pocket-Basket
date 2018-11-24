@@ -7,7 +7,6 @@ import alektas.pocketbasket.async.insertAllAsync;
 import alektas.pocketbasket.db.entity.BasketMeta;
 import androidx.lifecycle.LiveData;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -60,6 +59,11 @@ public class RepoManager implements Model, Observer {
     @Override
     public void putToBasket(@NonNull String name) {
         new putToBasketAsync(mItemsDao, this).execute(name);
+    }
+
+    @Override
+    public void moveItem(String name, int fromPosition, int toPosition) {
+        new moveItemAsync(mItemsDao, name, fromPosition, toPosition).execute();
     }
 
     // Change item state in "Basket"
@@ -156,6 +160,26 @@ public class RepoManager implements Model, Observer {
 
     /* AsyncTasks */
 
+    private static class moveItemAsync extends AsyncTask<Void, Void, Void> {
+        private ItemsDao mDao;
+        private String mName;
+        private int mFromPos;
+        private int mToPos;
+
+        moveItemAsync(ItemsDao dao, String name, int fromPosition, int toPosition) {
+            mDao = dao;
+            mName = name;
+            mFromPos = fromPosition;
+            mToPos = toPosition;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mDao.moveItem(mName, mFromPos, mToPos);
+            return null;
+        }
+    }
+
     private static class getItemMetaAsync extends AsyncTask<String, Void, BasketMeta> {
         private ItemsDao mDao;
 
@@ -174,7 +198,7 @@ public class RepoManager implements Model, Observer {
 
         @Override
         protected List<BasketMeta> doInBackground(Void... meta) {
-            return mDao.getBasketItems();
+            return mDao.getBasketMeta();
         }
     }
 

@@ -1,7 +1,9 @@
 package alektas.pocketbasket.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.Collections;
@@ -17,15 +19,31 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
 
     private static final String TAG = "BasketAdapter";
     private ItemsViewModel mModel;
+    private OnStartDragListener mDragListener;
+    private String mItemName;
+    private int mFromPosition;
+    private int mToPosition;
 
-    BasketRvAdapter(Context context, ItemsViewModel model) {
+    BasketRvAdapter(Context context, ItemsViewModel model, OnStartDragListener dragListener) {
         super(context, model);
         mModel = model;
+        mDragListener = dragListener;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         super.onBindViewHolder(viewHolder, position);
+
+        // Not overrided from BaseRecyclerAdapter because of drag handle needed only in Basket
+        viewHolder.mDragHandle.setImageResource(R.drawable.ic_drag_handle_darkgreen_24dp);
+        viewHolder.mDragHandle.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                mDragListener.onStartDrag(viewHolder);
+            }
+            return false;
+        });
+
         viewHolder.mIconView.setOnClickListener(v -> {
             mModel.checkItem(getItems().get(position).getName());
         });
@@ -58,7 +76,14 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     }
 
     @Override
+    public void onDragStarted(int fromPosition) {
+        mFromPosition = fromPosition;
+        mItemName = getItems().get(fromPosition).getName();
+    }
+
+    @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
+        mToPosition = toPosition;
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 Collections.swap(getItems(), i, i + 1);
@@ -70,5 +95,10 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
         }
         notifyItemMoved(fromPosition, toPosition);
         return true;
+    }
+
+    @Override
+    public void onDragCancel() {
+        mModel.moveItem(mItemName, mFromPosition, mToPosition);
     }
 }

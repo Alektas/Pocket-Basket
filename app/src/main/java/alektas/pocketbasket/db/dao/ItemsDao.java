@@ -1,7 +1,5 @@
 package alektas.pocketbasket.db.dao;
 
-import android.util.Log;
-
 import alektas.pocketbasket.db.entity.BasketMeta;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -34,7 +32,7 @@ public abstract class ItemsDao {
     public abstract LiveData<List<Item>> getBasketData();
 
     @Query("SELECT * FROM basket_items")
-    public abstract List<BasketMeta> getBasketItems();
+    public abstract List<BasketMeta> getBasketMeta();
 
     @Query("SELECT * FROM basket_items WHERE item_name = :name")
     public abstract BasketMeta getItemMeta(String name);
@@ -73,7 +71,6 @@ public abstract class ItemsDao {
             "WHERE position > :position")
     public abstract void onItemDeleted(int position);
 
-    // TODO: too slow, replace by setting position in code
     // leads to crush if the positions are not in ascending order
     @Query("UPDATE basket_items SET position = " +
             "(SELECT COUNT(*) FROM basket_items AS t " +
@@ -104,10 +101,9 @@ public abstract class ItemsDao {
 
     @Transaction
     public void moveItem(String name, int fromPosition, int toPosition) {
-        setPosition(name, 0); // free old position for other item
-        if (fromPosition > toPosition) onItemUp(fromPosition, toPosition);
-        else onItemDown(fromPosition, toPosition);
-        setPosition(name, toPosition);
+        if (fromPosition > toPosition) onItemUp(fromPosition + 1, toPosition + 1);
+        else onItemDown(fromPosition + 1, toPosition + 1);
+        setPosition(name, toPosition + 1);
     }
 
     @Transaction
@@ -152,10 +148,7 @@ public abstract class ItemsDao {
     public abstract void update(Item item);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    public abstract void update(List<Item> item);
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    public abstract void update(BasketMeta item);
+    public abstract void update(List<Item> items);
 
     @Delete
     public abstract void delete(List<Item> item);
