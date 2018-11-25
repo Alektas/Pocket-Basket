@@ -2,14 +2,29 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item
+        android:id="@+id/menu_share"
+        android:orderInCategory="5"
+        android:title="@string/share"
+        app:showAsAction="never"
+        app:actionProviderClass=
+            "androidx.appcompat.widget.ShareActionProvider" />
+
     <item android:id="@+id/menu_reset"
           android:orderInCategory="10"
           android:title="@string/reset"
           android:icon="@drawable/ic_reset_white_24dp"
-          app:showAsAction="never|withText"/>
+          app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_load_new_ver"
+          android:orderInCategory="30"
+          android:title="@string/update"
+          android:icon="@drawable/ic_file_download_white_24dp"
+          app:showAsAction="never"/>
 
     <item android:id="@+id/menu_about"
           android:orderInCategory="50"
           android:title="@string/about_app"
-          app:showAsAction="never|withText"/>
+          android:icon="@drawable/ic_help_white_24dp"
+          app:showAsAction="never"/>
 </menu>

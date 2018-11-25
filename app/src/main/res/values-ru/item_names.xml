@@ -12,7 +12,7 @@
     <string name="cookies">Печенье</string>
     <string name="pie">Пирог</string>
     <string name="cake">Торт</string>
-    <string name="black_bread">Черный хлеб</string>
+    <string name="brown_bread">Черный хлеб</string>
     <string name="white_bread">Белый хлеб</string>
     <string name="pasta">Макароны</string>
     <string name="lemon">Лимон</string>
@@ -49,12 +49,24 @@
     <string name="greens">Зелень</string>
     <string name="cheese">Сыр</string>
     <string name="sausage">Колбаса</string>
-
+    <string name="grapes">Виноград</string>
+    <string name="garlic">Чеснок</string>
+    <string name="pepper">Перец</string>
+    <string name="toothpaste">Зубная паста</string>
+    <string name="cigarettes">Сигареты</string>
+    <string name="beer">Пиво</string>
+    <string name="wine">Вино</string>
+    <string name="vodka">Водка</string>
     <string name="chicory">Цикорий</string>
     <string name="peas">Горох</string>
     <string name="sponges">Губки</string>
     <string name="deodorant">Дезодорант</string>
     <string name="gloves">Перчатки</string>
     <string name="rags">Тряпки</string>
+    <string name="gingerbread">Пряники</string>
+    <string name="waffles">Вафли</string>
+    <string name="candies">Конфеты</string>
+    <string name="lemonade">Лимонад</string>
+    <string name="canned_food">Консервы</string>
 
 </resources>

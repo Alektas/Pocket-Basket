@@ -13,8 +13,8 @@
     <string name="about_msg">Pocket Basket is app for product list creation.</string>
     <string name="about_title">@string/app_name</string>
     <string name="version">Version: %s</string>
-    <string name="garlic">Garlic</string>
-    <string name="pepper">Pepper</string>
-    <string name="grapes">Grapes</string>
+    <string name="share">Share</string>
+    <string name="update">Update</string>
+    <string name="share_intro">Need goods:</string>
 
 </resources>

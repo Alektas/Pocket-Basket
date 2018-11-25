@@ -12,7 +12,7 @@
     <string name="cookies">Cookies</string>
     <string name="pie">Pie</string>
     <string name="cake">Cake</string>
-    <string name="black_bread">Black bread</string>
+    <string name="brown_bread">Brown bread</string>
     <string name="white_bread">White bread</string>
     <string name="pasta">Pasta</string>
     <string name="lemon">Lemon</string>
@@ -49,12 +49,24 @@
     <string name="greens">Greens</string>
     <string name="cheese">Cheese</string>
     <string name="sausage">Sausage</string>
-
-    <string name="chicory">Сhicory</string>
+    <string name="garlic">Garlic</string>
+    <string name="pepper">Pepper</string>
+    <string name="grapes">Grapes</string>
+    <string name="toothpaste">Toothpaste</string>
+    <string name="cigarettes">Cigarettes</string>
+    <string name="beer">Beer</string>
+    <string name="wine">Wine</string>
+    <string name="vodka">Vodka</string>
+    <string name="chicory">Chicory</string>
     <string name="peas">Peas</string>
     <string name="sponges">Sponges</string>
     <string name="deodorant">Deodorant</string>
     <string name="gloves">Gloves</string>
     <string name="rags">Rags</string>
+    <string name="gingerbread">Gingerbread</string>
+    <string name="waffles">Waffles</string>
+    <string name="candies">Candies</string>
+    <string name="lemonade">Lemonade</string>
+    <string name="canned_food">Сanned food</string>
 
 </resources>
