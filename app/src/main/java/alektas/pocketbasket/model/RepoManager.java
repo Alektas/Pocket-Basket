@@ -7,6 +7,7 @@ import alektas.pocketbasket.async.insertAllAsync;
 import alektas.pocketbasket.db.entity.BasketMeta;
 import androidx.lifecycle.LiveData;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -34,7 +35,6 @@ public class RepoManager implements Model, Observer {
 
     /* Basket methods */
 
-    // Return item from "Basket"
     @Override
     public BasketMeta getBasketMeta(String key) {
         try {
@@ -55,15 +55,14 @@ public class RepoManager implements Model, Observer {
         return null;
     }
 
-    // Add item to "Basket".
     @Override
     public void putToBasket(@NonNull String name) {
         new putToBasketAsync(mItemsDao, this).execute(name);
     }
 
     @Override
-    public void moveItem(String name, int fromPosition, int toPosition) {
-        new moveItemAsync(mItemsDao, name, fromPosition, toPosition).execute();
+    public void updatePositions(List<Item> items) {
+        new updatePositionsAsync(mItemsDao).execute(items);
     }
 
     // Change item state in "Basket"
@@ -93,7 +92,7 @@ public class RepoManager implements Model, Observer {
         new removeBasketItemAsync(mItemsDao, this).execute(name);
     }
 
-    // Delete all items from "Basket"
+    // Delete all checked items from "Basket"
     @Override
     public void deleteChecked() {
         new deleteCheckedAsync(mItemsDao, this).execute();
@@ -160,22 +159,16 @@ public class RepoManager implements Model, Observer {
 
     /* AsyncTasks */
 
-    private static class moveItemAsync extends AsyncTask<Void, Void, Void> {
+    private static class updatePositionsAsync extends AsyncTask<List<Item>, Void, Void> {
         private ItemsDao mDao;
-        private String mName;
-        private int mFromPos;
-        private int mToPos;
 
-        moveItemAsync(ItemsDao dao, String name, int fromPosition, int toPosition) {
+        updatePositionsAsync(ItemsDao dao) {
             mDao = dao;
-            mName = name;
-            mFromPos = fromPosition;
-            mToPos = toPosition;
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
-            mDao.moveItem(mName, mFromPos, mToPos);
+        protected Void doInBackground(List<Item>... items) {
+            mDao.updatePositions(items[0]);
             return null;
         }
     }

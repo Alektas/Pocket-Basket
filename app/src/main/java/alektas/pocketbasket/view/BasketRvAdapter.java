@@ -20,9 +20,6 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     private static final String TAG = "BasketAdapter";
     private ItemsViewModel mModel;
     private OnStartDragListener mDragListener;
-    private String mItemName;
-    private int mFromPosition;
-    private int mToPosition;
 
     BasketRvAdapter(Context context, ItemsViewModel model, OnStartDragListener dragListener) {
         super(context, model);
@@ -76,14 +73,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     }
 
     @Override
-    public void onDragStarted(int fromPosition) {
-        mFromPosition = fromPosition;
-        mItemName = getItems().get(fromPosition).getName();
-    }
-
-    @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
-        mToPosition = toPosition;
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 Collections.swap(getItems(), i, i + 1);
@@ -93,12 +83,13 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
                 Collections.swap(getItems(), i, i - 1);
             }
         }
+
         notifyItemMoved(fromPosition, toPosition);
         return true;
     }
 
     @Override
-    public void onDragCancel() {
-        mModel.moveItem(mItemName, mFromPosition, mToPosition);
+    public void clearView() {
+        mModel.updatePositions(getItems());
     }
 }

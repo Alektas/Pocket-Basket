@@ -1,5 +1,7 @@
 package alektas.pocketbasket.db.dao;
 
+import android.util.Log;
+
 import alektas.pocketbasket.db.entity.BasketMeta;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -16,6 +18,7 @@ import alektas.pocketbasket.db.entity.Item;
 
 @Dao
 public abstract class ItemsDao {
+    private static final String TAG = "ItemsDao";
 
     @Query("SELECT * FROM items ORDER BY tag_res, name ASC")
     public abstract List<Item> getItems();
@@ -31,7 +34,7 @@ public abstract class ItemsDao {
             "GROUP BY basket_items.position")
     public abstract LiveData<List<Item>> getBasketData();
 
-    @Query("SELECT * FROM basket_items")
+    @Query("SELECT * FROM basket_items ORDER BY position")
     public abstract List<BasketMeta> getBasketMeta();
 
     @Query("SELECT * FROM basket_items WHERE item_name = :name")
@@ -46,23 +49,14 @@ public abstract class ItemsDao {
     @Query("SELECT position FROM basket_items WHERE item_name = :name")
     public abstract int getPosition(String name);
 
+    @Query("SELECT item_name FROM basket_items WHERE position = :position")
+    public abstract String getName(int position);
+
     @Query("UPDATE basket_items SET checked = :state WHERE item_name = :name")
     public abstract void check(String name, int state);
 
     @Query("UPDATE basket_items SET checked = :checked ")
     public abstract void checkAll(int checked);
-
-    @Query("UPDATE basket_items SET position = (position + 1) " +
-            "WHERE position < :fromPosition " +
-            "AND position >= :toPosition")
-    // fromPosition > toPosition
-    public abstract void onItemUp(int fromPosition, int toPosition);
-
-    @Query("UPDATE basket_items SET position = (position - 1) " +
-            "WHERE position > :fromPosition " +
-            "AND position <= :toPosition")
-    // fromPosition < toPosition
-    public abstract void onItemDown(int fromPosition, int toPosition);
 
     @Query("UPDATE basket_items SET position = :position WHERE item_name = :name")
     public abstract void setPosition(String name, int position);
@@ -87,6 +81,13 @@ public abstract class ItemsDao {
     public abstract void deleteAll();
 
     @Transaction
+    public void updatePositions(List<Item> items) {
+        for (int i = 0; i < items.size(); i++) {
+            setPosition(items.get(i).getName(), i + 1);
+        }
+    }
+
+    @Transaction
     public void deleteChecked() {
         deleteCheckedBasket();
         onDeleteChecked();
@@ -97,13 +98,6 @@ public abstract class ItemsDao {
         int position = getPosition(name);
         deleteFromBasket(name);
         onItemDeleted(position);
-    }
-
-    @Transaction
-    public void moveItem(String name, int fromPosition, int toPosition) {
-        if (fromPosition > toPosition) onItemUp(fromPosition + 1, toPosition + 1);
-        else onItemDown(fromPosition + 1, toPosition + 1);
-        setPosition(name, toPosition + 1);
     }
 
     @Transaction
