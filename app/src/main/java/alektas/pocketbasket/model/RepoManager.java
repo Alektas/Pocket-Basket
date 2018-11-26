@@ -35,7 +35,6 @@ public class RepoManager implements Model, Observer {
 
     /* Basket methods */
 
-    // Return item from "Basket"
     @Override
     public BasketMeta getBasketMeta(String key) {
         try {
@@ -56,10 +55,14 @@ public class RepoManager implements Model, Observer {
         return null;
     }
 
-    // Add item to "Basket".
     @Override
     public void putToBasket(@NonNull String name) {
         new putToBasketAsync(mItemsDao, this).execute(name);
+    }
+
+    @Override
+    public void updatePositions(List<Item> items) {
+        new updatePositionsAsync(mItemsDao).execute(items);
     }
 
     // Change item state in "Basket"
@@ -89,7 +92,7 @@ public class RepoManager implements Model, Observer {
         new removeBasketItemAsync(mItemsDao, this).execute(name);
     }
 
-    // Delete all items from "Basket"
+    // Delete all checked items from "Basket"
     @Override
     public void deleteChecked() {
         new deleteCheckedAsync(mItemsDao, this).execute();
@@ -156,6 +159,20 @@ public class RepoManager implements Model, Observer {
 
     /* AsyncTasks */
 
+    private static class updatePositionsAsync extends AsyncTask<List<Item>, Void, Void> {
+        private ItemsDao mDao;
+
+        updatePositionsAsync(ItemsDao dao) {
+            mDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(List<Item>... items) {
+            mDao.updatePositions(items[0]);
+            return null;
+        }
+    }
+
     private static class getItemMetaAsync extends AsyncTask<String, Void, BasketMeta> {
         private ItemsDao mDao;
 
@@ -174,7 +191,7 @@ public class RepoManager implements Model, Observer {
 
         @Override
         protected List<BasketMeta> doInBackground(Void... meta) {
-            return mDao.getBasketItems();
+            return mDao.getBasketMeta();
         }
     }
 

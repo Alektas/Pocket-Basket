@@ -37,6 +37,7 @@ public abstract class BaseRecyclerAdapter
         final CardView mIconView;
         final ImageView mCheckImage;
         final ImageView mDelImage;
+        final ImageView mDragHandle;
         final TextView mName;
 
         private ItemViewBinding mItemBinding;
@@ -50,6 +51,7 @@ public abstract class BaseRecyclerAdapter
             mCheckImage = mItemView.findViewById(R.id.check_image);
             mName = mItemView.findViewById(R.id.item_name);
             mDelImage = mItemView.findViewById(R.id.del_image);
+            mDragHandle = mItemView.findViewById(R.id.drag_handle);
         }
 
         void bind(Item item) {

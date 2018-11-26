@@ -47,6 +47,10 @@ public class ItemsViewModel extends AndroidViewModel {
         mRepoManager.putToBasket(name);
     }
 
+    public void updatePositions(List<Item> items) {
+        mRepoManager.updatePositions(items);
+    }
+
     public boolean isInBasket(Item item) {
         return getBasketMeta(item.getName()) != null;
     }
