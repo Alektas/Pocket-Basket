@@ -7,7 +7,6 @@ import alektas.pocketbasket.async.insertAllAsync;
 import alektas.pocketbasket.db.entity.BasketMeta;
 import androidx.lifecycle.LiveData;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -19,7 +18,7 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class RepoManager implements Model, Observer {
+public class RepoManager implements Repository, Observer {
     private static final String TAG = "RepoManager";
     private int mTag = 0;
     private ItemsDao mItemsDao;
@@ -33,22 +32,13 @@ public class RepoManager implements Model, Observer {
         mBasketItems = mItemsDao.getBasketData();
     }
 
+
     /* Basket methods */
 
     @Override
-    public BasketMeta getBasketMeta(String key) {
+    public BasketMeta getItemMeta(String name) {
         try {
-            return new getItemMetaAsync(mItemsDao).execute(key).get();
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public List<BasketMeta> getBasketMeta() {
-        try {
-            return new getAllMetaAsync(mItemsDao).execute().get();
+            return new getItemMetaAsync(mItemsDao).execute(name).get();
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -80,15 +70,15 @@ public class RepoManager implements Model, Observer {
         return false;
     }
 
+    // Check all items in Basket (or uncheck if already all items are checked)
     @Override
-    public void checkAll(boolean state) {
-        if (state) new checkAllAsync(mItemsDao).execute(1);
-        else new checkAllAsync(mItemsDao).execute(0);
+    public void checkAll() {
+        new checkAllAsync(mItemsDao).execute();
     }
 
     // Delete item from "Basket"
     @Override
-    public void removeBasketItem(@NonNull String name) {
+    public void removeFromBasket(@NonNull String name) {
         new removeBasketItemAsync(mItemsDao, this).execute(name);
     }
 
@@ -97,6 +87,7 @@ public class RepoManager implements Model, Observer {
     public void deleteChecked() {
         new deleteCheckedAsync(mItemsDao, this).execute();
     }
+
 
     /* Showcase methods */
 
@@ -110,12 +101,14 @@ public class RepoManager implements Model, Observer {
         new deleteAllAsync(mItemsDao, this).execute(items);
     }
 
+    // Show in Showcase only items with specified tag
     @Override
     public void setFilter(int tag) {
         mTag = tag;
         update();
     }
 
+    // Return default showcase items
     @Override
     public void resetShowcase(boolean fullReset) {
         if (fullReset) {
@@ -130,21 +123,18 @@ public class RepoManager implements Model, Observer {
         mShowcaseItems.setValue(getItems(mTag));
     }
 
+
     /* Data getters */
 
-    // Return list of items from "Showcase"
     @Override
-    public LiveData<List<Item>> getAllData() {
+    public LiveData<List<Item>> getShowcaseData() {
         return mShowcaseItems;
     }
 
-    // Return list of items from "Basket"
     @Override
     public LiveData<List<Item>> getBasketData() {
         return mBasketItems;
     }
-
-    /* Private */
 
     @Override
     public List<Item> getItems(int tag) {
@@ -156,6 +146,7 @@ public class RepoManager implements Model, Observer {
         }
         return null;
     }
+
 
     /* AsyncTasks */
 
@@ -184,25 +175,14 @@ public class RepoManager implements Model, Observer {
         }
     }
 
-    private static class getAllMetaAsync extends AsyncTask<Void, Void, List<BasketMeta>> {
-        private ItemsDao mDao;
-
-        getAllMetaAsync(ItemsDao dao) { mDao = dao; }
-
-        @Override
-        protected List<BasketMeta> doInBackground(Void... meta) {
-            return mDao.getBasketMeta();
-        }
-    }
-
-    private static class checkAllAsync extends AsyncTask<Integer, Void, Void> {
+    private static class checkAllAsync extends AsyncTask<Void, Void, Void> {
         private ItemsDao mDao;
 
         checkAllAsync(ItemsDao dao) { mDao = dao; }
 
         @Override
-        protected Void doInBackground(Integer... state) {
-            mDao.checkAll(state[0]);
+        protected Void doInBackground(Void... voids) {
+            mDao.checkAll();
             return null;
         }
     }

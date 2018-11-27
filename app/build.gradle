@@ -12,25 +12,59 @@ android {
         project.ext.set("archivesBaseName", "PocketBasket_" + defaultConfig.versionName)
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
     }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
+            aaptOptions {
+                cruncherEnabled = false
+            }
+            minifyEnabled false
+            shrinkResources false
+            ext.alwaysUpdateBuildId = false
+            ext.enableCrashlytics = false
+            versionNameSuffix "-debug"
             applicationIdSuffix ".debug"
-//            versionNameSuffix "_debug"
         }
     }
+
+    flavorDimensions "full"
+    productFlavors {
+        // When building a variant that uses this flavor, the following configurations
+        // override those in the defaultConfig block.
+        dev {
+            dimension "full"
+            versionNameSuffix "-dev"
+            applicationIdSuffix '.dev'
+            resConfigs("ru", "xxhdpi")
+        }
+
+        prod {
+            dimension "full"
+            // If you've configured the defaultConfig block for the release version of
+            // your app, you can leave this block empty and Gradle uses configurations in
+            // the defaultConfig block instead. You still need to create this flavor.
+            // Otherwise, all variants use the "dev" flavor configurations.
+        }
+    }
+
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
+
     dataBinding {
         enabled = true
-    }
-    productFlavors {
     }
 }
 

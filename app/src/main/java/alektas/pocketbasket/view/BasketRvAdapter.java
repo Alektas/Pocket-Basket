@@ -27,23 +27,40 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
         mDragListener = dragListener;
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         super.onBindViewHolder(viewHolder, position);
 
         // Not overrided from BaseRecyclerAdapter because of drag handle needed only in Basket
         viewHolder.mDragHandle.setImageResource(R.drawable.ic_drag_handle_darkgreen_24dp);
-        viewHolder.mDragHandle.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                mDragListener.onStartDrag(viewHolder);
-            }
-            return false;
-        });
+    }
 
-        viewHolder.mIconView.setOnClickListener(v -> {
-            mModel.checkItem(getItems().get(position).getName());
-        });
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public void onViewAttachedToWindow(@NonNull ViewHolder viewHolder) {
+        super.onViewAttachedToWindow(viewHolder);
+
+        if (viewHolder != null) {
+            viewHolder.mDragHandle.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    mDragListener.onStartDrag(viewHolder);
+                }
+                return false;
+            });
+
+            viewHolder.mIconView.setOnClickListener(v -> {
+                mModel.checkItem(getItems().get(viewHolder.getAdapterPosition()).getName());
+            });
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public void onViewDetachedFromWindow(@NonNull ViewHolder viewHolder) {
+        super.onViewDetachedFromWindow(viewHolder);
+
+        viewHolder.mDragHandle.setOnTouchListener(null);
+        viewHolder.mIconView.setOnClickListener(null);
     }
 
     // hide item name in showcase mode and show in basket mode in "Basket"

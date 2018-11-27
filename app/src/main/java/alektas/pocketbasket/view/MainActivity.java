@@ -557,7 +557,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateShareIntent(List<Item> items) {
-        if (mShareActionProvider != null) {
+        if (mShareActionProvider != null && items != null) {
 
             StringBuilder sb = new StringBuilder(getString(R.string.share_intro));
             for (Item item : items) {

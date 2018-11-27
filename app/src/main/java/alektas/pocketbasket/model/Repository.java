@@ -7,15 +7,14 @@ import java.util.List;
 
 import alektas.pocketbasket.db.entity.Item;
 
-public interface Model {
-    BasketMeta getBasketMeta(String key);
-    List<BasketMeta> getBasketMeta();
+public interface Repository {
+    BasketMeta getItemMeta(String name);
     void putToBasket(String name);
-    void updatePositions(List<Item> items);
+    void removeFromBasket(String name);
     void checkItem(String name);
     boolean isChecked(String name);
-    void checkAll(boolean state);
-    void removeBasketItem(String name);
+    void updatePositions(List<Item> items);
+    void checkAll();
     void deleteChecked();
 
     void addNewItem(Item item);
@@ -24,6 +23,6 @@ public interface Model {
     void resetShowcase(boolean fullReset);
     List<Item> getItems(int tag);
 
-    LiveData<List<Item>> getAllData();
+    LiveData<List<Item>> getShowcaseData();
     LiveData<List<Item>> getBasketData();
 }
