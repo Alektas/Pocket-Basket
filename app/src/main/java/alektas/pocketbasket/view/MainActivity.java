@@ -24,6 +24,9 @@ import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.widget.SearchView;
 
+import alektas.pocketbasket.async.getAllAsync;
+import alektas.pocketbasket.db.AppDatabase;
+import alektas.pocketbasket.db.dao.ItemsDao;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.ShareActionProvider;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -38,7 +41,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
@@ -534,6 +539,10 @@ public class MainActivity extends AppCompatActivity
         String query = intent.getStringExtra(SearchManager.QUERY);
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            if (query.toLowerCase().equals("all")) {
+                addAllItems();
+                return;
+            }
             addItem(query);
         } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String itemName = intent.getDataString();
@@ -548,6 +557,19 @@ public class MainActivity extends AppCompatActivity
 
     private void addItem(String query) {
         mViewModel.addNewItem(query, R.string.other);
+    }
+
+    private void addAllItems() {
+        ItemsDao dao = AppDatabase.getInstance(this, null).getDao();
+        List<Item> items = new ArrayList<>();
+        try {
+            items = new getAllAsync(dao).execute().get();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        for (Item item : items) {
+            addItem(item.getName());
+        }
     }
 
     private void loadNewVersion() {
