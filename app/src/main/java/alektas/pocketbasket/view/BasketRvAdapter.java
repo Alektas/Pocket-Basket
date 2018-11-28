@@ -36,7 +36,8 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         super.onBindViewHolder(viewHolder, position);
 
-        /* Not overrided from BaseRecyclerAdapter because of drag handle and white background needed only in Basket */
+        /* Not overrided from BaseRecyclerAdapter because of
+        drag handle and white background needed only in Basket */
         viewHolder.mDragHandle.setImageResource(R.drawable.ic_drag_handle_darkgreen_24dp);
         viewHolder.mItemView.setBackgroundColor(mContext.getResources().getColor(R.color.item_bg));
     }
@@ -130,7 +131,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     }
 
     @Override
-    public void clearView() {
+    public void onMoveEnd() {
         mModel.updatePositions(getItems());
     }
 

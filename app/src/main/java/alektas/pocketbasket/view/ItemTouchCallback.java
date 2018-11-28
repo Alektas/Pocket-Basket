@@ -1,5 +1,7 @@
 package alektas.pocketbasket.view;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -8,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 public class ItemTouchCallback extends ItemTouchHelper.Callback {
     private static final String TAG = "ItemTouchCallback";
     private ItemTouchAdapter mAdapter;
+    private boolean isSwipe = false;
+    private boolean isMove = false;
 
     public ItemTouchCallback(ItemTouchAdapter adapter) {
         mAdapter = adapter;
@@ -39,8 +43,13 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
                           @NonNull RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
 
-        mAdapter.clearView();
-        mAdapter.onSwipeEnd(viewHolder);
+        if (isSwipe) {
+            mAdapter.onSwipeEnd(viewHolder);
+            isSwipe = false;
+        } else if (isMove) {
+            mAdapter.onMoveEnd();
+            isMove = false;
+        }
     }
 
     @Override
@@ -49,6 +58,9 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
 
         if (ItemTouchHelper.ACTION_STATE_SWIPE == actionState) {
             mAdapter.onSwipeStart(viewHolder);
+            isSwipe = true;
+        } else if (ItemTouchHelper.ACTION_STATE_DRAG == actionState) {
+            isMove = true;
         }
     }
 
