@@ -8,10 +8,12 @@ import androidx.room.Index;
 import androidx.room.PrimaryKey;
 import androidx.annotation.NonNull;
 
-@Entity(tableName = "items", indices = {
-        @Index(value = {"name"}, unique = true),
-        @Index("tag_res")})
+@Entity(tableName = "items",
+        indices = {
+            @Index(value = {"name"}, unique = true),
+            @Index("tag_res")})
 public class Item {
+
     @PrimaryKey
     @ColumnInfo(name = "name")
     @NonNull
@@ -20,10 +22,6 @@ public class Item {
     private int mNameRes;
     @ColumnInfo(name = "img_res")
     private int mImgRes;
-    @ColumnInfo(name = "checked")
-    private int mChecked = 0;
-    @ColumnInfo(name = "in_basket")
-    private int inBasket = 0;
     @ColumnInfo(name = "tag_res")
     private int mTagRes;
 
@@ -79,21 +77,7 @@ public class Item {
         return mTagRes;
     }
 
-    public int getChecked() { return mChecked; }
-    public void setChecked(int checked) { mChecked = checked; }
-
-    public void setInBasket(int inBasket) { this.inBasket = inBasket; }
-    public int getInBasket() { return inBasket; }
-
-    /* API for the rest application (work with boolean) */
-    public boolean isInBasket() { return inBasket == 1; }
-    public void setInBasket(boolean inBasket) { this.inBasket = inBasket ? 1 : 0; }
-    public boolean isChecked() { return mChecked == 1; }
-    public void setChecked(boolean checked) { mChecked = checked ? 1 : 0; }
-
-    public String toString() { return mName
-            + ": inBasket = " + isInBasket()
-            + ", checked = " + isChecked(); }
+    public String toString() { return mName; }
 
     @Override
     public boolean equals(@Nullable Object obj) {

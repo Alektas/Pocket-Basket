@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +24,9 @@ import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.widget.SearchView;
 
+import alektas.pocketbasket.async.getAllAsync;
+import alektas.pocketbasket.db.AppDatabase;
+import alektas.pocketbasket.db.dao.ItemsDao;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.ShareActionProvider;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -39,7 +41,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
@@ -51,7 +55,8 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 public class MainActivity extends AppCompatActivity
         implements ResetDialog.ResetDialogListener,
         AddItemDialog.AddItemDialogListener,
-        DeleteModeListener {
+        DeleteModeListener,
+        OnStartDragListener {
 
     private static final String TAG = "PocketBasketApp";
 
@@ -76,6 +81,7 @@ public class MainActivity extends AppCompatActivity
     private GestureDetector mGestureDetector;
     private ConstraintLayout mConstraintLayout;
     private ShareActionProvider mShareActionProvider;
+    private ItemTouchHelper mTouchHelper;
 
     private ItemsViewModel mViewModel;
 
@@ -169,6 +175,7 @@ public class MainActivity extends AppCompatActivity
         initShowcase();
 
         mViewModel.getBasketData().observe(this, (items -> {
+
             mBasketAdapter.setItems(items);
             updateShareIntent(items);
         }));
@@ -220,12 +227,12 @@ public class MainActivity extends AppCompatActivity
     private void initBasket() {
         mBasket = findViewById(R.id.basket_list);
         mBasket.setLayoutManager(new LinearLayoutManager(this));
-        mBasketAdapter = new BasketRvAdapter(this, mViewModel);
+        mBasketAdapter = new BasketRvAdapter(this, mViewModel, this);
         mBasket.setAdapter(mBasketAdapter);
 
         ItemTouchHelper.Callback callback = new ItemTouchCallback(mBasketAdapter);
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(mBasket);
+        mTouchHelper = new ItemTouchHelper(callback);
+        mTouchHelper.attachToRecyclerView(mBasket);
 
         mBasket.addOnItemTouchListener(new ItemTouchListener());
     }
@@ -365,7 +372,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDialogAddItem(String itemName, int tagRes) {
-        mViewModel.addItem(itemName, tagRes);
+        mViewModel.addNewItem(itemName, tagRes);
     }
 
     @Override
@@ -380,6 +387,11 @@ public class MainActivity extends AppCompatActivity
         mDelModePanel.setVisibility(View.GONE);
     }
 
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        mTouchHelper.startDrag(viewHolder);
+    }
+
     /* On buttons click methods */
 
     public void onBtnClick(View view) {
@@ -388,7 +400,7 @@ public class MainActivity extends AppCompatActivity
                 hideFloatingMenu();
             }
             if (view.getId() == R.id.del_all_btn) {
-                mViewModel.clearBasket();
+                mViewModel.deleteChecked();
                 hideFloatingMenu();
             }
             if (view.getId() == R.id.check_all_btn) {
@@ -482,6 +494,7 @@ public class MainActivity extends AppCompatActivity
 
     /* Touch events */
 
+    // Handle change mode gesture
     class ItemTouchListener extends RecyclerView.SimpleOnItemTouchListener {
         @Override
         public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
@@ -526,6 +539,10 @@ public class MainActivity extends AppCompatActivity
         String query = intent.getStringExtra(SearchManager.QUERY);
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            if (query.toLowerCase().equals("all")) {
+                addAllItems();
+                return;
+            }
             addItem(query);
         } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String itemName = intent.getDataString();
@@ -539,7 +556,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void addItem(String query) {
-        mViewModel.addItem(query, R.string.other);
+        mViewModel.addNewItem(query, R.string.other);
+    }
+
+    private void addAllItems() {
+        ItemsDao dao = AppDatabase.getInstance(this, null).getDao();
+        List<Item> items = new ArrayList<>();
+        try {
+            items = new getAllAsync(dao).execute().get();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        for (Item item : items) {
+            addItem(item.getName());
+        }
     }
 
     private void loadNewVersion() {
@@ -549,7 +579,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateShareIntent(List<Item> items) {
-        if (mShareActionProvider != null) {
+        if (mShareActionProvider != null && items != null) {
 
             StringBuilder sb = new StringBuilder(getString(R.string.share_intro));
             for (Item item : items) {

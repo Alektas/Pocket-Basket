@@ -41,32 +41,48 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         super.onBindViewHolder(viewHolder, position);
 
-        Item item = getItems().get(position);
-        setDelIcon(viewHolder, item);
+        setDelIcon(viewHolder, getItems().get(position));
+    }
 
-        viewHolder.mItemView.setOnLongClickListener(view -> {
-            if (!mModel.isDelMode()) {
-                enableDelMode();
-            }
-            prepareToDel(item, viewHolder);
-            return true;
-        });
+    @Override
+    public void onViewAttachedToWindow(@NonNull ViewHolder viewHolder) {
+        super.onViewAttachedToWindow(viewHolder);
 
-        viewHolder.mItemView.setOnClickListener(view -> {
-            if (mModel.isDelMode()) {
-                if (mDelItems.contains(item)) { removeFromDel(item, viewHolder); }
-                else { prepareToDel(item, viewHolder); }
-            } else {
-                if (mModel.getBasketItem(item.getName()) == null) {
-                    mModel.putToBasket(item);
-                    notifyItemChanged(viewHolder.getAdapterPosition());
+        if (viewHolder != null && viewHolder.getAdapterPosition() != -1) {
+            final Item item = getItems().get(viewHolder.getAdapterPosition());
+
+            viewHolder.mItemView.setOnLongClickListener(view -> {
+                if (!mModel.isDelMode()) {
+                    enableDelMode();
                 }
-                else {
-                    mModel.removeBasketItem(item);
-                    notifyItemChanged(viewHolder.getAdapterPosition());
+                prepareToDel(item, viewHolder);
+                return true;
+            });
+
+            viewHolder.mItemView.setOnClickListener(view -> {
+                if (mModel.isDelMode()) {
+                    if (mDelItems.contains(item)) { removeFromDel(item, viewHolder); }
+                    else { prepareToDel(item, viewHolder); }
+                } else {
+                    if (mModel.getBasketMeta(item.getName()) == null) {
+                        mModel.putToBasket(item.getName());
+                        notifyItemChanged(viewHolder.getAdapterPosition());
+                    }
+                    else {
+                        mModel.removeFromBasket(item.getName());
+                        notifyItemChanged(viewHolder.getAdapterPosition());
+                    }
                 }
-            }
-        });
+            });
+        }
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull ViewHolder viewHolder) {
+        super.onViewDetachedFromWindow(viewHolder);
+
+        viewHolder.mItemView.setOnLongClickListener(null);
+        viewHolder.mItemView.setOnClickListener(null);
     }
 
     // show item name in showcase mode and hide in basket mode in "Showcase"
@@ -81,7 +97,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
 
     @Override
     void setChooseIcon(ViewHolder viewHolder, Item item) {
-        if(item.isInBasket()) {
+        if(mModel.isInBasket(item)) {
             viewHolder.mCheckImage.setImageResource(R.drawable.ic_choosed);
         }
         else {

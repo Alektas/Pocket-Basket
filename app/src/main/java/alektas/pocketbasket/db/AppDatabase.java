@@ -1,6 +1,7 @@
 package alektas.pocketbasket.db;
 
 import alektas.pocketbasket.async.insertAllAsync;
+import alektas.pocketbasket.db.entity.BasketMeta;
 import alektas.pocketbasket.model.Observer;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
@@ -15,7 +16,7 @@ import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.db.dao.ItemsDao;
 import alektas.pocketbasket.model.ItemGenerator;
 
-@Database(entities = {Item.class}, version = 5)
+@Database(entities = {Item.class, BasketMeta.class}, version = 7)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String TAG = "AppDatabase";
     private static volatile AppDatabase INSTANCE;
@@ -39,13 +40,85 @@ public abstract class AppDatabase extends RoomDatabase {
                                             .execute(ItemGenerator.getAll());
                                 }
                             })
-                            .addMigrations(MIGRATION_4_5)
+                            .addMigrations(MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
                             .build();
                 }
             }
         }
         return INSTANCE;
     }
+
+    private static final Migration MIGRATION_6_7 = new Migration(6, 7) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+
+            database.execSQL("CREATE TABLE `basket_items_new` (" +
+                    "`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`item_name` TEXT NOT NULL, " +
+                    "`position` INTEGER NOT NULL, " +
+                    "`checked` INTEGER NOT NULL, " +
+                    "FOREIGN KEY(`item_name`) REFERENCES `items`(`name`) " +
+                    "ON UPDATE CASCADE " +
+                    "ON DELETE CASCADE )");
+
+            // Update indexes
+            database.execSQL("DROP INDEX IF EXISTS index_basket_items_item_name");
+            database.execSQL("DROP INDEX IF EXISTS index_basket_items_position");
+            database.execSQL("CREATE UNIQUE INDEX `index_basket_items_item_name` " +
+                    "ON `basket_items_new` (`item_name`)");
+            database.execSQL("CREATE INDEX `index_basket_items_position` " +
+                    "ON `basket_items_new` (`position`)");
+
+            // Copy the data
+            database.execSQL("INSERT INTO basket_items_new " +
+                    "(item_name, position, checked) " +
+                    "SELECT item_name, position, checked FROM basket_items");
+            // Remove the old table
+            database.execSQL("DROP TABLE basket_items");
+            // Change the table name to the correct one
+            database.execSQL("ALTER TABLE basket_items_new RENAME TO basket_items");
+        }
+    };
+
+    private static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+
+            database.execSQL("CREATE TABLE `items_new` (" +
+                    "`name` TEXT NOT NULL, " +
+                    "`name_res` INTEGER NOT NULL, " +
+                    "`img_res` INTEGER NOT NULL, " +
+                    "`tag_res` INTEGER NOT NULL, " +
+                    "PRIMARY KEY(`name`))");
+            // Update indexes
+            database.execSQL("DROP INDEX IF EXISTS index_items_name");
+            database.execSQL("DROP INDEX IF EXISTS index_items_tag_res");
+            database.execSQL("CREATE UNIQUE INDEX `index_items_name` ON `items_new` (`name`)");
+            database.execSQL("CREATE  INDEX `index_items_tag_res` ON `items_new` (`tag_res`)");
+
+            database.execSQL("CREATE TABLE `basket_items` (" +
+                    "`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`item_name` TEXT NOT NULL, " +
+                    "`position` INTEGER NOT NULL, " +
+                    "`checked` INTEGER NOT NULL, " +
+                    "FOREIGN KEY(`item_name`) REFERENCES `items`(`name`) " +
+                    "ON UPDATE CASCADE " +
+                    "ON DELETE CASCADE )");
+            database.execSQL("CREATE UNIQUE INDEX `index_basket_items_item_name` " +
+                    "ON `basket_items` (`item_name`)");
+            database.execSQL("CREATE UNIQUE INDEX `index_basket_items_position` " +
+                    "ON `basket_items` (`position`)");
+
+            // Copy the data
+            database.execSQL("INSERT INTO items_new " +
+                    "(name, name_res, img_res, tag_res) " +
+                    "SELECT name, name_res, img_res, tag_res FROM items");
+            // Remove the old table
+            database.execSQL("DROP TABLE items");
+            // Change the table name to the correct one
+            database.execSQL("ALTER TABLE items_new RENAME TO items");
+        }
+    };
 
     private static final Migration MIGRATION_4_5 = new Migration(4, 5) {
         @Override

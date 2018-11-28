@@ -1,8 +1,8 @@
 package alektas.pocketbasket.viewmodel;
 
 import android.app.Application;
-import android.util.Log;
 
+import alektas.pocketbasket.db.entity.BasketMeta;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.annotation.NonNull;
@@ -27,56 +27,65 @@ public class ItemsViewModel extends AndroidViewModel {
     public ItemsViewModel(@NonNull Application application) {
         super(application);
         mRepoManager = new RepoManager(application);
-        mShowcaseData = mRepoManager.getAllData();
+        mShowcaseData = mRepoManager.getShowcaseData();
         mBasketData = mRepoManager.getBasketData();
         mDelItems = new ArrayList<>();
     }
 
+
     /* Basket methods */
 
-    public Item getBasketItem(String key) {
-        return mRepoManager.getBasketItem(key);
+    public BasketMeta getBasketMeta(String key) {
+        return mRepoManager.getItemMeta(key);
     }
 
-    public void putToBasket(Item item) {
-        mRepoManager.putToBasket(item);
+    public void putToBasket(String name) {
+        mRepoManager.putToBasket(name);
     }
 
-    public void checkItem(Item item) {
-        mRepoManager.changeItemState(item);
+    public void updatePositions(List<Item> items) {
+        mRepoManager.updatePositions(items);
     }
 
-    // Check all items in Basket (or uncheck if already all items are checked)
+    public boolean isInBasket(Item item) {
+        return getBasketMeta(item.getName()) != null;
+    }
+
+    public void checkItem(String name) {
+        mRepoManager.checkItem(name);
+    }
+
+    public boolean isChecked(String name) {
+        return mRepoManager.isChecked(name);
+    }
+
     public void checkAll() {
-        if (isAllChecked()) {
-            mRepoManager.checkAll(false);
-        }
-        else {
-            mRepoManager.checkAll(true);
-        }
+        mRepoManager.checkAll();
     }
 
-    public void removeBasketItem(Item item) {
-        mRepoManager.removeBasketItem(item);
+    public void removeFromBasket(String name) {
+        mRepoManager.removeFromBasket(name);
     }
 
-    public void clearBasket() { mRepoManager.clearBasket(); }
+    public void deleteChecked() {
+        mRepoManager.deleteChecked();
+    }
+
 
     /* Showcase methods */
 
-    public void addItem(String name, int tagRes) {
+    public void addNewItem(String name, int tagRes) {
         if (name == null) { return; }
         for (Item item : mRepoManager.getItems(0)) {
             if ( (name.toLowerCase())
                     .equals(item.getName().toLowerCase()) ) {
-                mRepoManager.putToBasket(item);
+                mRepoManager.putToBasket(item.getName());
                 return;
             }
         }
         Item item = new Item(name);
         item.setTagRes(tagRes);
-        item.setInBasket(true);
-        mRepoManager.insertItem(item);
+        mRepoManager.addNewItem(item);
     }
 
     public void deleteItems(List<Item> items) {
@@ -93,6 +102,7 @@ public class ItemsViewModel extends AndroidViewModel {
         mRepoManager.resetShowcase(fullReset);
     }
 
+
     /* Data getters */
 
     public LiveData<List<Item>> getShowcaseData() {
@@ -105,16 +115,6 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public List<Item> getDelItems() { return mDelItems; }
 
-    /* Private */
-
-    // Return 'true' if all items in Basket are checked
-    private boolean isAllChecked() {
-        if (mBasketData.getValue() == null) return false;
-        for(Item item : mBasketData.getValue()) {
-            if (!item.isChecked()) return false;
-        }
-        return true;
-    }
 
     /* Application state methods */
 
