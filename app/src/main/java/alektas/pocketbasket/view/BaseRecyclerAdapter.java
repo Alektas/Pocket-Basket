@@ -1,7 +1,6 @@
 package alektas.pocketbasket.view;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +36,7 @@ public abstract class BaseRecyclerAdapter
         final CardView mIconView;
         final ImageView mCheckImage;
         final ImageView mDelImage;
+        final ImageView mDragHandle;
         final TextView mName;
 
         private ItemViewBinding mItemBinding;
@@ -50,6 +50,7 @@ public abstract class BaseRecyclerAdapter
             mCheckImage = mItemView.findViewById(R.id.check_image);
             mName = mItemView.findViewById(R.id.item_name);
             mDelImage = mItemView.findViewById(R.id.del_image);
+            mDragHandle = mItemView.findViewById(R.id.drag_handle);
         }
 
         void bind(Item item) {
@@ -66,9 +67,7 @@ public abstract class BaseRecyclerAdapter
 
     @Override
     public long getItemId(int position) {
-        int nameRes = mItems.get(position).getNameRes();
-        if (nameRes != 0) return nameRes;
-        else return mItems.get(position).getName().hashCode();
+        return mItems.get(position).getName().hashCode();
     }
 
     @NonNull
@@ -99,18 +98,8 @@ public abstract class BaseRecyclerAdapter
     }
 
     void setItemText(ViewHolder viewHolder, Item item) {
-        viewHolder.mName.setText(getItemName(item));
+        viewHolder.mName.setText(item.getName());
     }
 
     abstract void setChooseIcon(ViewHolder viewHolder, Item item);
-
-    // get item name from resources or from key field if res is absent
-    String getItemName(Item item) {
-        int nameRes = item.getNameRes();
-        if (nameRes == 0) { return item.getName(); }
-        try {
-            return mContext.getString(nameRes);
-        }
-        catch (Resources.NotFoundException e) { return item.getName(); }
-    }
 }

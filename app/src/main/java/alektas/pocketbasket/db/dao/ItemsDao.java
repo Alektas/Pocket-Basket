@@ -18,6 +18,8 @@ import alektas.pocketbasket.db.entity.Item;
 
 @Dao
 public abstract class ItemsDao {
+    private static final String TAG = "ItemsDao";
+
 
     @Query("SELECT * FROM items ORDER BY tag_res, name ASC")
     public abstract List<Item> getItems();
@@ -33,67 +35,76 @@ public abstract class ItemsDao {
             "GROUP BY basket_items.position")
     public abstract LiveData<List<Item>> getBasketData();
 
-    @Query("SELECT * FROM basket_items")
-    public abstract List<BasketMeta> getBasketItems();
-
-    @Query("SELECT * FROM basket_items WHERE item_name = :name")
-    public abstract BasketMeta getItemMeta(String name);
-
     @Query("SELECT checked FROM basket_items WHERE item_name = :name")
     public abstract int isChecked(String name);
 
-    @Query("SELECT MAX(position) FROM basket_items")
-    public abstract int getMaxPosition();
 
-    @Query("SELECT position FROM basket_items WHERE item_name = :name")
-    public abstract int getPosition(String name);
+    /* Check item queries */
+
+    @Transaction
+    public void check(String name) {
+        if (getItemMeta(name).isChecked()) check(name, 0);
+        else check(name, 1);
+    }
 
     @Query("UPDATE basket_items SET checked = :state WHERE item_name = :name")
     public abstract void check(String name, int state);
 
+    @Query("SELECT * FROM basket_items WHERE item_name = :name")
+    public abstract BasketMeta getItemMeta(String name);
+
+
+    /* Check all items queries */
+
+    @Transaction
+    public void checkAll() {
+        if (findUnchecked() == null) {
+            checkAll(0);
+        }
+        else {
+            checkAll(1);
+        }
+    }
+
     @Query("UPDATE basket_items SET checked = :checked ")
     public abstract void checkAll(int checked);
 
-    @Query("UPDATE basket_items SET position = (position + 1) " +
-            "WHERE position < :fromPosition " +
-            "AND position >= :toPosition")
-    // fromPosition > toPosition
-    public abstract void onItemUp(int fromPosition, int toPosition);
+    @Query("SELECT item_name FROM basket_items WHERE checked = 0 LIMIT 1")
+    public abstract String findUnchecked();
 
-    @Query("UPDATE basket_items SET position = (position - 1) " +
-            "WHERE position > :fromPosition " +
-            "AND position <= :toPosition")
-    // fromPosition < toPosition
-    public abstract void onItemDown(int fromPosition, int toPosition);
+
+    /* Update item positions queries */
+
+    @Transaction
+    public void updatePositions(List<Item> items) {
+        for (int i = 0; i < items.size(); i++) {
+            setPosition(items.get(i).getName(), i + 1);
+        }
+    }
 
     @Query("UPDATE basket_items SET position = :position WHERE item_name = :name")
     public abstract void setPosition(String name, int position);
 
-    @Query("UPDATE basket_items SET position = (position - 1) " +
-            "WHERE position > :position")
-    public abstract void onItemDeleted(int position);
 
-    // TODO: too slow, replace by setting position in code
-    // leads to crush if the positions are not in ascending order
-    @Query("UPDATE basket_items SET position = " +
-            "(SELECT COUNT(*) FROM basket_items AS t " +
-            "WHERE t.position <= basket_items.position)")
-    public abstract void onDeleteChecked();
-
-    @Query("DELETE FROM basket_items WHERE item_name = :name")
-    public abstract void deleteFromBasket(String name);
-
-    @Query("DELETE FROM basket_items WHERE checked = 1")
-    public abstract void deleteCheckedBasket();
-
-    @Query("DELETE FROM items")
-    public abstract void deleteAll();
+    /* Delete checked items queries */
 
     @Transaction
     public void deleteChecked() {
         deleteCheckedBasket();
         onDeleteChecked();
     }
+
+    @Query("DELETE FROM basket_items WHERE checked = 1")
+    public abstract void deleteCheckedBasket();
+
+    // leads to crush if the positions are not in ascending order
+    @Query("UPDATE basket_items SET position = " +
+            "(SELECT COUNT(*) FROM basket_items AS t " +
+            "WHERE t.position <= basket_items.position)")
+    public abstract void onDeleteChecked();
+
+
+    /* Delete basket item queries */
 
     @Transaction
     public void deleteBasketItem(String name) {
@@ -102,19 +113,30 @@ public abstract class ItemsDao {
         onItemDeleted(position);
     }
 
-    @Transaction
-    public void moveItem(String name, int fromPosition, int toPosition) {
-        setPosition(name, 0); // free old position for other item
-        if (fromPosition > toPosition) onItemUp(fromPosition, toPosition);
-        else onItemDown(fromPosition, toPosition);
-        setPosition(name, toPosition);
-    }
+    @Query("SELECT position FROM basket_items WHERE item_name = :name")
+    public abstract int getPosition(String name);
+
+    @Query("DELETE FROM basket_items WHERE item_name = :name")
+    public abstract void deleteFromBasket(String name);
+
+    @Query("UPDATE basket_items SET position = (position - 1) " +
+            "WHERE position > :position")
+    public abstract void onItemDeleted(int position);
+
+
+    /* Reset showcase queries */
 
     @Transaction
     public void fullReset(List<Item> items) {
         deleteAll();
         insertAll(items);
     }
+
+    @Query("DELETE FROM items")
+    public abstract void deleteAll();
+
+
+    /* Add new item to showcase and put item to basket queries */
 
     @Transaction
     public void addNewItem(Item item) {
@@ -126,18 +148,18 @@ public abstract class ItemsDao {
     }
 
     @Transaction
-    public void check(String name) {
-        if (getItemMeta(name).isChecked()) check(name, 0);
-        else check(name, 1);
-    }
-
-    @Transaction
     public void putItemToBasket(String name) {
         BasketMeta item = new BasketMeta();
         item.setItemName(name);
         item.setPosition(getMaxPosition() + 1);
         putItemToBasket(item);
     }
+
+    @Query("SELECT MAX(position) FROM basket_items")
+    public abstract int getMaxPosition();
+
+
+    /* Default Insert, Update, Delete queries */
 
     @Insert
     public abstract void putItemToBasket(BasketMeta item);
@@ -152,10 +174,7 @@ public abstract class ItemsDao {
     public abstract void update(Item item);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    public abstract void update(List<Item> item);
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    public abstract void update(BasketMeta item);
+    public abstract void update(List<Item> items);
 
     @Delete
     public abstract void delete(List<Item> item);

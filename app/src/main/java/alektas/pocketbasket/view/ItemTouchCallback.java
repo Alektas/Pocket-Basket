@@ -14,9 +14,10 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
     }
 
     @Override
-    public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+    public int getMovementFlags(@NonNull RecyclerView recyclerView,
+                                @NonNull RecyclerView.ViewHolder viewHolder) {
         int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-        int swipeFlags = ItemTouchHelper.RIGHT;
+        int swipeFlags = ItemTouchHelper.END;
         return makeMovementFlags(dragFlags, swipeFlags);
     }
 
@@ -34,19 +35,21 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
     }
 
     @Override
+    public void clearView(@NonNull RecyclerView recyclerView,
+                          @NonNull RecyclerView.ViewHolder viewHolder) {
+        super.clearView(recyclerView, viewHolder);
+
+        mAdapter.clearView();
+        mAdapter.onSwipeEnd(viewHolder);
+    }
+
+    @Override
     public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
         super.onSelectedChanged(viewHolder, actionState);
 
         if (ItemTouchHelper.ACTION_STATE_SWIPE == actionState) {
             mAdapter.onSwipeStart(viewHolder);
         }
-    }
-
-    @Override
-    public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-        super.clearView(recyclerView, viewHolder);
-
-        mAdapter.onSwipeEnd(viewHolder);
     }
 
     @Override

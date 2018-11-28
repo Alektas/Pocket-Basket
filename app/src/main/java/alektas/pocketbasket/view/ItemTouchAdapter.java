@@ -8,6 +8,8 @@ public interface ItemTouchAdapter {
 
     void onItemDismiss(int position);
 
+    void clearView();
+
     void onSwipeStart(RecyclerView.ViewHolder viewHolder);
     void onSwipeEnd(RecyclerView.ViewHolder viewHolder);
 

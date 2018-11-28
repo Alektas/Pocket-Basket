@@ -2,8 +2,10 @@ package alektas.pocketbasket.view;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.Collections;
@@ -21,23 +23,50 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     private static final String TAG = "BasketAdapter";
     private Context mContext;
     private ItemsViewModel mModel;
+    private OnStartDragListener mDragListener;
 
-    BasketRvAdapter(Context context, ItemsViewModel model) {
+    BasketRvAdapter(Context context, ItemsViewModel model, OnStartDragListener dragListener) {
         super(context, model);
         mContext = context;
         mModel = model;
+        mDragListener = dragListener;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         super.onBindViewHolder(viewHolder, position);
 
-        /* Not overrided from BaseRecyclerAdapter because of white background needed only in Basket */
+        /* Not overrided from BaseRecyclerAdapter because of drag handle and white background needed only in Basket */
+        viewHolder.mDragHandle.setImageResource(R.drawable.ic_drag_handle_darkgreen_24dp);
         viewHolder.mItemView.setBackgroundColor(mContext.getResources().getColor(R.color.item_bg));
+    }
 
-        viewHolder.mIconView.setOnClickListener(v -> {
-            mModel.checkItem(getItems().get(position).getName());
-        });
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public void onViewAttachedToWindow(@NonNull ViewHolder viewHolder) {
+        super.onViewAttachedToWindow(viewHolder);
+
+        if (viewHolder != null) {
+            viewHolder.mDragHandle.setOnTouchListener((v, event) -> {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    mDragListener.onStartDrag(viewHolder);
+                }
+                return false;
+            });
+
+            viewHolder.mIconView.setOnClickListener(v -> {
+                mModel.checkItem(getItems().get(viewHolder.getAdapterPosition()).getName());
+            });
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public void onViewDetachedFromWindow(@NonNull ViewHolder viewHolder) {
+        super.onViewDetachedFromWindow(viewHolder);
+
+        viewHolder.mDragHandle.setOnTouchListener(null);
+        viewHolder.mIconView.setOnClickListener(null);
     }
 
     // hide item name in showcase mode and show in basket mode in "Basket"
@@ -95,8 +124,14 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
                 Collections.swap(getItems(), i, i - 1);
             }
         }
+
         notifyItemMoved(fromPosition, toPosition);
         return true;
+    }
+
+    @Override
+    public void clearView() {
+        mModel.updatePositions(getItems());
     }
 
     private void runColorAnim(View itemView, boolean colorful) {

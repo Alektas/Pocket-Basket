@@ -1,7 +1,6 @@
 package alektas.pocketbasket.viewmodel;
 
 import android.app.Application;
-import android.util.Log;
 
 import alektas.pocketbasket.db.entity.BasketMeta;
 import androidx.lifecycle.AndroidViewModel;
@@ -28,23 +27,24 @@ public class ItemsViewModel extends AndroidViewModel {
     public ItemsViewModel(@NonNull Application application) {
         super(application);
         mRepoManager = new RepoManager(application);
-        mShowcaseData = mRepoManager.getAllData();
+        mShowcaseData = mRepoManager.getShowcaseData();
         mBasketData = mRepoManager.getBasketData();
         mDelItems = new ArrayList<>();
     }
 
+
     /* Basket methods */
 
-    public List<BasketMeta> getBasketMeta() {
-        return mRepoManager.getBasketMeta();
-    }
-
     public BasketMeta getBasketMeta(String key) {
-        return mRepoManager.getBasketMeta(key);
+        return mRepoManager.getItemMeta(key);
     }
 
     public void putToBasket(String name) {
         mRepoManager.putToBasket(name);
+    }
+
+    public void updatePositions(List<Item> items) {
+        mRepoManager.updatePositions(items);
     }
 
     public boolean isInBasket(Item item) {
@@ -59,23 +59,18 @@ public class ItemsViewModel extends AndroidViewModel {
         return mRepoManager.isChecked(name);
     }
 
-    // Check all items in Basket (or uncheck if already all items are checked)
     public void checkAll() {
-        if (isAllChecked()) {
-            mRepoManager.checkAll(false);
-        }
-        else {
-            mRepoManager.checkAll(true);
-        }
+        mRepoManager.checkAll();
     }
 
     public void removeFromBasket(String name) {
-        mRepoManager.removeBasketItem(name);
+        mRepoManager.removeFromBasket(name);
     }
 
     public void deleteChecked() {
         mRepoManager.deleteChecked();
     }
+
 
     /* Showcase methods */
 
@@ -107,6 +102,7 @@ public class ItemsViewModel extends AndroidViewModel {
         mRepoManager.resetShowcase(fullReset);
     }
 
+
     /* Data getters */
 
     public LiveData<List<Item>> getShowcaseData() {
@@ -119,16 +115,6 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public List<Item> getDelItems() { return mDelItems; }
 
-    /* Private */
-
-    // Return 'true' if all items in Basket are checked
-    private boolean isAllChecked() { // TODO: replace by query
-        if (mBasketData.getValue() == null) return false;
-        for(Item item : mBasketData.getValue()) {
-            if (!mRepoManager.isChecked(item.getName())) return false;
-        }
-        return true;
-    }
 
     /* Application state methods */
 
