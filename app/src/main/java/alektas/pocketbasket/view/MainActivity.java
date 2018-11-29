@@ -3,6 +3,7 @@ package alektas.pocketbasket.view;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -28,6 +29,7 @@ import alektas.pocketbasket.async.getAllAsync;
 import alektas.pocketbasket.db.AppDatabase;
 import alektas.pocketbasket.db.dao.ItemsDao;
 import androidx.annotation.NonNull;
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.appcompat.app.AppCompatActivity;
@@ -105,9 +107,15 @@ public class MainActivity extends AppCompatActivity
         root.requestFocus();
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+
+        if(menu instanceof MenuBuilder){
+            MenuBuilder m = (MenuBuilder) menu;
+            m.setOptionalIconsVisible(true);
+        }
 
         // Locate MenuItem with ShareActionProvider
         MenuItem shareItem = menu.findItem(R.id.menu_share);
