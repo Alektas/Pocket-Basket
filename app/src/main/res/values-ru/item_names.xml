@@ -12,8 +12,8 @@
     <string name="cookies">Печенье</string>
     <string name="pie">Пирог</string>
     <string name="cake">Торт</string>
-    <string name="brown_bread">Черный хлеб</string>
-    <string name="white_bread">Белый хлеб</string>
+    <string name="brown_bread">Хлеб черный </string>
+    <string name="white_bread">Хлеб белый</string>
     <string name="pasta">Макароны</string>
     <string name="lemon">Лимон</string>
     <string name="apple">Яблоки</string>
@@ -31,8 +31,8 @@
     <string name="pork">Свинина</string>
     <string name="chicken">Курица</string>
     <string name="fish">Рыба</string>
-    <string name="butter">Сливочное масло</string>
-    <string name="seed_oil">Растительное масло</string>
+    <string name="butter">Масло сливочное </string>
+    <string name="seed_oil">Масло растительное</string>
     <string name="mayo">Майонез</string>
     <string name="ketchup">Кетчуп</string>
     <string name="egg">Яйца</string>
@@ -41,7 +41,7 @@
     <string name="soap">Мыло</string>
     <string name="toilet_paper">Туалетная бумага</string>
     <string name="shampoo">Шампунь</string>
-    <string name="detergent">Моющее средство</string>
+    <string name="detergent">Средство моющее </string>
     <string name="dumplings">Пельмени</string>
     <string name="cutlets">Котлеты</string>
     <string name="mushrooms">Грибы</string>
@@ -68,5 +68,6 @@
     <string name="candies">Конфеты</string>
     <string name="lemonade">Лимонад</string>
     <string name="canned_food">Консервы</string>
+    <string name="bubblegum">Жевательная резинка</string>
 
 </resources>

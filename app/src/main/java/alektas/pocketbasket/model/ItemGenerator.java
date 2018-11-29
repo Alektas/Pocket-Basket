@@ -98,6 +98,7 @@ public class ItemGenerator {
         addItem(sItems, R.string.salt, R.drawable.ic_salt, R.string.other);
         addItem(sItems, R.string.cigarettes, 0, R.string.other);
         addItem(sItems, R.string.soda, 0, R.string.other);
+        addItem(sItems, R.string.bubblegum, 0, R.string.other);
 
         return sItems;
     }
