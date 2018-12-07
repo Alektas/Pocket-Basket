@@ -74,8 +74,8 @@ public abstract class BaseRecyclerAdapter
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
-        ItemViewBinding binding =
-                DataBindingUtil.inflate(inflater, R.layout.item_view, parent, false);
+        View itemView = inflater.inflate(R.layout.item_view, parent, false);
+        ItemViewBinding binding = DataBindingUtil.bind(itemView);
         binding.setModel(mModel);
         return new ViewHolder(binding);
     }

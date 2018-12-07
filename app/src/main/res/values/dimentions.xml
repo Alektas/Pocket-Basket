@@ -4,7 +4,10 @@
     <dimen name="ic_item_corner_rad">8dp</dimen>
     <dimen name="ic_categ_size">40dp</dimen>
 
-    <dimen name="categ_wide_size">145dp</dimen>
+    <dimen name="item_height">72dp</dimen>
+    <dimen name="item_width">150dp</dimen>
+
+    <dimen name="categ_wide_size">130dp</dimen>
     <dimen name="categ_narrow_size">56dp</dimen>
 
     <dimen name="showcase_wide_size">160dp</dimen>
@@ -20,8 +23,7 @@
 
     <dimen name="text_size">14sp</dimen>
 
-    <dimen name="change_mode_left_edge">128dp</dimen>
-    <dimen name="change_mode_right_edge">72dp</dimen>
+    <dimen name="change_mode_distance">72dp</dimen>
     <dimen name="fling_X_min">72dp</dimen>
     <dimen name="fling_Y_max">100dp</dimen>
 

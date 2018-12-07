@@ -70,16 +70,6 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
         viewHolder.mIconView.setOnClickListener(null);
     }
 
-    // hide item name in showcase mode and show in basket mode in "Basket"
-    @Override
-    void setItemText(ViewHolder viewHolder, Item item) {
-        super.setItemText(viewHolder, item);
-        if (mModel.isBasketNamesShow()) {
-            viewHolder.mName.setVisibility(View.VISIBLE);
-        }
-        else viewHolder.mName.setVisibility(View.GONE);
-    }
-
     // add check image to icon of item in basket if item is checked
     @Override
     void setChooseIcon(ViewHolder viewHolder, Item item) {
