@@ -5,16 +5,20 @@ import android.animation.AnimatorInflater;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.Collections;
 
 import alektas.pocketbasket.R;
+import alektas.pocketbasket.databinding.BasketItemViewBinding;
 import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class BasketRvAdapter extends BaseRecyclerAdapter
@@ -32,14 +36,14 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
         mDragListener = dragListener;
     }
 
+    @NonNull
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        super.onBindViewHolder(viewHolder, position);
-
-        /* Not overrided from BaseRecyclerAdapter because of
-        drag handle and white background needed only in Basket */
-        viewHolder.mDragHandle.setImageResource(R.drawable.ic_drag_handle_darkgreen_24dp);
-        viewHolder.mItemView.setBackgroundColor(mContext.getResources().getColor(R.color.item_bg));
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View itemView = inflater.inflate(R.layout.basket_item_view, parent, false);
+        BasketItemViewBinding binding = DataBindingUtil.bind(itemView);
+        binding.setModel(mModel);
+        return new ViewHolder(binding);
     }
 
     @SuppressLint("ClickableViewAccessibility")

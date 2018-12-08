@@ -12,6 +12,7 @@ import java.util.List;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.databinding.ItemViewBinding;
+import alektas.pocketbasket.databinding.BasketItemViewBinding;
 import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import androidx.annotation.NonNull;
@@ -32,6 +33,7 @@ public abstract class BaseRecyclerAdapter
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
+        private static final String TAG = "ViewHolder";
         final View mItemView;
         final CardView mIconView;
         final ImageView mCheckImage;
@@ -40,11 +42,10 @@ public abstract class BaseRecyclerAdapter
         final TextView mName;
 
         private ItemViewBinding mItemBinding;
+        private BasketItemViewBinding mBasketItemBinding;
 
-        ViewHolder(@NonNull ItemViewBinding binding) {
-            super(binding.getRoot());
-            mItemBinding = binding;
-
+        ViewHolder(View view) {
+            super(view);
             mItemView = itemView;
             mIconView = mItemView.findViewById(R.id.item_icon_view);
             mCheckImage = mItemView.findViewById(R.id.check_image);
@@ -53,9 +54,25 @@ public abstract class BaseRecyclerAdapter
             mDragHandle = mItemView.findViewById(R.id.drag_handle);
         }
 
+        ViewHolder(@NonNull ItemViewBinding binding) {
+            this(binding.getRoot());
+            mItemBinding = binding;
+        }
+
+        ViewHolder(@NonNull BasketItemViewBinding binding) {
+            this(binding.getRoot());
+            mBasketItemBinding = binding;
+        }
+
         void bind(Item item) {
-            mItemBinding.setItem(item);
-            mItemBinding.executePendingBindings();
+            if (mItemBinding != null) {
+                mItemBinding.setItem(item);
+                mItemBinding.executePendingBindings();
+            }
+            if (mBasketItemBinding != null) {
+                mBasketItemBinding.setItem(item);
+                mBasketItemBinding.executePendingBindings();
+            }
         }
     }
 
