@@ -1,8 +1,5 @@
 package alektas.pocketbasket.view;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
@@ -381,8 +378,8 @@ public class MainActivity extends AppCompatActivity
     private void showFloatingMenu() {
         mAddBtn.setImageResource(R.drawable.ic_close_white_24dp);
 
-        runVisibilityAnim(mCheckAllBtn, 0, R.animator.check_all_show_anim);
-        runVisibilityAnim(mDelAllBtn, 0, R.animator.delete_all_show_anim);
+        mCheckAllBtn.setVisibility(View.VISIBLE);
+        mDelAllBtn.setVisibility(View.VISIBLE);
 
         isMenuShown = true;
     }
@@ -390,29 +387,10 @@ public class MainActivity extends AppCompatActivity
     private void hideFloatingMenu() {
         mAddBtn.setImageResource(R.drawable.ic_edit_24dp);
 
-        runVisibilityAnim(mCheckAllBtn, View.INVISIBLE, R.animator.check_all_hide_anim);
-        runVisibilityAnim(mDelAllBtn, View.INVISIBLE, R.animator.delete_all_hide_anim);
+        mCheckAllBtn.setVisibility(View.INVISIBLE);
+        mDelAllBtn.setVisibility(View.INVISIBLE);
 
         isMenuShown = false;
-    }
-
-    private void runVisibilityAnim(View view, int endVis, int animId) {
-        Animator anim = AnimatorInflater.loadAnimator(this, animId);
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                view.setVisibility(endVis);
-            }
-
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                view.setVisibility(View.VISIBLE);
-            }
-        });
-        anim.setTarget(view);
-        anim.start();
     }
 
     private void setFilter(int tag) {
@@ -433,13 +411,11 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDelModeEnable() {
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
         mDelModePanel.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onDelModeDisable() {
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
         mDelModePanel.setVisibility(View.GONE);
     }
 
