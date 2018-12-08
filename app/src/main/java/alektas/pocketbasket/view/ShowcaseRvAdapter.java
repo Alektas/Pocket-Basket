@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.R;
@@ -106,7 +107,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     }
 
     public void deleteChoosedItems() {
-        mModel.deleteItems(mDelItems);
+        mModel.deleteItems(new ArrayList<>(mDelItems));
         cancelDel();
     }
 
