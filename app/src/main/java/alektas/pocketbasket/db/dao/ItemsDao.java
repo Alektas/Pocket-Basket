@@ -149,6 +149,7 @@ public abstract class ItemsDao {
 
     @Transaction
     public void putItemToBasket(String name) {
+        if (getItemMeta(name) != null) return;
         BasketMeta item = new BasketMeta();
         item.setItemName(name);
         item.setPosition(getMaxPosition() + 1);
