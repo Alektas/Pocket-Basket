@@ -54,7 +54,6 @@
         android:background="@color/colorPrimaryLight"
         android:divider="@color/colorPrimaryLight"
         android:animateLayoutChanges="false"
-        android:focusableInTouchMode="true"
         app:layout_constraintBottom_toTopOf="@+id/del_mode_panel"
         app:layout_constraintEnd_toStartOf="@+id/basket_list"
         app:layout_constraintHorizontal_bias="0"
@@ -68,13 +67,11 @@
         android:layout_width="@dimen/basket_narrow_size"
         android:layout_height="0dp"
         android:animateLayoutChanges="false"
-        android:focusableInTouchMode="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@+id/showcase_list"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        />
+        app:layout_constraintTop_toBottomOf="@id/toolbar"/>
 
     <include
         android:id="@+id/del_mode_panel"

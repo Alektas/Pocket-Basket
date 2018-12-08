@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -606,6 +607,9 @@ public class MainActivity extends AppCompatActivity
                 alreadySetChangeModeAllowing = false;
                 initX = 0;
                 movX = 0;
+
+                mShowcase.onTouchEvent(event);
+                mBasket.onTouchEvent(event);
 
                 break;
             }
