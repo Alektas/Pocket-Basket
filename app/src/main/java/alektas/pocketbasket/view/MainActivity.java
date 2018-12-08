@@ -53,7 +53,8 @@ public class MainActivity extends AppCompatActivity
         implements ResetDialog.ResetDialogListener,
         AddItemDialog.AddItemDialogListener,
         DeleteModeListener,
-        OnStartDragListener {
+        OnStartDragListener,
+        ItemSizeProvider {
 
     private static final String TAG = "PocketBasketApp";
 
@@ -62,6 +63,7 @@ public class MainActivity extends AppCompatActivity
     private int mShowcaseWideWidth;
     private int mShowcaseNarrowWidth;
     private int mBasketNarrowWidth;
+    private int mBasketWideWidth;
     private boolean isMenuShown;
 
     private RecyclerView mBasket;
@@ -216,6 +218,7 @@ public class MainActivity extends AppCompatActivity
         mBasketNarrowWidth = (int) getResources().getDimension(R.dimen.basket_narrow_size);
         mCategWideWidth = (int) getResources().getDimension(R.dimen.categ_wide_size);
         mShowcaseWideWidth = screenWidth - mCategWideWidth - mBasketNarrowWidth;
+        mBasketWideWidth = screenWidth - mCategNarrowWidth - mShowcaseNarrowWidth;
 
         changeModeDistance = getResources().getDimension(R.dimen.change_mode_distance);
     }
@@ -241,7 +244,8 @@ public class MainActivity extends AppCompatActivity
         mBasket = findViewById(R.id.basket_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mBasket.setLayoutManager(layoutManager);
-        mBasketAdapter = new BasketRvAdapter(this, mViewModel, this);
+        mBasketAdapter = new BasketRvAdapter(this, mViewModel,
+                this,this);
         mBasket.setAdapter(mBasketAdapter);
 
         ItemTouchHelper.Callback callback = new ItemTouchCallback(mBasketAdapter);
@@ -255,7 +259,8 @@ public class MainActivity extends AppCompatActivity
         mShowcase = findViewById(R.id.showcase_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mShowcase.setLayoutManager(layoutManager);
-        mShowcaseAdapter = new ShowcaseRvAdapter(this, this, mViewModel);
+        mShowcaseAdapter = new ShowcaseRvAdapter(this, this,
+                this, mViewModel);
         mShowcase.setAdapter(mShowcaseAdapter);
 
         mShowcase.addOnItemTouchListener(new ItemTouchListener());
@@ -422,6 +427,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mTouchHelper.startDrag(viewHolder);
+    }
+
+    @Override
+    public int getItemWidth() {
+        return mShowcaseWideWidth;
+    }
+
+    @Override
+    public int getBasketItemWidth() {
+        return mBasketWideWidth;
     }
 
     /* On buttons click methods */

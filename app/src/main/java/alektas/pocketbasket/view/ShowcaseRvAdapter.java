@@ -18,14 +18,17 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     private DeleteModeListener mDMListener;
     private ItemsViewModel mModel;
     private List<Item> mDelItems;
+    private int mItemWidth;
 
     ShowcaseRvAdapter(Context context,
                       DeleteModeListener delModeListener,
+                      ItemSizeProvider itemSizeProvider,
                       @NonNull ItemsViewModel model) {
         super(context, model);
         mDMListener = delModeListener;
         mModel = model;
         mDelItems = model.getDelItems();
+        mItemWidth = itemSizeProvider.getItemWidth();
     }
 
     @NonNull
@@ -33,6 +36,8 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ViewHolder viewHolder = super.onCreateViewHolder(parent, viewType);
         viewHolder.mName.setTextColor(Color.WHITE);
+        viewHolder.mItemView.getLayoutParams().width = mItemWidth;
+        viewHolder.mItemView.requestLayout();
         return viewHolder;
     }
 

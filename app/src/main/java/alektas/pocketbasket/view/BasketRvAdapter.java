@@ -28,12 +28,16 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     private Context mContext;
     private ItemsViewModel mModel;
     private OnStartDragListener mDragListener;
+    private final int mItemWidth;
 
-    BasketRvAdapter(Context context, ItemsViewModel model, OnStartDragListener dragListener) {
+    BasketRvAdapter(Context context, ItemsViewModel model,
+                    OnStartDragListener dragListener,
+                    ItemSizeProvider itemSizeProvider) {
         super(context, model);
         mContext = context;
         mModel = model;
         mDragListener = dragListener;
+        mItemWidth = itemSizeProvider.getBasketItemWidth();
     }
 
     @NonNull
@@ -41,9 +45,13 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View itemView = inflater.inflate(R.layout.basket_item_view, parent, false);
+        itemView.getLayoutParams().width = mItemWidth;
+        itemView.requestLayout();
         BasketItemViewBinding binding = DataBindingUtil.bind(itemView);
         binding.setModel(mModel);
-        return new ViewHolder(binding);
+        ViewHolder holder = new ViewHolder(binding);
+        holder.mName.setPadding(0, 0, 56, 0);
+        return holder;
     }
 
     @SuppressLint("ClickableViewAccessibility")
