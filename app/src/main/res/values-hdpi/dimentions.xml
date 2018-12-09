@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="ic_item_size">40dp</dimen>
+    <dimen name="item_height">56dp</dimen>
+
+    <dimen name="showcase_narrow_size">56dp</dimen>
+    <dimen name="basket_narrow_size">56dp</dimen>
+
+    <dimen name="icon_text_size">10sp</dimen>
+</resources>
