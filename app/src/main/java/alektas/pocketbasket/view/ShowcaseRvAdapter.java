@@ -3,7 +3,6 @@ package alektas.pocketbasket.view;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
-import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -19,14 +18,17 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     private DeleteModeListener mDMListener;
     private ItemsViewModel mModel;
     private List<Item> mDelItems;
+    private int mItemWidth;
 
     ShowcaseRvAdapter(Context context,
                       DeleteModeListener delModeListener,
+                      ItemSizeProvider itemSizeProvider,
                       @NonNull ItemsViewModel model) {
         super(context, model);
         mDMListener = delModeListener;
         mModel = model;
         mDelItems = model.getDelItems();
+        mItemWidth = itemSizeProvider.getItemWidth();
     }
 
     @NonNull
@@ -34,6 +36,8 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         ViewHolder viewHolder = super.onCreateViewHolder(parent, viewType);
         viewHolder.mName.setTextColor(Color.WHITE);
+        viewHolder.mItemView.getLayoutParams().width = mItemWidth;
+        viewHolder.mItemView.requestLayout();
         return viewHolder;
     }
 
@@ -84,16 +88,6 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
 
         viewHolder.mItemView.setOnLongClickListener(null);
         viewHolder.mItemView.setOnClickListener(null);
-    }
-
-    // show item name in showcase mode and hide in basket mode in "Showcase"
-    @Override
-    void setItemText(ViewHolder viewHolder, Item item) {
-        super.setItemText(viewHolder, item);
-        if (mModel.isShowcaseNamesShow()) {
-            viewHolder.mName.setVisibility(View.VISIBLE);
-        }
-        else viewHolder.mName.setVisibility(View.GONE);
     }
 
     @Override

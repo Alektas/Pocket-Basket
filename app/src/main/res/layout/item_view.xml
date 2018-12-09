@@ -3,40 +3,22 @@
     <data>
         <variable
             name="item"
-            type="alektas.pocketbasket.db.entity.Item" />
+            type="alektas.pocketbasket.db.entity.Item"/>
 
         <variable
             name="model"
-            type="alektas.pocketbasket.viewmodel.ItemsViewModel" />
+            type="alektas.pocketbasket.viewmodel.ItemsViewModel"/>
     </data>
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/item_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/item_height">
 
-        <include layout="@layout/item_icon_view"
-                 android:id="@+id/item_icon_view"
+        <include layout="@layout/item_content"
             app:item="@{item}"
             app:model="@{model}"/>
 
-        <TextView
-            android:id="@+id/item_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/padding_8"
-            android:layout_marginEnd="@dimen/padding_8"
-            android:layout_toEndOf="@id/item_icon_view"
-            android:layout_centerVertical="true"
-            android:textColor="@android:color/black" />
-
-        <ImageView
-            android:id="@+id/drag_handle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/padding_16"
-            android:layout_centerVertical="true"
-            android:layout_alignParentEnd="true"/>
     </RelativeLayout>
 </layout>

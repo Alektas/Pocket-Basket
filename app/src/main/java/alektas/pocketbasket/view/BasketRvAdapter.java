@@ -5,16 +5,20 @@ import android.animation.AnimatorInflater;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.Collections;
 
 import alektas.pocketbasket.R;
+import alektas.pocketbasket.databinding.BasketItemViewBinding;
 import alektas.pocketbasket.db.entity.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class BasketRvAdapter extends BaseRecyclerAdapter
@@ -24,22 +28,32 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     private Context mContext;
     private ItemsViewModel mModel;
     private OnStartDragListener mDragListener;
+    private final int mItemWidth;
+    private int marginEnd;
 
-    BasketRvAdapter(Context context, ItemsViewModel model, OnStartDragListener dragListener) {
+    BasketRvAdapter(Context context, ItemsViewModel model,
+                    OnStartDragListener dragListener,
+                    ItemSizeProvider itemSizeProvider) {
         super(context, model);
         mContext = context;
         mModel = model;
         mDragListener = dragListener;
+        mItemWidth = itemSizeProvider.getBasketItemWidth();
+        marginEnd = itemSizeProvider.getBasketTextMarginEnd();
     }
 
+    @NonNull
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        super.onBindViewHolder(viewHolder, position);
-
-        /* Not overrided from BaseRecyclerAdapter because of
-        drag handle and white background needed only in Basket */
-        viewHolder.mDragHandle.setImageResource(R.drawable.ic_drag_handle_darkgreen_24dp);
-        viewHolder.mItemView.setBackgroundColor(mContext.getResources().getColor(R.color.item_bg));
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        View itemView = inflater.inflate(R.layout.basket_item_view, parent, false);
+        itemView.getLayoutParams().width = mItemWidth;
+        itemView.requestLayout();
+        BasketItemViewBinding binding = DataBindingUtil.bind(itemView);
+        binding.setModel(mModel);
+        ViewHolder holder = new ViewHolder(binding);
+        holder.mName.setPadding(0, 0, marginEnd, 0);
+        return holder;
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -68,16 +82,6 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
 
         viewHolder.mDragHandle.setOnTouchListener(null);
         viewHolder.mIconView.setOnClickListener(null);
-    }
-
-    // hide item name in showcase mode and show in basket mode in "Basket"
-    @Override
-    void setItemText(ViewHolder viewHolder, Item item) {
-        super.setItemText(viewHolder, item);
-        if (mModel.isBasketNamesShow()) {
-            viewHolder.mName.setVisibility(View.VISIBLE);
-        }
-        else viewHolder.mName.setVisibility(View.GONE);
     }
 
     // add check image to icon of item in basket if item is checked

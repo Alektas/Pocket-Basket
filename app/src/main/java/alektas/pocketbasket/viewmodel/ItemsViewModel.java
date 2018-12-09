@@ -21,8 +21,6 @@ public class ItemsViewModel extends AndroidViewModel {
     private RepoManager mRepoManager;
     private boolean isDelMode = false;
     private boolean isShowcaseMode = true;
-    private boolean isBasketNamesShow = false;
-    private boolean isShowcaseNamesShow = true;
 
     public ItemsViewModel(@NonNull Application application) {
         super(application);
@@ -132,21 +130,5 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public void setShowcaseMode(boolean showcaseMode) {
         isShowcaseMode = showcaseMode;
-    }
-
-    public boolean isBasketNamesShow() {
-        return isBasketNamesShow;
-    }
-
-    public void setBasketNamesShow(boolean basketNamesShow) {
-        isBasketNamesShow = basketNamesShow;
-    }
-
-    public boolean isShowcaseNamesShow() {
-        return isShowcaseNamesShow;
-    }
-
-    public void setShowcaseNamesShow(boolean showcaseNamesShow) {
-        isShowcaseNamesShow = showcaseNamesShow;
     }
 }

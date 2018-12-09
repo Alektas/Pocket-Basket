@@ -1,8 +1,5 @@
 package alektas.pocketbasket.view;
 
-import android.animation.Animator;
-import android.animation.AnimatorInflater;
-import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
@@ -12,7 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.GestureDetector;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -52,20 +50,21 @@ import alektas.pocketbasket.R;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import alektas.pocketbasket.db.entity.Item;
 
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-
 public class MainActivity extends AppCompatActivity
         implements ResetDialog.ResetDialogListener,
         AddItemDialog.AddItemDialogListener,
         DeleteModeListener,
-        OnStartDragListener {
+        OnStartDragListener,
+        ItemSizeProvider {
 
     private static final String TAG = "PocketBasketApp";
 
-    private float mCategNarrowWidth;
-    private float mShowcaseWideWidth;
-    private float mShowcaseNarrowWidth;
-    private float mBasketNarrowWidth;
+    private int mCategNarrowWidth;
+    private int mCategWideWidth;
+    private int mShowcaseWideWidth;
+    private int mShowcaseNarrowWidth;
+    private int mBasketNarrowWidth;
+    private int mBasketWideWidth;
     private boolean isMenuShown;
 
     private RecyclerView mBasket;
@@ -80,12 +79,18 @@ public class MainActivity extends AppCompatActivity
     private BasketRvAdapter mBasketAdapter;
     private ShowcaseRvAdapter mShowcaseAdapter;
     private Transition mTransitionSet;
-    private GestureDetector mGestureDetector;
     private ConstraintLayout mConstraintLayout;
     private ShareActionProvider mShareActionProvider;
     private ItemTouchHelper mTouchHelper;
 
     private ItemsViewModel mViewModel;
+    private int initX;
+    private int initY;
+    private int movX;
+    private float changeModeDistance;
+    private boolean allowChangeMode = true;
+    private boolean alreadySetChangeModeAllowing = false;
+    private int basketTextMarginEnd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,8 +174,6 @@ public class MainActivity extends AppCompatActivity
         initFloatingActionMenu();
 
         mConstraintLayout = findViewById(R.id.root_layout);
-        mGestureDetector =
-                new GestureDetector(this, new SlideListener());
 
         mCategories = findViewById(R.id.categ_group);
 
@@ -209,10 +212,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initDimensions() {
-        mCategNarrowWidth = getResources().getDimension(R.dimen.categ_narrow_size);
-        mShowcaseNarrowWidth = getResources().getDimension(R.dimen.showcase_narrow_size);
-        mShowcaseWideWidth = getResources().getDimension(R.dimen.showcase_wide_size);
-        mBasketNarrowWidth = getResources().getDimension(R.dimen.basket_narrow_size);
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int screenWidth = displaymetrics.widthPixels;
+        mCategNarrowWidth = (int) getResources().getDimension(R.dimen.categ_narrow_size);
+        mShowcaseNarrowWidth = (int) getResources().getDimension(R.dimen.showcase_narrow_size);
+        mBasketNarrowWidth = (int) getResources().getDimension(R.dimen.basket_narrow_size);
+        mCategWideWidth = (int) getResources().getDimension(R.dimen.categ_wide_size);
+        mShowcaseWideWidth = screenWidth - mCategWideWidth - mBasketNarrowWidth;
+        mBasketWideWidth = screenWidth - mCategNarrowWidth - mShowcaseNarrowWidth;
+
+        changeModeDistance = getResources().getDimension(R.dimen.change_mode_distance);
+        basketTextMarginEnd = (int) getResources().getDimension(R.dimen.basket_item_text_margin_end);
     }
 
     private void initSearch() {
@@ -227,15 +238,17 @@ public class MainActivity extends AppCompatActivity
         mCheckAllBtn = findViewById(R.id.check_all_btn);
         mDelAllBtn = findViewById(R.id.del_all_btn);
         mAddBtn.setOnLongClickListener(view -> {
-            if (!isMenuShown) showMenu();
+            if (!isMenuShown) showFloatingMenu();
             return true;
         });
     }
 
     private void initBasket() {
         mBasket = findViewById(R.id.basket_list);
-        mBasket.setLayoutManager(new LinearLayoutManager(this));
-        mBasketAdapter = new BasketRvAdapter(this, mViewModel, this);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        mBasket.setLayoutManager(layoutManager);
+        mBasketAdapter = new BasketRvAdapter(this, mViewModel,
+                this,this);
         mBasket.setAdapter(mBasketAdapter);
 
         ItemTouchHelper.Callback callback = new ItemTouchCallback(mBasketAdapter);
@@ -247,8 +260,10 @@ public class MainActivity extends AppCompatActivity
 
     private void initShowcase() {
         mShowcase = findViewById(R.id.showcase_list);
-        mShowcase.setLayoutManager(new LinearLayoutManager(this));
-        mShowcaseAdapter = new ShowcaseRvAdapter(this, this, mViewModel);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        mShowcase.setLayoutManager(layoutManager);
+        mShowcaseAdapter = new ShowcaseRvAdapter(this, this,
+                this, mViewModel);
         mShowcase.setAdapter(mShowcaseAdapter);
 
         mShowcase.addOnItemTouchListener(new ItemTouchListener());
@@ -256,85 +271,123 @@ public class MainActivity extends AppCompatActivity
 
     /* Layout changes methods */
 
+    @SuppressLint("RestrictedApi")
     private void setLandscapeLayout() {
-        changeLayoutState(WRAP_CONTENT,
+        changeLayoutSize(mCategWideWidth,
                 mShowcaseWideWidth,
                 0);
-        resizeRadioText(mCategories, 14f);
-        ((View)mAddBtn).setVisibility(View.VISIBLE);
-        mCancelDmBtn.setVisibility(View.VISIBLE);
 
-        mViewModel.setBasketNamesShow(true);
-        mViewModel.setShowcaseNamesShow(true);
+        mAddBtn.setVisibility(View.VISIBLE);
+        mCancelDmBtn.setVisibility(View.VISIBLE);
     }
 
+    // Set basket or showcase mode in depends of touch moving distance (movX)
+    private void setMode(int movX) {
+        if (mViewModel.isShowcaseMode()) {
+            if (movX < -changeModeDistance) {
+                setBasketMode();
+            } else {
+                TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
+                changeLayoutSize(mCategWideWidth,
+                        0,
+                        mBasketNarrowWidth);
+            }
+        } else {
+            if (movX > changeModeDistance) {
+                setShowcaseMode();
+            } else {
+                TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
+                changeLayoutSize(mCategNarrowWidth,
+                        mShowcaseNarrowWidth,
+                        0);
+            }
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
     private void setBasketMode() {
-        changeLayoutState(mCategNarrowWidth,
+        changeLayoutSize(mCategNarrowWidth,
                 mShowcaseNarrowWidth,
                 0);
-        resizeRadioText(mCategories, 0f);
 
-        ((View)mAddBtn).setVisibility(View.VISIBLE);
+        mAddBtn.setVisibility(View.VISIBLE);
         if (isMenuShown) { hideFloatingMenu(); }
         mCancelDmBtn.setVisibility(View.GONE);
 
-        mViewModel.setBasketNamesShow(true);
-        mViewModel.setShowcaseNamesShow(false);
-
         mViewModel.setShowcaseMode(false);
-        mBasketAdapter.notifyDataSetChanged();
-        mShowcaseAdapter.notifyDataSetChanged();
     }
 
+    @SuppressLint("RestrictedApi")
     private void setShowcaseMode() {
-        changeLayoutState(WRAP_CONTENT,
+        changeLayoutSize(mCategWideWidth,
                 0,
                 mBasketNarrowWidth);
-        resizeRadioText(mCategories, 14f);
 
-        ((View)mAddBtn).setVisibility(View.GONE);
+        mAddBtn.setVisibility(View.GONE);
         if (isMenuShown) { hideFloatingMenu(); }
         mCancelDmBtn.setVisibility(View.VISIBLE);
 
-        mViewModel.setBasketNamesShow(false);
-        mViewModel.setShowcaseNamesShow(true);
-
         mViewModel.setShowcaseMode(true);
-        mBasketAdapter.notifyDataSetChanged();
-        mShowcaseAdapter.notifyDataSetChanged();
     }
 
-    private void changeLayoutState(float categWidth, float showcaseWidth, float basketWidth) {
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
+    // Set layouts' size in depends of touch moving distance (movX)
+    private void changeLayoutSizeByTouch(int movX) {
+        int showcaseWidth;
+        int categWidth;
 
+        if (mViewModel.isShowcaseMode()) {
+            showcaseWidth = calculateLayoutSize(
+                    mShowcaseWideWidth - mShowcaseNarrowWidth + movX/2,
+                    mShowcaseNarrowWidth,
+                    mShowcaseWideWidth);
+            categWidth = calculateLayoutSize(
+                    mCategWideWidth - mCategNarrowWidth + movX/2,
+                    mCategNarrowWidth,
+                    mCategWideWidth);
+        } else {
+            showcaseWidth = calculateLayoutSize(
+                    movX/2,
+                    mShowcaseNarrowWidth,
+                    mShowcaseWideWidth);
+            categWidth = calculateLayoutSize(
+                    movX/2,
+                    mCategNarrowWidth,
+                    mCategWideWidth);
+        }
+
+        changeLayoutSize(categWidth, showcaseWidth, 0);
+    }
+
+    private void changeLayoutSize(int categWidth, int showcaseWidth, int basketWidth) {
         ViewGroup.LayoutParams categParams = mCategories.getLayoutParams();
         ViewGroup.LayoutParams showcaseParams = mShowcase.getLayoutParams();
         ViewGroup.LayoutParams basketParams = mBasket.getLayoutParams();
 
-        categParams.width = (int) categWidth;
-        showcaseParams.width = (int) showcaseWidth;
-        basketParams.width = (int) basketWidth;
+        categParams.width = categWidth;
+        showcaseParams.width = showcaseWidth;
+        basketParams.width = basketWidth;
 
         mCategories.setLayoutParams(categParams);
         mShowcase.setLayoutParams(showcaseParams);
         mBasket.setLayoutParams(basketParams);
+    }
 
-        if (mViewModel.isDelMode()) {
-            mDelModePanel.setVisibility(View.VISIBLE);
+    // Return value for size of layout between minSize and maxSize corresponding to movX
+    private int calculateLayoutSize(int movX, int minSize, int maxSize) {
+        if (movX <= 0) {
+            return minSize;
+        } else if (movX < maxSize - minSize) {
+            return minSize + movX;
+        } else {
+            return maxSize;
         }
     }
 
-    private void resizeRadioText(RadioGroup group, float textSize) {
-        for (int i = 0; i < group.getChildCount(); i++) {
-            ((RadioButton) group.getChildAt(i)).setTextSize(textSize);
-        }
-    }
-
-    private void showMenu() {
+    private void showFloatingMenu() {
         mAddBtn.setImageResource(R.drawable.ic_close_white_24dp);
 
-        runVisibilityAnim(mCheckAllBtn, 0, R.animator.check_all_show_anim);
-        runVisibilityAnim(mDelAllBtn, 0, R.animator.delete_all_show_anim);
+        mCheckAllBtn.setVisibility(View.VISIBLE);
+        mDelAllBtn.setVisibility(View.VISIBLE);
 
         isMenuShown = true;
     }
@@ -342,29 +395,10 @@ public class MainActivity extends AppCompatActivity
     private void hideFloatingMenu() {
         mAddBtn.setImageResource(R.drawable.ic_edit_24dp);
 
-        runVisibilityAnim(mCheckAllBtn, View.INVISIBLE, R.animator.check_all_hide_anim);
-        runVisibilityAnim(mDelAllBtn, View.INVISIBLE, R.animator.delete_all_hide_anim);
+        mCheckAllBtn.setVisibility(View.INVISIBLE);
+        mDelAllBtn.setVisibility(View.INVISIBLE);
 
         isMenuShown = false;
-    }
-
-    private void runVisibilityAnim(View view, int endVis, int animId) {
-        Animator anim = AnimatorInflater.loadAnimator(this, animId);
-        anim.addListener(new AnimatorListenerAdapter() {
-            @Override
-            public void onAnimationEnd(Animator animation) {
-                super.onAnimationEnd(animation);
-                view.setVisibility(endVis);
-            }
-
-            @Override
-            public void onAnimationStart(Animator animation) {
-                super.onAnimationStart(animation);
-                view.setVisibility(View.VISIBLE);
-            }
-        });
-        anim.setTarget(view);
-        anim.start();
     }
 
     private void setFilter(int tag) {
@@ -385,19 +419,32 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDelModeEnable() {
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
         mDelModePanel.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onDelModeDisable() {
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
         mDelModePanel.setVisibility(View.GONE);
     }
 
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mTouchHelper.startDrag(viewHolder);
+    }
+
+    @Override
+    public int getItemWidth() {
+        return mShowcaseWideWidth;
+    }
+
+    @Override
+    public int getBasketItemWidth() {
+        return mBasketWideWidth;
+    }
+
+    @Override
+    public int getBasketTextMarginEnd() {
+        return basketTextMarginEnd;
     }
 
     /* On buttons click methods */
@@ -502,42 +549,76 @@ public class MainActivity extends AppCompatActivity
 
     /* Touch events */
 
-    // Handle change mode gesture
+    // Avoid animation and touch conflict by intercept event if changing mode
     class ItemTouchListener extends RecyclerView.SimpleOnItemTouchListener {
         @Override
-        public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
-            return mGestureDetector.onTouchEvent(e);
+        public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent event) {
+            return alreadySetChangeModeAllowing && allowChangeMode;
         }
     }
 
-    class SlideListener extends GestureDetector.SimpleOnGestureListener {
-        private final double MIN_FLING_X;
-        private final double MAX_FLING_Y;
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        handleChangeModeByTouch(event);
+        return super.dispatchTouchEvent(event);
+    }
 
-        SlideListener() {
-            MIN_FLING_X = getResources().getDimension(R.dimen.fling_X_min);
-            MAX_FLING_Y = getResources().getDimension(R.dimen.fling_Y_max);
-        }
+    private void handleChangeModeByTouch(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                initX = (int) (event.getX() + 0.5f);
+                initY = (int) (event.getY() + 0.5f);
 
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            if (getResources().getConfiguration().orientation
-                    == Configuration.ORIENTATION_LANDSCAPE) {
-                return false;
+                /* Disable change mode from basket in basket mode
+                because direction of swipe is match to direction of item delete swipe */
+                if (!mViewModel.isShowcaseMode()
+                        && initX > (mCategNarrowWidth + mShowcaseNarrowWidth)) {
+                    allowChangeMode = false;
+                    alreadySetChangeModeAllowing = true;
+                }
+                break;
             }
 
-            double dY = Math.abs(e2.getY() - e1.getY());
-            double dX = Math.abs(e2.getX() - e1.getX());
-            if (dY < MAX_FLING_Y && dX > MIN_FLING_X) {
-                if (mViewModel.isShowcaseMode() && velocityX < 0) {
-                    setBasketMode();
+            case MotionEvent.ACTION_MOVE: {
+                // Do not handle change mode if it didn't allowed
+                if (!allowChangeMode && alreadySetChangeModeAllowing) {
+                    return;
                 }
-                else if (!mViewModel.isShowcaseMode() && velocityX > 0){
-                    setShowcaseMode();
+
+                movX = (int) (event.getX() + 0.5f - initX);
+                int movY = (int) (event.getY() + 0.5f - initY);
+
+                // Allow or disallow changing mode
+                if (!alreadySetChangeModeAllowing) {
+                    alreadySetChangeModeAllowing = true;
+                    if (Math.abs(movY) > Math.abs(movX)) {
+                        allowChangeMode = false;
+                        return;
+                    } else {
+                        allowChangeMode = true;
+                    }
                 }
-                return true;
+
+                changeLayoutSizeByTouch(movX);
+
+                break;
             }
-            return false;
+
+            case MotionEvent.ACTION_UP: {
+                if (allowChangeMode) {
+                    setMode(movX);
+                    mShowcase.onTouchEvent(event);
+                    mBasket.onTouchEvent(event);
+                } else {
+                    allowChangeMode = true;
+                }
+
+                alreadySetChangeModeAllowing = false;
+                initX = 0;
+                movX = 0;
+
+                break;
+            }
         }
     }
 
