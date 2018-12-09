@@ -69,5 +69,19 @@
     <string name="lemonade">Лимонад</string>
     <string name="canned_food">Консервы</string>
     <string name="bubblegum">Жевательная резинка</string>
+    <string name="frozen_vegetables">Овощи замороженные</string>
+    <string name="condensed_milk">Сгущённое молоко</string>
+    <string name="flour">Мука</string>
+    <string name="kefir">Кефир</string>
+    <string name="yogurt">Йогурт</string>
+    <string name="kiwi">Киви</string>
+    <string name="plums">Сливы</string>
+    <string name="tangerines">Мандарины</string>
+    <string name="water">Вода</string>
+    <string name="pizza">Пицца</string>
+    <string name="wheat_groats">Крупа пшеничная</string>
+    <string name="millet_groats">Крупа пшённая</string>
+    <string name="corn_grits">Крупа кукурузная</string>
+    <string name="barley_groats">Крупа ячменная</string>
 
 </resources>

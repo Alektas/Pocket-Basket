@@ -69,5 +69,19 @@
     <string name="lemonade">Lemonade</string>
     <string name="canned_food">Сanned food</string>
     <string name="bubblegum">Bubble gum</string>
+    <string name="frozen_vegetables">Frozen vegetables</string>
+    <string name="condensed_milk">Condensed milk</string>
+    <string name="flour">Flour</string>
+    <string name="kefir">Kefir</string>
+    <string name="yogurt">Yogurt</string>
+    <string name="kiwi">Kiwi</string>
+    <string name="plums">Plums</string>
+    <string name="tangerines">Tangerines</string>
+    <string name="water">Water</string>
+    <string name="pizza">Pizza</string>
+    <string name="wheat_groats">Wheat groats</string>
+    <string name="millet_groats">Millet groats</string>
+    <string name="corn_grits">Corn grits</string>
+    <string name="barley_groats">Barley groats</string>
 
 </resources>
