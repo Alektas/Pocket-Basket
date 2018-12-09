@@ -21,6 +21,10 @@
     <dimen name="padding_32">32dp</dimen>
     <dimen name="padding_rb">10dp</dimen>
 
+    <dimen name="item_text_size">14sp</dimen>
+    <dimen name="icon_text_size">14sp</dimen>
+    <dimen name="category_text_size">@dimen/item_text_size</dimen>
+
     <dimen name="change_mode_distance">72dp</dimen>
 
 </resources>

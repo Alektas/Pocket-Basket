@@ -45,6 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
+                android:textSize="@dimen/icon_text_size"
                 android:text="@{item.imgRes == 0 ? item : null}"/>
         </androidx.cardview.widget.CardView>
 
@@ -56,6 +57,7 @@
             android:layout_marginEnd="@dimen/padding_8"
             android:layout_toEndOf="@id/item_icon_view"
             android:layout_centerVertical="true"
+            android:textSize="@dimen/item_text_size"
             android:textColor="@android:color/black"/>
 
     </merge>

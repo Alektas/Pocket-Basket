@@ -25,6 +25,7 @@
         <item name="android:layout_weight">1</item>
         <item name="android:padding">@dimen/padding_8</item>
         <item name="android:lines">1</item>
+        <item name="android:textSize">@dimen/category_text_size</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@drawable/categ_bg</item>
         <item name="android:onClick">onFilterClick</item>
