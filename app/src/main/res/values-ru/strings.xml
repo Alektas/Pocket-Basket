@@ -1,11 +1,7 @@
 <resources>
-    <string name="app_name">Pocket Basket</string>
-    <string name="clear">Очистить</string>
-    <string name="item_name">Название</string>
     <string name="reset_msg">Вернуться к первоначальной витрине?</string>
     <string name="accept">Принять</string>
     <string name="cancel">Отмена</string>
-    <string name="add">Добавить</string>
     <string name="del_user_items">Удалить пользовательские предметы</string>
     <string name="search_hint">Добавить предмет</string>
     <string name="reset">Сброс</string>

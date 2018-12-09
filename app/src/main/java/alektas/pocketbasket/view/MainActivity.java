@@ -52,7 +52,6 @@ import alektas.pocketbasket.db.entity.Item;
 
 public class MainActivity extends AppCompatActivity
         implements ResetDialog.ResetDialogListener,
-        AddItemDialog.AddItemDialogListener,
         DeleteModeListener,
         OnStartDragListener,
         ItemSizeProvider {
@@ -202,13 +201,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initAnimTransition() {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mTransitionSet = TransitionInflater.from(this)
-                    .inflateTransition(R.transition.change_mode_transition);
-        } else {
-            mTransitionSet = TransitionInflater.from(this)
-                    .inflateTransition(R.transition.change_mode_transition_compat);
-        }
+        mTransitionSet = TransitionInflater.from(this)
+                .inflateTransition(R.transition.change_mode_transition);
     }
 
     private void initDimensions() {
@@ -410,11 +404,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDialogAcceptReset(boolean fullReset) {
         mViewModel.resetShowcase(fullReset);
-    }
-
-    @Override
-    public void onDialogAddItem(String itemName, int tagRes) {
-        mViewModel.addNewItem(itemName, tagRes);
     }
 
     @Override

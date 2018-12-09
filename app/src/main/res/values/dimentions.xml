@@ -5,8 +5,6 @@
     <dimen name="ic_categ_size">40dp</dimen>
 
     <dimen name="item_height">72dp</dimen>
-    <dimen name="item_width">150dp</dimen>
-
     <dimen name="basket_item_text_margin_end">56dp</dimen>
 
     <dimen name="categ_wide_size">130dp</dimen>
@@ -23,11 +21,6 @@
     <dimen name="padding_32">32dp</dimen>
     <dimen name="padding_rb">10dp</dimen>
 
-    <dimen name="text_size">14sp</dimen>
-
     <dimen name="change_mode_distance">72dp</dimen>
-    <dimen name="fling_X_min">72dp</dimen>
-    <dimen name="fling_Y_max">100dp</dimen>
 
-    <dimen name="del_distance">100dp</dimen>
 </resources>
