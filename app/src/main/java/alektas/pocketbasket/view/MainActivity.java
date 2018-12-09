@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity
     private float changeModeDistance;
     private boolean allowChangeMode = true;
     private boolean alreadySetChangeModeAllowing = false;
+    private int basketTextMarginEnd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -222,6 +223,7 @@ public class MainActivity extends AppCompatActivity
         mBasketWideWidth = screenWidth - mCategNarrowWidth - mShowcaseNarrowWidth;
 
         changeModeDistance = getResources().getDimension(R.dimen.change_mode_distance);
+        basketTextMarginEnd = (int) getResources().getDimension(R.dimen.basket_item_text_margin_end);
     }
 
     private void initSearch() {
@@ -440,6 +442,11 @@ public class MainActivity extends AppCompatActivity
         return mBasketWideWidth;
     }
 
+    @Override
+    public int getBasketTextMarginEnd() {
+        return basketTextMarginEnd;
+    }
+
     /* On buttons click methods */
 
     public void onBtnClick(View view) {
@@ -600,6 +607,8 @@ public class MainActivity extends AppCompatActivity
             case MotionEvent.ACTION_UP: {
                 if (allowChangeMode) {
                     setMode(movX);
+                    mShowcase.onTouchEvent(event);
+                    mBasket.onTouchEvent(event);
                 } else {
                     allowChangeMode = true;
                 }
@@ -607,9 +616,6 @@ public class MainActivity extends AppCompatActivity
                 alreadySetChangeModeAllowing = false;
                 initX = 0;
                 movX = 0;
-
-                mShowcase.onTouchEvent(event);
-                mBasket.onTouchEvent(event);
 
                 break;
             }

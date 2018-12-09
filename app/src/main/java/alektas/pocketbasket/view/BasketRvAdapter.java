@@ -29,6 +29,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     private ItemsViewModel mModel;
     private OnStartDragListener mDragListener;
     private final int mItemWidth;
+    private int marginEnd;
 
     BasketRvAdapter(Context context, ItemsViewModel model,
                     OnStartDragListener dragListener,
@@ -38,6 +39,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
         mModel = model;
         mDragListener = dragListener;
         mItemWidth = itemSizeProvider.getBasketItemWidth();
+        marginEnd = itemSizeProvider.getBasketTextMarginEnd();
     }
 
     @NonNull
@@ -50,7 +52,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
         BasketItemViewBinding binding = DataBindingUtil.bind(itemView);
         binding.setModel(mModel);
         ViewHolder holder = new ViewHolder(binding);
-        holder.mName.setPadding(0, 0, 56, 0);
+        holder.mName.setPadding(0, 0, marginEnd, 0);
         return holder;
     }
 
