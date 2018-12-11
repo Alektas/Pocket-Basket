@@ -1,7 +1,5 @@
 package alektas.pocketbasket.db.dao;
 
-import android.util.Log;
-
 import alektas.pocketbasket.db.entity.BasketMeta;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -25,7 +23,7 @@ public abstract class ItemsDao {
     public abstract List<Item> getItems();
 
     @Query("SELECT * FROM items WHERE tag_res = :tag ORDER BY name ASC")
-    public abstract List<Item> getByTag(int tag);
+    public abstract List<Item> getByTag(String tag);
 
     @Query("SELECT * FROM items WHERE name LIKE :query")
     public abstract List<Item> search(String query);

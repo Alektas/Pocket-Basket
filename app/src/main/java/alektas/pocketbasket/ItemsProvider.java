@@ -62,7 +62,10 @@ public class ItemsProvider extends ContentProvider {
         int i = 0;
         for (Item item : items) {
             // ID, name, image resource ID and data(name)
-            cursor.addRow(new Object[] {i, item.getName(), item.getImgRes(), item.getName()});
+            cursor.addRow(new Object[] {i,
+                    item.getName(),
+                    Utils.getImgId(item.getImgRes()),
+                    item.getName()});
             i++;
         }
         return cursor;

@@ -23,6 +23,7 @@ import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.widget.SearchView;
 
+import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.async.getAllAsync;
 import alektas.pocketbasket.db.AppDatabase;
 import alektas.pocketbasket.db.dao.ItemsDao;
@@ -396,7 +397,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setFilter(int tag) {
-        mViewModel.setFilter(tag);
+        mViewModel.setFilter(Utils.getIdName(tag));
     }
 
     /* Interfaces methods */
@@ -471,7 +472,7 @@ public class MainActivity extends AppCompatActivity
         switch (view.getId()) {
             case R.id.all_rb:
                 if (checked)
-                    setFilter(0);
+                    setFilter(R.string.all);
                 break;
             case R.id.drink_rb:
                 if (checked)
@@ -634,7 +635,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void addItem(String query) {
-        mViewModel.addNewItem(query, R.string.other);
+        mViewModel.addNewItem(query, Utils.getIdName(R.string.other));
     }
 
     private void addAllItems() {

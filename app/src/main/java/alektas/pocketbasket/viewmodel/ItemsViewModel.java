@@ -72,9 +72,9 @@ public class ItemsViewModel extends AndroidViewModel {
 
     /* Showcase methods */
 
-    public void addNewItem(String name, int tagRes) {
+    public void addNewItem(String name, String tagRes) {
         if (name == null) { return; }
-        for (Item item : mRepoManager.getItems(0)) {
+        for (Item item : mRepoManager.getItems()) {
             if ( (name.toLowerCase())
                     .equals(item.getName().toLowerCase()) ) {
                 mRepoManager.putToBasket(item.getName());
@@ -91,7 +91,7 @@ public class ItemsViewModel extends AndroidViewModel {
     }
 
     // Show in Showcase only items with specified tag
-    public void setFilter(int tag) {
+    public void setFilter(String tag) {
         mRepoManager.setFilter(tag);
     }
 

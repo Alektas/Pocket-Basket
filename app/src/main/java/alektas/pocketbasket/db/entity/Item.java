@@ -1,5 +1,7 @@
 package alektas.pocketbasket.db.entity;
 
+import alektas.pocketbasket.R;
+import alektas.pocketbasket.Utils;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -19,29 +21,30 @@ public class Item {
     @NonNull
     private String mName;
     @ColumnInfo(name = "name_res")
-    private int mNameRes;
+    private String mNameRes;
     @ColumnInfo(name = "img_res")
-    private int mImgRes;
+    private String mImgRes;
     @ColumnInfo(name = "tag_res")
-    private int mTagRes;
+    @NonNull
+    private String mTagRes;
 
     @Ignore
     public Item(@NonNull String name) {
         mName = name;
-        mNameRes = 0;
-        mImgRes = 0;
-        mTagRes = 0;
+        mNameRes = null;
+        mImgRes = null;
+        mTagRes = Utils.getIdName(R.string.all);
     }
 
     @Ignore
-    public Item(int nameRes, int imgRes, int tagRes) {
+    public Item(String nameRes, String imgRes, String tagRes) {
         mNameRes = nameRes;
-        mName = "" + nameRes;
+        mName = nameRes;
         mImgRes = imgRes;
         mTagRes = tagRes;
     }
 
-    public Item(String name, int nameRes, int imgRes, int tagRes) {
+    public Item(String name, String nameRes, String imgRes, String tagRes) {
         mName = name;
         mNameRes = nameRes;
         mImgRes = imgRes;
@@ -56,24 +59,24 @@ public class Item {
         mName = name;
     }
 
-    public void setNameRes(int nameRes) {
+    public void setNameRes(String nameRes) {
         mNameRes = nameRes;
     }
-    public int getNameRes() {
+    public String getNameRes() {
         return mNameRes;
     }
 
-    public void setImgRes(int imgRes) {
+    public void setImgRes(String imgRes) {
         mImgRes = imgRes;
     }
-    public int getImgRes() {
+    public String getImgRes() {
         return mImgRes;
     }
 
-    public void setTagRes(int tagRes) {
+    public void setTagRes(String tagRes) {
         mTagRes = tagRes;
     }
-    public int getTagRes() {
+    public String getTagRes() {
         return mTagRes;
     }
 
