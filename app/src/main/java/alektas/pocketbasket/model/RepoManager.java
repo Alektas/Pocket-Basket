@@ -2,6 +2,8 @@ package alektas.pocketbasket.model;
 
 import android.app.Application;
 
+import alektas.pocketbasket.R;
+import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.async.getAllAsync;
 import alektas.pocketbasket.async.insertAllAsync;
 import alektas.pocketbasket.db.entity.BasketMeta;
@@ -20,7 +22,7 @@ import java.util.concurrent.ExecutionException;
 
 public class RepoManager implements Repository, Observer {
     private static final String TAG = "RepoManager";
-    private int mTag = 0;
+    private String mTag = Utils.getIdName(R.string.all);
     private ItemsDao mItemsDao;
     private MutableLiveData<List<Item>> mShowcaseItems;
     private LiveData<List<Item>> mBasketItems;
@@ -103,7 +105,7 @@ public class RepoManager implements Repository, Observer {
 
     // Show in Showcase only items with specified tag
     @Override
-    public void setFilter(int tag) {
+    public void setFilter(String tag) {
         mTag = tag;
         update();
     }
@@ -118,6 +120,8 @@ public class RepoManager implements Repository, Observer {
         }
     }
 
+
+    // Set value to Showcase LiveData to notify observers
     @Override
     public void update() {
         mShowcaseItems.setValue(getItems(mTag));
@@ -137,9 +141,20 @@ public class RepoManager implements Repository, Observer {
     }
 
     @Override
-    public List<Item> getItems(int tag) {
+    public List<Item> getItems(String tag) {
         try {
             return new getAllAsync(mItemsDao).execute(tag).get();
+        }
+        catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public List<Item> getItems() {
+        try {
+            return new getAllAsync(mItemsDao).execute().get();
         }
         catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();

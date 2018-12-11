@@ -6,6 +6,7 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
+import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.db.entity.Item;
@@ -14,6 +15,7 @@ public class ItemGenerator {
     private static final String TAG = "ItemGenerator";
 
     private static List<Item> sItems;
+    private static Resources mResources = App.getComponent().context().getResources();
 
     public static List<Item> getAll() {
         if (sItems != null) return sItems;
@@ -117,17 +119,19 @@ public class ItemGenerator {
         return sItems;
     }
 
-    private static void addItem(List<Item> items, int nameRes, int imgRes, int tags) {
-        Item item;
-        try {
-            String name = Utils.getString(nameRes);
-            item = new Item(name, nameRes, imgRes, tags);
+    private static void addItem(List<Item> items, int nameRes, int imgRes, int tagRes) {
+        String nameIdName = Utils.getIdName(nameRes);
+        String tagIdName = Utils.getIdName(tagRes);
+        String iconIdName;
+        if (imgRes == 0) {
+            iconIdName = null;
+        } else {
+            iconIdName = Utils.getIdName(imgRes);
         }
-        catch (Resources.NotFoundException e) {
-            e.printStackTrace();
-            Log.e(TAG, "addItem: item has no image resource.", e);
-            item = new Item(nameRes, imgRes, tags);
-        }
+
+        String name = Utils.getString(nameRes);
+        Item item = new Item(name, nameIdName, iconIdName, tagIdName);
+
         items.add(item);
     }
 }

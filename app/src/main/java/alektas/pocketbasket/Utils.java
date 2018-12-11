@@ -11,6 +11,36 @@ public class Utils {
         return mResources.getString(stringResId);
     }
 
+    public static int getResId(String idName, String type) {
+        if (idName == null) return 0;
+        return mResources.getIdentifier(idName,
+                type,
+                App.getComponent().context().getPackageName());
+    }
+
+    public static int getImgId(String idName) {
+        if (idName == null) return 0;
+        return mResources.getIdentifier(idName,
+                "drawable",
+                App.getComponent().context().getPackageName());
+    }
+
+    public static int getStringId(String idName) {
+        if (idName == null) return 0;
+        return mResources.getIdentifier(idName,
+                "string",
+                App.getComponent().context().getPackageName());
+    }
+
+    public static String getIdName(int id) {
+        try {
+            return mResources.getResourceEntryName(id);
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "getIdName: resource not found: " + id, e);
+        }
+        return null;
+    }
+
     public static long measureProcessTime(Measurable process) {
         long start = System.nanoTime();
         process.run();

@@ -19,9 +19,10 @@ public interface Repository {
 
     void addNewItem(Item item);
     void deleteItems(List<Item> item);
-    void setFilter(int tag);
+    void setFilter(String tag);
     void resetShowcase(boolean fullReset);
-    List<Item> getItems(int tag);
+    List<Item> getItems();
+    List<Item> getItems(String tag);
 
     LiveData<List<Item>> getShowcaseData();
     LiveData<List<Item>> getBasketData();
