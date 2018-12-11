@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -50,6 +49,8 @@ import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import alektas.pocketbasket.db.entity.Item;
+
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class MainActivity extends AppCompatActivity
         implements ResetDialog.ResetDialogListener,
@@ -210,12 +211,19 @@ public class MainActivity extends AppCompatActivity
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int screenWidth = displaymetrics.widthPixels;
+        int screenHeight = displaymetrics.heightPixels;
+        int minDisplaySize = Math.min(screenHeight, screenWidth);
         mCategNarrowWidth = (int) getResources().getDimension(R.dimen.categ_narrow_size);
         mShowcaseNarrowWidth = (int) getResources().getDimension(R.dimen.showcase_narrow_size);
         mBasketNarrowWidth = (int) getResources().getDimension(R.dimen.basket_narrow_size);
         mCategWideWidth = (int) getResources().getDimension(R.dimen.categ_wide_size);
-        mShowcaseWideWidth = screenWidth - mCategWideWidth - mBasketNarrowWidth;
-        mBasketWideWidth = screenWidth - mCategNarrowWidth - mShowcaseNarrowWidth;
+        mShowcaseWideWidth = minDisplaySize - mCategWideWidth - mBasketNarrowWidth;
+        if (getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE) {
+            mBasketWideWidth = screenWidth - mCategWideWidth - mShowcaseWideWidth;
+        } else {
+            mBasketWideWidth = screenWidth - mCategNarrowWidth - mShowcaseNarrowWidth;
+        }
 
         changeModeDistance = getResources().getDimension(R.dimen.change_mode_distance);
         basketTextMarginEnd = (int) getResources().getDimension(R.dimen.basket_item_text_margin_end);
@@ -269,7 +277,7 @@ public class MainActivity extends AppCompatActivity
     @SuppressLint("RestrictedApi")
     private void setLandscapeLayout() {
         changeLayoutSize(mCategWideWidth,
-                mShowcaseWideWidth,
+                WRAP_CONTENT,
                 0);
 
         mAddBtn.setVisibility(View.VISIBLE);
@@ -549,7 +557,10 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        handleChangeModeByTouch(event);
+        if (getResources().getConfiguration().orientation
+                != Configuration.ORIENTATION_LANDSCAPE) {
+            handleChangeModeByTouch(event);
+        }
         return super.dispatchTouchEvent(event);
     }
 
