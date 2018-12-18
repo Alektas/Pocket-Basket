@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 28
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "alektas.pocketbasket"
         minSdkVersion 19
@@ -23,38 +24,56 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            aaptOptions {
-                cruncherEnabled = false
-            }
+            aaptOptions.cruncherEnabled = false
             minifyEnabled false
             shrinkResources false
             ext.alwaysUpdateBuildId = false
             ext.enableCrashlytics = false
-            versionNameSuffix "-debug"
-            applicationIdSuffix ".debug"
+            splits.abi.enable = false
+            splits.density.enable = false
         }
     }
 
-    flavorDimensions "full"
+    flavorDimensions "mode"
     productFlavors {
         // When building a variant that uses this flavor, the following configurations
         // override those in the defaultConfig block.
+        me {
+            dimension "mode"
+            minSdkVersion 27
+//            resConfigs('ru', 'xxhdpi')
+            versionNameSuffix "-me"
+            applicationIdSuffix '.me'
+        }
+
         dev {
-            dimension "full"
-            versionNameSuffix "-dev"
-            applicationIdSuffix '.dev'
-//            resConfigs("ru", "xxhdpi")
+            dimension "mode"
         }
 
         prod {
-            dimension "full"
+            dimension "mode"
             // If you've configured the defaultConfig block for the release version of
             // your app, you can leave this block empty and Gradle uses configurations in
             // the defaultConfig block instead. You still need to create this flavor.
             // Otherwise, all variants use the "dev" flavor configurations.
+        }
+    }
+
+    splits {
+
+        // Configures multiple APKs based on screen density.
+        density {
+            enable true
+
+            // Specifies a list of screen densities Gradle should not create APKs for.
+            exclude "ldpi", "mdpi"
+
+            // Specifies a list of compatible screen size settings.
+            compatibleScreens 'normal', 'large', 'xlarge'
         }
     }
 
@@ -84,7 +103,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.leanback:leanback:1.0.0'
-    implementation 'androidx.annotation:annotation:1.0.0'
+    implementation 'androidx.annotation:annotation:1.0.1'
     implementation 'androidx.room:room-runtime:2.0.0'
     annotationProcessor 'androidx.room:room-compiler:2.0.0'
     // ViewModel and LiveData
@@ -92,7 +111,7 @@ dependencies {
     implementation 'com.google.dagger:dagger:2.16'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     implementation 'com.google.android.material:material:1.0.0'
 }

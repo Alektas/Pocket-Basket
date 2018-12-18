@@ -8,7 +8,6 @@
     style="?android:attr/buttonBarStyle">
 
     <Button
-        android:id="@+id/del_dm_btn"
         android:layout_width="@dimen/ic_categ_size"
         android:layout_height="@dimen/ic_categ_size"
         android:layout_margin="@dimen/padding_8"
