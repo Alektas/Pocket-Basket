@@ -7,4 +7,7 @@
 
     <color name="item_bg">#fafafa</color>
     <color name="item_bg_del">#f44336</color>
+
+    <color name="guide_bg_color">#dc212121</color>
+    <color name="guide_sub_text_color">#e0e0e0</color>
 </resources>

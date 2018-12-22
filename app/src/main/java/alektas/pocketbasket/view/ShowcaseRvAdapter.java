@@ -53,7 +53,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     public void onViewAttachedToWindow(@NonNull ViewHolder viewHolder) {
         super.onViewAttachedToWindow(viewHolder);
 
-        if (viewHolder != null && viewHolder.getAdapterPosition() != -1) {
+        if (viewHolder.getAdapterPosition() != -1) {
             final Item item = getItems().get(viewHolder.getAdapterPosition());
 
             viewHolder.mItemView.setOnLongClickListener(view -> {
@@ -101,6 +101,9 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     }
 
     public void deleteChoosedItems() {
+        /* Put to argument new List to avoid ConcurrentModificationException.
+         * That causes by deleting items in AsyncTask and
+         * clearing this list in Main Thread at one time */
         mModel.deleteItems(new ArrayList<>(mDelItems));
         cancelDel();
     }
@@ -131,12 +134,10 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     }
 
     private void enableDelMode() {
-        mModel.setDelMode(true);
         mDMListener.onDelModeEnable();
     }
 
     private void disableDelMode() {
-        mModel.setDelMode(false);
         mDMListener.onDelModeDisable();
     }
 }
