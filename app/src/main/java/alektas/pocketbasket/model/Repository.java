@@ -16,6 +16,7 @@ public interface Repository {
     void updatePositions(List<Item> items);
     void checkAll();
     void deleteChecked();
+    List<Item> getBasketItems();
 
     void addNewItem(Item item);
     void deleteItems(List<Item> item);

@@ -16,6 +16,7 @@
         android:elevation="4dp"
         android:gravity="center"
         android:theme="@style/AppBar"
+        app:layout_constraintTop_toTopOf="parent"
         app:contentInsetLeft="0dp"
         app:contentInsetStart="0dp"
         app:popupTheme="@style/AppBar">
@@ -61,7 +62,6 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:layout_constraintVertical_chainStyle="packed"/>
 
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/basket_list"
         android:layout_width="@dimen/basket_narrow_size"
@@ -72,6 +72,8 @@
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@+id/showcase_list"
         app:layout_constraintTop_toBottomOf="@id/toolbar"/>
+
+    <!-- Delete buttons. Appear in Delete Mode -->
 
     <include
         android:id="@+id/del_mode_panel"
@@ -86,19 +88,23 @@
         app:layout_constraintTop_toBottomOf="@id/showcase_list"
         app:layout_constraintVertical_bias="1.0"/>
 
+    <!-- FAB -->
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_item_btn"
+        android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/padding_16"
         android:longClickable="true"
-        android:onClick="onBtnClick"
-        android:src="@drawable/ic_edit_24dp"
+        android:onClick="onFabClick"
+        app:srcCompat="@drawable/ic_edit_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toEndOf="@+id/showcase_list"/>
+
+    <!-- Floating menu buttons -->
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/check_all_btn"
@@ -106,14 +112,14 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_marginBottom="@dimen/padding_16"
-        android:onClick="onBtnClick"
-        android:src="@drawable/ic_check_all_white_24dp"
+        android:onClick="onFabClick"
+        app:srcCompat="@drawable/ic_check_all_white_24dp"
         android:visibility="invisible"
         app:fabSize="mini"
-        app:layout_constraintBottom_toTopOf="@id/add_item_btn"
-        app:layout_constraintEnd_toEndOf="@id/add_item_btn"
+        app:layout_constraintBottom_toTopOf="@id/fab"
+        app:layout_constraintEnd_toEndOf="@id/fab"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@id/add_item_btn"/>
+        app:layout_constraintStart_toStartOf="@id/fab"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/del_all_btn"
@@ -121,13 +127,510 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_marginBottom="@dimen/padding_16"
-        android:onClick="onBtnClick"
-        android:src="@drawable/ic_delete_forever_white_24dp"
+        android:onClick="onFabClick"
+        app:srcCompat="@drawable/ic_delete_forever_white_24dp"
         android:visibility="invisible"
         app:fabSize="mini"
         app:layout_constraintBottom_toTopOf="@id/check_all_btn"
         app:layout_constraintEnd_toEndOf="@id/check_all_btn"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@id/check_all_btn"/>
+
+    <!-- Guidelines -->
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_top_hor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.25"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottom_hor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.75"/>
+
+    <!-- Guide: skip button -->
+
+    <ImageButton
+        android:id="@+id/skip_guide_btn"
+        android:layout_width="@dimen/categ_narrow_size"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_close_white_24dp"
+        android:background="@drawable/skip_btn_shape"
+        android:backgroundTint="@color/colorAccent"
+        android:visibility="invisible"
+        android:translationZ="1dp"
+        android:onClick="onSkipGuideBtnClick"
+        app:layout_constraintVertical_bias="1"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <!-- Guide: bg -->
+
+    <ImageView
+        android:id="@+id/guide_bg_full_img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:srcCompat="@color/guide_bg_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/guide_bg_right_large_img"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:srcCompat="@color/guide_bg_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/showcase_list"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/guide_bg_right_small_img"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:srcCompat="@color/guide_bg_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/basket_list"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/guide_bg_left_large_img"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:srcCompat="@color/guide_bg_color"
+        app:layout_constraintEnd_toEndOf="@id/showcase_list"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/guide_bg_left_small_img"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:srcCompat="@color/guide_bg_color"
+        app:layout_constraintEnd_toEndOf="@id/categories_wrapper"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/guide_bg_bottom_img"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/guide_bg_bottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guideline_top_hor"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ImageView
+        android:id="@+id/guide_bg_top_img"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/guide_bg_top"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/guideline_bottom_hor"/>
+
+    <!-- Guide: categories help -->
+
+    <TextView
+        android:id="@+id/guide_categories_help_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_categ"
+        app:layout_constraintVertical_bias="0.75"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/guide_categories_help_sub_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideSubText"
+        android:text="@string/guide_categ_sub"
+        app:layout_constraintStart_toStartOf="@id/guide_categories_help_text"
+        app:layout_constraintEnd_toEndOf="@id/guide_categories_help_text"
+        app:layout_constraintTop_toBottomOf="@id/guide_categories_help_text"/>
+
+    <!-- Guide: showcase help -->
+
+    <TextView
+        android:id="@+id/guide_showcase_help_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_showcase"
+        app:layout_constraintVertical_bias="0.75"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/guide_showcase_help_sub_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideSubText"
+        android:text="@string/guide_showcase_sub"
+        app:layout_constraintStart_toStartOf="@id/guide_showcase_help_text"
+        app:layout_constraintEnd_toEndOf="@id/guide_showcase_help_text"
+        app:layout_constraintTop_toBottomOf="@id/guide_showcase_help_text"/>
+
+    <!-- Guide: basket help -->
+
+    <TextView
+        android:id="@+id/guide_basket_help_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_basket"
+        app:layout_constraintVertical_bias="0.75"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/guide_basket_help_sub_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideSubText"
+        android:text="@string/guide_basket_sub"
+        app:layout_constraintStart_toStartOf="@id/guide_basket_help_text"
+        app:layout_constraintEnd_toEndOf="@id/guide_basket_help_text"
+        app:layout_constraintTop_toBottomOf="@id/guide_basket_help_text"/>
+
+    <!-- Guide: change mode -->
+
+    <ImageView
+        android:id="@+id/guide_scroll_hor_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_scroll_horizontal"
+        app:layout_constraintVertical_bias="0.25"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/guide_change_mode_text"
+        style="@style/GuideMainText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/guide_change_mode"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.75"/>
+
+    <TextView
+        android:id="@+id/guide_change_mode_sub_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideSubText"
+        android:text="@string/guide_change_mode_sub"
+        app:layout_constraintStart_toStartOf="@id/guide_change_mode_text"
+        app:layout_constraintEnd_toEndOf="@id/guide_change_mode_text"
+        app:layout_constraintTop_toBottomOf="@id/guide_change_mode_text"/>
+
+    <!-- Guide: add item -->
+
+    <ImageView
+        android:id="@+id/guide_tap_add_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_tap"
+        app:layout_constraintVertical_bias="0.25"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/showcase_list"
+        app:layout_constraintStart_toStartOf="@id/showcase_list"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <TextView
+        android:id="@+id/guide_add_item_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_add_item"
+        app:layout_constraintVertical_bias="0.75"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/guide_add_item_sub_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideSubText"
+        android:text="@string/guide_add_item_sub"
+        app:layout_constraintStart_toStartOf="@id/guide_add_item_text"
+        app:layout_constraintEnd_toEndOf="@id/guide_add_item_text"
+        app:layout_constraintTop_toBottomOf="@id/guide_add_item_text"/>
+
+    <!-- Guide: check item in Basket -->
+
+    <ImageView
+        android:id="@+id/guide_tap_check_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_tap"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintVertical_bias="0.05"
+        app:layout_constraintEnd_toEndOf="@id/basket_list"
+        app:layout_constraintStart_toStartOf="@id/basket_list"
+        app:layout_constraintTop_toTopOf="@id/basket_list"
+        app:layout_constraintBottom_toBottomOf="@id/basket_list"/>
+
+    <TextView
+        android:id="@+id/guide_check_item_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_check_item"
+        app:layout_constraintVertical_bias="0.75"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Guide: move item in Basket -->
+
+    <ImageView
+        android:id="@+id/guide_scroll_vert_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_scroll_vertical_mir_cut"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintEnd_toEndOf="@id/basket_list"
+        app:layout_constraintStart_toStartOf="@id/basket_list"
+        app:layout_constraintTop_toTopOf="@id/basket_list"
+        app:layout_constraintBottom_toBottomOf="@id/basket_list"/>
+
+    <TextView
+        android:id="@+id/guide_move_item_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_move_item"
+        app:layout_constraintVertical_bias="0.75"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/guide_move_item_sub_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideSubText"
+        android:text="@string/guide_move_item_sub"
+        app:layout_constraintStart_toStartOf="@id/guide_move_item_text"
+        app:layout_constraintEnd_toEndOf="@id/guide_move_item_text"
+        app:layout_constraintTop_toBottomOf="@id/guide_move_item_text"/>
+
+    <!-- Guide: remove item from Basket -->
+
+    <ImageView
+        android:id="@+id/guide_swipe_right_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_swipe_right"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintVertical_bias="0.1"
+        app:layout_constraintEnd_toEndOf="@id/basket_list"
+        app:layout_constraintStart_toStartOf="@id/basket_list"
+        app:layout_constraintTop_toTopOf="@id/basket_list"/>
+
+    <TextView
+        android:id="@+id/guide_remove_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_remove_item"
+        app:layout_constraintVertical_bias="0.75"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/guide_remove_sub_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideSubText"
+        android:text="@string/guide_remove_item_sub"
+        app:layout_constraintStart_toStartOf="@id/guide_remove_text"
+        app:layout_constraintEnd_toEndOf="@id/guide_remove_text"
+        app:layout_constraintTop_toBottomOf="@id/guide_remove_text"/>
+
+    <!-- Guide: turn on delete mode -->
+
+    <ImageView
+        android:id="@+id/guide_del_mode_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_press_and_hold"
+        app:layout_constraintVertical_bias="0.25"
+        app:layout_constraintEnd_toEndOf="@id/showcase_list"
+        app:layout_constraintStart_toStartOf="@id/showcase_list"
+        app:layout_constraintTop_toTopOf="@id/showcase_list"
+        app:layout_constraintBottom_toTopOf="@id/guide_del_mode_text"/>
+
+    <TextView
+        android:id="@+id/guide_del_mode_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_del_mode"
+        app:layout_constraintVertical_bias="0.75"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Guide: delete items from Showcase -->
+
+    <ImageView
+        android:id="@+id/guide_tap_delete_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_margin="@dimen/padding_8"
+        app:srcCompat="@drawable/ic_tap_rot90_cut"
+        app:layout_constraintHorizontal_bias="0.05"
+        app:layout_constraintVertical_bias="0.98"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/del_mode_panel"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/del_mode_panel"/>
+
+    <TextView
+        android:id="@+id/guide_delete_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_delete_items"
+        app:layout_constraintVertical_bias="0.25"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/guide_delete_sub_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideSubText"
+        android:text="@string/guide_delete_items_sub"
+        app:layout_constraintStart_toStartOf="@id/guide_delete_text"
+        app:layout_constraintEnd_toEndOf="@id/guide_delete_text"
+        app:layout_constraintTop_toBottomOf="@id/guide_delete_text"/>
+
+    <!-- Guide: floating menu invoke -->
+
+    <ImageView
+        android:id="@+id/guide_show_floating_menu_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_press_and_hold_rot90_cut"
+        app:layout_constraintEnd_toStartOf="@id/fab"
+        app:layout_constraintTop_toTopOf="@id/fab"
+        app:layout_constraintBottom_toBottomOf="@id/fab"/>
+
+    <TextView
+        android:id="@+id/guide_show_floating_menu_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_floating_menu"
+        app:layout_constraintVertical_bias="0.25"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <!-- Guide: floating menu help -->
+
+    <TextView
+        android:id="@+id/guide_floating_menu_check_all_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_check_all"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintBottom_toBottomOf="@id/check_all_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/check_all_btn"
+        app:layout_constraintTop_toTopOf="@id/check_all_btn"/>
+
+    <TextView
+        android:id="@+id/guide_floating_menu_del_checked_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_del_checked"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintBottom_toBottomOf="@id/del_all_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/del_all_btn"
+        app:layout_constraintTop_toTopOf="@id/del_all_btn"/>
+
+    <TextView
+        android:id="@+id/guide_floating_menu_close_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/GuideMainText"
+        android:text="@string/guide_close_menu"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintBottom_toBottomOf="@id/fab"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/fab"
+        app:layout_constraintTop_toTopOf="@id/fab"/>
+
+    <!-- Guide: finish case -->
+
+    <ImageView
+        android:id="@+id/guide_finish_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_check"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

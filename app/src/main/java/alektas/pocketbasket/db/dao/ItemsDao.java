@@ -47,6 +47,11 @@ public abstract class ItemsDao {
             "GROUP BY basket_items.position")
     public abstract LiveData<List<Item>> getBasketData();
 
+    @Query("SELECT * FROM items " +
+            "INNER JOIN basket_items on items.name = basket_items.item_name " +
+            "GROUP BY basket_items.position")
+    public abstract List<Item> getBasketItems();
+
     @Query("SELECT checked FROM basket_items WHERE item_name = :name")
     public abstract int isChecked(String name);
 

@@ -13,6 +13,7 @@ android {
         project.ext.set("archivesBaseName", "PocketBasket-" + defaultConfig.versionName)
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
 
         javaCompileOptions {
             annotationProcessorOptions {
