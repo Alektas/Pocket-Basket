@@ -67,7 +67,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_help_outline_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_info_outline_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -77,13 +77,10 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="005005" />
-                            <entry key="height" value="54" />
-                            <entry key="outputName" value="ic_tap_rot90_cut" />
+                            <entry key="outputName" value="ic_info_outline_darkgreen_24dp" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="D:\YandexDisk\Изображения\icons\Hand Gestures\SVG\1-Finger_Thumb-In\Tap_rot90-cut.svg" />
-                            <entry key="width" value="90" />
                           </map>
                         </option>
                       </PersistentState>

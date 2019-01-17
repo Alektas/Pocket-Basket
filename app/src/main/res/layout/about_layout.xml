@@ -14,6 +14,24 @@
         android:text="@string/about_msg"/>
 
     <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_16"
+        android:layout_marginStart="@dimen/padding_32"
+        android:layout_marginEnd="@dimen/padding_32"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:text="@string/about_developer"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_32"
+        android:layout_marginEnd="@dimen/padding_32"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:autoLink="email"
+        android:text="@string/about_email"/>
+
+    <TextView
         android:id="@+id/version_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

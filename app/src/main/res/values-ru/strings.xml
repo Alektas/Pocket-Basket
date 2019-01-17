@@ -36,5 +36,6 @@
     <string name="guide_basket">Это корзина</string>
     <string name="guide_basket_sub">Здесь хранятся выбранные из витрины товары</string>
     <string name="guide_change_mode_sub">Просто проведите пальцем влево</string>
+    <string name="about_developer">Разработчик: Alektas</string>
 
 </resources>

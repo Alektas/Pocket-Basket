@@ -32,6 +32,6 @@
     <item android:id="@+id/menu_about"
           android:orderInCategory="50"
           android:title="@string/about_app"
-          android:icon="@drawable/ic_help_outline_darkgreen_24dp"
+          android:icon="@drawable/ic_info_outline_darkgreen_24dp"
           app:showAsAction="never"/>
 </menu>
