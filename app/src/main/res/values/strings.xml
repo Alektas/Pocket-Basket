@@ -19,7 +19,7 @@
     <string name="about_email" translatable="false">alektas@inbox.ru</string>
     <string name="version">Version: %s</string>
 
-    <string name="guide">Guide</string>
+    <string name="guide">Help</string>
     <string name="skip">Skip</string>
     <string name="guide_change_mode">Change mode by swipe</string>
     <string name="guide_add_item">Add items by tap</string>
