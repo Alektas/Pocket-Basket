@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView mBasket;
     private RecyclerView mShowcase;
     private ViewGroup mDelModePanel;
-    private RadioGroup mCategories;
+    private View mCategoriesWrapper;
     private FloatingActionButton mAddBtn;
     private SearchView mSearchView;
     private View mDelAllBtn;
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity
 
         mConstraintLayout = findViewById(R.id.root_layout);
 
-        mCategories = findViewById(R.id.categ_group);
+        mCategoriesWrapper = findViewById(R.id.categories_wrapper);
 
         mDelModePanel = findViewById(R.id.del_mode_panel);
         mCancelDmBtn = findViewById(R.id.cancel_dm_btn);
@@ -563,15 +563,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void changeLayoutSize(int categWidth, int showcaseWidth, int basketWidth) {
-        ViewGroup.LayoutParams categParams = mCategories.getLayoutParams();
+        ViewGroup.LayoutParams categWrapParams = mCategoriesWrapper.getLayoutParams();
         ViewGroup.LayoutParams showcaseParams = mShowcase.getLayoutParams();
         ViewGroup.LayoutParams basketParams = mBasket.getLayoutParams();
 
-        categParams.width = categWidth;
+        categWrapParams.width = categWidth;
         showcaseParams.width = showcaseWidth;
         basketParams.width = basketWidth;
 
-        mCategories.setLayoutParams(categParams);
+        mCategoriesWrapper.setLayoutParams(categWrapParams);
         mShowcase.setLayoutParams(showcaseParams);
         mBasket.setLayoutParams(basketParams);
     }
