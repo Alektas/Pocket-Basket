@@ -5,10 +5,10 @@ android {
     buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "alektas.pocketbasket"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 28
 
-        versionName '0.5.0'
+        versionName '0.6.0'
         versionNameSuffix '-alpha'
         project.ext.set("archivesBaseName", "PocketBasket-" + defaultConfig.versionName)
 
