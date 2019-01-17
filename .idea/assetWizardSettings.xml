@@ -77,10 +77,13 @@
                         </option>
                         <option name="values">
                           <map>
+                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="005005" />
-                            <entry key="outputName" value="ic_info_outline_darkgreen_24dp" />
+                            <entry key="height" value="91" />
+                            <entry key="outputName" value="ic_pizza" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="D:\YandexDisk\Изображения\icons\Hand Gestures\SVG\1-Finger_Thumb-In\Tap_rot90-cut.svg" />
+                            <entry key="sourceFile" value="D:\YandexDisk\Изображения\icons\Food Set 3\SVG\91\2427861 - fast food food italian food junk food pizza.svg" />
+                            <entry key="width" value="91" />
                           </map>
                         </option>
                       </PersistentState>

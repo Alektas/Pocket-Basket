@@ -22,8 +22,8 @@ public class ItemGenerator {
         sItems = new ArrayList<>();
         addItem(sItems, R.string.lemonade, 0, R.string.drink);
         addItem(sItems, R.string.juice, 0, R.string.drink);
-        addItem(sItems, R.string.tea, 0, R.string.drink);
-        addItem(sItems, R.string.coffee, 0, R.string.drink);
+        addItem(sItems, R.string.tea, R.drawable.ic_tea, R.string.drink);
+        addItem(sItems, R.string.coffee, R.drawable.ic_coffee, R.string.drink);
         addItem(sItems, R.string.cacao, 0, R.string.drink);
         addItem(sItems, R.string.beer, 0, R.string.drink);
         addItem(sItems, R.string.wine, 0, R.string.drink);
@@ -32,7 +32,7 @@ public class ItemGenerator {
         addItem(sItems, R.string.water, 0, R.string.drink);
 
         addItem(sItems, R.string.milk, R.drawable.ic_milk, R.string.milky);
-        addItem(sItems, R.string.curd, 0, R.string.milky);
+        addItem(sItems, R.string.curd, R.drawable.ic_curd, R.string.milky);
         addItem(sItems, R.string.sour_cream, 0, R.string.milky);
         addItem(sItems, R.string.cheese, R.drawable.ic_cheese, R.string.milky);
         addItem(sItems, R.string.kefir, 0, R.string.milky);
@@ -52,22 +52,22 @@ public class ItemGenerator {
         addItem(sItems, R.string.white_bread, R.drawable.ic_white_bread, R.string.floury);
         addItem(sItems, R.string.pasta, R.drawable.ic_pasta, R.string.floury);
         addItem(sItems, R.string.flour, 0, R.string.floury);
-        addItem(sItems, R.string.pizza, 0, R.string.floury);
+        addItem(sItems, R.string.pizza, R.drawable.ic_pizza, R.string.floury);
 
         addItem(sItems, R.string.lemon, R.drawable.ic_lemon, R.string.fruit);
         addItem(sItems, R.string.apple, R.drawable.ic_apple, R.string.fruit);
         addItem(sItems, R.string.banana, R.drawable.ic_banana, R.string.fruit);
-        addItem(sItems, R.string.orange, 0, R.string.fruit);
+        addItem(sItems, R.string.orange, R.drawable.ic_orange, R.string.fruit);
         addItem(sItems, R.string.grapes, R.drawable.ic_grapes, R.string.fruit);
         addItem(sItems, R.string.kiwi, 0, R.string.fruit);
         addItem(sItems, R.string.plums, 0, R.string.fruit);
         addItem(sItems, R.string.tangerines, 0, R.string.fruit);
 
-        addItem(sItems, R.string.potatoes, 0, R.string.vegetable);
+        addItem(sItems, R.string.potatoes, R.drawable.ic_potatoes, R.string.vegetable);
         addItem(sItems, R.string.carrot, R.drawable.ic_carrot, R.string.vegetable);
         addItem(sItems, R.string.cabbage, R.drawable.ic_cabbage, R.string.vegetable);
         addItem(sItems, R.string.onion, R.drawable.ic_onion, R.string.vegetable);
-        addItem(sItems, R.string.tomato, 0, R.string.vegetable);
+        addItem(sItems, R.string.tomato, R.drawable.ic_tomato, R.string.vegetable);
         addItem(sItems, R.string.cucumber, R.drawable.ic_cucumber, R.string.vegetable);
         addItem(sItems, R.string.garlic, R.drawable.ic_garlic, R.string.vegetable);
         addItem(sItems, R.string.pepper, R.drawable.ic_pepper, R.string.vegetable);
