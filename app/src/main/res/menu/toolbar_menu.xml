@@ -23,9 +23,15 @@
           android:icon="@drawable/ic_file_download_darkgreen_24dp"
           app:showAsAction="never"/>
 
+    <item android:id="@+id/menu_guide"
+          android:orderInCategory="40"
+          android:title="@string/guide"
+          android:icon="@drawable/ic_help_outline_darkgreen_24dp"
+          app:showAsAction="never"/>
+
     <item android:id="@+id/menu_about"
           android:orderInCategory="50"
           android:title="@string/about_app"
-          android:icon="@drawable/ic_help_outline_darkgreen_24dp"
+          android:icon="@drawable/ic_info_outline_darkgreen_24dp"
           app:showAsAction="never"/>
 </menu>

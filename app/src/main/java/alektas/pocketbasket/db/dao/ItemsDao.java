@@ -1,7 +1,5 @@
 package alektas.pocketbasket.db.dao;
 
-import android.util.Log;
-
 import alektas.pocketbasket.db.entity.BasketMeta;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -20,12 +18,26 @@ import alektas.pocketbasket.db.entity.Item;
 public abstract class ItemsDao {
     private static final String TAG = "ItemsDao";
 
-
-    @Query("SELECT * FROM items ORDER BY tag_res, name ASC")
+    @Query("SELECT * FROM items ORDER BY CASE " +
+            "WHEN tag_res = 'drink' THEN 1 " +
+            "WHEN tag_res = 'fruit' THEN 2 " +
+            "WHEN tag_res = 'vegetable' THEN 3 " +
+            "WHEN tag_res = 'floury' THEN 4 " +
+            "WHEN tag_res = 'milky' THEN 5 " +
+            "WHEN tag_res = 'groats' THEN 6 " +
+            "WHEN tag_res = 'sweets' THEN 7 " +
+            "WHEN tag_res = 'meat' THEN 8 " +
+            "WHEN tag_res = 'seafood' THEN 9 " +
+            "WHEN tag_res = 'semis' THEN 10 " +
+            "WHEN tag_res = 'sauce_n_oil' THEN 11 " +
+            "WHEN tag_res = 'household' THEN 12 " +
+            "WHEN tag_res = 'other' THEN 13 " +
+            "ELSE 14 " +
+            "END, name")
     public abstract List<Item> getItems();
 
     @Query("SELECT * FROM items WHERE tag_res = :tag ORDER BY name ASC")
-    public abstract List<Item> getByTag(int tag);
+    public abstract List<Item> getByTag(String tag);
 
     @Query("SELECT * FROM items WHERE name LIKE :query")
     public abstract List<Item> search(String query);
@@ -34,6 +46,11 @@ public abstract class ItemsDao {
             "INNER JOIN basket_items on items.name = basket_items.item_name " +
             "GROUP BY basket_items.position")
     public abstract LiveData<List<Item>> getBasketData();
+
+    @Query("SELECT * FROM items " +
+            "INNER JOIN basket_items on items.name = basket_items.item_name " +
+            "GROUP BY basket_items.position")
+    public abstract List<Item> getBasketItems();
 
     @Query("SELECT checked FROM basket_items WHERE item_name = :name")
     public abstract int isChecked(String name);

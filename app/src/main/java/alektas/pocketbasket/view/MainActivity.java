@@ -1,12 +1,14 @@
 package alektas.pocketbasket.view;
 
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -23,9 +25,13 @@ import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.widget.SearchView;
 
+import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.async.getAllAsync;
 import alektas.pocketbasket.db.AppDatabase;
 import alektas.pocketbasket.db.dao.ItemsDao;
+import alektas.pocketbasket.guide.Guide;
+import alektas.pocketbasket.guide.GuideCase;
+import alektas.pocketbasket.guide.GuideHelperImpl;
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
@@ -50,6 +56,8 @@ import alektas.pocketbasket.R;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import alektas.pocketbasket.db.entity.Item;
 
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+
 public class MainActivity extends AppCompatActivity
         implements ResetDialog.ResetDialogListener,
         DeleteModeListener,
@@ -65,24 +73,6 @@ public class MainActivity extends AppCompatActivity
     private int mBasketNarrowWidth;
     private int mBasketWideWidth;
     private boolean isMenuShown;
-
-    private RecyclerView mBasket;
-    private RecyclerView mShowcase;
-    private ViewGroup mDelModePanel;
-    private RadioGroup mCategories;
-    private FloatingActionButton mAddBtn;
-    private SearchView mSearchView;
-    private View mDelAllBtn;
-    private View mCheckAllBtn;
-    private View mCancelDmBtn;
-    private BasketRvAdapter mBasketAdapter;
-    private ShowcaseRvAdapter mShowcaseAdapter;
-    private Transition mTransitionSet;
-    private ConstraintLayout mConstraintLayout;
-    private ShareActionProvider mShareActionProvider;
-    private ItemTouchHelper mTouchHelper;
-
-    private ItemsViewModel mViewModel;
     private int initX;
     private int initY;
     private int movX;
@@ -90,6 +80,25 @@ public class MainActivity extends AppCompatActivity
     private boolean allowChangeMode = true;
     private boolean alreadySetChangeModeAllowing = false;
     private int basketTextMarginEnd;
+
+    private RecyclerView mBasket;
+    private RecyclerView mShowcase;
+    private ViewGroup mDelModePanel;
+    private View mCategoriesWrapper;
+    private FloatingActionButton mAddBtn;
+    private SearchView mSearchView;
+    private View mDelAllBtn;
+    private View mCheckAllBtn;
+    private View mCancelDmBtn;
+    private View mSkipGuideBtn;
+    private BasketRvAdapter mBasketAdapter;
+    private ShowcaseRvAdapter mShowcaseAdapter;
+    private Transition mTransitionSet;
+    private ConstraintLayout mConstraintLayout;
+    private ShareActionProvider mShareActionProvider;
+    private ItemTouchHelper mTouchHelper;
+    private ItemsViewModel mViewModel;
+    private GuideHelperImpl mGuideHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +110,16 @@ public class MainActivity extends AppCompatActivity
 
         init();
         handleSearch(getIntent());
+
+        if (mViewModel.isGuideStarted()) mViewModel.finishGuide();
+
+        SharedPreferences prefs =
+                getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
+        if (prefs.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
+            prefs.edit().putBoolean(getString(R.string.FIRST_START_KEY), false).apply();
+            addItem(getString(R.string.cabbage));
+            startGuide();
+        }
     }
 
     @Override
@@ -147,6 +166,11 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
 
+            case R.id.menu_guide: {
+                startGuide();
+                return true;
+            }
+
             case R.id.menu_about: {
                 DialogFragment dialog = new AboutDialog();
                 dialog.show(getSupportFragmentManager(), "AboutDialog");
@@ -174,15 +198,16 @@ public class MainActivity extends AppCompatActivity
 
         mConstraintLayout = findViewById(R.id.root_layout);
 
-        mCategories = findViewById(R.id.categ_group);
+        mCategoriesWrapper = findViewById(R.id.categories_wrapper);
 
         mDelModePanel = findViewById(R.id.del_mode_panel);
         mCancelDmBtn = findViewById(R.id.cancel_dm_btn);
 
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
 
-        initBasket();
-        initShowcase();
+        initGuide(mViewModel);
+        initBasket(mViewModel);
+        initShowcase(mViewModel);
 
         mViewModel.getBasketData().observe(this, (items -> {
 
@@ -192,8 +217,7 @@ public class MainActivity extends AppCompatActivity
         mViewModel.getShowcaseData().observe(this,
                 mShowcaseAdapter::setItems);
 
-        if (getResources().getConfiguration().orientation
-                == Configuration.ORIENTATION_LANDSCAPE) {
+        if (isLandscape()) {
             setLandscapeLayout();
         } else {
             setShowcaseMode();
@@ -209,12 +233,18 @@ public class MainActivity extends AppCompatActivity
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int screenWidth = displaymetrics.widthPixels;
+        int screenHeight = displaymetrics.heightPixels;
+        int minDisplaySize = Math.min(screenHeight, screenWidth);
         mCategNarrowWidth = (int) getResources().getDimension(R.dimen.categ_narrow_size);
         mShowcaseNarrowWidth = (int) getResources().getDimension(R.dimen.showcase_narrow_size);
         mBasketNarrowWidth = (int) getResources().getDimension(R.dimen.basket_narrow_size);
         mCategWideWidth = (int) getResources().getDimension(R.dimen.categ_wide_size);
-        mShowcaseWideWidth = screenWidth - mCategWideWidth - mBasketNarrowWidth;
-        mBasketWideWidth = screenWidth - mCategNarrowWidth - mShowcaseNarrowWidth;
+        mShowcaseWideWidth = minDisplaySize - mCategWideWidth - mBasketNarrowWidth;
+        if (isLandscape()) {
+            mBasketWideWidth = screenWidth - mCategWideWidth - mShowcaseWideWidth;
+        } else {
+            mBasketWideWidth = screenWidth - mCategNarrowWidth - mShowcaseNarrowWidth;
+        }
 
         changeModeDistance = getResources().getDimension(R.dimen.change_mode_distance);
         basketTextMarginEnd = (int) getResources().getDimension(R.dimen.basket_item_text_margin_end);
@@ -228,20 +258,22 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initFloatingActionMenu() {
-        mAddBtn = findViewById(R.id.add_item_btn);
+        mAddBtn = findViewById(R.id.fab);
         mCheckAllBtn = findViewById(R.id.check_all_btn);
         mDelAllBtn = findViewById(R.id.del_all_btn);
         mAddBtn.setOnLongClickListener(view -> {
-            if (!isMenuShown) showFloatingMenu();
+            if (!isMenuShown) {
+                showFloatingMenu();
+            }
             return true;
         });
     }
 
-    private void initBasket() {
+    private void initBasket(ItemsViewModel model) {
         mBasket = findViewById(R.id.basket_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mBasket.setLayoutManager(layoutManager);
-        mBasketAdapter = new BasketRvAdapter(this, mViewModel,
+        mBasketAdapter = new BasketRvAdapter(this, model,
                 this,this);
         mBasket.setAdapter(mBasketAdapter);
 
@@ -252,15 +284,193 @@ public class MainActivity extends AppCompatActivity
         mBasket.addOnItemTouchListener(new ItemTouchListener());
     }
 
-    private void initShowcase() {
+    private void initShowcase(ItemsViewModel model) {
         mShowcase = findViewById(R.id.showcase_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mShowcase.setLayoutManager(layoutManager);
         mShowcaseAdapter = new ShowcaseRvAdapter(this, this,
-                this, mViewModel);
+                this, model);
         mShowcase.setAdapter(mShowcaseAdapter);
 
         mShowcase.addOnItemTouchListener(new ItemTouchListener());
+    }
+
+    private void initGuide(ItemsViewModel model) {
+        mSkipGuideBtn = findViewById(R.id.skip_guide_btn);
+        View bgTop = findViewById(R.id.guide_bg_top_img);
+        View bgBottom = findViewById(R.id.guide_bg_bottom_img);
+
+        // Guide: categories help
+        GuideCase categoriesHelpCase = new GuideCase(
+                GuideHelperImpl.GUIDE_CATEGORIES_HELP,
+                bgBottom,
+                findViewById(R.id.guide_bg_right_large_img),
+                findViewById(R.id.guide_categories_help_text),
+                findViewById(R.id.guide_categories_help_sub_text));
+
+        // Guide: showcase help
+        GuideCase showcaseHelpCase = new GuideCase(
+                GuideHelperImpl.GUIDE_SHOWCASE_HELP,
+                bgBottom,
+                findViewById(R.id.guide_bg_right_small_img),
+                findViewById(R.id.guide_bg_left_small_img),
+                findViewById(R.id.guide_showcase_help_text),
+                findViewById(R.id.guide_showcase_help_sub_text));
+
+        // Guide: basket help
+        GuideCase basketHelpCase = new GuideCase(
+                GuideHelperImpl.GUIDE_BASKET_HELP,
+                bgBottom,
+                findViewById(R.id.guide_bg_left_large_img),
+                findViewById(R.id.guide_basket_help_text),
+                findViewById(R.id.guide_basket_help_sub_text));
+
+        //  Guide: change mode
+        View changeModeImg = findViewById(R.id.guide_scroll_hor_img);
+        AnimatorSet scrollHorizAnim = (AnimatorSet) AnimatorInflater
+                .loadAnimator(this, R.animator.scroll_horiz);
+        scrollHorizAnim.setTarget(changeModeImg);
+        GuideCase changeModeCase = new GuideCase(
+                GuideHelperImpl.GUIDE_CHANGE_MODE,
+                scrollHorizAnim,
+                changeModeImg,
+                bgBottom,
+                findViewById(R.id.guide_change_mode_text),
+                findViewById(R.id.guide_change_mode_sub_text));
+
+        //  Guide: add item
+        View addItemImg = findViewById(R.id.guide_tap_add_img);
+        AnimatorSet tapAnim = (AnimatorSet) AnimatorInflater
+                .loadAnimator(this, R.animator.tap);
+        GuideCase addItemCase = new GuideCase(
+                GuideHelperImpl.GUIDE_ADD_ITEM,
+                tapAnim,
+                true,
+                addItemImg,
+                bgBottom,
+                findViewById(R.id.guide_add_item_text),
+                findViewById(R.id.guide_add_item_sub_text));
+
+        //  Guide: check item in Basket
+        View checkItemImg = findViewById(R.id.guide_tap_check_img);
+        GuideCase checkItemCase = new GuideCase(
+                GuideHelperImpl.GUIDE_CHECK_ITEM,
+                tapAnim,
+                true,
+                checkItemImg,
+                bgBottom,
+                findViewById(R.id.guide_check_item_text));
+
+        //  Guide: move item in Basket
+        AnimatorSet scrollVertAnim = (AnimatorSet) AnimatorInflater
+                .loadAnimator(this, R.animator.scroll_vert);
+        View moveItemImg = findViewById(R.id.guide_scroll_vert_img);
+        scrollVertAnim.setTarget(moveItemImg);
+        GuideCase moveItemCase = new GuideCase(
+                GuideHelperImpl.GUIDE_MOVE_ITEM,
+                scrollVertAnim,
+                moveItemImg,
+                bgBottom,
+                findViewById(R.id.guide_move_item_text),
+                findViewById(R.id.guide_move_item_sub_text));
+
+        //  Guide: remove item from Basket
+        View removeItemImg = findViewById(R.id.guide_swipe_right_img);
+        AnimatorSet swipeRightAnim = (AnimatorSet) AnimatorInflater
+                .loadAnimator(this, R.animator.swipe_right);
+        swipeRightAnim.setTarget(removeItemImg);
+        GuideCase removeItemCase = new GuideCase(
+                GuideHelperImpl.GUIDE_REMOVE_ITEM,
+                swipeRightAnim,
+                removeItemImg,
+                bgBottom,
+                findViewById(R.id.guide_remove_text),
+                findViewById(R.id.guide_remove_sub_text));
+
+        //  Guide: turn on delete mode
+        View longPressImg = findViewById(R.id.guide_del_mode_img);
+        AnimatorSet longPressAnim = (AnimatorSet) AnimatorInflater
+                .loadAnimator(this, R.animator.long_press);
+        GuideCase delModeCase = new GuideCase(
+                GuideHelperImpl.GUIDE_DEL_MODE,
+                longPressAnim,
+                true,
+                longPressImg,
+                bgBottom,
+                findViewById(R.id.guide_del_mode_text));
+
+        //  Guide: delete items from Showcase
+        View tapToDelImg = findViewById(R.id.guide_tap_delete_img);
+        GuideCase deleteItemsCase = new GuideCase(
+                GuideHelperImpl.GUIDE_DEL_ITEMS,
+                tapAnim,
+                true,
+                tapToDelImg,
+                bgTop,
+                findViewById(R.id.guide_delete_text),
+                findViewById(R.id.guide_delete_sub_text));
+
+        //  Guide: floating menu invoke
+        View pressFabImg = findViewById(R.id.guide_show_floating_menu_img);
+        GuideCase floatingMenuCase = new GuideCase(
+                GuideHelperImpl.GUIDE_FLOATING_MENU,
+                longPressAnim,
+                true,
+                pressFabImg,
+                bgTop,
+                findViewById(R.id.guide_show_floating_menu_text));
+
+        //  Guide: floating menu help
+        GuideCase floatingMenuHelpCase = new GuideCase(
+                GuideHelperImpl.GUIDE_FLOATING_MENU_HELP,
+                findViewById(R.id.guide_bg_full_img),
+                findViewById(R.id.guide_floating_menu_close_text),
+                findViewById(R.id.guide_floating_menu_check_all_text),
+                findViewById(R.id.guide_floating_menu_del_checked_text));
+
+        //  Guide: finish case
+        View finishImg = findViewById(R.id.guide_finish_img);
+        AnimatorSet finishAnim = (AnimatorSet) AnimatorInflater
+                .loadAnimator(this, R.animator.finish_guide);
+        finishAnim.setTarget(finishImg);
+        GuideCase finishCase = new GuideCase(
+                GuideHelperImpl.GUIDE_FINISH,
+                finishAnim,
+                finishImg);
+        finishCase.setAutoNext(true);
+
+        Guide guide = new Guide();
+        guide.addCase(categoriesHelpCase)
+                .addCase(showcaseHelpCase)
+                .addCase(basketHelpCase)
+                .addCase(changeModeCase)
+                .addCase(addItemCase)
+                .addCase(checkItemCase)
+                .addCase(moveItemCase)
+                .addCase(removeItemCase)
+                .addCase(delModeCase)
+                .addCase(deleteItemsCase)
+                .addCase(floatingMenuCase)
+                .addCase(floatingMenuHelpCase)
+                .addCase(finishCase);
+
+        guide.setGuideListener(new Guide.GuideListener() {
+            @Override
+            public void onGuideFinish() {
+                mSkipGuideBtn.setVisibility(View.INVISIBLE);
+                model.setGuideStarted(false);
+            }
+
+            @Override
+            public void onGuideCaseStart(String caseKey) {
+                if (isLandscape() && GuideHelperImpl.GUIDE_CHANGE_MODE.equals(caseKey))
+                    mGuideHelper.nextCase();
+            }
+        });
+
+        mGuideHelper = new GuideHelperImpl(guide);
+
+        model.setGuide(mGuideHelper);
     }
 
     /* Layout changes methods */
@@ -268,7 +478,7 @@ public class MainActivity extends AppCompatActivity
     @SuppressLint("RestrictedApi")
     private void setLandscapeLayout() {
         changeLayoutSize(mCategWideWidth,
-                mShowcaseWideWidth,
+                WRAP_CONTENT,
                 0);
 
         mAddBtn.setVisibility(View.VISIBLE);
@@ -353,15 +563,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void changeLayoutSize(int categWidth, int showcaseWidth, int basketWidth) {
-        ViewGroup.LayoutParams categParams = mCategories.getLayoutParams();
+        ViewGroup.LayoutParams categWrapParams = mCategoriesWrapper.getLayoutParams();
         ViewGroup.LayoutParams showcaseParams = mShowcase.getLayoutParams();
         ViewGroup.LayoutParams basketParams = mBasket.getLayoutParams();
 
-        categParams.width = categWidth;
+        categWrapParams.width = categWidth;
         showcaseParams.width = showcaseWidth;
         basketParams.width = basketWidth;
 
-        mCategories.setLayoutParams(categParams);
+        mCategoriesWrapper.setLayoutParams(categWrapParams);
         mShowcase.setLayoutParams(showcaseParams);
         mBasket.setLayoutParams(basketParams);
     }
@@ -384,6 +594,8 @@ public class MainActivity extends AppCompatActivity
         mDelAllBtn.setVisibility(View.VISIBLE);
 
         isMenuShown = true;
+
+        mViewModel.onFloatingMenuShown();
     }
 
     private void hideFloatingMenu() {
@@ -396,7 +608,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setFilter(int tag) {
-        mViewModel.setFilter(tag);
+        mViewModel.setFilter(Utils.getIdName(tag));
     }
 
     /* Interfaces methods */
@@ -408,12 +620,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onDelModeEnable() {
-        mDelModePanel.setVisibility(View.VISIBLE);
+        boolean dmAllowed = mViewModel.setDelMode(true);
+        if (dmAllowed) mDelModePanel.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onDelModeDisable() {
-        mDelModePanel.setVisibility(View.GONE);
+        boolean dmAllowed = mViewModel.setDelMode(false);
+        if (dmAllowed) mDelModePanel.setVisibility(View.GONE);
     }
 
     @Override
@@ -438,9 +652,10 @@ public class MainActivity extends AppCompatActivity
 
     /* On buttons click methods */
 
-    public void onBtnClick(View view) {
+    public void onFabClick(View view) {
+        mViewModel.onFabClick();
         if (isMenuShown) {
-            if (view.getId() == R.id.add_item_btn) {
+            if (view.getId() == R.id.fab) {
                 hideFloatingMenu();
             }
             if (view.getId() == R.id.del_all_btn) {
@@ -451,7 +666,7 @@ public class MainActivity extends AppCompatActivity
                 mViewModel.checkAll();
             }
         }
-        else if (view.getId() == R.id.add_item_btn){
+        else if (view.getId() == R.id.fab){
             if (mSearchView.hasFocus()) {
                 if (!TextUtils.isEmpty(mSearchView.getQuery())) {
                     addItem(mSearchView.getQuery().toString());
@@ -463,6 +678,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void onSkipGuideBtnClick(View view) {
+        mViewModel.onSkipGuideBtnClick();
+    }
+
     public void onFilterClick(View view) {
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
@@ -471,7 +690,7 @@ public class MainActivity extends AppCompatActivity
         switch (view.getId()) {
             case R.id.all_rb:
                 if (checked)
-                    setFilter(0);
+                    setFilter(R.string.all);
                 break;
             case R.id.drink_rb:
                 if (checked)
@@ -533,6 +752,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void onCancelDmBtnClick(View view) {
+        if (isLandscape() && mViewModel.isGuideStarted()) return;
         mShowcaseAdapter.cancelDel();
     }
 
@@ -548,7 +768,26 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        handleChangeModeByTouch(event);
+        // do not allow touch in guide mode
+        if (!mViewModel.isTouchAllowed()) {
+            int[] loc = new int[2];
+            mSkipGuideBtn.getLocationOnScreen(loc);
+            if (event.getX() < loc[0] + mSkipGuideBtn.getWidth()
+                    && event.getY() > loc[1]) {
+                // allow touch on skip button
+                mSkipGuideBtn.onTouchEvent(event);
+            } else {
+                // touch did not occur over the skip button, so the current case is confirmed
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    mViewModel.nextGuideCase();
+                }
+            }
+            return true;
+        }
+        // do not allow mode change in the landscape orientation
+        if (!isLandscape() && mViewModel.isModeChangedAllowed()) {
+            handleChangeModeByTouch(event);
+        }
         return super.dispatchTouchEvent(event);
     }
 
@@ -613,6 +852,21 @@ public class MainActivity extends AppCompatActivity
 
     /* Private methods */
 
+    private boolean isLandscape() {
+        return getResources().getConfiguration().orientation
+                == Configuration.ORIENTATION_LANDSCAPE;
+    }
+
+    private void startGuide() {
+        if (!isLandscape() && !mViewModel.isShowcaseMode()) setShowcaseMode();
+        if (mViewModel.isDelMode()) {
+            onDelModeDisable();
+            mShowcaseAdapter.notifyDataSetChanged(); // update icons
+        }
+        mSkipGuideBtn.setVisibility(View.VISIBLE);
+        mViewModel.startGuide();
+    }
+
     private void handleSearch(Intent intent) {
         String query = intent.getStringExtra(SearchManager.QUERY);
 
@@ -634,7 +888,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void addItem(String query) {
-        mViewModel.addNewItem(query, R.string.other);
+        mViewModel.addNewItem(query, Utils.getIdName(R.string.other));
     }
 
     private void addAllItems() {

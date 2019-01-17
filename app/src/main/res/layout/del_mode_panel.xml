@@ -5,10 +5,10 @@
               android:layout_height="wrap_content"
               android:background="@color/colorPrimaryLight"
               android:gravity="center"
-    style="?android:attr/buttonBarStyle">
+              android:animateLayoutChanges="true"
+              style="?android:attr/buttonBarStyle">
 
     <Button
-        android:id="@+id/del_dm_btn"
         android:layout_width="@dimen/ic_categ_size"
         android:layout_height="@dimen/ic_categ_size"
         android:layout_margin="@dimen/padding_8"

@@ -1,17 +1,47 @@
 <resources>
     <string name="app_name" translatable="false">Pocket Basket</string>
+    <string name="PREFERENCES_FILE_KEY" translatable="false">alektas.pocketbasket</string>
+    <string name="FIRST_START_KEY" translatable="false">isFirstStart</string>
     <string name="reset_msg">Back to the original showcase?</string>
     <string name="cancel">Cancel</string>
     <string name="accept">Accept</string>
     <string name="del_user_items">Delete user items</string>
     <string name="search_hint">Add item</string>
     <string name="reset">Reset</string>
-    <string name="about_app">About app</string>
-    <string name="about_msg">Pocket Basket is app for product list creation.</string>
-    <string name="about_title">@string/app_name</string>
-    <string name="version">Version: %s</string>
     <string name="share">Share</string>
     <string name="update">Update</string>
     <string name="share_intro">Need goods:</string>
+
+    <string name="about_app">About app</string>
+    <string name="about_msg">Pocket Basket is app for product list creation.</string>
+    <string name="about_title">@string/app_name</string>
+    <string name="about_developer">Developer: Alektas</string>
+    <string name="about_email" translatable="false">alektas@inbox.ru</string>
+    <string name="version">Version: %s</string>
+
+    <string name="guide">Help</string>
+    <string name="skip">Skip</string>
+    <string name="guide_change_mode">Change mode by swipe</string>
+    <string name="guide_add_item">Add items by tap</string>
+    <string name="guide_check_item">Check item by tap on icon</string>
+    <string name="guide_move_item">Move item in basket by drag</string>
+    <string name="guide_remove_item">Remove item by swipe</string>
+    <string name="guide_del_mode">Select for deleting by long press</string>
+    <string name="guide_delete_items">Delete selected items</string>
+    <string name="guide_floating_menu">Press button to show menu</string>
+    <string name="guide_check_all">Check all items</string>
+    <string name="guide_del_checked">Delete checked items</string>
+    <string name="guide_close_menu">Close menu</string>
+    <string name="guide_add_item_sub">or use search bar</string>
+    <string name="guide_move_item_sub">or by long press on item</string>
+    <string name="guide_remove_item_sub">or by tap on item in showcase</string>
+    <string name="guide_delete_items_sub">They can be restored by \"Reset\" in the menu</string>
+    <string name="guide_categ">This is categories</string>
+    <string name="guide_categ_sub">There you can filter items you needed</string>
+    <string name="guide_showcase">This is showcase</string>
+    <string name="guide_showcase_sub">From here you can take items to basket</string>
+    <string name="guide_basket">This is basket</string>
+    <string name="guide_basket_sub">There you keep items from showcase</string>
+    <string name="guide_change_mode_sub">Just swipe left</string>
 
 </resources>
