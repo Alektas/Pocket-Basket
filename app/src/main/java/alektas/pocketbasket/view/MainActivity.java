@@ -19,7 +19,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
@@ -192,13 +191,14 @@ public class MainActivity extends AppCompatActivity
 
     private void init() {
         initAnimTransition();
-        initDimensions();
         initSearch();
         initFloatingActionMenu();
 
         mConstraintLayout = findViewById(R.id.root_layout);
 
         mCategoriesWrapper = findViewById(R.id.categories_wrapper);
+
+        initDimensions();
 
         mDelModePanel = findViewById(R.id.del_mode_panel);
         mCancelDmBtn = findViewById(R.id.cancel_dm_btn);

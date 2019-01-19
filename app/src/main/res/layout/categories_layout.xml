@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/categ_wide_size"
     android:layout_height="wrap_content"
-    android:background="@color/colorPrimary" >
+    android:background="@color/colorPrimary">
 
     <RadioButton
         android:id="@+id/all_rb"
