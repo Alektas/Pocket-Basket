@@ -73,7 +73,7 @@
         app:layout_constraintStart_toEndOf="@+id/showcase_list"
         app:layout_constraintTop_toBottomOf="@id/toolbar"/>
 
-    <!-- Delete buttons. Appear in Delete Mode -->
+    <!-- Delete and Cancel buttons. Appear in Delete Mode -->
 
     <include
         android:id="@+id/del_mode_panel"
