@@ -8,6 +8,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
 
+        versionCode 1
+        manifestPlaceholders = [versionCode:versionCode]
         versionName '0.6.1'
         versionNameSuffix '-alpha'
         project.ext.set("archivesBaseName", "PocketBasket-" + defaultConfig.versionName)
@@ -101,7 +103,7 @@ buildscript {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha2'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'androidx.annotation:annotation:1.0.1'
