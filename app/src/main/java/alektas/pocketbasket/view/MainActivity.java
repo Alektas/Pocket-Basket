@@ -71,14 +71,15 @@ public class MainActivity extends AppCompatActivity
     private int mShowcaseNarrowWidth;
     private int mBasketNarrowWidth;
     private int mBasketWideWidth;
-    private boolean isMenuShown;
+    private int basketTextMarginEnd;
     private int initX;
     private int initY;
     private int movX;
     private float changeModeDistance;
+    private boolean isMenuShown;
     private boolean allowChangeMode = true;
     private boolean alreadySetChangeModeAllowing = false;
-    private int basketTextMarginEnd;
+    private boolean allowChooseCategory = true;
 
     private RecyclerView mBasket;
     private RecyclerView mShowcase;
@@ -768,7 +769,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        // do not allow touch in guide mode
+        // Do not allow touch in some guide cases.
         if (!mViewModel.isTouchAllowed()) {
             int[] loc = new int[2];
             mSkipGuideBtn.getLocationOnScreen(loc);
@@ -788,6 +789,15 @@ public class MainActivity extends AppCompatActivity
         if (!isLandscape() && mViewModel.isModeChangedAllowed()) {
             handleChangeModeByTouch(event);
         }
+
+        // disallow category selection when resizing layout
+        if (!isAllowChooseCategory(event)) {
+            /* Provide a touch to showcase, otherwise delete mode would be triggered on each swipe
+             * (touch would be perceived as a long press on items in showcase) */
+            mShowcase.dispatchTouchEvent(event);
+            return true;
+        }
+
         return super.dispatchTouchEvent(event);
     }
 
@@ -798,7 +808,7 @@ public class MainActivity extends AppCompatActivity
                 initY = (int) (event.getY() + 0.5f);
 
                 /* Disable change mode from basket in basket mode
-                because direction of swipe is match to direction of item delete swipe */
+                 * because direction of swipe is match to direction of item delete swipe */
                 if (!mViewModel.isShowcaseMode()
                         && initX > (mCategNarrowWidth + mShowcaseNarrowWidth)) {
                     allowChangeMode = false;
@@ -848,6 +858,23 @@ public class MainActivity extends AppCompatActivity
                 break;
             }
         }
+    }
+
+    private boolean isAllowChooseCategory(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+                allowChooseCategory = true;
+                break;
+            }
+
+            case MotionEvent.ACTION_MOVE: {
+                if (allowChangeMode && alreadySetChangeModeAllowing) {
+                    allowChooseCategory = false;
+                }
+                break;
+            }
+        }
+        return allowChooseCategory;
     }
 
     /* Private methods */
