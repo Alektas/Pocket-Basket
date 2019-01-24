@@ -10,7 +10,7 @@ public final class ItemsContract {
     public static final String COL_ICON = SearchManager.SUGGEST_COLUMN_ICON_1;
     public static final String COL_DATA = SearchManager.SUGGEST_COLUMN_INTENT_DATA;
 
-    public static final String AUTHORITY = "alektas.pocketbasket.ItemsProvider";
+    public static final String AUTHORITY = Utils.getString(R.string.search_provider_authority);
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/items");
 
     public static final String[] SEARCH_COLUMNS = {
