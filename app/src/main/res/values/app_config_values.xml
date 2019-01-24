@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <string name="app_name" translatable="false">Pocket Basket</string>
+    <string name="PREFERENCES_FILE_KEY" translatable="false">alektas.pocketbasket</string>
+    <string name="FIRST_START_KEY" translatable="false">isFirstStart</string>
+</resources>

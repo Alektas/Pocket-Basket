@@ -7,6 +7,14 @@ public class Utils {
     private static final String TAG = "Utils";
     private static Resources mResources = App.getComponent().context().getResources();
 
+    public static int getVersionCode() {
+        return BuildConfig.VERSION_CODE;
+    }
+
+    public static String getVersionName() {
+        return BuildConfig.VERSION_NAME;
+    }
+
     public static String getString(int stringResId) {
         return mResources.getString(stringResId);
     }

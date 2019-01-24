@@ -1,7 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">Pocket Basket</string>
-    <string name="PREFERENCES_FILE_KEY" translatable="false">alektas.pocketbasket</string>
-    <string name="FIRST_START_KEY" translatable="false">isFirstStart</string>
     <string name="reset_msg">Back to the original showcase?</string>
     <string name="cancel">Cancel</string>
     <string name="accept">Accept</string>
@@ -14,7 +11,7 @@
 
     <string name="about_app">About app</string>
     <string name="about_msg">Pocket Basket is app for product list creation.</string>
-    <string name="about_title">@string/app_name</string>
+    <string name="about_title" translatable="false">@string/app_name</string>
     <string name="about_developer">Developer: Alektas</string>
     <string name="about_email" translatable="false">alektas@inbox.ru</string>
     <string name="version">Version: %s</string>
