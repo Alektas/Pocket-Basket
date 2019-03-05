@@ -1,8 +1,12 @@
 package alektas.pocketbasket.viewmodel;
 
 import android.app.Application;
+import android.os.Bundle;
 import android.util.Log;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
+import alektas.pocketbasket.App;
 import alektas.pocketbasket.db.entity.BasketMeta;
 import alektas.pocketbasket.guide.GuideHelperImpl;
 import alektas.pocketbasket.model.Repository;
@@ -45,6 +49,10 @@ public class ItemsViewModel extends AndroidViewModel {
     public void putToBasket(String name) {
         mRepoManager.putToBasket(name);
         completeAddItemGuideCase();
+
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, name);
+        App.getAnalytics().logEvent(FirebaseAnalytics.Event.ADD_TO_CART, bundle);
     }
 
     public void updatePositions(List<Item> items) {
@@ -223,10 +231,18 @@ public class ItemsViewModel extends AndroidViewModel {
 
         isGuideStarted = true;
         mGuide.startGuide();
+
+        Bundle startGuide = new Bundle();
+        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_BEGIN, startGuide);
     }
 
     public void finishGuide() {
         mGuide.finishGuide();
+
+        Bundle finGuide = new Bundle();
+        finGuide.putString(FirebaseAnalytics.Param.LEVEL_NAME,
+                "finish guide at case: " + mGuide.currentCase());
+        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_COMPLETE, finGuide);
     }
 
     public void onSkipGuideBtnClick() {

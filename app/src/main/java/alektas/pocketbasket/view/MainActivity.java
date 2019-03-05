@@ -45,6 +45,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity
                 getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
         if (prefs.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
             prefs.edit().putBoolean(getString(R.string.FIRST_START_KEY), false).apply();
-            addItem(getString(R.string.cabbage));
+            mViewModel.putToBasket(getString(R.string.cabbage));
             startGuide();
         }
     }
@@ -145,6 +146,13 @@ public class MainActivity extends AppCompatActivity
 
         // Fetch and store ShareActionProvider
         mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+        mShareActionProvider.setOnShareTargetSelectedListener((source, intent) -> {
+            String sharedItems = intent.getStringExtra(Intent.EXTRA_TEXT);
+            Bundle bundle = new Bundle();
+            bundle.putString(FirebaseAnalytics.Param.CONTENT, sharedItems);
+            App.getAnalytics().logEvent(FirebaseAnalytics.Event.SHARE, bundle);
+            return false;
+        });
         updateShareIntent(mViewModel.getBasketData().getValue());
 
         return true;
@@ -163,6 +171,11 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.menu_load_new_ver: {
                 loadNewVersion();
+
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "check for new app version");
+                App.getAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
                 return true;
             }
 
@@ -174,6 +187,11 @@ public class MainActivity extends AppCompatActivity
             case R.id.menu_about: {
                 DialogFragment dialog = new AboutDialog();
                 dialog.show(getSupportFragmentManager(), "AboutDialog");
+
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "read about app");
+                App.getAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
                 return true;
             }
         }
@@ -211,7 +229,6 @@ public class MainActivity extends AppCompatActivity
         initShowcase(mViewModel);
 
         mViewModel.getBasketData().observe(this, (items -> {
-
             mBasketAdapter.setItems(items);
             updateShareIntent(items);
         }));
@@ -617,6 +634,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDialogAcceptReset(boolean fullReset) {
         mViewModel.resetShowcase(fullReset);
+
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "reset showcase");
+        bundle.putString(FirebaseAnalytics.Param.CHECKOUT_OPTION, "is full reset: " + fullReset);
+        App.getAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
     }
 
     @Override
@@ -916,6 +938,10 @@ public class MainActivity extends AppCompatActivity
 
     private void addItem(String query) {
         mViewModel.addNewItem(query, Utils.getIdName(R.string.other));
+
+        Bundle search = new Bundle();
+        search.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
+        App.getAnalytics().logEvent(FirebaseAnalytics.Event.SEARCH, search);
     }
 
     private void addAllItems() {
