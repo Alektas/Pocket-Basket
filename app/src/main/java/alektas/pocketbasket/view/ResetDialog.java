@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import alektas.pocketbasket.R;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
@@ -36,6 +37,7 @@ public class ResetDialog extends DialogFragment {
         }
     }
 
+    @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

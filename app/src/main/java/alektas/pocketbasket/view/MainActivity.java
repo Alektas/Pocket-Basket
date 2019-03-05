@@ -24,13 +24,6 @@ import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.widget.SearchView;
 
-import alektas.pocketbasket.Utils;
-import alektas.pocketbasket.async.getAllAsync;
-import alektas.pocketbasket.db.AppDatabase;
-import alektas.pocketbasket.db.dao.ItemsDao;
-import alektas.pocketbasket.guide.Guide;
-import alektas.pocketbasket.guide.GuideCase;
-import alektas.pocketbasket.guide.GuideHelperImpl;
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
@@ -47,14 +40,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.Utils;
+import alektas.pocketbasket.guide.Guide;
+import alektas.pocketbasket.guide.GuideCase;
+import alektas.pocketbasket.guide.GuideHelperImpl;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -920,10 +915,6 @@ public class MainActivity extends AppCompatActivity
         String query = intent.getStringExtra(SearchManager.QUERY);
 
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            if (query.toLowerCase().equals("all")) {
-                addAllItems();
-                return;
-            }
             addItem(query);
         } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String itemName = intent.getDataString();
@@ -942,19 +933,6 @@ public class MainActivity extends AppCompatActivity
         Bundle search = new Bundle();
         search.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.SEARCH, search);
-    }
-
-    private void addAllItems() {
-        ItemsDao dao = AppDatabase.getInstance(this, null).getDao();
-        List<Item> items = new ArrayList<>();
-        try {
-            items = new getAllAsync(dao).execute().get();
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        for (Item item : items) {
-            addItem(item.getName());
-        }
     }
 
     private void loadNewVersion() {
