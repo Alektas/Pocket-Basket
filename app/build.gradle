@@ -51,7 +51,6 @@ android {
             minSdkVersion 27
             resConfigs('xxhdpi')
             versionNameSuffix "-dev"
-            applicationIdSuffix '.dev'
         }
 
         prod {

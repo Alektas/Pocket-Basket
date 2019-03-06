@@ -860,21 +860,29 @@ public class MainActivity extends AppCompatActivity
             }
 
             case MotionEvent.ACTION_UP: {
-                if (allowChangeMode) {
-                    setMode(movX);
-                    mShowcase.onTouchEvent(event);
-                    mBasket.onTouchEvent(event);
-                } else {
-                    allowChangeMode = true;
-                }
+                finishModeChange(event);
+                break;
+            }
 
-                alreadySetChangeModeAllowing = false;
-                initX = 0;
-                movX = 0;
-
+            case MotionEvent.ACTION_CANCEL: {
+                finishModeChange(event);
                 break;
             }
         }
+    }
+
+    private void finishModeChange(MotionEvent event) {
+        if (allowChangeMode) {
+            setMode(movX);
+            mShowcase.onTouchEvent(event);
+            mBasket.onTouchEvent(event);
+        } else {
+            allowChangeMode = true;
+        }
+
+        alreadySetChangeModeAllowing = false;
+        initX = 0;
+        movX = 0;
     }
 
     private boolean isAllowChooseCategory(MotionEvent event) {
