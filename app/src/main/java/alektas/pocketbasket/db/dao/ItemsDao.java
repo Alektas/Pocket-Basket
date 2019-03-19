@@ -42,14 +42,12 @@ public abstract class ItemsDao {
     @Query("SELECT * FROM items WHERE name LIKE :query")
     public abstract List<Item> search(String query);
 
-    @Query("SELECT * FROM items " +
-            "INNER JOIN basket_items on items.name = basket_items.item_name " +
-            "GROUP BY basket_items.position")
+    @Query("SELECT * FROM items WHERE items.name IN " +
+            "(SELECT item_name FROM basket_items GROUP BY basket_items.position)")
     public abstract LiveData<List<Item>> getBasketData();
 
-    @Query("SELECT * FROM items " +
-            "INNER JOIN basket_items on items.name = basket_items.item_name " +
-            "GROUP BY basket_items.position")
+    @Query("SELECT * FROM items WHERE items.name IN " +
+            "(SELECT item_name FROM basket_items GROUP BY basket_items.position)")
     public abstract List<Item> getBasketItems();
 
     @Query("SELECT checked FROM basket_items WHERE item_name = :name")
@@ -154,7 +152,6 @@ public abstract class ItemsDao {
 
 
     /* Add new item to showcase and put item to basket queries */
-
     @Transaction
     public void addNewItem(Item item) {
         insert(item);
