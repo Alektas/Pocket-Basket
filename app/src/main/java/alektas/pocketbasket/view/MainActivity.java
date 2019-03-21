@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity
 
     private RecyclerView mBasket;
     private RecyclerView mShowcase;
-    private ViewGroup mDelModePanel;
+    private LinearLayout mDelModePanel;
     private View mCategoriesWrapper;
     private FloatingActionButton mAddBtn;
     private SearchView mSearchView;
@@ -570,7 +571,7 @@ public class MainActivity extends AppCompatActivity
 
         mAddBtn.setVisibility(View.VISIBLE);
         if (isMenuShown) { hideFloatingMenu(); }
-        mCancelDmBtn.setVisibility(View.GONE);
+        mDelModePanel.setOrientation(LinearLayout.VERTICAL);
 
         mViewModel.setShowcaseMode(false);
     }
@@ -583,7 +584,7 @@ public class MainActivity extends AppCompatActivity
 
         mAddBtn.setVisibility(View.GONE);
         if (isMenuShown) { hideFloatingMenu(); }
-        mCancelDmBtn.setVisibility(View.VISIBLE);
+        mDelModePanel.setOrientation(LinearLayout.HORIZONTAL);
 
         mViewModel.setShowcaseMode(true);
     }
