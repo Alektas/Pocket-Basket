@@ -30,7 +30,6 @@ public class ItemsViewModel extends AndroidViewModel {
     private Repository mRepoManager;
     private boolean isDelMode = false;
     private boolean isShowcaseMode = true;
-    private boolean isGuideStarted = false;
 
     public ItemsViewModel(@NonNull Application application) {
         super(application);
@@ -42,55 +41,67 @@ public class ItemsViewModel extends AndroidViewModel {
 
     /* Basket methods */
 
+    /**
+     * @param key name of the item
+     * @return contain item position in Basket and check state
+     */
     public BasketMeta getBasketMeta(String key) {
         return mRepoManager.getItemMeta(key);
     }
 
     public void putToBasket(String name) {
         mRepoManager.putToBasket(name);
-        completeAddItemGuideCase();
+        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_ADD_ITEM);
 
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, name);
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.ADD_TO_CART, bundle);
     }
 
+    /**
+     * Caused by dragging items in the Basket.
+     * Save items' positions in the Basket like a positions in the list.
+     * @param items all basket items
+     */
     public void updatePositions(List<Item> items) {
         mRepoManager.updatePositions(items);
-        if (isGuideStarted
-                && GuideHelperImpl.GUIDE_MOVE_ITEM.equals(mGuide.currentCase())) {
-            mGuide.nextCase();
-        }
+        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_MOVE_ITEM);
     }
 
-    public boolean isInBasket(Item item) {
+    public boolean isItemInBasket(Item item) {
         return getBasketMeta(item.getName()) != null;
     }
 
+    /**
+     * Check or uncheck item in the Basket
+     */
     public void checkItem(String name) {
         mRepoManager.checkItem(name);
-        if (isGuideStarted
-                && GuideHelperImpl.GUIDE_CHECK_ITEM.equals(mGuide.currentCase())) {
-            mGuide.nextCase();
-        }
+        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_CHECK_ITEM);
     }
 
-    public boolean isChecked(String name) {
+    /**
+     * Verify if item in the Basket is checked.
+     */
+    public boolean isItemChecked(String name) {
         return mRepoManager.isChecked(name);
     }
 
-    public void checkAll() {
+    /**
+     * Verify if all items in the Basket are checked.
+     */
+    public void checkAllItems() {
         mRepoManager.checkAll();
     }
 
     public void removeFromBasket(String name) {
         mRepoManager.removeFromBasket(name);
-        if (isGuideStarted
-                && GuideHelperImpl.GUIDE_REMOVE_ITEM.equals(mGuide.currentCase())) {
-            mGuide.nextCase();
-        }
+        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_REMOVE_ITEM);
     }
 
+    /**
+     * Delete all checked items in the Basket.
+     */
     public void deleteChecked() {
         mRepoManager.deleteChecked();
     }
@@ -98,32 +109,53 @@ public class ItemsViewModel extends AndroidViewModel {
 
     /* Showcase methods */
 
-    public void addNewItem(String name, String tagRes) {
+    /**
+     * Create a new item in the Showcase if it doesn't already exist,
+     * then add it to the Basket
+     */
+    public void addItem(String name) {
         if (name == null) return;
+
+        if (getItem(name) != null) putToBasket(name);
+        else {
+            mRepoManager.addNewItem(new Item(name));
+            mGuide.onCaseHappened(GuideHelperImpl.GUIDE_ADD_ITEM);
+        }
+    }
+
+    /**
+     * Find item in the Showcase by name regardless of register
+     */
+    private Item getItem(String name) {
         for (Item item : mRepoManager.getItems()) {
             if ( (name.toLowerCase())
                     .equals(item.getName().toLowerCase()) ) {
-                putToBasket(item.getName());
-                return;
+                return item;
             }
         }
-        Item item = new Item(name);
-        item.setTagRes(tagRes);
-        mRepoManager.addNewItem(item);
-
-        completeAddItemGuideCase();
+        return null;
     }
 
+    /**
+     * Delete from the Showcase all items presented in list
+     * @param items deleting items
+     */
     public void deleteItems(List<Item> items) {
         mRepoManager.deleteItems(items);
     }
 
-    // Show in Showcase only items with specified tag
+    /**
+     * Show in the Showcase only items with specified tag
+     * @param tag item type or category
+     */
     public void setFilter(String tag) {
         mRepoManager.setFilter(tag);
     }
 
-    // Return default showcase items
+    /**
+     * Return default showcase items
+     * @param fullReset if true delete all user items
+     */
     public void resetShowcase(boolean fullReset) {
         mRepoManager.resetShowcase(fullReset);
     }
@@ -139,6 +171,9 @@ public class ItemsViewModel extends AndroidViewModel {
         return mBasketData;
     }
 
+    /**
+     * @return items selected by the user for removal from the Showcase
+     */
     public List<Item> getDelItems() { return mDelItems; }
 
 
@@ -148,20 +183,22 @@ public class ItemsViewModel extends AndroidViewModel {
         return isDelMode;
     }
 
-    // Return true if delete mode allowed
+    /**
+     * Turn on/off the Delete Mode in which user can delete items from the Showcase
+     * @return true if delete mode allowed and was applied
+     */
     public boolean setDelMode(boolean delMode) {
-        if (isGuideStarted) {
-            if (delMode && GuideHelperImpl.GUIDE_DEL_MODE.equals(mGuide.currentCase())) {
-                isDelMode = true;
-                mGuide.nextCase();
-            } else if (!delMode && GuideHelperImpl.GUIDE_DEL_ITEMS.equals(mGuide.currentCase())) {
-                isDelMode = false;
-                mGuide.nextCase();
-            } else {
-                isDelMode = false;
-                return false;
-            }
+        if (!isDelModeAllowed()) {
+            isDelMode = false;
+            return false;
         }
+
+        if (delMode) {
+            mGuide.onCaseHappened(GuideHelperImpl.GUIDE_DEL_MODE);
+        } else {
+            mGuide.onCaseHappened(GuideHelperImpl.GUIDE_DEL_ITEMS);
+        }
+
         isDelMode = delMode;
         return true;
     }
@@ -172,51 +209,46 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public void setShowcaseMode(boolean showcaseMode) {
         isShowcaseMode = showcaseMode;
-        if (isGuideStarted
-                && GuideHelperImpl.GUIDE_CHANGE_MODE.equals(mGuide.currentCase())) {
-            mGuide.nextCase();
-        }
+        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_CHANGE_MODE);
     }
 
     public void setGuide(GuideHelper guide) {
         mGuide = guide;
     }
 
-    public void setGuideStarted(boolean guideStarted) {
-        isGuideStarted = guideStarted;
+    /**
+     * When the Guide is started the Delete Mode allowed only in several cases
+     */
+    private boolean isDelModeAllowed() {
+        if (!mGuide.isGuideStarted()) return true;
+        return GuideHelperImpl.GUIDE_DEL_MODE.equals(mGuide.currentCase())
+                || GuideHelperImpl.GUIDE_DEL_ITEMS.equals(mGuide.currentCase());
     }
 
-    public boolean isGuideStarted() {
-        return isGuideStarted;
-    }
-
+    /**
+     * When the Guide is started change mode allowed only in several cases
+     */
     public boolean isModeChangedAllowed() {
-        if (isGuideStarted) {
-            return GuideHelperImpl.GUIDE_CHANGE_MODE.equals(mGuide.currentCase());
-        } else {
-            return true;
-        }
+        if (!mGuide.isGuideStarted()) return true;
+        return GuideHelperImpl.GUIDE_CHANGE_MODE.equals(mGuide.currentCase());
     }
 
+    /**
+     * When the Guide is started touch allowed only in several cases
+     */
     public boolean isTouchAllowed() {
-        return  !(isGuideStarted
-                && (GuideHelperImpl.GUIDE_CATEGORIES_HELP.equals(mGuide.currentCase())
+        return !( mGuide.isGuideStarted() &&
+                (GuideHelperImpl.GUIDE_CATEGORIES_HELP.equals(mGuide.currentCase())
                 || GuideHelperImpl.GUIDE_SHOWCASE_HELP.equals(mGuide.currentCase())
                 || GuideHelperImpl.GUIDE_BASKET_HELP.equals(mGuide.currentCase())) );
     }
 
     public void onFloatingMenuShown() {
-        if (isGuideStarted
-                && GuideHelperImpl.GUIDE_FLOATING_MENU.equals(mGuide.currentCase())) {
-            mGuide.nextCase();
-        }
+        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_FLOATING_MENU);
     }
 
     public void onFabClick() {
-        if (isGuideStarted
-                && GuideHelperImpl.GUIDE_FLOATING_MENU_HELP.equals(mGuide.currentCase())) {
-            mGuide.nextCase();
-        }
+        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_FLOATING_MENU_HELP);
     }
 
 
@@ -229,7 +261,6 @@ public class ItemsViewModel extends AndroidViewModel {
                     new NullPointerException("Guide is null"));
         }
 
-        isGuideStarted = true;
         mGuide.startGuide();
 
         Bundle startGuide = new Bundle();
@@ -253,10 +284,4 @@ public class ItemsViewModel extends AndroidViewModel {
         mGuide.nextCase();
     }
 
-    private void completeAddItemGuideCase() {
-        if (isGuideStarted
-                && GuideHelperImpl.GUIDE_ADD_ITEM.equals(mGuide.currentCase())) {
-            mGuide.nextCase();
-        }
-    }
 }
