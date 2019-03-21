@@ -20,6 +20,22 @@ public class GuideHelperImpl implements GuideHelper {
         mGuide = guide;
     }
 
+    /**
+     * Inform the guide helper that the case has happened
+     * @param caseName name of the case that is happened
+     */
+    @Override
+    public void onCaseHappened(String caseName) {
+        if (mGuide.isStarted() && caseName.equals(currentCase())) {
+            mGuide.next();
+        }
+    }
+
+    @Override
+    public boolean isGuideStarted() {
+        return mGuide.isStarted();
+    }
+
     @Override
     public String currentCase() {
         return mGuide.getCurrentCaseKey();

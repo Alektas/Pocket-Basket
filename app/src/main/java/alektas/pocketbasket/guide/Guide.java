@@ -8,8 +8,9 @@ import java.util.List;
 public class Guide implements GuideCase.CaseListener {
     private static final String TAG = "Guide";
     private List<GuideCase> mCases;
-    private int mCurrentCaseNumb;
     private GuideListener mListener;
+    private int mCurrentCaseNumb;
+    private boolean isStarted = false;
 
     public interface GuideListener {
         void onGuideCaseStart(String caseKey);
@@ -50,6 +51,10 @@ public class Guide implements GuideCase.CaseListener {
         return mCases.get(mCurrentCaseNumb).getKey();
     }
 
+    public boolean isStarted() {
+        return isStarted;
+    }
+
     public void start() {
         if (mCurrentCaseNumb != 0) {
             mCases.get(mCurrentCaseNumb).hide();
@@ -57,6 +62,7 @@ public class Guide implements GuideCase.CaseListener {
         }
         try {
             mCases.get(0).show();
+            isStarted = true;
         } catch (NullPointerException e) {
             Log.e(TAG, "to start guide you must add at least one guide case. ", e);
         }
@@ -75,6 +81,7 @@ public class Guide implements GuideCase.CaseListener {
     public void finish() {
         mCases.get(mCurrentCaseNumb).hide();
         mCurrentCaseNumb = 0;
+        isStarted = false;
         mListener.onGuideFinish();
     }
 
