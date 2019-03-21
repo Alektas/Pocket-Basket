@@ -40,11 +40,12 @@ public class Utils {
                 App.getComponent().context().getPackageName());
     }
 
-    public static String getIdName(int id) {
+
+    public static String getResIdName(int id) {
         try {
             return mResources.getResourceEntryName(id);
         } catch (Resources.NotFoundException e) {
-            Log.e(TAG, "getIdName: resource not found: " + id, e);
+            Log.e(TAG, "getResIdName: resource not found: " + id, e);
         }
         return null;
     }

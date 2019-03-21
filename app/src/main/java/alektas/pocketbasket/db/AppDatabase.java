@@ -78,7 +78,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             name + "', " +
                             "null, " +
                             "null, '" +
-                            Utils.getIdName(R.string.other) + "')");
+                            Utils.getResIdName(R.string.other) + "')");
                 }
             }
 

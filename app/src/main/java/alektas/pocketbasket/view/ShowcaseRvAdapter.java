@@ -92,7 +92,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
 
     @Override
     void setChooseIcon(ViewHolder viewHolder, Item item) {
-        if(mModel.isInBasket(item)) {
+        if(mModel.isItemInBasket(item)) {
             viewHolder.mCheckImage.setImageResource(R.drawable.ic_choosed);
         }
         else {

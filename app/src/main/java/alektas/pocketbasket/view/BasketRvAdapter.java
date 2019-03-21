@@ -87,7 +87,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     // add check image to icon of item in basket if item is checked
     @Override
     void setChooseIcon(ViewHolder viewHolder, Item item) {
-        if (mModel.isChecked(item.getName())) {
+        if (mModel.isItemChecked(item.getName())) {
             viewHolder.mCheckImage.setImageResource(R.drawable.ic_checked);
         }
         else {

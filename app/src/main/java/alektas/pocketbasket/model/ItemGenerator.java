@@ -1,7 +1,6 @@
 package alektas.pocketbasket.model;
 
 import android.content.res.Resources;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,13 +119,13 @@ public class ItemGenerator {
     }
 
     private static void addItem(List<Item> items, int nameRes, int imgRes, int tagRes) {
-        String nameIdName = Utils.getIdName(nameRes);
-        String tagIdName = Utils.getIdName(tagRes);
+        String nameIdName = Utils.getResIdName(nameRes);
+        String tagIdName = Utils.getResIdName(tagRes);
         String iconIdName;
         if (imgRes == 0) {
             iconIdName = null;
         } else {
-            iconIdName = Utils.getIdName(imgRes);
+            iconIdName = Utils.getResIdName(imgRes);
         }
 
         String name = Utils.getString(nameRes);

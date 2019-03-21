@@ -23,7 +23,7 @@ import java.util.concurrent.ExecutionException;
 
 public class RepoManager implements Repository, Observer {
     private static final String TAG = "RepoManager";
-    private String mTag = Utils.getIdName(R.string.all);
+    private String mTag = Utils.getResIdName(R.string.all);
     private ItemsDao mItemsDao;
     private MutableLiveData<List<Item>> mShowcaseItems;
     private LiveData<List<Item>> mBasketItems;

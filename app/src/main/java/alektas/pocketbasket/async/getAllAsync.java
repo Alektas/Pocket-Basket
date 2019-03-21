@@ -18,7 +18,7 @@ public class getAllAsync extends AsyncTask<String, Void, List<Item>> {
     protected List<Item> doInBackground(String... tags) {
         if (tags.length == 0
                 || tags[0] == null
-                || tags[0].equals(Utils.getIdName(R.string.all))) return mDao.getItems();
+                || tags[0].equals(Utils.getResIdName(R.string.all))) return mDao.getItems();
         else return mDao.getByTag(tags[0]);
     }
 }

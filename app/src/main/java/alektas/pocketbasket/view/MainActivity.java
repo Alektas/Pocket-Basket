@@ -109,12 +109,11 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         init();
-        handleSearch(getIntent());
-
-        if (mViewModel.isGuideStarted()) mViewModel.finishGuide();
 
         SharedPreferences prefs =
                 getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
+
+        // If it is the first app launch start the Guide
         if (prefs.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
             prefs.edit().putBoolean(getString(R.string.FIRST_START_KEY), false).apply();
             mViewModel.putToBasket(getString(R.string.cabbage));
@@ -125,6 +124,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
+        // Remove focus from search view and hide keyboard
         mSearchView.setQuery("", false);
         View root = findViewById(R.id.root_layout);
         root.requestFocus();
@@ -155,6 +155,7 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
 
+        // Show icons in toolbar menu
         if(menu instanceof MenuBuilder){
             MenuBuilder m = (MenuBuilder) menu;
             m.setOptionalIconsVisible(true);
@@ -165,6 +166,7 @@ public class MainActivity extends AppCompatActivity
 
         // Fetch and store ShareActionProvider
         mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(shareItem);
+        // Log analytic event on share
         mShareActionProvider.setOnShareTargetSelectedListener((source, intent) -> {
             String sharedItems = intent.getStringExtra(Intent.EXTRA_TEXT);
             Bundle bundle = new Bundle();
@@ -172,6 +174,7 @@ public class MainActivity extends AppCompatActivity
             App.getAnalytics().logEvent(FirebaseAnalytics.Event.SHARE, bundle);
             return false;
         });
+        // Put current basket items to share intent
         updateShareIntent(mViewModel.getBasketData().getValue());
 
         return true;
@@ -191,6 +194,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.menu_load_new_ver: {
                 loadNewVersion();
 
+                // Log analytic event
                 Bundle bundle = new Bundle();
                 bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "check for new app version");
                 App.getAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
@@ -207,6 +211,7 @@ public class MainActivity extends AppCompatActivity
                 DialogFragment dialog = new AboutDialog();
                 dialog.show(getSupportFragmentManager(), "AboutDialog");
 
+                // Log analytic event
                 Bundle bundle = new Bundle();
                 bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "read about app");
                 App.getAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
@@ -218,6 +223,7 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    // Used for search handle
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -251,8 +257,7 @@ public class MainActivity extends AppCompatActivity
             mBasketAdapter.setItems(items);
             updateShareIntent(items);
         }));
-        mViewModel.getShowcaseData().observe(this,
-                mShowcaseAdapter::setItems);
+        mViewModel.getShowcaseData().observe(this, mShowcaseAdapter::setItems);
 
         if (isLandscape()) {
             setLandscapeLayout();
@@ -313,9 +318,7 @@ public class MainActivity extends AppCompatActivity
         mCheckAllBtn = findViewById(R.id.check_all_btn);
         mDelAllBtn = findViewById(R.id.del_all_btn);
         mAddBtn.setOnLongClickListener(view -> {
-            if (!isMenuShown) {
-                showFloatingMenu();
-            }
+            if (!isMenuShown) { showFloatingMenu(); }
             return true;
         });
     }
@@ -673,8 +676,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setFilter(int tag) {
-        mViewModel.setFilter(Utils.getIdName(tag));
+        mViewModel.setFilter(Utils.getResIdName(tag));
     }
+
 
     /* Interfaces methods */
 
@@ -733,7 +737,7 @@ public class MainActivity extends AppCompatActivity
                 hideFloatingMenu();
             }
             if (view.getId() == R.id.check_all_btn) {
-                mViewModel.checkAll();
+                mViewModel.checkAllItems();
             }
         }
         else if (view.getId() == R.id.fab){
@@ -822,7 +826,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void onCancelDmBtnClick(View view) {
-        if (isLandscape() && mViewModel.isGuideStarted()) return;
+        if (isLandscape() && mGuideHelper.isGuideStarted()) return;
         mShowcaseAdapter.cancelDel();
     }
 
@@ -990,7 +994,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void addItem(String query) {
-        mViewModel.addNewItem(query, Utils.getIdName(R.string.other));
+        mViewModel.addItem(query);
 
         Bundle search = new Bundle();
         search.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);

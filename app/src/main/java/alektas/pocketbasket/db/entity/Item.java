@@ -33,18 +33,26 @@ public class Item {
         mName = name;
         mNameRes = null;
         mImgRes = null;
-        mTagRes = Utils.getIdName(R.string.all);
+        mTagRes = Utils.getResIdName(R.string.other);
     }
 
     @Ignore
-    public Item(String nameRes, String imgRes, String tagRes) {
+    public Item(@NonNull String name, @NonNull String tagRes) {
+        mName = name;
+        mNameRes = null;
+        mImgRes = null;
+        mTagRes = tagRes;
+    }
+
+    @Ignore
+    public Item(@NonNull String nameRes, String imgRes, @NonNull String tagRes) {
         mNameRes = nameRes;
         mName = nameRes;
         mImgRes = imgRes;
         mTagRes = tagRes;
     }
 
-    public Item(String name, String nameRes, String imgRes, String tagRes) {
+    public Item(@NonNull String name, String nameRes, String imgRes, @NonNull String tagRes) {
         mName = name;
         mNameRes = nameRes;
         mImgRes = imgRes;
