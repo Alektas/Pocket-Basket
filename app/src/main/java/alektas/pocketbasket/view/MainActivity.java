@@ -37,6 +37,9 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -83,6 +86,7 @@ public class MainActivity extends AppCompatActivity
     private View mCategoriesWrapper;
     private FloatingActionButton mAddBtn;
     private SearchView mSearchView;
+    private AdView mAdView;
     private View mDelAllBtn;
     private View mCheckAllBtn;
     private View mCancelDmBtn;
@@ -124,6 +128,26 @@ public class MainActivity extends AppCompatActivity
         mSearchView.setQuery("", false);
         View root = findViewById(R.id.root_layout);
         root.requestFocus();
+
+        if (mAdView != null) {
+            mAdView.resume();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        if (mAdView != null) {
+            mAdView.pause();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mAdView != null) {
+            mAdView.destroy();
+        }
+        super.onDestroy();
     }
 
     @SuppressLint("RestrictedApi")
@@ -235,6 +259,8 @@ public class MainActivity extends AppCompatActivity
         } else {
             setShowcaseMode();
         }
+
+        initAd();
     }
 
     private void initAnimTransition() {
@@ -268,6 +294,18 @@ public class MainActivity extends AppCompatActivity
         mSearchView = findViewById(R.id.menu_search);
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         mSearchView.setIconified(false);
+    }
+
+    private void initAd() {
+        MobileAds.initialize(this, getString(R.string.ad_app_id));
+
+        mAdView = (AdView) findViewById(R.id.adBanner);
+
+        AdRequest request = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+
+        mAdView.loadAd(request);
     }
 
     private void initFloatingActionMenu() {
@@ -471,7 +509,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onGuideFinish() {
                 mSkipGuideBtn.setVisibility(View.INVISIBLE);
-                model.setGuideStarted(false);
+                showAdBanner();
             }
 
             @Override
@@ -618,6 +656,20 @@ public class MainActivity extends AppCompatActivity
         mDelAllBtn.setVisibility(View.INVISIBLE);
 
         isMenuShown = false;
+    }
+
+    private void showAdBanner() {
+        if (mAdView != null) {
+            mAdView.setVisibility(View.VISIBLE);
+            mAdView.resume();
+        }
+    }
+
+    private void hideAdBanner() {
+        if (mAdView != null) {
+            mAdView.pause();
+            mAdView.setVisibility(View.GONE);
+        }
     }
 
     private void setFilter(int tag) {
@@ -910,6 +962,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startGuide() {
+        hideAdBanner();
+
         if (!isLandscape() && !mViewModel.isShowcaseMode()) setShowcaseMode();
         if (mViewModel.isDelMode()) {
             onDelModeDisable();

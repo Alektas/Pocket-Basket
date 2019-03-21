@@ -37,7 +37,7 @@
         android:fillViewport="true"
         android:paddingTop="@dimen/padding_8"
         android:paddingBottom="@dimen/padding_8"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/adBanner"
         app:layout_constraintEnd_toStartOf="@+id/showcase_list"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
@@ -67,7 +67,7 @@
         android:layout_width="@dimen/basket_narrow_size"
         android:layout_height="0dp"
         android:animateLayoutChanges="false"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/adBanner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@+id/showcase_list"
@@ -81,7 +81,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/adBanner"
         app:layout_constraintEnd_toEndOf="@+id/showcase_list"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/showcase_list"
@@ -99,7 +99,7 @@
         android:longClickable="true"
         android:onClick="onFabClick"
         app:srcCompat="@drawable/ic_edit_24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/adBanner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toEndOf="@+id/showcase_list"/>
@@ -135,6 +135,20 @@
         app:layout_constraintEnd_toEndOf="@id/check_all_btn"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@id/check_all_btn"/>
+
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        ads:adSize="SMART_BANNER"
+        ads:adUnitId="@string/ad_banner_test_id"
+        app:layout_constraintTop_toBottomOf="@id/del_mode_panel"
+        ads:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+    </com.google.android.gms.ads.AdView>
+
 
     <!-- Guidelines -->
 

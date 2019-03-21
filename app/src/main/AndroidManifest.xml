@@ -37,6 +37,9 @@
             android:authorities="@string/search_provider_authority"
             android:name="alektas.pocketbasket.ItemsProvider"
             android:exported="false"/>
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/ad_app_id"/>
     </application>
 
 </manifest>
