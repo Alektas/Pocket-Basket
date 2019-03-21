@@ -537,7 +537,9 @@ public class MainActivity extends AppCompatActivity
                 0);
 
         mAddBtn.setVisibility(View.VISIBLE);
-        mCancelDmBtn.setVisibility(View.VISIBLE);
+        mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
+
+        mViewModel.setShowcaseMode(true);
     }
 
     // Set basket or showcase mode in depends of touch moving distance (movX)
@@ -572,6 +574,7 @@ public class MainActivity extends AppCompatActivity
         mAddBtn.setVisibility(View.VISIBLE);
         if (isMenuShown) { hideFloatingMenu(); }
         mDelModePanel.setOrientation(LinearLayout.VERTICAL);
+        mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
 
         mViewModel.setShowcaseMode(false);
     }
@@ -585,6 +588,7 @@ public class MainActivity extends AppCompatActivity
         mAddBtn.setVisibility(View.GONE);
         if (isMenuShown) { hideFloatingMenu(); }
         mDelModePanel.setOrientation(LinearLayout.HORIZONTAL);
+        mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
 
         mViewModel.setShowcaseMode(true);
     }
