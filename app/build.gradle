@@ -12,7 +12,7 @@ android {
         versionCode 3
         resValue "string", "version_name", versionName
         resValue "integer", "version_code", versionCode.toString()
-        resValue "string", "search_provider_authority", "alektas.pocketbasket.ItemsProvider" + versionCode
+//        resValue "string", "search_provider_authority", "alektas.pocketbasket.ItemsProvider" + versionCode
         project.ext.set("archivesBaseName", "PocketBasket-" + defaultConfig.versionName)
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -106,6 +106,8 @@ dependencies {
     implementation 'androidx.room:room-runtime:2.0.0'
     annotationProcessor 'androidx.room:room-compiler:2.0.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+
+    // Firebase
     implementation 'com.google.firebase:firebase-core:16.0.7'
     implementation 'com.google.firebase:firebase-ads:17.2.0'
 
