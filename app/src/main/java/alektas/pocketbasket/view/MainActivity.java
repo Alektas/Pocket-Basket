@@ -25,6 +25,7 @@ import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.widget.SearchView;
 
+import alektas.pocketbasket.BuildConfig;
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
@@ -307,9 +308,18 @@ public class MainActivity extends AppCompatActivity
 
         mAdView = (AdView) findViewById(R.id.adBanner);
 
-        AdRequest request = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                .build();
+        AdRequest request;
+        if (BuildConfig.DEBUG) {
+            mAdView.setAdUnitId(getString(R.string.ad_banner_test_id));
+
+            request = new AdRequest.Builder()
+                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                    .addTestDevice(getString(R.string.ad_test_device_id))
+                    .build();
+        } else {
+            mAdView.setAdUnitId(getString(R.string.ad_banner_id));
+            request = new AdRequest.Builder().build();
+        }
 
         mAdView.loadAd(request);
     }
