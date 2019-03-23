@@ -91,7 +91,6 @@ public class MainActivity extends AppCompatActivity
     private AdView mAdView;
     private View mDelAllBtn;
     private View mCheckAllBtn;
-    private View mCancelDmBtn;
     private View mSkipGuideBtn;
     private BasketRvAdapter mBasketAdapter;
     private ShowcaseRvAdapter mShowcaseAdapter;
@@ -247,7 +246,6 @@ public class MainActivity extends AppCompatActivity
         initDimensions();
 
         mDelModePanel = findViewById(R.id.del_mode_panel);
-        mCancelDmBtn = findViewById(R.id.cancel_dm_btn);
 
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
 
@@ -310,14 +308,11 @@ public class MainActivity extends AppCompatActivity
 
         AdRequest request;
         if (BuildConfig.DEBUG) {
-            mAdView.setAdUnitId(getString(R.string.ad_banner_test_id));
-
             request = new AdRequest.Builder()
                     .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                     .addTestDevice(getString(R.string.ad_test_device_id))
                     .build();
         } else {
-            mAdView.setAdUnitId(getString(R.string.ad_banner_id));
             request = new AdRequest.Builder().build();
         }
 
