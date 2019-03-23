@@ -1,6 +1,24 @@
 apply plugin: 'com.android.application'
 
+// Create a variable called keystorePropertiesFile, and initialize it to
+// keystore.properties file, in the rootProject folder.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+
+// Initialize a new Properties() object called keystoreProperties.
+def keystoreProperties = new Properties()
+
+// Load your keystore.properties file into the keystoreProperties object.
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
+    signingConfigs {
+        config {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
     compileSdkVersion 28
     buildToolsVersion '28.0.3'
     defaultConfig {
@@ -21,12 +39,12 @@ android {
             }
         }
     }
-
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
         debug {
             aaptOptions.cruncherEnabled = false
@@ -38,7 +56,6 @@ android {
             splits.density.enable = false
         }
     }
-
     flavorDimensions "mode"
     productFlavors {
         // When building a variant that uses this flavor, the following configurations
@@ -46,7 +63,6 @@ android {
         dev {
             dimension "mode"
             minSdkVersion 27
-            resConfigs('xxhdpi')
             versionNameSuffix "-dev"
         }
 
@@ -58,7 +74,6 @@ android {
             // Otherwise, all variants use the "dev" flavor configurations.
         }
     }
-
     splits {
 
         // Configures multiple APKs based on screen density.
@@ -72,12 +87,10 @@ android {
             compatibleScreens 'normal', 'large', 'xlarge'
         }
     }
-
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8
     }
-
     dataBinding {
         enabled = true
     }
@@ -103,11 +116,9 @@ dependencies {
     implementation 'androidx.room:room-runtime:2.0.0'
     annotationProcessor 'androidx.room:room-compiler:2.0.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
-
     // Firebase
     implementation 'com.google.firebase:firebase-core:16.0.7'
     implementation 'com.google.firebase:firebase-ads:17.2.0'
-
     implementation 'com.google.dagger:dagger:2.16'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
     testImplementation 'junit:junit:4.12'
