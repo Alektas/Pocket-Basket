@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
@@ -305,7 +306,43 @@ public class MainActivity extends AppCompatActivity
         MobileAds.initialize(this, getString(R.string.ad_app_id));
 
         mAdView = (AdView) findViewById(R.id.adBanner);
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+                showAdBanner();
+            }
 
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                // Code to be executed when an ad request fails.
+                Log.d(TAG, "onAdFailedToLoad: code = " + errorCode);
+                hideAdBanner();
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                // Code to be executed when the user has left the app.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+                hideAdBanner();
+            }
+        });
+
+        updateAd();
+    }
+
+    private void updateAd() {
         AdRequest request;
         if (BuildConfig.DEBUG) {
             request = new AdRequest.Builder()
@@ -672,14 +709,17 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void showAdBanner() {
-        if (mAdView != null) {
+        if (mAdView != null
+                && mAdView.isLoading()
+                && !mGuideHelper.isGuideStarted()
+                && mAdView.getVisibility() != View.VISIBLE) {
             mAdView.setVisibility(View.VISIBLE);
             mAdView.resume();
         }
     }
 
     private void hideAdBanner() {
-        if (mAdView != null) {
+        if (mAdView != null && mAdView.getVisibility() != View.GONE) {
             mAdView.pause();
             mAdView.setVisibility(View.GONE);
         }
