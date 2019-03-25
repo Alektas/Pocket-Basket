@@ -876,7 +876,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void onCancelDmBtnClick(View view) {
-        if (isLandscape() && mGuideHelper.isGuideStarted()) return;
         mShowcaseAdapter.cancelDel();
     }
 
@@ -1021,7 +1020,7 @@ public class MainActivity extends AppCompatActivity
         if (!isLandscape() && !mViewModel.isShowcaseMode()) setShowcaseMode();
         if (mViewModel.isDelMode()) {
             onDelModeDisable();
-            mShowcaseAdapter.notifyDataSetChanged(); // update icons
+            mShowcaseAdapter.notifyDataSetChanged(); // update icons (remove deleting selection)
         }
         mSkipGuideBtn.setVisibility(View.VISIBLE);
         mViewModel.startGuide();

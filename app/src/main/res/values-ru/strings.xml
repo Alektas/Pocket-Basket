@@ -19,7 +19,8 @@
     <string name="guide_move_item">Переместите предмет касанием</string>
     <string name="guide_remove_item">Уберите предмет из корзины свайпом</string>
     <string name="guide_del_mode">Перейдите в режим удаления долгим нажатием</string>
-    <string name="guide_delete_items">Удалите выбранные предметы </string>
+    <string name="guide_delete_items">Удалите предметы или закройте панель</string>
+    <string name="guide_delete_items_sub">Предметы могут быть восстановлены с помощью пункта меню \"Сброс\"</string>
     <string name="guide_floating_menu">Вызовите меню долгим нажатием</string>
     <string name="guide_check_all">Отметить все</string>
     <string name="guide_del_checked">Убрать отмеченные</string>
@@ -27,7 +28,6 @@
     <string name="guide_add_item_sub">или используйте строку поиска</string>
     <string name="guide_move_item_sub">или долгим нажатием по предмету</string>
     <string name="guide_remove_item_sub">или коснитесь его иконки в витрине слева</string>
-    <string name="guide_delete_items_sub">Они могут быть восстановлены с помощью пункта меню \"Сброс\"</string>
     <string name="guide_categ">Это категории</string>
     <string name="guide_categ_sub">Здесь можно выбрать нужный тип товаров</string>
     <string name="guide_showcase">Это витрина</string>

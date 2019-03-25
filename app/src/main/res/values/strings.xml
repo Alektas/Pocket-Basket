@@ -24,7 +24,8 @@
     <string name="guide_move_item">Move item in basket by drag</string>
     <string name="guide_remove_item">Remove item by swipe</string>
     <string name="guide_del_mode">Select for deleting by long press</string>
-    <string name="guide_delete_items">Delete selected items</string>
+    <string name="guide_delete_items">Delete items or close panel</string>
+    <string name="guide_delete_items_sub">Items can be restored by \"Reset\" in the menu</string>
     <string name="guide_floating_menu">Press button to show menu</string>
     <string name="guide_check_all">Check all items</string>
     <string name="guide_del_checked">Delete checked items</string>
@@ -32,7 +33,6 @@
     <string name="guide_add_item_sub">or use search bar</string>
     <string name="guide_move_item_sub">or by long press on item</string>
     <string name="guide_remove_item_sub">or by tap on item in showcase</string>
-    <string name="guide_delete_items_sub">They can be restored by \"Reset\" in the menu</string>
     <string name="guide_categ">This is categories</string>
     <string name="guide_categ_sub">There you can filter items you needed</string>
     <string name="guide_showcase">This is showcase</string>

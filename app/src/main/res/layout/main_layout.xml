@@ -550,9 +550,9 @@
         android:visibility="invisible"
         android:layout_margin="@dimen/padding_8"
         app:srcCompat="@drawable/ic_tap_rot90_cut"
-        app:layout_constraintHorizontal_bias="0.05"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintVertical_bias="0.98"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/del_mode_panel"
         app:layout_constraintStart_toStartOf="@id/del_mode_panel"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/del_mode_panel"/>

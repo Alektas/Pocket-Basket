@@ -111,7 +111,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     public void cancelDel() {
         disableDelMode();
         mDelItems.clear();
-        notifyDataSetChanged();
+        notifyDataSetChanged(); // TODO: replace with point notifier
     }
 
     // add delete image to icon of item in showcase if item is choosed in Delete Mode
