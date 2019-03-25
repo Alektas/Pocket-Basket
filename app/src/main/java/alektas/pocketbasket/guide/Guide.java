@@ -14,6 +14,7 @@ public class Guide implements GuideCase.CaseListener {
 
     public interface GuideListener {
         void onGuideCaseStart(String caseKey);
+        void onGuideStart();
         void onGuideFinish();
     }
 
@@ -56,6 +57,8 @@ public class Guide implements GuideCase.CaseListener {
     }
 
     public void start() {
+        mListener.onGuideStart();
+
         if (mCurrentCaseNumb != 0) {
             mCases.get(mCurrentCaseNumb).hide();
             mCurrentCaseNumb = 0;

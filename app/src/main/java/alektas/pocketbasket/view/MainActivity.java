@@ -553,15 +553,34 @@ public class MainActivity extends AppCompatActivity
 
         guide.setGuideListener(new Guide.GuideListener() {
             @Override
+            public void onGuideStart() {
+                hideAdBanner();
+                if (!isLandscape() && !mViewModel.isShowcaseMode()) setShowcaseMode();
+                if (mViewModel.isDelMode()) {
+                    onDelModeDisable();
+                    mShowcaseAdapter.notifyDataSetChanged(); // update icons (remove deleting selection)
+                }
+                hideFloatingButton();
+                mSkipGuideBtn.setVisibility(View.VISIBLE);
+            }
+
+            @Override
             public void onGuideFinish() {
                 mSkipGuideBtn.setVisibility(View.INVISIBLE);
+                showFloatingButton();
                 showAdBanner();
             }
 
             @Override
             public void onGuideCaseStart(String caseKey) {
-                if (isLandscape() && GuideHelperImpl.GUIDE_CHANGE_MODE.equals(caseKey))
+                // Change mode in the landscape orientation is not allowed
+                // so skip this guide case
+                if (isLandscape() && GuideHelperImpl.GUIDE_CHANGE_MODE.equals(caseKey)) {
                     mGuideHelper.nextCase();
+                }
+                if (GuideHelperImpl.GUIDE_FLOATING_MENU.equals(caseKey)) {
+                    showFloatingButton();
+                }
             }
         });
 
@@ -570,15 +589,15 @@ public class MainActivity extends AppCompatActivity
         model.setGuide(mGuideHelper);
     }
 
+
     /* Layout changes methods */
 
-    @SuppressLint("RestrictedApi")
     private void setLandscapeLayout() {
         changeLayoutSize(mCategWideWidth,
                 WRAP_CONTENT,
                 0);
 
-        mAddBtn.setVisibility(View.VISIBLE);
+        showFloatingButton();
         mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
 
         mViewModel.setShowcaseMode(true);
@@ -607,32 +626,30 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @SuppressLint("RestrictedApi")
     private void setBasketMode() {
+        mViewModel.setShowcaseMode(false);
+
         changeLayoutSize(mCategNarrowWidth,
                 mShowcaseNarrowWidth,
                 0);
 
-        mAddBtn.setVisibility(View.VISIBLE);
+        showFloatingButton();
         if (isMenuShown) { hideFloatingMenu(); }
         mDelModePanel.setOrientation(LinearLayout.VERTICAL);
         mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
-
-        mViewModel.setShowcaseMode(false);
     }
 
-    @SuppressLint("RestrictedApi")
     private void setShowcaseMode() {
+        mViewModel.setShowcaseMode(true);
+
         changeLayoutSize(mCategWideWidth,
                 0,
                 mBasketNarrowWidth);
 
-        mAddBtn.setVisibility(View.GONE);
+        hideFloatingButton();
         if (isMenuShown) { hideFloatingMenu(); }
         mDelModePanel.setOrientation(LinearLayout.HORIZONTAL);
         mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
-
-        mViewModel.setShowcaseMode(true);
     }
 
     // Set layouts' size in depends of touch moving distance (movX)
@@ -686,6 +703,19 @@ public class MainActivity extends AppCompatActivity
         } else {
             return maxSize;
         }
+    }
+
+    @SuppressLint("RestrictedApi")
+    private void showFloatingButton() {
+        if (!mGuideHelper.isGuideStarted() && !mViewModel.isShowcaseMode()
+                || GuideHelperImpl.GUIDE_FLOATING_MENU.equals(mGuideHelper.currentCase())
+                || GuideHelperImpl.GUIDE_FLOATING_MENU_HELP.equals(mGuideHelper.currentCase()))
+        mAddBtn.setVisibility(View.VISIBLE);
+    }
+
+    @SuppressLint("RestrictedApi")
+    private void hideFloatingButton() {
+        mAddBtn.setVisibility(View.GONE);
     }
 
     private void showFloatingMenu() {
@@ -1015,14 +1045,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void startGuide() {
-        hideAdBanner();
-
-        if (!isLandscape() && !mViewModel.isShowcaseMode()) setShowcaseMode();
-        if (mViewModel.isDelMode()) {
-            onDelModeDisable();
-            mShowcaseAdapter.notifyDataSetChanged(); // update icons (remove deleting selection)
-        }
-        mSkipGuideBtn.setVisibility(View.VISIBLE);
         mViewModel.startGuide();
     }
 
