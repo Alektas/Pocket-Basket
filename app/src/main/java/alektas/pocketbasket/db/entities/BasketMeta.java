@@ -1,4 +1,4 @@
-package alektas.pocketbasket.db.entity;
+package alektas.pocketbasket.db.entities;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

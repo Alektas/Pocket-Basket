@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import androidx.annotation.NonNull;
 

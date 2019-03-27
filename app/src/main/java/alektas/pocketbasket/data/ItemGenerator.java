@@ -1,4 +1,4 @@
-package alektas.pocketbasket.model;
+package alektas.pocketbasket.data;
 
 import android.content.res.Resources;
 
@@ -8,7 +8,7 @@ import java.util.List;
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.Utils;
-import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.db.entities.Item;
 
 public class ItemGenerator {
     private static final String TAG = "ItemGenerator";

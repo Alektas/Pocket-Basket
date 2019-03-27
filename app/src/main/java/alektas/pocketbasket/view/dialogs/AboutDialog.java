@@ -1,4 +1,4 @@
-package alektas.pocketbasket.view;
+package alektas.pocketbasket.view.dialogs;
 
 import android.app.Dialog;
 import android.os.Bundle;

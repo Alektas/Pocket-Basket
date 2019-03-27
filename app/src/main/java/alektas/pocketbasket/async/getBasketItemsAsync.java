@@ -4,10 +4,8 @@ import android.os.AsyncTask;
 
 import java.util.List;
 
-import alektas.pocketbasket.R;
-import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.db.dao.ItemsDao;
-import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.db.entities.Item;
 
 public class getBasketItemsAsync extends AsyncTask<Void, Void, List<Item>> {
     private ItemsDao mDao;

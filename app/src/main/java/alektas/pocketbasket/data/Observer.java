@@ -1,4 +1,4 @@
-package alektas.pocketbasket.model;
+package alektas.pocketbasket.data;
 
 public interface Observer {
     void update();

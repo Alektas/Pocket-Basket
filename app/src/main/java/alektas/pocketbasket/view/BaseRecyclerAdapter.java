@@ -1,7 +1,6 @@
 package alektas.pocketbasket.view;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,7 @@ import java.util.List;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.databinding.ItemViewBinding;
 import alektas.pocketbasket.databinding.BasketItemViewBinding;
-import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;

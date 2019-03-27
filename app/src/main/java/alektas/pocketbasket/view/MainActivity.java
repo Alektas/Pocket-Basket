@@ -26,6 +26,8 @@ import android.transition.TransitionManager;
 import android.widget.SearchView;
 
 import alektas.pocketbasket.BuildConfig;
+import alektas.pocketbasket.view.dialogs.AboutDialog;
+import alektas.pocketbasket.view.dialogs.ResetDialog;
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
@@ -51,7 +53,7 @@ import java.util.List;
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
-import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideCase;

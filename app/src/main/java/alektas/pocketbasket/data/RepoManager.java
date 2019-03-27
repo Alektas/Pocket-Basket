@@ -1,11 +1,11 @@
-package alektas.pocketbasket.model;
+package alektas.pocketbasket.data;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.async.getAllAsync;
 import alektas.pocketbasket.async.getBasketItemsAsync;
 import alektas.pocketbasket.async.insertAllAsync;
-import alektas.pocketbasket.db.entity.BasketMeta;
+import alektas.pocketbasket.db.entities.BasketMeta;
 import androidx.lifecycle.LiveData;
 
 import android.content.Context;
@@ -15,7 +15,7 @@ import androidx.annotation.NonNull;
 
 import alektas.pocketbasket.db.AppDatabase;
 import alektas.pocketbasket.db.dao.ItemsDao;
-import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.db.entities.Item;
 import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;

@@ -1,11 +1,11 @@
-package alektas.pocketbasket.model;
+package alektas.pocketbasket.data;
 
-import alektas.pocketbasket.db.entity.BasketMeta;
+import alektas.pocketbasket.db.entities.BasketMeta;
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
-import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.db.entities.Item;
 
 public interface Repository {
     BasketMeta getItemMeta(String name);

@@ -3,8 +3,8 @@ package alektas.pocketbasket.db;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.async.insertAllAsync;
-import alektas.pocketbasket.db.entity.BasketMeta;
-import alektas.pocketbasket.model.Observer;
+import alektas.pocketbasket.db.entities.BasketMeta;
+import alektas.pocketbasket.data.Observer;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.room.Database;
@@ -17,9 +17,9 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 
-import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.db.dao.ItemsDao;
-import alektas.pocketbasket.model.ItemGenerator;
+import alektas.pocketbasket.data.ItemGenerator;
 
 @Database(entities = {Item.class, BasketMeta.class}, version = 8)
 public abstract class AppDatabase extends RoomDatabase {

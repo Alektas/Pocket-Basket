@@ -7,9 +7,9 @@ import android.util.Log;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import alektas.pocketbasket.App;
-import alektas.pocketbasket.db.entity.BasketMeta;
+import alektas.pocketbasket.db.entities.BasketMeta;
 import alektas.pocketbasket.guide.GuideHelperImpl;
-import alektas.pocketbasket.model.Repository;
+import alektas.pocketbasket.data.Repository;
 import alektas.pocketbasket.guide.GuideHelper;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -18,8 +18,8 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import alektas.pocketbasket.db.entity.Item;
-import alektas.pocketbasket.model.RepoManager;
+import alektas.pocketbasket.db.entities.Item;
+import alektas.pocketbasket.data.RepoManager;
 
 public class ItemsViewModel extends AndroidViewModel {
     private static final String TAG = "ItemsViewModel";

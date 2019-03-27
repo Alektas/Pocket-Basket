@@ -1,6 +1,6 @@
 package alektas.pocketbasket.db.dao;
 
-import alektas.pocketbasket.db.entity.BasketMeta;
+import alektas.pocketbasket.db.entities.BasketMeta;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -12,7 +12,7 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.db.entities.Item;
 
 @Dao
 public abstract class ItemsDao {

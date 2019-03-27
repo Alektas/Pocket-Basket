@@ -14,7 +14,7 @@ import java.util.Collections;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.databinding.BasketItemViewBinding;
-import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 
 import androidx.annotation.NonNull;
