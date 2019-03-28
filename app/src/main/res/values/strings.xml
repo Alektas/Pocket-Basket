@@ -14,7 +14,13 @@
     <string name="about_title" translatable="false">@string/app_name</string>
     <string name="about_developer">Developer: Alektas</string>
     <string name="about_email" translatable="false">alektas@inbox.ru</string>
-    <string name="version">Version: %s</string>
+    <string name="about_license">(license)</string>
+    <string name="about_google_material" translatable="false">- Google Material</string>
+    <string name="about_bomsymbols" translatable="false">- BomSymbols</string>
+    <string name="about_jeff_portaro" translatable="false">- Jeff Portaro</string>
+    <string name="about_alektas" translatable="false">- Alektas</string>
+    <string name="about_icons_by">Icons by:</string>
+    <string name="about_version">Version: %s</string>
 
     <string name="guide">Help</string>
     <string name="skip">Skip</string>
@@ -40,5 +46,10 @@
     <string name="guide_basket">This is basket</string>
     <string name="guide_basket_sub">There you keep items from showcase</string>
     <string name="guide_change_mode_sub">Just swipe left</string>
+    <string name="apache_license_link" translatable="false">https://www.apache.org/licenses/LICENSE-2.0.html</string>
+    <string name="cc_license_link" translatable="false">http://creativecommons.org/licenses/by/3.0/</string>
+    <string name="jeff_link" translatable="false">https://pixelbuddha.net/freebie/touch-gestures-icons</string>
+    <string name="bom_link" translatable="false">https://www.iconfinder.com/korawan_m</string>
+    <string name="google_material_link" translatable="false">https://material.io/tools/icons/</string>
 
 </resources>

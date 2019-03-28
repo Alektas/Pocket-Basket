@@ -7,7 +7,7 @@
     <string name="reset">Сброс</string>
     <string name="about_app">О приложении</string>
     <string name="about_msg">Pocket Basket это приложение для составления списка продуктов.</string>
-    <string name="version">"Версия: %s"</string>
+    <string name="about_version">"Версия: %s"</string>
     <string name="share">Поделиться</string>
     <string name="update">Обновить</string>
     <string name="share_intro">Нужны товары:</string>
@@ -36,5 +36,7 @@
     <string name="guide_basket_sub">Здесь хранятся выбранные из витрины товары</string>
     <string name="guide_change_mode_sub">Просто проведите пальцем влево</string>
     <string name="about_developer">Разработчик: Alektas</string>
+    <string name="about_icons_by">Иконки:</string>
+    <string name="about_license">(лицензия)</string>
 
 </resources>

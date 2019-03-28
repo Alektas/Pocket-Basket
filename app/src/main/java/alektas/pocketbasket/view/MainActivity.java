@@ -806,7 +806,7 @@ public class MainActivity extends AppCompatActivity
         return basketTextMarginEnd;
     }
 
-    /* On buttons click methods */
+    /* On click methods */
 
     public void onFabClick(View view) {
         mViewModel.onFabClick();
@@ -909,6 +909,42 @@ public class MainActivity extends AppCompatActivity
 
     public void onCancelDmBtnClick(View view) {
         mShowcaseAdapter.cancelDel();
+    }
+
+    public void onLinkClick(View view) {
+        String link = null;
+
+        switch (view.getId()) {
+            case R.id.apache_link:
+            case R.id.apache2_link: {
+                link = getString(R.string.apache_license_link);
+                break;
+            }
+
+            case R.id.cc_link: {
+                link = getString(R.string.cc_license_link);
+                break;
+            }
+
+            case R.id.jeff_link: {
+                link = getString(R.string.jeff_link);
+                break;
+            }
+
+            case R.id.bom_link: {
+                link = getString(R.string.bom_link);
+                break;
+            }
+
+            case R.id.google_link: {
+                link = getString(R.string.google_material_link);
+                break;
+            }
+        }
+
+        if (link == null) return;
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+        startActivity(browserIntent);
     }
 
     /* Touch events */
