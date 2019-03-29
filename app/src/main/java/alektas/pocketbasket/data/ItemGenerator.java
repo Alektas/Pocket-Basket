@@ -32,22 +32,22 @@ public class ItemGenerator {
 
         addItem(sItems, R.string.milk, R.drawable.ic_milk, R.string.milky);
         addItem(sItems, R.string.curd, R.drawable.ic_curd, R.string.milky);
-        addItem(sItems, R.string.sour_cream, 0, R.string.milky);
+        addItem(sItems, R.string.sour_cream, R.drawable.ic_sourcream, R.string.milky);
         addItem(sItems, R.string.cheese, R.drawable.ic_cheese, R.string.milky);
         addItem(sItems, R.string.kefir, 0, R.string.milky);
         addItem(sItems, R.string.yogurt, 0, R.string.milky);
 
-        addItem(sItems, R.string.ice_cream, 0, R.string.sweets);
+        addItem(sItems, R.string.ice_cream, R.drawable.ic_icecream, R.string.sweets);
         addItem(sItems, R.string.cookies, R.drawable.ic_cookies, R.string.sweets);
         addItem(sItems, R.string.pie, 0, R.string.sweets);
         addItem(sItems, R.string.cake, 0, R.string.sweets);
         addItem(sItems, R.string.gingerbread, 0, R.string.sweets);
         addItem(sItems, R.string.waffles, 0, R.string.sweets);
         addItem(sItems, R.string.candies, 0, R.string.sweets);
-        addItem(sItems, R.string.sugar, 0, R.string.sweets);
+        addItem(sItems, R.string.sugar, R.drawable.ic_sugar, R.string.sweets);
         addItem(sItems, R.string.condensed_milk, 0, R.string.sweets);
 
-        addItem(sItems, R.string.brown_bread, 0, R.string.floury);
+        addItem(sItems, R.string.brown_bread, R.drawable.ic_black_bread, R.string.floury);
         addItem(sItems, R.string.white_bread, R.drawable.ic_white_bread, R.string.floury);
         addItem(sItems, R.string.pasta, R.drawable.ic_pasta, R.string.floury);
         addItem(sItems, R.string.flour, 0, R.string.floury);
@@ -74,7 +74,7 @@ public class ItemGenerator {
 
         addItem(sItems, R.string.rice, R.drawable.ic_rice, R.string.groats);
         addItem(sItems, R.string.oatmeal, 0, R.string.groats);
-        addItem(sItems, R.string.buckwheat, 0, R.string.groats);
+        addItem(sItems, R.string.buckwheat, R.drawable.ic_buckwheat, R.string.groats);
         addItem(sItems, R.string.peas, 0, R.string.groats);
         addItem(sItems, R.string.wheat_groats, 0, R.string.groats);
         addItem(sItems, R.string.millet_groats, 0, R.string.groats);
@@ -82,13 +82,13 @@ public class ItemGenerator {
         addItem(sItems, R.string.barley_groats, 0, R.string.groats);
 
         addItem(sItems, R.string.pork, 0, R.string.meat);
-        addItem(sItems, R.string.chicken, 0, R.string.meat);
+        addItem(sItems, R.string.chicken, R.drawable.ic_chicken, R.string.meat);
         addItem(sItems, R.string.beef, R.drawable.ic_beef, R.string.meat);
         addItem(sItems, R.string.sausage, R.drawable.ic_sausage, R.string.meat);
 
         addItem(sItems, R.string.fish, R.drawable.ic_fish, R.string.seafood);
 
-        addItem(sItems, R.string.butter, 0, R.string.sauce_n_oil);
+        addItem(sItems, R.string.butter, R.drawable.ic_butter, R.string.sauce_n_oil);
         addItem(sItems, R.string.seed_oil, 0, R.string.sauce_n_oil);
         addItem(sItems, R.string.mayo, 0, R.string.sauce_n_oil);
         addItem(sItems, R.string.ketchup, 0, R.string.sauce_n_oil);
@@ -102,14 +102,17 @@ public class ItemGenerator {
         addItem(sItems, R.string.gloves, 0, R.string.household);
         addItem(sItems, R.string.rags, 0, R.string.household);
         addItem(sItems, R.string.toothpaste, 0, R.string.household);
+        addItem(sItems, R.string.garbage_bags, 0, R.string.household);
+        addItem(sItems, R.string.plastic_bags, 0, R.string.household);
+        addItem(sItems, R.string.washing_powder, 0, R.string.household);
 
-        addItem(sItems, R.string.dumplings, 0, R.string.semis);
+        addItem(sItems, R.string.dumplings, R.drawable.ic_dumplings, R.string.semis);
         addItem(sItems, R.string.cutlets, 0, R.string.semis);
         addItem(sItems, R.string.canned_food, 0, R.string.semis);
         addItem(sItems, R.string.frozen_vegetables, 0, R.string.semis);
 
         addItem(sItems, R.string.mushrooms, R.drawable.ic_mushroom, R.string.other);
-        addItem(sItems, R.string.egg, 0, R.string.other);
+        addItem(sItems, R.string.eggs, R.drawable.ic_eggs, R.string.other);
         addItem(sItems, R.string.salt, R.drawable.ic_salt, R.string.other);
         addItem(sItems, R.string.cigarettes, 0, R.string.other);
         addItem(sItems, R.string.soda, 0, R.string.other);

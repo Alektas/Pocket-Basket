@@ -165,11 +165,11 @@
                           <map>
                             <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="005005" />
-                            <entry key="height" value="91" />
-                            <entry key="outputName" value="ic_pizza" />
+                            <entry key="height" value="192" />
+                            <entry key="outputName" value="ic_sourcream" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="D:\YandexDisk\Изображения\icons\Food Set 3\SVG\91\2427861 - fast food food italian food junk food pizza.svg" />
-                            <entry key="width" value="91" />
+                            <entry key="sourceFile" value="D:\YandexDisk\Изображения\icons\vector\ic_sourcream.svg" />
+                            <entry key="width" value="192" />
                           </map>
                         </option>
                       </PersistentState>

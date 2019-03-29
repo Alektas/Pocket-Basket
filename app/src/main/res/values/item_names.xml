@@ -35,7 +35,7 @@
     <string name="seed_oil">Seed oil</string>
     <string name="mayo">Mayo</string>
     <string name="ketchup">Ketchup</string>
-    <string name="egg">Egg</string>
+    <string name="eggs">Egg</string>
     <string name="salt">Salt</string>
     <string name="sugar">Sugar</string>
     <string name="soap">Soap</string>
@@ -83,5 +83,8 @@
     <string name="millet_groats">Millet groats</string>
     <string name="corn_grits">Corn grits</string>
     <string name="barley_groats">Barley groats</string>
+    <string name="garbage_bags">Garbage bags</string>
+    <string name="plastic_bags">Plastic bags</string>
+    <string name="washing_powder">Washing powder</string>
 
 </resources>
