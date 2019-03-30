@@ -160,6 +160,13 @@ public class ItemsViewModel extends AndroidViewModel {
         mRepoManager.resetShowcase(fullReset);
     }
 
+    /**
+     * Update all items, including icons, that were added in new versions
+     */
+    public void updateAllItems() {
+        mRepoManager.updateAll();
+    }
+
 
     /* Data getters */
 

@@ -117,6 +117,14 @@ public class MainActivity extends AppCompatActivity
         SharedPreferences prefs =
                 getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
 
+        // Update items in database when other app version is launched.
+        // It allow to display correct icons, which were added or removed in other version.
+        int vc = Utils.getVersionCode();
+        if (prefs.getInt(getString(R.string.VERSION_CODE_KEY), 1) != vc) {
+            prefs.edit().putInt(getString(R.string.VERSION_CODE_KEY), vc).apply();
+            mViewModel.updateAllItems();
+        }
+
         // If it is the first app launch start the Guide
         if (prefs.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
             prefs.edit().putBoolean(getString(R.string.FIRST_START_KEY), false).apply();

@@ -5,6 +5,7 @@ import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.async.getAllAsync;
 import alektas.pocketbasket.async.getBasketItemsAsync;
 import alektas.pocketbasket.async.insertAllAsync;
+import alektas.pocketbasket.async.updateAllAsync;
 import alektas.pocketbasket.db.entities.BasketMeta;
 import androidx.lifecycle.LiveData;
 
@@ -121,6 +122,10 @@ public class RepoManager implements Repository, Observer {
         }
     }
 
+    @Override
+    public void updateAll() {
+        new updateAllAsync(mItemsDao, this).execute(ItemGenerator.getAll());
+    }
 
     // Set value to Showcase LiveData to notify observers
     @Override

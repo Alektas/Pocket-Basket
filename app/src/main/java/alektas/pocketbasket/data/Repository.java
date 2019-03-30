@@ -22,6 +22,7 @@ public interface Repository {
     void deleteItems(List<Item> item);
     void setFilter(String tag);
     void resetShowcase(boolean fullReset);
+    void updateAll();
     List<Item> getItems();
     List<Item> getItems(String tag);
 
