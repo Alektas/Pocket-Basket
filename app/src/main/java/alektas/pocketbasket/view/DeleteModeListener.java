@@ -1,6 +1,6 @@
 package alektas.pocketbasket.view;
 
-interface DeleteModeListener {
+public interface DeleteModeListener {
     void onDelModeEnable();
     void onDelModeDisable();
 }

@@ -1,4 +1,4 @@
-package alektas.pocketbasket.view;
+package alektas.pocketbasket.view.rvadapters;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
@@ -15,6 +15,9 @@ import java.util.Collections;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.databinding.BasketItemViewBinding;
 import alektas.pocketbasket.db.entities.Item;
+import alektas.pocketbasket.view.ItemSizeProvider;
+import alektas.pocketbasket.view.ItemTouchAdapter;
+import alektas.pocketbasket.view.OnStartDragListener;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 
 import androidx.annotation.NonNull;
@@ -31,7 +34,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     private final int mItemWidth;
     private int marginEnd;
 
-    BasketRvAdapter(Context context, ItemsViewModel model,
+    public BasketRvAdapter(Context context, ItemsViewModel model,
                     OnStartDragListener dragListener,
                     ItemSizeProvider itemSizeProvider) {
         super(context, model);

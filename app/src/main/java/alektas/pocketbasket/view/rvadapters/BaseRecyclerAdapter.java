@@ -1,4 +1,4 @@
-package alektas.pocketbasket.view;
+package alektas.pocketbasket.view.rvadapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

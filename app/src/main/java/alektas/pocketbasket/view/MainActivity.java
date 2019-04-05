@@ -28,6 +28,8 @@ import android.widget.SearchView;
 import alektas.pocketbasket.BuildConfig;
 import alektas.pocketbasket.view.dialogs.AboutDialog;
 import alektas.pocketbasket.view.dialogs.ResetDialog;
+import alektas.pocketbasket.view.rvadapters.BasketRvAdapter;
+import alektas.pocketbasket.view.rvadapters.ShowcaseRvAdapter;
 import androidx.annotation.NonNull;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;

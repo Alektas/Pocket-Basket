@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import alektas.pocketbasket.App;
+import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.db.entities.BasketMeta;
 import alektas.pocketbasket.guide.GuideHelperImpl;
 import alektas.pocketbasket.data.Repository;
@@ -19,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.db.entities.Item;
-import alektas.pocketbasket.data.RepoManager;
 
 public class ItemsViewModel extends AndroidViewModel {
     private static final String TAG = "ItemsViewModel";
@@ -33,7 +33,7 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public ItemsViewModel(@NonNull Application application) {
         super(application);
-        mRepoManager = new RepoManager(application);
+        mRepoManager = new RepositoryImpl(application);
         mShowcaseData = mRepoManager.getShowcaseData();
         mBasketData = mRepoManager.getBasketData();
         mDelItems = new ArrayList<>();

@@ -1,4 +1,4 @@
-package alektas.pocketbasket.view;
+package alektas.pocketbasket.view.rvadapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -10,6 +10,8 @@ import java.util.List;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.db.entities.Item;
+import alektas.pocketbasket.view.DeleteModeListener;
+import alektas.pocketbasket.view.ItemSizeProvider;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import androidx.annotation.NonNull;
 
@@ -20,7 +22,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     private List<Item> mDelItems;
     private int mItemWidth;
 
-    ShowcaseRvAdapter(Context context,
+    public ShowcaseRvAdapter(Context context,
                       DeleteModeListener delModeListener,
                       ItemSizeProvider itemSizeProvider,
                       @NonNull ItemsViewModel model) {

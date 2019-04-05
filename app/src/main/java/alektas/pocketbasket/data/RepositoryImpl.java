@@ -22,14 +22,14 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class RepoManager implements Repository, Observer {
-    private static final String TAG = "RepoManager";
+public class RepositoryImpl implements Repository, Observer {
+    private static final String TAG = "RepositoryImpl";
     private String mTag = Utils.getResIdName(R.string.all);
     private ItemsDao mItemsDao;
     private MutableLiveData<List<Item>> mShowcaseItems;
     private LiveData<List<Item>> mBasketItems;
 
-    public RepoManager(Context context) {
+    public RepositoryImpl(Context context) {
         mShowcaseItems = new MutableLiveData<>();
         mItemsDao = AppDatabase.getInstance(context, this).getDao();
         update();
