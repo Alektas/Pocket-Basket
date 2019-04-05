@@ -3,7 +3,10 @@ package alektas.pocketbasket;
 import android.content.res.Resources;
 import android.util.Log;
 
+import java.util.Locale;
+
 import alektas.pocketbasket.db.entities.Item;
+import androidx.annotation.NonNull;
 
 public class Utils {
     private static final String TAG = "Utils";
@@ -21,44 +24,48 @@ public class Utils {
         return mResources.getString(stringResId);
     }
 
-    public static String getString(String stringResName) {
+    public static String getString(@NonNull String stringResName) {
         return getString(getStringId(stringResName));
     }
 
-    public static int getResId(String idName, String type) {
-        if (idName == null) return 0;
-        return mResources.getIdentifier(idName,
+    public static int getResId(String resName, String type) {
+        if (resName == null) return 0;
+        return mResources.getIdentifier(resName,
                 type,
                 App.getComponent().context().getPackageName());
     }
 
-    public static int getImgId(String idName) {
-        if (idName == null) return 0;
-        return mResources.getIdentifier(idName,
+    public static int getImgId(String imgResName) {
+        if (imgResName == null) return 0;
+        return mResources.getIdentifier(imgResName,
                 "drawable",
                 App.getComponent().context().getPackageName());
     }
 
-    public static int getStringId(String idName) {
-        if (idName == null) return 0;
-        return mResources.getIdentifier(idName,
+    public static int getStringId(String stringResName) {
+        if (stringResName == null) return 0;
+        return mResources.getIdentifier(stringResName,
                 "string",
                 App.getComponent().context().getPackageName());
     }
 
 
-    public static String getResIdName(int id) {
+    public static String getResIdName(int resId) {
         try {
-            return mResources.getResourceEntryName(id);
+            return mResources.getResourceEntryName(resId);
         } catch (Resources.NotFoundException e) {
-            Log.e(TAG, "getResIdName: resource not found: " + id, e);
+            Log.e(TAG, "getResIdName: resource not found: " + resId, e);
         }
         return null;
     }
 
-    public static String getDisplayName(Item item) {
+    public static String getDisplayName(@NonNull Item item) {
         if (item.getNameRes() == null) return item.getName();
         return getString(item.getNameRes());
+    }
+
+    public static Locale getCurrentLocale(){
+        return Locale.getDefault();
     }
 
     public static long measureProcessTime(Measurable process) {
