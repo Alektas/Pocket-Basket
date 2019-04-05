@@ -11,6 +11,7 @@ import java.util.List;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.Utils;
+import alektas.pocketbasket.data.ItemGenerator;
 import alektas.pocketbasket.data.Repository;
 import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.db.entities.BasketMeta;
@@ -189,7 +190,8 @@ public class ItemsViewModel extends AndroidViewModel {
      * @param fullReset if true delete all user items
      */
     public void resetShowcase(boolean fullReset) {
-        mRepoManager.resetShowcase(fullReset);
+        if (fullReset) mRepoManager.resetShowcase();
+        else mRepoManager.insertAll(ItemGenerator.getAll());
     }
 
     /**
