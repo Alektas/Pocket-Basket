@@ -10,10 +10,6 @@ import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
-import java.util.List;
-
-import alektas.pocketbasket.db.entities.Item;
-
 @Dao
 public abstract class ItemsDao {
     private static final String TAG = "ItemsDao";

@@ -34,6 +34,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.BuildConfig;
@@ -124,11 +125,22 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences prefs =
                 getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
 
-        // Update items in database when other app version is launched.
-        // It allow to display correct icons, which were added or removed in other version.
+        /* Update items in database when other app version is launched or locale is changed.
+        It allow to display correct icons, which were added or removed in other version,
+        and correct item names */
+        String curLang = Utils.getCurrentLocale().getLanguage();
+        String savedLang = prefs.getString(getString(R.string.LOCALE_KEY), "lang");
+        if (savedLang == null) savedLang = "lang";
+
         int vc = Utils.getVersionCode();
-        if (prefs.getInt(getString(R.string.VERSION_CODE_KEY), 1) != vc) {
-            prefs.edit().putInt(getString(R.string.VERSION_CODE_KEY), vc).apply();
+        boolean isVersionChanged =
+                prefs.getInt(getString(R.string.VERSION_CODE_KEY), 1) != vc;
+
+        if (!savedLang.equals(curLang) || isVersionChanged) {
+            prefs.edit()
+                    .putString(getString(R.string.LOCALE_KEY), curLang)
+                    .putInt(getString(R.string.VERSION_CODE_KEY), vc)
+                    .apply();
             mViewModel.updateAllItems();
         }
 
