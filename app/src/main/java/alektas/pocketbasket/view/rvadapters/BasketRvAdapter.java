@@ -41,7 +41,10 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
         mContext = context;
         mModel = model;
         mDragListener = dragListener;
+        // Fix item width
+        // Width depends on configuration (landscape or portrait)
         mItemWidth = itemSizeProvider.getBasketItemWidth();
+        // Text margin to avoid overlapping the drag handler
         marginEnd = itemSizeProvider.getBasketTextMarginEnd();
     }
 
@@ -64,18 +67,16 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     public void onViewAttachedToWindow(@NonNull ViewHolder viewHolder) {
         super.onViewAttachedToWindow(viewHolder);
 
-        if (viewHolder != null) {
-            viewHolder.mDragHandle.setOnTouchListener((v, event) -> {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    mDragListener.onStartDrag(viewHolder);
-                }
-                return false;
-            });
+        viewHolder.mDragHandle.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                mDragListener.onStartDrag(viewHolder);
+            }
+            return false;
+        });
 
-            viewHolder.mIconView.setOnClickListener(v -> {
-                mModel.checkItem(getItems().get(viewHolder.getAdapterPosition()).getName());
-            });
-        }
+        viewHolder.mIconView.setOnClickListener(v -> {
+            mModel.checkItem(getItems().get(viewHolder.getAdapterPosition()).getName());
+        });
     }
 
     @SuppressLint("ClickableViewAccessibility")

@@ -30,6 +30,8 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
         mDMListener = delModeListener;
         mModel = model;
         mDelItems = model.getDelItems();
+        // Fix item width
+        // Width depends on configuration (landscape or portrait)
         mItemWidth = itemSizeProvider.getItemWidth();
     }
 
