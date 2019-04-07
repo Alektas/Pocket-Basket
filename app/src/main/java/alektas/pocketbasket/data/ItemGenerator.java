@@ -19,13 +19,13 @@ public class ItemGenerator {
     public static List<Item> getAll() {
         if (sItems != null) return sItems;
         sItems = new ArrayList<>();
-        addItem(sItems, R.string.lemonade, 0, R.string.drink);
+        addItem(sItems, R.string.lemonade, R.drawable.ic_lemonade, R.string.drink);
         addItem(sItems, R.string.juice, 0, R.string.drink);
         addItem(sItems, R.string.tea, R.drawable.ic_tea, R.string.drink);
         addItem(sItems, R.string.coffee, R.drawable.ic_coffee, R.string.drink);
         addItem(sItems, R.string.cacao, 0, R.string.drink);
         addItem(sItems, R.string.beer, 0, R.string.drink);
-        addItem(sItems, R.string.wine, 0, R.string.drink);
+        addItem(sItems, R.string.wine, R.drawable.ic_wine, R.string.drink);
         addItem(sItems, R.string.vodka, 0, R.string.drink);
         addItem(sItems, R.string.chicory, 0, R.string.drink);
         addItem(sItems, R.string.water, 0, R.string.drink);
@@ -76,7 +76,7 @@ public class ItemGenerator {
         addItem(sItems, R.string.oatmeal, 0, R.string.groats);
         addItem(sItems, R.string.buckwheat, R.drawable.ic_buckwheat, R.string.groats);
         addItem(sItems, R.string.peas, 0, R.string.groats);
-        addItem(sItems, R.string.wheat_groats, 0, R.string.groats);
+        addItem(sItems, R.string.wheat_groats, R.drawable.ic_wheat, R.string.groats);
         addItem(sItems, R.string.millet_groats, 0, R.string.groats);
         addItem(sItems, R.string.corn_grits, 0, R.string.groats);
         addItem(sItems, R.string.barley_groats, 0, R.string.groats);
@@ -89,7 +89,7 @@ public class ItemGenerator {
         addItem(sItems, R.string.fish, R.drawable.ic_fish, R.string.seafood);
 
         addItem(sItems, R.string.butter, R.drawable.ic_butter, R.string.sauce_n_oil);
-        addItem(sItems, R.string.seed_oil, 0, R.string.sauce_n_oil);
+        addItem(sItems, R.string.seed_oil, R.drawable.ic_oil, R.string.sauce_n_oil);
         addItem(sItems, R.string.mayo, 0, R.string.sauce_n_oil);
         addItem(sItems, R.string.ketchup, 0, R.string.sauce_n_oil);
 
