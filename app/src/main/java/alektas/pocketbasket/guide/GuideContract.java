@@ -1,6 +1,7 @@
 package alektas.pocketbasket.guide;
 
-public class GuideHelperImpl implements GuideHelper {
+public class GuideContract {
+
     public static final String GUIDE_CHANGE_MODE = "change_mode_case";
     public static final String GUIDE_ADD_ITEM = "add_item_case";
     public static final String GUIDE_CHECK_ITEM = "check_item_case";
@@ -14,45 +15,5 @@ public class GuideHelperImpl implements GuideHelper {
     public static final String GUIDE_BASKET_HELP = "basket_help_case";
     public static final String GUIDE_SHOWCASE_HELP = "showcase_help_case";
     public static final String GUIDE_CATEGORIES_HELP = "categories_help_case";
-    private Guide mGuide;
 
-    public GuideHelperImpl(Guide guide) {
-        mGuide = guide;
-    }
-
-    /**
-     * Inform the guide helper that the case has happened
-     * @param caseName name of the case that is happened
-     */
-    @Override
-    public void onCaseHappened(String caseName) {
-        if (mGuide.isStarted() && caseName.equals(currentCase())) {
-            mGuide.next();
-        }
-    }
-
-    @Override
-    public boolean isGuideStarted() {
-        return mGuide.isStarted();
-    }
-
-    @Override
-    public String currentCase() {
-        return mGuide.getCurrentCaseKey();
-    }
-
-    @Override
-    public void startGuide() {
-        mGuide.start();
-    }
-
-    @Override
-    public void nextCase() {
-        mGuide.next();
-    }
-
-    @Override
-    public void finishGuide() {
-        mGuide.finish();
-    }
 }
