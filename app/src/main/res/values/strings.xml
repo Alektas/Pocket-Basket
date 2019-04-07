@@ -23,7 +23,6 @@
     <string name="about_version">Version: %s</string>
 
     <string name="guide">Help</string>
-    <string name="skip">Skip</string>
     <string name="guide_change_mode">Change mode by swipe</string>
     <string name="guide_add_item">Add items by tap</string>
     <string name="guide_check_item">Check item by tap on icon</string>
