@@ -12,6 +12,8 @@ public interface Guide {
 
     String currentCaseKey();
 
+    void setCase(String caseKey);
+
     int caseNumb(String caseKey);
 
     boolean isGuideStarted();

@@ -136,8 +136,9 @@ public class MainActivity extends AppCompatActivity
             startGuide();
         } else {
             if (mViewModel.isGuideMode()) {
-                prepareViewToGuide(mViewModel.getGuide(), mViewModel.getCurGuideCase());
+                String curCase = mViewModel.getCurGuideCase();
                 mViewModel.continueGuide();
+                prepareViewToGuide(mViewModel.getGuide(), curCase);
             }
         }
     }
@@ -591,14 +592,14 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onGuideFinish() {
                 mViewModel.setGuideStarted(false);
-                mViewModel.setCurGuideCase("");
+                mViewModel.setGuideCase("");
                 mSkipGuideBtn.setVisibility(View.INVISIBLE);
                 showAdBanner();
             }
 
             @Override
             public void onGuideCaseStart(String caseKey) {
-                mViewModel.setCurGuideCase(caseKey);
+                mViewModel.setGuideCase(caseKey);
                 prepareViewToGuide(guide, caseKey);
             }
         });
@@ -613,15 +614,14 @@ public class MainActivity extends AppCompatActivity
      */
     private void prepareViewToGuide(Guide guide, String caseKey) {
         mSkipGuideBtn.setVisibility(View.VISIBLE);
+        int curCaseNumb = guide.caseNumb(caseKey);
 
         // Change mode in the landscape orientation is not allowed
         // so skip this guide case
         if (isLandscape() && GuideContract.GUIDE_CHANGE_MODE.equals(caseKey)) {
-            guide.nextCase();
+            mViewModel.getGuide().onCaseHappened(GuideContract.GUIDE_CHANGE_MODE);
             return;
         }
-
-        int curCaseNumb = guide.caseNumb(caseKey);
 
         // Show the floating button only when it's needed in the Guide
         if (curCaseNumb < guide.caseNumb(GuideContract.GUIDE_FLOATING_MENU)) {

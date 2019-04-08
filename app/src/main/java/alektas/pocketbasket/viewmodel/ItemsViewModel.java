@@ -233,8 +233,9 @@ public class ItemsViewModel extends AndroidViewModel {
         return mCurGuideCase;
     }
 
-    public void setCurGuideCase(String curGuideCase) {
+    public void setGuideCase(String curGuideCase) {
         mCurGuideCase = curGuideCase;
+        mGuide.setCase(curGuideCase);
     }
 
     /**

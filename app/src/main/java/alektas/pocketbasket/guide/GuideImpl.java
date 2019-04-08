@@ -10,6 +10,7 @@ public class GuideImpl implements Guide, GuideCase.CaseListener {
     private List<GuideCase> mCases;
     private GuideListener mListener;
     private int mCurrentCaseNumb;
+    private GuideCase mCurrentCase;
     private boolean isStarted = false;
 
     public interface GuideListener {
@@ -65,6 +66,20 @@ public class GuideImpl implements Guide, GuideCase.CaseListener {
         return mCases.get(mCurrentCaseNumb).getKey();
     }
 
+    @Override
+    public void setCase(String caseKey) {
+        for(int i = 0; i < mCases.size(); i++) {
+            GuideCase gc = mCases.get(i);
+            if (gc.getKey().equals(caseKey)) {
+                mCurrentCase = gc;
+                mCurrentCaseNumb = i;
+            }
+        }
+
+        if (mCurrentCase == null) { Log.e("GUIDE_EXCEPTION",
+                "setCase: Guide case with name '" + caseKey + "' doesn't exist."); }
+    }
+
     /**
      * Get case position number in list of all cases.
      * @param caseKey case unique key, should be hold in the GuideContract
@@ -72,7 +87,7 @@ public class GuideImpl implements Guide, GuideCase.CaseListener {
      */
     @Override
     public int caseNumb(String caseKey) {
-        for(int i = 0; i < mCases.size(); i++) {
+        for (int i = 0; i < mCases.size(); i++) {
             if (caseKey.equals(mCases.get(i).getKey())) {
                 return i;
             }
@@ -115,19 +130,9 @@ public class GuideImpl implements Guide, GuideCase.CaseListener {
     @Override
     public void startFrom(String caseKey) {
         isStarted = true;
+        setCase(caseKey);
 
-        GuideCase guideCase = null;
-        for(int i = 0; i < mCases.size(); i++) {
-            GuideCase gc = mCases.get(i);
-            if (gc.getKey().equals(caseKey)) {
-                guideCase = gc;
-                mCurrentCaseNumb = i;
-            }
-        }
-
-        if (guideCase != null) { guideCase.show(); }
-        else { Log.e("GUIDE_EXCEPTION",
-                "startFrom: Guide case with name '" + caseKey + "' doesn't exist."); }
+        if (mCurrentCase != null) { mCurrentCase.show(); }
     }
 
     @Override
