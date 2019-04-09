@@ -35,7 +35,7 @@
     <string name="seed_oil">Масло растительное</string>
     <string name="mayo">Майонез</string>
     <string name="ketchup">Кетчуп</string>
-    <string name="egg">Яйца</string>
+    <string name="eggs">Яйца</string>
     <string name="salt">Соль</string>
     <string name="sugar">Сахар</string>
     <string name="soap">Мыло</string>
@@ -83,5 +83,8 @@
     <string name="millet_groats">Крупа пшённая</string>
     <string name="corn_grits">Крупа кукурузная</string>
     <string name="barley_groats">Крупа ячменная</string>
+    <string name="garbage_bags">Мешки для мусора</string>
+    <string name="plastic_bags">Пакеты</string>
+    <string name="washing_powder">Стиральный порошок</string>
 
 </resources>

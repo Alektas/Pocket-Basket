@@ -27,7 +27,7 @@
         <item name="android:lines">2</item>
         <item name="android:textSize">@dimen/category_text_size</item>
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:background">@drawable/categ_bg</item>
+        <item name="android:background">@drawable/bg_categ</item>
         <item name="android:onClick">onFilterClick</item>
     </style>
 

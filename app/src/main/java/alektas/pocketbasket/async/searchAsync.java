@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 import java.util.List;
 
 import alektas.pocketbasket.db.dao.ItemsDao;
-import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.db.entities.Item;
 
 public class searchAsync extends AsyncTask<String, Void, List<Item>> {
     private ItemsDao mDao;

@@ -65,7 +65,7 @@
         android:id="@+id/sauce_n_oil_rb"
         style="@style/CategButton"
         android:text="@string/sauce_n_oil"
-        android:button="@drawable/ic_categ_oil_inset"/>
+        android:button="@drawable/ic_categ_oils_inset"/>
     <RadioButton
         android:id="@+id/household_rb"
         style="@style/CategButton"

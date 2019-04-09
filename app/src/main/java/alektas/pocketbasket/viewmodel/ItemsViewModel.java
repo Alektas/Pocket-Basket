@@ -7,10 +7,11 @@ import android.util.Log;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import alektas.pocketbasket.App;
-import alektas.pocketbasket.db.entity.BasketMeta;
-import alektas.pocketbasket.guide.GuideHelperImpl;
-import alektas.pocketbasket.model.Repository;
-import alektas.pocketbasket.guide.GuideHelper;
+import alektas.pocketbasket.data.RepositoryImpl;
+import alektas.pocketbasket.db.entities.BasketMeta;
+import alektas.pocketbasket.guide.Guide;
+import alektas.pocketbasket.guide.GuideContract;
+import alektas.pocketbasket.data.Repository;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.annotation.NonNull;
@@ -18,22 +19,23 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import alektas.pocketbasket.db.entity.Item;
-import alektas.pocketbasket.model.RepoManager;
+import alektas.pocketbasket.db.entities.Item;
 
 public class ItemsViewModel extends AndroidViewModel {
     private static final String TAG = "ItemsViewModel";
-    private GuideHelper mGuide;
+    private Guide mGuide;
     private LiveData<List<Item>> mShowcaseData;
     private LiveData<List<Item>> mBasketData;
     private List<Item> mDelItems;
     private Repository mRepoManager;
     private boolean isDelMode = false;
     private boolean isShowcaseMode = true;
+    private boolean isGuideMode = false;
+    private String mCurGuideCase;
 
     public ItemsViewModel(@NonNull Application application) {
         super(application);
-        mRepoManager = new RepoManager(application);
+        mRepoManager = new RepositoryImpl(application);
         mShowcaseData = mRepoManager.getShowcaseData();
         mBasketData = mRepoManager.getBasketData();
         mDelItems = new ArrayList<>();
@@ -51,7 +53,7 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public void putToBasket(String name) {
         mRepoManager.putToBasket(name);
-        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_ADD_ITEM);
+        mGuide.onCaseHappened(GuideContract.GUIDE_ADD_ITEM);
 
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, name);
@@ -65,7 +67,7 @@ public class ItemsViewModel extends AndroidViewModel {
      */
     public void updatePositions(List<Item> items) {
         mRepoManager.updatePositions(items);
-        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_MOVE_ITEM);
+        mGuide.onCaseHappened(GuideContract.GUIDE_MOVE_ITEM);
     }
 
     public boolean isItemInBasket(Item item) {
@@ -77,7 +79,7 @@ public class ItemsViewModel extends AndroidViewModel {
      */
     public void checkItem(String name) {
         mRepoManager.checkItem(name);
-        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_CHECK_ITEM);
+        mGuide.onCaseHappened(GuideContract.GUIDE_CHECK_ITEM);
     }
 
     /**
@@ -96,7 +98,7 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public void removeFromBasket(String name) {
         mRepoManager.removeFromBasket(name);
-        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_REMOVE_ITEM);
+        mGuide.onCaseHappened(GuideContract.GUIDE_REMOVE_ITEM);
     }
 
     /**
@@ -119,7 +121,7 @@ public class ItemsViewModel extends AndroidViewModel {
         if (getItem(name) != null) putToBasket(name);
         else {
             mRepoManager.addNewItem(new Item(name));
-            mGuide.onCaseHappened(GuideHelperImpl.GUIDE_ADD_ITEM);
+            mGuide.onCaseHappened(GuideContract.GUIDE_ADD_ITEM);
         }
     }
 
@@ -160,6 +162,13 @@ public class ItemsViewModel extends AndroidViewModel {
         mRepoManager.resetShowcase(fullReset);
     }
 
+    /**
+     * Update all items, including icons, that were added in new versions
+     */
+    public void updateAllItems() {
+        mRepoManager.updateAll();
+    }
+
 
     /* Data getters */
 
@@ -194,9 +203,9 @@ public class ItemsViewModel extends AndroidViewModel {
         }
 
         if (delMode) {
-            mGuide.onCaseHappened(GuideHelperImpl.GUIDE_DEL_MODE);
+            mGuide.onCaseHappened(GuideContract.GUIDE_DEL_MODE);
         } else {
-            mGuide.onCaseHappened(GuideHelperImpl.GUIDE_DEL_ITEMS);
+            mGuide.onCaseHappened(GuideContract.GUIDE_DEL_ITEMS);
         }
 
         isDelMode = delMode;
@@ -209,11 +218,40 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public void setShowcaseMode(boolean showcaseMode) {
         isShowcaseMode = showcaseMode;
-        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_CHANGE_MODE);
+        mGuide.onCaseHappened(GuideContract.GUIDE_CHANGE_MODE);
     }
 
-    public void setGuide(GuideHelper guide) {
+    public boolean isGuideMode() {
+        return isGuideMode;
+    }
+
+    public void setGuideStarted(boolean guideMode) {
+        isGuideMode = guideMode;
+    }
+
+    public String getCurGuideCase() {
+        return mCurGuideCase;
+    }
+
+    public void setGuideCase(String curGuideCase) {
+        mCurGuideCase = curGuideCase;
+        mGuide.setCase(curGuideCase);
+    }
+
+    /**
+     * Continue guide from the last guide case.
+     * Invoked when the phone has been rotated.
+     */
+    public void continueGuide() {
+        mGuide.startFrom(mCurGuideCase);
+    }
+
+    public void setGuide(Guide guide) {
         mGuide = guide;
+    }
+
+    public Guide getGuide() {
+        return mGuide;
     }
 
     /**
@@ -221,16 +259,8 @@ public class ItemsViewModel extends AndroidViewModel {
      */
     private boolean isDelModeAllowed() {
         if (!mGuide.isGuideStarted()) return true;
-        return GuideHelperImpl.GUIDE_DEL_MODE.equals(mGuide.currentCase())
-                || GuideHelperImpl.GUIDE_DEL_ITEMS.equals(mGuide.currentCase());
-    }
-
-    /**
-     * When the Guide is started change mode allowed only in several cases
-     */
-    public boolean isModeChangedAllowed() {
-        if (!mGuide.isGuideStarted()) return true;
-        return GuideHelperImpl.GUIDE_CHANGE_MODE.equals(mGuide.currentCase());
+        return GuideContract.GUIDE_DEL_MODE.equals(mGuide.currentCaseKey())
+                || GuideContract.GUIDE_DEL_ITEMS.equals(mGuide.currentCaseKey());
     }
 
     /**
@@ -238,17 +268,17 @@ public class ItemsViewModel extends AndroidViewModel {
      */
     public boolean isTouchAllowed() {
         return !( mGuide.isGuideStarted() &&
-                (GuideHelperImpl.GUIDE_CATEGORIES_HELP.equals(mGuide.currentCase())
-                || GuideHelperImpl.GUIDE_SHOWCASE_HELP.equals(mGuide.currentCase())
-                || GuideHelperImpl.GUIDE_BASKET_HELP.equals(mGuide.currentCase())) );
+                (GuideContract.GUIDE_CATEGORIES_HELP.equals(mGuide.currentCaseKey())
+                || GuideContract.GUIDE_SHOWCASE_HELP.equals(mGuide.currentCaseKey())
+                || GuideContract.GUIDE_BASKET_HELP.equals(mGuide.currentCaseKey())) );
     }
 
     public void onFloatingMenuShown() {
-        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_FLOATING_MENU);
+        mGuide.onCaseHappened(GuideContract.GUIDE_FLOATING_MENU);
     }
 
     public void onFabClick() {
-        mGuide.onCaseHappened(GuideHelperImpl.GUIDE_FLOATING_MENU_HELP);
+        mGuide.onCaseHappened(GuideContract.GUIDE_FLOATING_MENU_HELP);
     }
 
 
@@ -257,10 +287,11 @@ public class ItemsViewModel extends AndroidViewModel {
     public void startGuide() {
         if (mGuide == null) {
             Log.e(TAG, "startGuide: to start the guide " +
-                            "you need to set GuideHelper by setGuide method",
-                    new NullPointerException("Guide is null"));
+                            "you need to set Guide by setGuide method",
+                    new NullPointerException("GuideImpl is null"));
         }
 
+        isGuideMode = true;
         mGuide.startGuide();
 
         Bundle startGuide = new Bundle();
@@ -269,10 +300,11 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public void finishGuide() {
         mGuide.finishGuide();
+        isGuideMode = false;
 
         Bundle finGuide = new Bundle();
         finGuide.putString(FirebaseAnalytics.Param.LEVEL_NAME,
-                "finish guide at case: " + mGuide.currentCase());
+                "finishGuide guide at case: " + mGuide.currentCaseKey());
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_COMPLETE, finGuide);
     }
 

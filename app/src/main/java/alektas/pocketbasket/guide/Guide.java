@@ -1,95 +1,29 @@
 package alektas.pocketbasket.guide;
 
-import android.util.Log;
+public interface Guide {
 
-import java.util.ArrayList;
-import java.util.List;
+    /**
+     * Inform the guide that the case has happened
+     * @param caseKey name of the case that is happened
+     */
+    void onCaseHappened(String caseKey);
 
-public class Guide implements GuideCase.CaseListener {
-    private static final String TAG = "Guide";
-    private List<GuideCase> mCases;
-    private GuideListener mListener;
-    private int mCurrentCaseNumb;
-    private boolean isStarted = false;
+    Guide addCase(GuideCase guideCase);
 
-    public interface GuideListener {
-        void onGuideCaseStart(String caseKey);
-        void onGuideFinish();
-    }
+    String currentCaseKey();
 
-    public Guide() {
-        mCases = new ArrayList<>();
-    }
+    void setCase(String caseKey);
 
-    @Override
-    public void onCaseStart(String caseKey) {
-        mListener.onGuideCaseStart(caseKey);
-    }
+    int caseNumb(String caseKey);
 
-    @Override
-    public void onCaseFinish(String caseKey) {
-        GuideCase guideCase = getCase(caseKey);
-        if (guideCase != null && guideCase.isAutoNext()) {
-            next();
-        }
-    }
+    boolean isGuideStarted();
 
-    private GuideCase getCase(String key) {
-        for (GuideCase guideCase : mCases) {
-            if (key.equals(guideCase.getKey())) return guideCase;
-        }
-        return null;
-    }
+    void startGuide();
 
-    public Guide addCase(GuideCase guideCase) {
-        guideCase.setCaseListener(this);
-        mCases.add(guideCase);
-        return this;
-    }
+    void nextCase();
 
-    public String getCurrentCaseKey() {
-        return mCases.get(mCurrentCaseNumb).getKey();
-    }
+    void startFrom(String caseKey);
 
-    public boolean isStarted() {
-        return isStarted;
-    }
+    void finishGuide();
 
-    public void start() {
-        if (mCurrentCaseNumb != 0) {
-            mCases.get(mCurrentCaseNumb).hide();
-            mCurrentCaseNumb = 0;
-        }
-        try {
-            mCases.get(0).show();
-            isStarted = true;
-        } catch (NullPointerException e) {
-            Log.e(TAG, "to start guide you must add at least one guide case. ", e);
-        }
-    }
-
-    public void next() {
-        if (mCurrentCaseNumb != mCases.size() - 1) {
-            mCases.get(mCurrentCaseNumb).hide();
-            ++mCurrentCaseNumb;
-            mCases.get(mCurrentCaseNumb).show();
-        } else {
-            finish();
-        }
-    }
-
-    public void finish() {
-        mCases.get(mCurrentCaseNumb).hide();
-        mCurrentCaseNumb = 0;
-        isStarted = false;
-        mListener.onGuideFinish();
-    }
-
-    public void setGuideListener(GuideListener listener) {
-        mListener = listener;
-    }
-
-    public void removeGuideListener() {
-        mListener = null;
-    }
 }

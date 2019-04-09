@@ -2,11 +2,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    android:focusableInTouchMode="true">
+    android:focusableInTouchMode="true"
+    tools:context=".view.MainActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -43,7 +45,6 @@
         app:layout_constraintTop_toBottomOf="@id/toolbar">
 
         <include
-            android:id="@+id/categ_group"
             layout="@layout/categories_layout"/>
     </ScrollView>
 
@@ -254,7 +255,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="invisible"
-        app:srcCompat="@drawable/guide_bg_bottom"
+        app:srcCompat="@drawable/bg_guide_bottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guideline_top_hor"
@@ -265,7 +266,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:visibility="invisible"
-        app:srcCompat="@drawable/guide_bg_top"
+        app:srcCompat="@drawable/bg_guide_top"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -547,15 +548,15 @@
         android:id="@+id/guide_tap_delete_img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
         android:visibility="invisible"
-        android:layout_margin="@dimen/padding_8"
-        app:srcCompat="@drawable/ic_tap_rot90_cut"
-        app:layout_constraintHorizontal_bias="0.05"
-        app:layout_constraintVertical_bias="0.98"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/del_mode_panel"
+        app:layout_constraintEnd_toEndOf="@id/del_mode_panel"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@id/del_mode_panel"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/del_mode_panel"/>
+        app:layout_constraintVertical_bias="0.98"
+        app:srcCompat="@drawable/ic_tap_rot90_cut"/>
 
     <TextView
         android:id="@+id/guide_delete_text"

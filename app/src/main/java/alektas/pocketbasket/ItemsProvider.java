@@ -6,7 +6,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.concurrent.ExecutionException;
 
 import alektas.pocketbasket.db.AppDatabase;
 import alektas.pocketbasket.db.dao.ItemsDao;
-import alektas.pocketbasket.db.entity.Item;
+import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.async.searchAsync;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

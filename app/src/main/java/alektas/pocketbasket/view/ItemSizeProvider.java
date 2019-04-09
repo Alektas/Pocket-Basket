@@ -1,6 +1,6 @@
 package alektas.pocketbasket.view;
 
-interface ItemSizeProvider {
+public interface ItemSizeProvider {
     int getItemWidth();
     int getBasketItemWidth();
     int getBasketTextMarginEnd();

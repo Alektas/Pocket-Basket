@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="wrap_content">
 
     <TextView
+        android:id="@+id/about_app_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_16"
@@ -14,30 +14,130 @@
         android:text="@string/about_msg"/>
 
     <TextView
+        android:id="@+id/developer_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_16"
         android:layout_marginStart="@dimen/padding_32"
         android:layout_marginEnd="@dimen/padding_32"
+        android:layout_below="@id/about_app_text"
         style="@style/TextAppearance.AppCompat.Medium"
         android:text="@string/about_developer"/>
 
     <TextView
+        android:id="@+id/dev_mail_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/padding_32"
         android:layout_marginEnd="@dimen/padding_32"
+        android:layout_below="@id/developer_text"
         style="@style/TextAppearance.AppCompat.Medium"
         android:autoLink="email"
         android:text="@string/about_email"/>
 
     <TextView
-        android:id="@+id/version_text"
+        android:id="@+id/icons_designers_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_16"
         android:layout_marginStart="@dimen/padding_32"
         android:layout_marginEnd="@dimen/padding_32"
-        style="@style/TextAppearance.AppCompat.Medium"/>
+        android:layout_below="@id/dev_mail_link"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:text="@string/about_icons_by"/>
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/alektas_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_32"
+        android:layout_marginEnd="@dimen/padding_32"
+        android:layout_below="@id/icons_designers_text"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:text="@string/about_alektas"/>
+
+    <TextView
+        android:id="@+id/jeff_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_32"
+        android:layout_marginEnd="@dimen/padding_8"
+        android:layout_below="@id/alektas_text"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:clickable="true"
+        android:onClick="onLinkClick"
+        android:text="@string/about_jeff_portaro"/>
+
+    <TextView
+        android:id="@+id/apache_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding_32"
+        android:layout_toEndOf="@id/jeff_link"
+        android:layout_alignBaseline="@id/jeff_link"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:clickable="true"
+        android:onClick="onLinkClick"
+        android:text="@string/about_license"/>
+
+    <TextView
+        android:id="@+id/bom_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_32"
+        android:layout_marginEnd="@dimen/padding_8"
+        android:layout_below="@id/jeff_link"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:clickable="true"
+        android:onClick="onLinkClick"
+        android:text="@string/about_bomsymbols"/>
+
+    <TextView
+        android:id="@+id/cc_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding_32"
+        android:layout_toEndOf="@id/bom_link"
+        android:layout_alignBaseline="@id/bom_link"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:clickable="true"
+        android:onClick="onLinkClick"
+        android:text="@string/about_license"/>
+
+    <TextView
+        android:id="@+id/google_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_32"
+        android:layout_marginEnd="@dimen/padding_8"
+        android:layout_below="@id/bom_link"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:clickable="true"
+        android:onClick="onLinkClick"
+        android:text="@string/about_google_material"/>
+
+    <TextView
+        android:id="@+id/apache2_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding_32"
+        android:layout_toEndOf="@id/google_link"
+        android:layout_alignBaseline="@id/google_link"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:clickable="true"
+        android:onClick="onLinkClick"
+        android:text="@string/about_license"/>
+
+    <TextView
+        android:id="@+id/version_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="textEnd"
+        android:layout_marginTop="@dimen/padding_16"
+        android:layout_marginStart="@dimen/padding_32"
+        android:layout_marginEnd="@dimen/padding_32"
+        android:layout_below="@id/google_link"
+        android:layout_alignParentEnd="true"
+        style="@style/TextAppearance.AppCompat.Small"/>
+
+</RelativeLayout>

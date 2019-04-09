@@ -26,8 +26,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
 
-        versionName "0.6.3"
-        versionCode 3
+        versionName "0.7.0"
+        versionCode 4
         project.ext.set("archivesBaseName", "PocketBasket-" + defaultConfig.versionName)
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -62,7 +62,6 @@ android {
         // override those in the defaultConfig block.
         dev {
             dimension "mode"
-            minSdkVersion 27
             versionNameSuffix "-dev"
         }
 
@@ -72,19 +71,6 @@ android {
             // your app, you can leave this block empty and Gradle uses configurations in
             // the defaultConfig block instead. You still need to create this flavor.
             // Otherwise, all variants use the "dev" flavor configurations.
-        }
-    }
-    splits {
-
-        // Configures multiple APKs based on screen density.
-        density {
-            enable true
-
-            // Specifies a list of screen densities Gradle should not create APKs for.
-            exclude "ldpi", "mdpi"
-
-            // Specifies a list of compatible screen size settings.
-            compatibleScreens 'normal', 'large', 'xlarge'
         }
     }
     compileOptions {
@@ -109,7 +95,7 @@ buildscript {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha3'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha4'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'androidx.annotation:annotation:1.0.2'

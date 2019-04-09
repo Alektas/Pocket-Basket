@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <inset
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/ic_rb_floury"
+    android:drawable="@drawable/ic_categ_floury"
     android:insetLeft="@dimen/padding_rb" />

@@ -5,7 +5,7 @@
 
         <variable
             name="item"
-            type="alektas.pocketbasket.db.entity.Item"/>
+            type="alektas.pocketbasket.db.entities.Item"/>
 
         <variable
             name="model"
