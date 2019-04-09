@@ -592,15 +592,16 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onGuideFinish() {
                 mViewModel.setGuideStarted(false);
-                mViewModel.setGuideCase("");
-                mSkipGuideBtn.setVisibility(View.INVISIBLE);
+                mViewModel.setGuideCase(null);
+                mSkipGuideBtn.setVisibility(View.GONE);
+                showFloatingButton();
                 showAdBanner();
             }
 
             @Override
             public void onGuideCaseStart(String caseKey) {
                 mViewModel.setGuideCase(caseKey);
-                prepareViewToGuide(guide, caseKey);
+                prepareViewToCase(guide, caseKey);
             }
         });
 
@@ -613,22 +614,11 @@ public class MainActivity extends AppCompatActivity
      * @param caseKey key of the case to which a view is prepared
      */
     private void prepareViewToGuide(Guide guide, String caseKey) {
+        prepareViewToCase(guide, caseKey);
+
         mSkipGuideBtn.setVisibility(View.VISIBLE);
+
         int curCaseNumb = guide.caseNumb(caseKey);
-
-        // Change mode in the landscape orientation is not allowed
-        // so skip this guide case
-        if (isLandscape() && GuideContract.GUIDE_CHANGE_MODE.equals(caseKey)) {
-            mViewModel.getGuide().onCaseHappened(GuideContract.GUIDE_CHANGE_MODE);
-            return;
-        }
-
-        // Show the floating button only when it's needed in the Guide
-        if (curCaseNumb < guide.caseNumb(GuideContract.GUIDE_FLOATING_MENU)) {
-            hideFloatingButton();
-        } else {
-            showFloatingButton();
-        }
 
         // Set appropriate mode
         if (isLandscape()) return;
@@ -638,6 +628,24 @@ public class MainActivity extends AppCompatActivity
         } else if (curCaseNumb <= guide.caseNumb(GuideContract.GUIDE_CHANGE_MODE)
                 && !mViewModel.isShowcaseMode()) {
             setShowcaseMode();
+        }
+    }
+
+    private void prepareViewToCase(Guide guide, String caseKey) {
+        // Change mode in the landscape orientation is not allowed
+        // so skip this guide case
+        if (isLandscape() && GuideContract.GUIDE_CHANGE_MODE.equals(caseKey)) {
+            mViewModel.getGuide().onCaseHappened(GuideContract.GUIDE_CHANGE_MODE);
+            return;
+        }
+
+        int curCaseNumb = guide.caseNumb(caseKey);
+
+        // Show the floating button only when it's needed in the Guide
+        if (curCaseNumb < guide.caseNumb(GuideContract.GUIDE_FLOATING_MENU)) {
+            hideFloatingButton();
+        } else {
+            showFloatingButton();
         }
     }
 
@@ -684,6 +692,7 @@ public class MainActivity extends AppCompatActivity
                 0);
 
         showFloatingButton();
+
         if (isMenuShown) { hideFloatingMenu(); }
         mDelModePanel.setOrientation(LinearLayout.VERTICAL);
         mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
@@ -757,12 +766,7 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressLint("RestrictedApi")
     private void showFloatingButton() {
-        if (!mViewModel.isGuideMode() && !mViewModel.isShowcaseMode()
-                || GuideContract.GUIDE_FLOATING_MENU.equals(mViewModel.getCurGuideCase())
-                || GuideContract.GUIDE_FLOATING_MENU_HELP.equals(mViewModel.getCurGuideCase())) {
-
-            mAddBtn.setVisibility(View.VISIBLE);
-        }
+        mAddBtn.setVisibility(View.VISIBLE);
     }
 
     @SuppressLint("RestrictedApi")
@@ -1026,7 +1030,8 @@ public class MainActivity extends AppCompatActivity
             return true;
         }
         // do not allow mode change in the landscape orientation
-        if (!isLandscape() && mViewModel.isModeChangedAllowed()) {
+        if (!isLandscape() && (!mViewModel.isGuideMode()
+                || GuideContract.GUIDE_CHANGE_MODE.equals(mViewModel.getCurGuideCase()))) {
             handleChangeModeByTouch(event);
         }
 
@@ -1047,8 +1052,8 @@ public class MainActivity extends AppCompatActivity
                 initX = (int) (event.getX() + 0.5f);
                 initY = (int) (event.getY() + 0.5f);
 
-                /* Disable change mode from basket in basket mode
-                 * because direction of swipe is match to direction of item delete swipe */
+                /* Disable change mode from the basket in basket mode
+                 * because direction of the swipe is match to direction of the item delete swipe */
                 if (!mViewModel.isShowcaseMode()
                         && initX > (mCategNarrowWidth + mShowcaseNarrowWidth)) {
                     allowChangeMode = false;

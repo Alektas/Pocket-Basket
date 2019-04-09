@@ -264,14 +264,6 @@ public class ItemsViewModel extends AndroidViewModel {
     }
 
     /**
-     * When the Guide is started change mode allowed only in several cases
-     */
-    public boolean isModeChangedAllowed() {
-        if (!mGuide.isGuideStarted()) return true;
-        return GuideContract.GUIDE_CHANGE_MODE.equals(mGuide.currentCaseKey());
-    }
-
-    /**
      * When the Guide is started touch allowed only in several cases
      */
     public boolean isTouchAllowed() {

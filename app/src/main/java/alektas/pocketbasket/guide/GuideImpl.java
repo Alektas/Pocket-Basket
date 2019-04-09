@@ -109,7 +109,8 @@ public class GuideImpl implements Guide, GuideCase.CaseListener {
             mCurrentCaseNumb = 0;
         }
         try {
-            mCases.get(0).show();
+            mCurrentCase = mCases.get(0);
+            mCurrentCase.show();
             isStarted = true;
         } catch (NullPointerException e) {
             Log.e(TAG, "to startGuide guide you must add at least one guide case. ", e);
