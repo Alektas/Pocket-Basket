@@ -596,7 +596,7 @@ public class MainActivity extends AppCompatActivity implements
                 mViewModel.setGuideStarted(false);
                 mViewModel.setGuideCase(null);
                 mSkipGuideBtn.setVisibility(View.GONE);
-                showFloatingButton();
+                if (!mViewModel.isShowcaseMode()) showFloatingButton();
                 showAdBanner();
             }
 
