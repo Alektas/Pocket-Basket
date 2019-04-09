@@ -62,7 +62,6 @@ android {
         // override those in the defaultConfig block.
         dev {
             dimension "mode"
-            minSdkVersion 27
             versionNameSuffix "-dev"
         }
 
@@ -72,19 +71,6 @@ android {
             // your app, you can leave this block empty and Gradle uses configurations in
             // the defaultConfig block instead. You still need to create this flavor.
             // Otherwise, all variants use the "dev" flavor configurations.
-        }
-    }
-    splits {
-
-        // Configures multiple APKs based on screen density.
-        density {
-            enable true
-
-            // Specifies a list of screen densities Gradle should not create APKs for.
-            exclude "ldpi", "mdpi"
-
-            // Specifies a list of compatible screen size settings.
-            compatibleScreens 'normal', 'large', 'xlarge'
         }
     }
     compileOptions {
