@@ -798,7 +798,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private void showAdBanner() {
         if (mAdView != null
-                && mAdView.isLoading()
                 && !mViewModel.isGuideMode()
                 && mAdView.getVisibility() != View.VISIBLE) {
             mAdView.setVisibility(View.VISIBLE);
