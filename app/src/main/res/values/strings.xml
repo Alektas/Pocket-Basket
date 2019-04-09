@@ -1,7 +1,9 @@
 <resources>
     <string name="reset_msg">Back to the original showcase?</string>
     <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
     <string name="accept">Accept</string>
+    <string name="no">No</string>
     <string name="del_user_items">Delete user items</string>
     <string name="search_hint">Add item</string>
     <string name="reset">Reset</string>
@@ -21,6 +23,9 @@
     <string name="about_alektas" translatable="false">- Alektas</string>
     <string name="about_icons_by">Icons by:</string>
     <string name="about_version">Version: %s</string>
+
+    <string name="guide_accept_title">Do you want to go training?</string>
+    <string name="guide_accept_msg">Training can always be repeated by selecting \"Help\" in the menu</string>
 
     <string name="guide">Help</string>
     <string name="guide_change_mode">Change mode by swipe</string>
@@ -45,6 +50,7 @@
     <string name="guide_basket">This is basket</string>
     <string name="guide_basket_sub">There you keep items from showcase</string>
     <string name="guide_change_mode_sub">Just swipe left</string>
+
     <string name="apache_license_link" translatable="false">https://www.apache.org/licenses/LICENSE-2.0.html</string>
     <string name="cc_license_link" translatable="false">http://creativecommons.org/licenses/by/3.0/</string>
     <string name="jeff_link" translatable="false">https://pixelbuddha.net/freebie/touch-gestures-icons</string>

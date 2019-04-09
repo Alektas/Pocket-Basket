@@ -29,6 +29,7 @@ import alektas.pocketbasket.BuildConfig;
 import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideImpl;
 import alektas.pocketbasket.view.dialogs.AboutDialog;
+import alektas.pocketbasket.view.dialogs.GuideAcceptDialog;
 import alektas.pocketbasket.view.dialogs.ResetDialog;
 import alektas.pocketbasket.view.rvadapters.BasketRvAdapter;
 import alektas.pocketbasket.view.rvadapters.ShowcaseRvAdapter;
@@ -64,8 +65,9 @@ import alektas.pocketbasket.guide.GuideContract;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class MainActivity extends AppCompatActivity
-        implements ResetDialog.ResetDialogListener,
+public class MainActivity extends AppCompatActivity implements
+        ResetDialog.ResetDialogListener,
+        GuideAcceptDialog.GuideAcceptDialogListener,
         DeleteModeListener,
         OnStartDragListener,
         ItemSizeProvider {
@@ -132,8 +134,8 @@ public class MainActivity extends AppCompatActivity
         // If it is the first app launch startGuide the guide
         if (prefs.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
             prefs.edit().putBoolean(getString(R.string.FIRST_START_KEY), false).apply();
-            mViewModel.putToBasket(getString(R.string.cabbage));
-            startGuide();
+            DialogFragment dialog = new GuideAcceptDialog();
+            dialog.show(getSupportFragmentManager(), "GuideAcceptDialog");
         } else {
             if (mViewModel.isGuideMode()) {
                 String curCase = mViewModel.getCurGuideCase();
@@ -826,6 +828,12 @@ public class MainActivity extends AppCompatActivity
         bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "reset showcase");
         bundle.putString(FirebaseAnalytics.Param.CHECKOUT_OPTION, "is full reset: " + fullReset);
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+    }
+
+    @Override
+    public void onDialogAcceptGuide() {
+        mViewModel.putToBasket(getString(R.string.cabbage));
+        startGuide();
     }
 
     @Override

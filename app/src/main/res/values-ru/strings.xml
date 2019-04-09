@@ -1,17 +1,27 @@
 <resources>
     <string name="reset_msg">Вернуться к первоначальной витрине?</string>
     <string name="accept">Принять</string>
+    <string name="yes">Да</string>
     <string name="cancel">Закрыть</string>
+    <string name="no">Нет</string>
     <string name="del_user_items">Удалить пользовательские предметы</string>
     <string name="search_hint">Добавить предмет</string>
     <string name="reset">Сброс</string>
-    <string name="about_app">О приложении</string>
-    <string name="about_msg">Pocket Basket это приложение для составления списка продуктов.</string>
-    <string name="about_version">"Версия: %s"</string>
     <string name="share">Поделиться</string>
     <string name="update">Обновить</string>
     <string name="share_intro">Нужны товары:</string>
     <string name="guide">Помощь</string>
+
+    <string name="about_app">О приложении</string>
+    <string name="about_msg">Pocket Basket это приложение для составления списка продуктов.</string>
+    <string name="about_version">"Версия: %s"</string>
+    <string name="about_developer">Разработчик: Alektas</string>
+    <string name="about_icons_by">Иконки:</string>
+    <string name="about_license">(лицензия)</string>
+
+    <string name="guide_accept_title">Хотите пройти обучение?</string>
+    <string name="guide_accept_msg">Обучение всегда можно пройти повторно выбрав \"Помощь\" в меню</string>
+
     <string name="guide_change_mode">Смените режим свайпом</string>
     <string name="guide_add_item">Коснитесь, чтобы добавить в корзину</string>
     <string name="guide_check_item">Коснитесь иконки, чтобы отметить предмет</string>
@@ -34,8 +44,5 @@
     <string name="guide_basket">Это корзина</string>
     <string name="guide_basket_sub">Здесь хранятся выбранные из витрины товары</string>
     <string name="guide_change_mode_sub">Просто проведите пальцем влево</string>
-    <string name="about_developer">Разработчик: Alektas</string>
-    <string name="about_icons_by">Иконки:</string>
-    <string name="about_license">(лицензия)</string>
 
 </resources>
