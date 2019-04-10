@@ -7,6 +7,7 @@ import android.util.Log;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import alektas.pocketbasket.App;
+import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.db.entities.BasketMeta;
 import alektas.pocketbasket.guide.Guide;
@@ -56,8 +57,16 @@ public class ItemsViewModel extends AndroidViewModel {
         mGuide.onCaseHappened(GuideContract.GUIDE_ADD_ITEM);
 
         Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, name);
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, name);
+        bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, getCategory(name));
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.ADD_TO_CART, bundle);
+    }
+
+    private String getCategory(String itemName) {
+        Item item = getItem(itemName);
+        if (item == null) return "null";
+        return Utils.getString(item.getTagRes());
     }
 
     /**

@@ -19,6 +19,10 @@ public class Utils {
         return mResources.getString(stringResId);
     }
 
+    public static String getString(String stringResName) {
+        return getString(getStringId(stringResName));
+    }
+
     public static int getResId(String idName, String type) {
         if (idName == null) return 0;
         return mResources.getIdentifier(idName,
