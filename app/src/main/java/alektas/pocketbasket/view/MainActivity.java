@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements
         OnStartDragListener,
         ItemSizeProvider {
 
-    private static final String TAG = "PocketBasketApp";
+    private static final String TAG = "MainActivity";
 
     private int mCategNarrowWidth;
     private int mCategWideWidth;
@@ -351,7 +351,15 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onAdFailedToLoad(int errorCode) {
                 // Code to be executed when an ad request fails.
-                Log.d(TAG, "onAdFailedToLoad: code = " + errorCode);
+                String errorStr;
+                switch (errorCode) {
+                    case 0: errorStr = "INTERNAL_ERROR"; break;
+                    case 1: errorStr = "INVALID_REQUEST"; break;
+                    case 2: errorStr = "NETWORK_ERROR"; break;
+                    case 3: errorStr = "NO_FILL"; break;
+                    default: errorStr = "UNKNOWN";
+                }
+                Log.d(TAG, "onAdFailedToLoad: code = " + errorStr);
                 hideAdBanner();
             }
 
@@ -405,6 +413,7 @@ public class MainActivity extends AppCompatActivity implements
         mBasket = findViewById(R.id.basket_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mBasket.setLayoutManager(layoutManager);
+        mBasket.setHasFixedSize(true);
         mBasketAdapter = new BasketRvAdapter(this, model,
                 this,this);
         mBasket.setAdapter(mBasketAdapter);
@@ -420,6 +429,7 @@ public class MainActivity extends AppCompatActivity implements
         mShowcase = findViewById(R.id.showcase_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mShowcase.setLayoutManager(layoutManager);
+        mShowcase.setHasFixedSize(true);
         mShowcaseAdapter = new ShowcaseRvAdapter(
                 this, model);
         mShowcase.setAdapter(mShowcaseAdapter);
