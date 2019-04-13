@@ -3,6 +3,8 @@ package alektas.pocketbasket;
 import android.content.res.Resources;
 import android.util.Log;
 
+import alektas.pocketbasket.db.entities.Item;
+
 public class Utils {
     private static final String TAG = "Utils";
     private static Resources mResources = App.getComponent().context().getResources();
@@ -52,6 +54,11 @@ public class Utils {
             Log.e(TAG, "getResIdName: resource not found: " + id, e);
         }
         return null;
+    }
+
+    public static String getDisplayName(Item item) {
+        if (item.getNameRes() == null) return item.getName();
+        return getString(item.getNameRes());
     }
 
     public static long measureProcessTime(Measurable process) {

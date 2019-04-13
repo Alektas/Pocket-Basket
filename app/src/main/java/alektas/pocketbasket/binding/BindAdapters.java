@@ -1,7 +1,7 @@
 package alektas.pocketbasket.binding;
 
 import android.content.res.Resources;
-import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import androidx.databinding.BindingAdapter;
@@ -18,4 +18,10 @@ public class BindAdapters {
             view.setImageResource(0);
         }
     }
+
+    @BindingAdapter("android:onTouch")
+    public static void setTouchListener(View self, View.OnTouchListener listener) {
+        self.setOnTouchListener(listener);
+    }
+
 }

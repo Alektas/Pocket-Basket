@@ -6,33 +6,38 @@ import android.util.Log;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import alektas.pocketbasket.App;
-import alektas.pocketbasket.Utils;
-import alektas.pocketbasket.data.RepositoryImpl;
-import alektas.pocketbasket.db.entities.BasketMeta;
-import alektas.pocketbasket.guide.Guide;
-import alektas.pocketbasket.guide.GuideContract;
-import alektas.pocketbasket.data.Repository;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
-import androidx.annotation.NonNull;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import alektas.pocketbasket.App;
+import alektas.pocketbasket.Utils;
+import alektas.pocketbasket.data.Repository;
+import alektas.pocketbasket.data.RepositoryImpl;
+import alektas.pocketbasket.db.entities.BasketMeta;
 import alektas.pocketbasket.db.entities.Item;
+import alektas.pocketbasket.guide.Guide;
+import alektas.pocketbasket.guide.GuideContract;
+import alektas.pocketbasket.view.DeleteModeListener;
+import alektas.pocketbasket.view.ShowcaseListener;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ItemsViewModel extends AndroidViewModel {
     private static final String TAG = "ItemsViewModel";
     private Guide mGuide;
+    private DeleteModeListener mDmListener;
+    private ShowcaseListener mScListener;
     private LiveData<List<Item>> mShowcaseData;
     private LiveData<List<Item>> mBasketData;
     private List<Item> mDelItems;
     private Repository mRepoManager;
+    private String mCurGuideCase;
     private boolean isDelMode = false;
     private boolean isShowcaseMode = true;
     private boolean isGuideMode = false;
-    private String mCurGuideCase;
+
 
     public ItemsViewModel(@NonNull Application application) {
         super(application);
@@ -40,6 +45,22 @@ public class ItemsViewModel extends AndroidViewModel {
         mShowcaseData = mRepoManager.getShowcaseData();
         mBasketData = mRepoManager.getBasketData();
         mDelItems = new ArrayList<>();
+    }
+
+    public void setDeleteModeListener(DeleteModeListener dmListener) {
+        mDmListener = dmListener;
+    }
+
+    public void removeDeleteModeListener() {
+        mDmListener = null;
+    }
+
+    public void setShowcaseListener(ShowcaseListener scListener) {
+        mScListener = scListener;
+    }
+
+    public void removeShowcaseListener() {
+        mScListener = null;
     }
 
     /* Basket methods */
@@ -176,6 +197,63 @@ public class ItemsViewModel extends AndroidViewModel {
      */
     public void updateAllItems() {
         mRepoManager.updateAll();
+    }
+
+    public boolean onItemLongClick(Item item, RecyclerView.ViewHolder holder) {
+        if (!isDelMode()) {
+            enableDelMode();
+        }
+        prepareToDel(item, holder.getAdapterPosition());
+        return true;
+    }
+
+    public void onItemClick(Item item, RecyclerView.ViewHolder holder) {
+        int pos = holder.getAdapterPosition();
+        if (isDelMode()) {
+            if (mDelItems.contains(item)) { removeFromDel(item, pos); }
+            else { prepareToDel(item, pos); }
+        } else {
+            if (getBasketMeta(item.getName()) == null) {
+                putToBasket(item.getName());
+                mScListener.onItemChoose(pos);
+            }
+            else {
+                removeFromBasket(item.getName());
+                mScListener.onItemChoose(pos);
+            }
+        }
+    }
+
+    public void deleteChoosedItems() {
+        /* Put to argument new List to avoid ConcurrentModificationException.
+         * That causes by deleting items in AsyncTask and
+         * clearing this list in Main Thread at one time */
+        deleteItems(new ArrayList<>(mDelItems));
+        cancelDel();
+    }
+
+    public void cancelDel() {
+        disableDelMode();
+        mDelItems.clear();
+        mScListener.onDataSetChange();
+    }
+
+    private void prepareToDel(Item item, int position) {
+        mDelItems.add(item);
+        mScListener.onItemChoose(position);
+    }
+
+    private void removeFromDel(Item item, int position) {
+        mDelItems.remove(item);
+        mScListener.onItemChoose(position);
+    }
+
+    private void enableDelMode() {
+        mDmListener.onDelModeEnable();
+    }
+
+    private void disableDelMode() {
+        mDmListener.onDelModeDisable();
     }
 
 

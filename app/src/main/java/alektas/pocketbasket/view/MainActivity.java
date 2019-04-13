@@ -11,6 +11,9 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
+import android.transition.TransitionManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -20,31 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
-import android.transition.TransitionManager;
 import android.widget.SearchView;
-
-import alektas.pocketbasket.BuildConfig;
-import alektas.pocketbasket.guide.Guide;
-import alektas.pocketbasket.guide.GuideImpl;
-import alektas.pocketbasket.view.dialogs.AboutDialog;
-import alektas.pocketbasket.view.dialogs.GuideAcceptDialog;
-import alektas.pocketbasket.view.dialogs.ResetDialog;
-import alektas.pocketbasket.view.rvadapters.BasketRvAdapter;
-import alektas.pocketbasket.view.rvadapters.ShowcaseRvAdapter;
-import androidx.annotation.NonNull;
-import androidx.appcompat.view.menu.MenuBuilder;
-import androidx.appcompat.widget.ShareActionProvider;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -53,15 +32,36 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.App;
+import alektas.pocketbasket.BuildConfig;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.viewmodel.ItemsViewModel;
-import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.Utils;
+import alektas.pocketbasket.db.entities.Item;
+import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideCase;
 import alektas.pocketbasket.guide.GuideContract;
+import alektas.pocketbasket.guide.GuideImpl;
+import alektas.pocketbasket.view.dialogs.AboutDialog;
+import alektas.pocketbasket.view.dialogs.GuideAcceptDialog;
+import alektas.pocketbasket.view.dialogs.ResetDialog;
+import alektas.pocketbasket.view.rvadapters.BasketRvAdapter;
+import alektas.pocketbasket.view.rvadapters.ShowcaseRvAdapter;
+import alektas.pocketbasket.viewmodel.ItemsViewModel;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.widget.ShareActionProvider;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements
         ResetDialog.ResetDialogListener,
         GuideAcceptDialog.GuideAcceptDialogListener,
         DeleteModeListener,
+        ShowcaseListener,
         OnStartDragListener,
         ItemSizeProvider {
 
@@ -171,6 +172,10 @@ public class MainActivity extends AppCompatActivity implements
         if (mAdView != null) {
             mAdView.destroy();
         }
+
+        mViewModel.removeDeleteModeListener();
+        mViewModel.removeShowcaseListener();
+
         super.onDestroy();
     }
 
@@ -271,16 +276,20 @@ public class MainActivity extends AppCompatActivity implements
         mDelModePanel = findViewById(R.id.del_mode_panel);
 
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
+        mViewModel.setDeleteModeListener(this);
+        mViewModel.setShowcaseListener(this);
 
         initGuide(mViewModel);
         initBasket(mViewModel);
         initShowcase(mViewModel);
 
         mViewModel.getBasketData().observe(this, (items -> {
-            mBasketAdapter.setItems(items);
+            mBasketAdapter.setItems(new ArrayList<>(items));
             updateShareIntent(items);
         }));
-        mViewModel.getShowcaseData().observe(this, mShowcaseAdapter::setItems);
+        mViewModel.getShowcaseData().observe(this, (items) -> {
+            mShowcaseAdapter.setItems(new ArrayList<>(items));
+        });
 
         if (isLandscape()) {
             setLandscapeLayout();
@@ -411,7 +420,7 @@ public class MainActivity extends AppCompatActivity implements
         mShowcase = findViewById(R.id.showcase_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mShowcase.setLayoutManager(layoutManager);
-        mShowcaseAdapter = new ShowcaseRvAdapter(this, this,
+        mShowcaseAdapter = new ShowcaseRvAdapter(
                 this, model);
         mShowcase.setAdapter(mShowcaseAdapter);
 
@@ -848,8 +857,19 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+    public void onDataSetChange() {
+        mShowcaseAdapter.notifyDataSetChanged();  // TODO: replace with point notifier
+    }
+
+    @Override
+    public void onItemChoose(int position) {
+        mShowcaseAdapter.notifyItemChanged(position);
+    }
+
+    @Override
+    public boolean onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mTouchHelper.startDrag(viewHolder);
+        return true;
     }
 
     @Override
@@ -965,11 +985,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void onDelDmBtnClick(View view) {
-        mShowcaseAdapter.deleteChoosedItems();
+        mViewModel.deleteChoosedItems();
     }
 
     public void onCancelDmBtnClick(View view) {
-        mShowcaseAdapter.cancelDel();
+        mViewModel.cancelDel();
     }
 
     public void onLinkClick(View view) {

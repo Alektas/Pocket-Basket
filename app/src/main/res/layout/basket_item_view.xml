@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout>
     <data>
+        <import type="alektas.pocketbasket.Utils"/>
+
         <variable
             name="item"
             type="alektas.pocketbasket.db.entities.Item"/>
@@ -8,6 +10,14 @@
         <variable
             name="model"
             type="alektas.pocketbasket.viewmodel.ItemsViewModel"/>
+
+        <variable
+            name="dragListener"
+            type="alektas.pocketbasket.view.OnStartDragListener"/>
+
+        <variable
+            name="holder"
+            type="androidx.recyclerview.widget.RecyclerView.ViewHolder"/>
     </data>
 
     <RelativeLayout
@@ -17,13 +27,51 @@
         android:layout_height="@dimen/item_height"
         android:background="@color/item_bg">
 
-        <include layout="@layout/item_content"
-                 android:id="@+id/item_content"
-                 app:item="@{item}"
-                 app:model="@{model}"
-                 android:layout_width="match_parent"
-                 android:layout_height="@dimen/item_height"
-                 android:layout_alignParentStart="true"/>
+        <androidx.cardview.widget.CardView
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/item_icon_view"
+            android:layout_gravity="center_vertical|start"
+            android:layout_width="@dimen/ic_item_size"
+            android:layout_height="@dimen/ic_item_size"
+            android:layout_margin="@dimen/padding_8"
+            card_view:cardCornerRadius="@dimen/ic_item_corner_rad"
+            card_view:cardPreventCornerOverlap="true"
+            android:onClick="@{() -> model.checkItem(item.name)}">
+
+            <ImageView
+                android:id="@+id/item_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="@dimen/ic_padding"
+                android:src="@{Utils.getImgId(item.imgRes)}"/>
+
+            <ImageView
+                android:id="@+id/check_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@{model.isItemChecked(item.name) ? @drawable/ic_checked : null}"/>
+
+            <TextView
+                android:id="@+id/info_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textSize="@dimen/icon_text_size"
+                android:text="@{Utils.getImgId(item.imgRes) == 0 ? Utils.getDisplayName(item) : null}"/>
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_8"
+            android:layout_marginEnd="@dimen/basket_item_text_margin_end"
+            android:layout_toEndOf="@id/item_icon_view"
+            android:layout_centerVertical="true"
+            android:textSize="@dimen/item_text_size"
+            android:textColor="@android:color/black"
+            android:text="@{Utils.getDisplayName(item)}"/>
 
         <ImageView
             android:id="@+id/drag_handle"
@@ -32,6 +80,7 @@
             android:layout_margin="@dimen/padding_16"
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
+            android:onTouch="@{() -> dragListener.onStartDrag(holder)}"
             android:src="@drawable/ic_drag_handle_darkgreen_24dp"/>
 
     </RelativeLayout>

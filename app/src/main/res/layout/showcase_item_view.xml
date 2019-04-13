@@ -10,9 +10,19 @@
         <variable
             name="model"
             type="alektas.pocketbasket.viewmodel.ItemsViewModel"/>
+
+        <variable
+            name="holder"
+            type="androidx.recyclerview.widget.RecyclerView.ViewHolder"/>
     </data>
 
-    <merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/item_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/item_height"
+        android:onClick="@{() -> model.onItemClick(item, holder)}"
+        android:onLongClick="@{() -> model.onItemLongClick(item, holder)}">
 
         <androidx.cardview.widget.CardView
             xmlns:android="http://schemas.android.com/apk/res/android"
@@ -35,12 +45,14 @@
             <ImageView
                 android:id="@+id/check_image"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                android:src="@{model.isItemInBasket(item) ? @drawable/ic_choosed : null}"/>
 
             <ImageView
                 android:id="@+id/del_image"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                android:src="@{model.delMode &amp;&amp; model.delItems.contains(item) ? @drawable/ic_deleting : null}"/>
 
             <TextView
                 android:id="@+id/info_text"
@@ -48,7 +60,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textSize="@dimen/icon_text_size"
-                android:text="@{Utils.getImgId(item.imgRes) == 0 ? item.name : null}"/>
+                android:text="@{Utils.getImgId(item.imgRes) == 0 ? Utils.getDisplayName(item) : null}"/>
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -60,7 +72,8 @@
             android:layout_toEndOf="@id/item_icon_view"
             android:layout_centerVertical="true"
             android:textSize="@dimen/item_text_size"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/white"
+            android:text="@{Utils.getDisplayName(item)}"/>
 
-    </merge>
+    </RelativeLayout>
 </layout>
