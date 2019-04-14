@@ -1,6 +1,9 @@
 package alektas.pocketbasket.db.dao;
 
+import java.util.List;
+
 import alektas.pocketbasket.db.entities.BasketMeta;
+import alektas.pocketbasket.db.entities.Item;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -174,7 +177,7 @@ public abstract class ItemsDao {
 
     /* Default Insert, Update, Delete queries */
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     public abstract void putItemToBasket(BasketMeta item);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

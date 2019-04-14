@@ -1191,9 +1191,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void handleSearch(Intent intent) {
-        String query = intent.getStringExtra(SearchManager.QUERY);
-
+        /* Intent.ACTION_SEARCH - on enter text typed in search view
+         * Intent.ACTION_VIEW - on click in search suggestions  */
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
             addItem(query);
         } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String itemName = intent.getDataString();

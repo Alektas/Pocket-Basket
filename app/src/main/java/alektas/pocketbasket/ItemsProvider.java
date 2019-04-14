@@ -46,7 +46,6 @@ public class ItemsProvider extends ContentProvider {
         } else {
             // query contains the users search
             // return a cursor with appropriate data
-
             try {
                 items = new searchAsync(dao).execute(query).get();
             } catch (ExecutionException | InterruptedException e) {
@@ -60,7 +59,8 @@ public class ItemsProvider extends ContentProvider {
     private Cursor fillCursor(MatrixCursor cursor, List<Item> items) {
         int i = 0;
         for (Item item : items) {
-            // ID, name, image resource ID and data(name)
+            // Cursor fields assigned in the ItemsContract.
+            // ID, visible text, image resource ID and data(key = name).
             cursor.addRow(new Object[] {i,
                     item.getName(),
                     Utils.getImgId(item.getImgRes()),
