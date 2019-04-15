@@ -105,6 +105,7 @@ dependencies {
     // Firebase
     implementation 'com.google.firebase:firebase-core:16.0.8'
     implementation 'com.google.firebase:firebase-ads:17.2.0'
+    implementation 'com.google.firebase:firebase-inappmessaging-display:17.1.1'
     implementation 'com.google.dagger:dagger:2.16'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
     testImplementation 'junit:junit:4.12'
