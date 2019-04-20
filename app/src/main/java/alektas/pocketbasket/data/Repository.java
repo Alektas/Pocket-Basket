@@ -1,11 +1,10 @@
 package alektas.pocketbasket.data;
 
-import alektas.pocketbasket.db.entities.BasketMeta;
-import androidx.lifecycle.LiveData;
-
 import java.util.List;
 
+import alektas.pocketbasket.db.entities.BasketMeta;
 import alektas.pocketbasket.db.entities.Item;
+import androidx.lifecycle.LiveData;
 
 public interface Repository {
     BasketMeta getItemMeta(String name);
@@ -21,7 +20,8 @@ public interface Repository {
     void addNewItem(Item item);
     void deleteItems(List<Item> item);
     void setFilter(String tag);
-    void resetShowcase(boolean fullReset);
+    void resetShowcase();
+    void insertAll(List<Item> items);
     void updateAll();
     List<Item> getItems();
     List<Item> getItems(String tag);

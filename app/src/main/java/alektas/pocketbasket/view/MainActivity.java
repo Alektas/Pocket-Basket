@@ -11,6 +11,9 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
+import android.transition.TransitionManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -20,31 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
-import android.transition.TransitionManager;
 import android.widget.SearchView;
-
-import alektas.pocketbasket.BuildConfig;
-import alektas.pocketbasket.guide.Guide;
-import alektas.pocketbasket.guide.GuideImpl;
-import alektas.pocketbasket.view.dialogs.AboutDialog;
-import alektas.pocketbasket.view.dialogs.GuideAcceptDialog;
-import alektas.pocketbasket.view.dialogs.ResetDialog;
-import alektas.pocketbasket.view.rvadapters.BasketRvAdapter;
-import alektas.pocketbasket.view.rvadapters.ShowcaseRvAdapter;
-import androidx.annotation.NonNull;
-import androidx.appcompat.view.menu.MenuBuilder;
-import androidx.appcompat.widget.ShareActionProvider;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -53,15 +32,37 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import alektas.pocketbasket.App;
+import alektas.pocketbasket.BuildConfig;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.viewmodel.ItemsViewModel;
-import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.Utils;
+import alektas.pocketbasket.db.entities.Item;
+import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideCase;
 import alektas.pocketbasket.guide.GuideContract;
+import alektas.pocketbasket.guide.GuideImpl;
+import alektas.pocketbasket.view.dialogs.AboutDialog;
+import alektas.pocketbasket.view.dialogs.GuideAcceptDialog;
+import alektas.pocketbasket.view.dialogs.ResetDialog;
+import alektas.pocketbasket.view.rvadapters.BasketRvAdapter;
+import alektas.pocketbasket.view.rvadapters.ShowcaseRvAdapter;
+import alektas.pocketbasket.viewmodel.ItemsViewModel;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.widget.ShareActionProvider;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -69,10 +70,11 @@ public class MainActivity extends AppCompatActivity implements
         ResetDialog.ResetDialogListener,
         GuideAcceptDialog.GuideAcceptDialogListener,
         DeleteModeListener,
+        ShowcaseListener,
         OnStartDragListener,
         ItemSizeProvider {
 
-    private static final String TAG = "PocketBasketApp";
+    private static final String TAG = "MainActivity";
 
     private int mCategNarrowWidth;
     private int mCategWideWidth;
@@ -123,11 +125,22 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences prefs =
                 getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
 
-        // Update items in database when other app version is launched.
-        // It allow to display correct icons, which were added or removed in other version.
+        /* Update items in database when other app version is launched or locale is changed.
+        It allow to display correct icons, which were added or removed in other version,
+        and correct item names */
+        String curLang = Utils.getCurrentLocale().getLanguage();
+        String savedLang = prefs.getString(getString(R.string.LOCALE_KEY), "lang");
+        if (savedLang == null) savedLang = "lang";
+
         int vc = Utils.getVersionCode();
-        if (prefs.getInt(getString(R.string.VERSION_CODE_KEY), 1) != vc) {
-            prefs.edit().putInt(getString(R.string.VERSION_CODE_KEY), vc).apply();
+        boolean isVersionChanged =
+                prefs.getInt(getString(R.string.VERSION_CODE_KEY), 1) != vc;
+
+        if (!savedLang.equals(curLang) || isVersionChanged) {
+            prefs.edit()
+                    .putString(getString(R.string.LOCALE_KEY), curLang)
+                    .putInt(getString(R.string.VERSION_CODE_KEY), vc)
+                    .apply();
             mViewModel.updateAllItems();
         }
 
@@ -171,6 +184,10 @@ public class MainActivity extends AppCompatActivity implements
         if (mAdView != null) {
             mAdView.destroy();
         }
+
+        mViewModel.removeDeleteModeListener();
+        mViewModel.removeShowcaseListener();
+
         super.onDestroy();
     }
 
@@ -271,16 +288,20 @@ public class MainActivity extends AppCompatActivity implements
         mDelModePanel = findViewById(R.id.del_mode_panel);
 
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
+        mViewModel.setDeleteModeListener(this);
+        mViewModel.setShowcaseListener(this);
 
         initGuide(mViewModel);
         initBasket(mViewModel);
         initShowcase(mViewModel);
 
         mViewModel.getBasketData().observe(this, (items -> {
-            mBasketAdapter.setItems(items);
+            mBasketAdapter.setItems(new ArrayList<>(items));
             updateShareIntent(items);
         }));
-        mViewModel.getShowcaseData().observe(this, mShowcaseAdapter::setItems);
+        mViewModel.getShowcaseData().observe(this, (items) -> {
+            mShowcaseAdapter.setItems(new ArrayList<>(items));
+        });
 
         if (isLandscape()) {
             setLandscapeLayout();
@@ -342,7 +363,15 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onAdFailedToLoad(int errorCode) {
                 // Code to be executed when an ad request fails.
-                Log.d(TAG, "onAdFailedToLoad: code = " + errorCode);
+                String errorStr;
+                switch (errorCode) {
+                    case 0: errorStr = "INTERNAL_ERROR"; break;
+                    case 1: errorStr = "INVALID_REQUEST"; break;
+                    case 2: errorStr = "NETWORK_ERROR"; break;
+                    case 3: errorStr = "NO_FILL"; break;
+                    default: errorStr = "UNKNOWN";
+                }
+                Log.d(TAG, "onAdFailedToLoad: code = " + errorStr);
                 hideAdBanner();
             }
 
@@ -396,6 +425,7 @@ public class MainActivity extends AppCompatActivity implements
         mBasket = findViewById(R.id.basket_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mBasket.setLayoutManager(layoutManager);
+        mBasket.setHasFixedSize(true);
         mBasketAdapter = new BasketRvAdapter(this, model,
                 this,this);
         mBasket.setAdapter(mBasketAdapter);
@@ -411,7 +441,8 @@ public class MainActivity extends AppCompatActivity implements
         mShowcase = findViewById(R.id.showcase_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         mShowcase.setLayoutManager(layoutManager);
-        mShowcaseAdapter = new ShowcaseRvAdapter(this, this,
+        mShowcase.setHasFixedSize(true);
+        mShowcaseAdapter = new ShowcaseRvAdapter(
                 this, model);
         mShowcase.setAdapter(mShowcaseAdapter);
 
@@ -597,7 +628,7 @@ public class MainActivity extends AppCompatActivity implements
                 mViewModel.setGuideCase(null);
                 mSkipGuideBtn.setVisibility(View.GONE);
                 if (!mViewModel.isShowcaseMode()) showFloatingButton();
-                showAdBanner();
+                updateAd();
             }
 
             @Override
@@ -848,8 +879,19 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+    public void onDataSetChange() {
+        mShowcaseAdapter.notifyDataSetChanged();  // TODO: replace with point notifier
+    }
+
+    @Override
+    public void onItemChoose(int position) {
+        mShowcaseAdapter.notifyItemChanged(position);
+    }
+
+    @Override
+    public boolean onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mTouchHelper.startDrag(viewHolder);
+        return true;
     }
 
     @Override
@@ -965,11 +1007,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void onDelDmBtnClick(View view) {
-        mShowcaseAdapter.deleteChoosedItems();
+        mViewModel.deleteChoosedItems();
     }
 
     public void onCancelDmBtnClick(View view) {
-        mShowcaseAdapter.cancelDel();
+        mViewModel.cancelDel();
     }
 
     public void onLinkClick(View view) {
@@ -1149,9 +1191,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void handleSearch(Intent intent) {
-        String query = intent.getStringExtra(SearchManager.QUERY);
-
+        /* Intent.ACTION_SEARCH - on enter text typed in search view
+         * Intent.ACTION_VIEW - on click in search suggestions  */
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
             addItem(query);
         } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String itemName = intent.getDataString();

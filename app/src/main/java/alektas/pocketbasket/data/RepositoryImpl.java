@@ -1,26 +1,24 @@
 package alektas.pocketbasket.data;
 
+import android.content.Context;
+import android.os.AsyncTask;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.async.getAllAsync;
 import alektas.pocketbasket.async.getBasketItemsAsync;
 import alektas.pocketbasket.async.insertAllAsync;
 import alektas.pocketbasket.async.updateAllAsync;
-import alektas.pocketbasket.db.entities.BasketMeta;
-import androidx.lifecycle.LiveData;
-
-import android.content.Context;
-import android.os.AsyncTask;
-
-import androidx.annotation.NonNull;
-
 import alektas.pocketbasket.db.AppDatabase;
 import alektas.pocketbasket.db.dao.ItemsDao;
+import alektas.pocketbasket.db.entities.BasketMeta;
 import alektas.pocketbasket.db.entities.Item;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class RepositoryImpl implements Repository, Observer {
     private static final String TAG = "RepositoryImpl";
@@ -114,12 +112,13 @@ public class RepositoryImpl implements Repository, Observer {
 
     // Return default showcase items
     @Override
-    public void resetShowcase(boolean fullReset) {
-        if (fullReset) {
-            new resetAsync(mItemsDao, this).execute(ItemGenerator.getAll());
-        } else {
-            new insertAllAsync(mItemsDao, this).execute(ItemGenerator.getAll());
-        }
+    public void resetShowcase() {
+        new resetAsync(mItemsDao, this).execute(ItemGenerator.getAll());
+    }
+
+    @Override
+    public void insertAll(List<Item> items) {
+        new insertAllAsync(mItemsDao, this).execute(items);
     }
 
     @Override

@@ -26,8 +26,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
 
-        versionName "0.7.0"
-        versionCode 4
+        versionName "0.7.1"
+        versionCode 5
         project.ext.set("archivesBaseName", "PocketBasket-" + defaultConfig.versionName)
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -67,10 +67,6 @@ android {
 
         free {
             dimension "mode"
-            // If you've configured the defaultConfig block for the release version of
-            // your app, you can leave this block empty and Gradle uses configurations in
-            // the defaultConfig block instead. You still need to create this flavor.
-            // Otherwise, all variants use the "dev" flavor configurations.
         }
     }
     compileOptions {
@@ -79,6 +75,12 @@ android {
     }
     dataBinding {
         enabled = true
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE-FIREBASE.txt'
+        exclude 'META-INF/NOTICE'
     }
 }
 
@@ -105,6 +107,9 @@ dependencies {
     // Firebase
     implementation 'com.google.firebase:firebase-core:16.0.8'
     implementation 'com.google.firebase:firebase-ads:17.2.0'
+    implementation 'com.google.firebase:firebase-inappmessaging-display:17.1.1'
+    implementation 'com.google.firebase:firebase-messaging:17.6.0'
+
     implementation 'com.google.dagger:dagger:2.16'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
     testImplementation 'junit:junit:4.12'

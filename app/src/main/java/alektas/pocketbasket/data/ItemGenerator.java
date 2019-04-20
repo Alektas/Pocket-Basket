@@ -122,17 +122,17 @@ public class ItemGenerator {
     }
 
     private static void addItem(List<Item> items, int nameRes, int imgRes, int tagRes) {
-        String nameIdName = Utils.getResIdName(nameRes);
-        String tagIdName = Utils.getResIdName(tagRes);
-        String iconIdName;
-        if (imgRes == 0) {
-            iconIdName = null;
-        } else {
-            iconIdName = Utils.getResIdName(imgRes);
-        }
+        String nameResName = Utils.getResIdName(nameRes);
+        String tagResName = Utils.getResIdName(tagRes);
+        if (tagResName == null) tagResName = Utils.getResIdName(R.string.other);
+
+        String iconResName;
+        if (imgRes == 0) iconResName = null;
+        else iconResName = Utils.getResIdName(imgRes);
+
 
         String name = Utils.getString(nameRes);
-        Item item = new Item(name, nameIdName, iconIdName, tagIdName);
+        Item item = new Item(name, nameResName, iconResName, tagResName);
 
         items.add(item);
     }

@@ -4,6 +4,7 @@
     <string name="app_name" translatable="false">Pocket Basket</string>
     <string name="PREFERENCES_FILE_KEY" translatable="false">alektas.pocketbasket</string>
     <string name="VERSION_CODE_KEY" translatable="false">versionCode</string>
+    <string name="LOCALE_KEY" translatable="false">locale</string>
     <string name="FIRST_START_KEY" translatable="false">isFirstStart</string>
     <string name="search_provider_authority" translatable="false">alektas.pocketbasket.ItemsProvider</string>
 

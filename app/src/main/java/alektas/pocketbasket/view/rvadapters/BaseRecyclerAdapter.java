@@ -1,76 +1,59 @@
 package alektas.pocketbasket.view.rvadapters;
 
-import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.util.List;
 
-import alektas.pocketbasket.R;
-import alektas.pocketbasket.databinding.ItemViewBinding;
 import alektas.pocketbasket.databinding.BasketItemViewBinding;
+import alektas.pocketbasket.databinding.ShowcaseItemViewBinding;
 import alektas.pocketbasket.db.entities.Item;
-import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
 public abstract class BaseRecyclerAdapter
-        extends RecyclerView.Adapter<BaseRecyclerAdapter.ViewHolder> {
-    private Context mContext;
-    private ItemsViewModel mModel;
-    private List<Item> mItems;
+        extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private List<Object> mItems;
 
-    BaseRecyclerAdapter(Context context, ItemsViewModel model) {
-        mContext = context;
-        mModel = model;
+    BaseRecyclerAdapter() {
         setHasStableIds(true);
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
-        private static final String TAG = "ViewHolder";
-        final View mItemView;
-        final CardView mIconView;
-        final ImageView mCheckImage;
-        final ImageView mDelImage;
-        final ImageView mDragHandle;
-        final TextView mName;
+    static class ItemHolder extends RecyclerView.ViewHolder {
+        private static final String TAG = "ItemHolder";
+        private ViewDataBinding mBinding;
 
-        private ItemViewBinding mItemBinding;
-        private BasketItemViewBinding mBasketItemBinding;
-
-        ViewHolder(View view) {
-            super(view);
-            mItemView = itemView;
-            mIconView = mItemView.findViewById(R.id.item_icon_view);
-            mCheckImage = mItemView.findViewById(R.id.check_image);
-            mName = mItemView.findViewById(R.id.item_name);
-            mDelImage = mItemView.findViewById(R.id.del_image);
-            mDragHandle = mItemView.findViewById(R.id.drag_handle);
+        private ItemHolder(@NonNull View itemView) {
+            super(itemView);
         }
 
-        ViewHolder(@NonNull ItemViewBinding binding) {
+        ItemHolder(ViewDataBinding binding) {
             this(binding.getRoot());
-            mItemBinding = binding;
-        }
-
-        ViewHolder(@NonNull BasketItemViewBinding binding) {
-            this(binding.getRoot());
-            mBasketItemBinding = binding;
+            mBinding = binding;
         }
 
         void bind(Item item) {
-            if (mItemBinding != null) {
-                mItemBinding.setItem(item);
-                mItemBinding.executePendingBindings();
+            if (mBinding instanceof ShowcaseItemViewBinding) {
+                ((ShowcaseItemViewBinding) mBinding).setItem(item);
+                mBinding.executePendingBindings();
             }
-            if (mBasketItemBinding != null) {
-                mBasketItemBinding.setItem(item);
-                mBasketItemBinding.executePendingBindings();
+            if (mBinding instanceof BasketItemViewBinding) {
+                ((BasketItemViewBinding) mBinding).setItem(item);
+                mBinding.executePendingBindings();
+            }
+        }
+
+        void bind(Item item, RecyclerView.ViewHolder holder) {
+            if (mBinding instanceof ShowcaseItemViewBinding) {
+                ((ShowcaseItemViewBinding) mBinding).setItem(item);
+                ((ShowcaseItemViewBinding) mBinding).setHolder(holder);
+                mBinding.executePendingBindings();
+            }
+            if (mBinding instanceof BasketItemViewBinding) {
+                ((BasketItemViewBinding) mBinding).setItem(item);
+                ((BasketItemViewBinding) mBinding).setHolder(holder);
+                mBinding.executePendingBindings();
             }
         }
     }
@@ -83,39 +66,32 @@ public abstract class BaseRecyclerAdapter
 
     @Override
     public long getItemId(int position) {
-        return mItems.get(position).getName().hashCode();
+        Object obj = mItems.get(position);
+        if (obj instanceof Item) return ((Item) obj).getName().hashCode();
+        return obj.hashCode();
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        LayoutInflater inflater = LayoutInflater.from(mContext);
-        View itemView = inflater.inflate(R.layout.item_view, parent, false);
-        ItemViewBinding binding = DataBindingUtil.bind(itemView);
-        binding.setModel(mModel);
-        return new ViewHolder(binding);
-    }
+    public abstract RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType);
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        Item item = mItems.get(position);
-        viewHolder.bind(item);
-        setItemText(viewHolder, item);
-        setChooseIcon(viewHolder, item);
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
+        Object obj = mItems.get(position);
+        if (obj instanceof Item) {
+            ItemHolder vh = (ItemHolder) viewHolder;
+            Item item = (Item) obj;
+            vh.bind(item, viewHolder);
+        }
     }
 
-    public List<Item> getItems() {
+    public List<Object> getItems() {
         return mItems;
     }
 
-    public void setItems(List<Item> items) {
+    public void setItems(List<Object> items) {
         mItems = items;
         notifyDataSetChanged();
     }
 
-    void setItemText(ViewHolder viewHolder, Item item) {
-        viewHolder.mName.setText(item.getName());
-    }
-
-    abstract void setChooseIcon(ViewHolder viewHolder, Item item);
 }
