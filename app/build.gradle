@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply from: "$rootDir/release.gradle"
 
 // Create a variable called keystorePropertiesFile, and initialize it to
 // keystore.properties file, in the rootProject folder.
