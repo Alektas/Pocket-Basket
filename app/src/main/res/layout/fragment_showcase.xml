@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/showcase_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.ShowcaseFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/showcase_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryLight"
+        android:divider="@color/colorPrimaryLight"
+        android:animateLayoutChanges="false"
+        tools:listitem="@layout/showcase_item_view"/>
+
+</FrameLayout>
