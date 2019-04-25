@@ -31,62 +31,44 @@
             android:imeOptions="actionDone"/>
     </androidx.appcompat.widget.Toolbar>
 
-    <ScrollView
-        android:id="@+id/categories_wrapper"
+    <fragment
+        android:id="@+id/fragment_categories"
+        android:name="alektas.pocketbasket.view.CategoriesFragment"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:background="@color/colorPrimary"
-        android:fillViewport="true"
-        android:paddingTop="@dimen/padding_8"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintBottom_toTopOf="@id/separator"
-        app:layout_constraintEnd_toStartOf="@+id/showcase_list"
-        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar">
+        app:layout_constraintEnd_toStartOf="@id/fragment_showcase"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:layout="@layout/fragment_categories"/>
 
-        <include
-            layout="@layout/categories_layout"/>
-    </ScrollView>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/showcase_list"
+    <fragment
+        android:id="@+id/fragment_showcase"
+        android:name="alektas.pocketbasket.view.ShowcaseFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/colorPrimaryLight"
-        android:divider="@color/colorPrimaryLight"
-        android:animateLayoutChanges="false"
-        app:layout_constraintBottom_toTopOf="@+id/del_mode_panel"
-        app:layout_constraintEnd_toStartOf="@+id/basket_list"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="@id/separator"
+        app:layout_constraintStart_toEndOf="@id/fragment_categories"
+        app:layout_constraintEnd_toStartOf="@id/fragment_basket"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@+id/categories_wrapper"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintVertical_chainStyle="packed"/>
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:layout="@layout/fragment_showcase"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/basket_list"
+    <fragment
+        android:id="@+id/fragment_basket"
+        android:name="alektas.pocketbasket.view.BasketFragment"
         android:layout_width="@dimen/basket_narrow_size"
         android:layout_height="0dp"
-        android:animateLayoutChanges="false"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintBottom_toTopOf="@id/separator"
+        app:layout_constraintStart_toEndOf="@id/fragment_showcase"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@+id/showcase_list"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"/>
-
-    <!-- Delete and Cancel buttons. Appear in Delete Mode -->
-
-    <include
-        android:id="@+id/del_mode_panel"
-        layout="@layout/del_mode_panel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/separator"
-        app:layout_constraintEnd_toEndOf="@+id/showcase_list"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/showcase_list"
-        app:layout_constraintTop_toBottomOf="@id/showcase_list"
-        app:layout_constraintVertical_bias="1.0"/>
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:layout="@layout/fragment_basket"/>
 
     <!-- FAB -->
 
@@ -102,7 +84,7 @@
         app:layout_constraintBottom_toTopOf="@id/separator"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintStart_toEndOf="@+id/showcase_list"/>
+        app:layout_constraintStart_toEndOf="@+id/fragment_showcase"/>
 
     <!-- Floating menu buttons -->
 
@@ -213,7 +195,7 @@
         android:visibility="invisible"
         app:srcCompat="@color/guide_bg_color"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/showcase_list"
+        app:layout_constraintStart_toStartOf="@id/fragment_showcase"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -224,7 +206,7 @@
         android:visibility="invisible"
         app:srcCompat="@color/guide_bg_color"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/basket_list"
+        app:layout_constraintStart_toStartOf="@id/fragment_basket"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
@@ -234,7 +216,7 @@
         android:layout_height="match_parent"
         android:visibility="invisible"
         app:srcCompat="@color/guide_bg_color"
-        app:layout_constraintEnd_toEndOf="@id/showcase_list"
+        app:layout_constraintEnd_toEndOf="@id/fragment_showcase"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -245,7 +227,7 @@
         android:layout_height="match_parent"
         android:visibility="invisible"
         app:srcCompat="@color/guide_bg_color"
-        app:layout_constraintEnd_toEndOf="@id/categories_wrapper"
+        app:layout_constraintEnd_toEndOf="@id/fragment_categories"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
@@ -390,8 +372,8 @@
         app:srcCompat="@drawable/ic_tap"
         app:layout_constraintVertical_bias="0.25"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/showcase_list"
-        app:layout_constraintStart_toStartOf="@id/showcase_list"
+        app:layout_constraintEnd_toEndOf="@id/fragment_showcase"
+        app:layout_constraintStart_toStartOf="@id/fragment_showcase"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView
@@ -426,10 +408,10 @@
         app:srcCompat="@drawable/ic_tap"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintVertical_bias="0.05"
-        app:layout_constraintEnd_toEndOf="@id/basket_list"
-        app:layout_constraintStart_toStartOf="@id/basket_list"
-        app:layout_constraintTop_toTopOf="@id/basket_list"
-        app:layout_constraintBottom_toBottomOf="@id/basket_list"/>
+        app:layout_constraintEnd_toEndOf="@id/fragment_basket"
+        app:layout_constraintStart_toStartOf="@id/fragment_basket"
+        app:layout_constraintTop_toTopOf="@id/fragment_basket"
+        app:layout_constraintBottom_toBottomOf="@id/fragment_basket"/>
 
     <TextView
         android:id="@+id/guide_check_item_text"
@@ -453,10 +435,10 @@
         app:srcCompat="@drawable/ic_scroll_vertical_mir_cut"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintVertical_bias="0"
-        app:layout_constraintEnd_toEndOf="@id/basket_list"
-        app:layout_constraintStart_toStartOf="@id/basket_list"
-        app:layout_constraintTop_toTopOf="@id/basket_list"
-        app:layout_constraintBottom_toBottomOf="@id/basket_list"/>
+        app:layout_constraintEnd_toEndOf="@id/fragment_basket"
+        app:layout_constraintStart_toStartOf="@id/fragment_basket"
+        app:layout_constraintTop_toTopOf="@id/fragment_basket"
+        app:layout_constraintBottom_toBottomOf="@id/fragment_basket"/>
 
     <TextView
         android:id="@+id/guide_move_item_text"
@@ -490,9 +472,9 @@
         app:srcCompat="@drawable/ic_swipe_right"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintVertical_bias="0.1"
-        app:layout_constraintEnd_toEndOf="@id/basket_list"
-        app:layout_constraintStart_toStartOf="@id/basket_list"
-        app:layout_constraintTop_toTopOf="@id/basket_list"/>
+        app:layout_constraintEnd_toEndOf="@id/fragment_basket"
+        app:layout_constraintStart_toStartOf="@id/fragment_basket"
+        app:layout_constraintTop_toTopOf="@id/fragment_basket"/>
 
     <TextView
         android:id="@+id/guide_remove_text"
@@ -525,9 +507,9 @@
         android:visibility="invisible"
         app:srcCompat="@drawable/ic_press_and_hold"
         app:layout_constraintVertical_bias="0.25"
-        app:layout_constraintEnd_toEndOf="@id/showcase_list"
-        app:layout_constraintStart_toStartOf="@id/showcase_list"
-        app:layout_constraintTop_toTopOf="@id/showcase_list"
+        app:layout_constraintEnd_toEndOf="@id/fragment_showcase"
+        app:layout_constraintStart_toStartOf="@id/fragment_showcase"
+        app:layout_constraintTop_toTopOf="@id/fragment_showcase"
         app:layout_constraintBottom_toTopOf="@id/guide_del_mode_text"/>
 
     <TextView
@@ -550,10 +532,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@id/del_mode_panel"
-        app:layout_constraintEnd_toEndOf="@id/del_mode_panel"
+        app:layout_constraintBottom_toBottomOf="@id/fragment_showcase"
+        app:layout_constraintEnd_toEndOf="@id/fragment_showcase"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@id/del_mode_panel"
+        app:layout_constraintStart_toStartOf="@id/fragment_showcase"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.98"
         app:srcCompat="@drawable/ic_tap_rot90_cut"/>

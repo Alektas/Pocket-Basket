@@ -25,6 +25,19 @@ import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.SearchView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.widget.ShareActionProvider;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.MenuItemCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -34,7 +47,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.BuildConfig;
@@ -51,18 +63,6 @@ import alektas.pocketbasket.view.dialogs.ResetDialog;
 import alektas.pocketbasket.view.rvadapters.BasketRvAdapter;
 import alektas.pocketbasket.view.rvadapters.ShowcaseRvAdapter;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.MenuBuilder;
-import androidx.appcompat.widget.ShareActionProvider;
-import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.view.MenuItemCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
@@ -95,9 +95,11 @@ public class MainActivity extends AppCompatActivity implements
     private boolean allowChooseCategory = true;
 
     private RecyclerView mBasket;
+    private View mBasketContainer;
     private RecyclerView mShowcase;
+    private View mShowcaseContainer;
     private LinearLayout mDelModePanel;
-    private View mCategoriesWrapper;
+    private View mCategoriesContainer;
     private FloatingActionButton mAddBtn;
     private SearchView mSearchView;
     private AdView mAdView;
@@ -281,7 +283,9 @@ public class MainActivity extends AppCompatActivity implements
 
         mConstraintLayout = findViewById(R.id.root_layout);
 
-        mCategoriesWrapper = findViewById(R.id.categories_wrapper);
+        mCategoriesContainer = findViewById(R.id.fragment_categories);
+        mShowcaseContainer = findViewById(R.id.fragment_showcase);
+        mBasketContainer = findViewById(R.id.fragment_basket);
 
         initDimensions();
 
@@ -696,11 +700,12 @@ public class MainActivity extends AppCompatActivity implements
 
     // Set basket or showcase mode in depends of touch moving distance (movX)
     private void setMode(int movX) {
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
+
         if (mViewModel.isShowcaseMode()) {
             if (movX < -changeModeDistance) {
                 setBasketMode();
             } else {
-                TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
                 changeLayoutSize(mCategWideWidth,
                         0,
                         mBasketNarrowWidth);
@@ -709,7 +714,6 @@ public class MainActivity extends AppCompatActivity implements
             if (movX > changeModeDistance) {
                 setShowcaseMode();
             } else {
-                TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
                 changeLayoutSize(mCategNarrowWidth,
                         mShowcaseNarrowWidth,
                         0);
@@ -773,17 +777,17 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void changeLayoutSize(int categWidth, int showcaseWidth, int basketWidth) {
-        ViewGroup.LayoutParams categWrapParams = mCategoriesWrapper.getLayoutParams();
-        ViewGroup.LayoutParams showcaseParams = mShowcase.getLayoutParams();
-        ViewGroup.LayoutParams basketParams = mBasket.getLayoutParams();
+        ViewGroup.LayoutParams categoriesParams = mCategoriesContainer.getLayoutParams();
+        ViewGroup.LayoutParams showcaseParams = mShowcaseContainer.getLayoutParams();
+        ViewGroup.LayoutParams basketParams = mBasketContainer.getLayoutParams();
 
-        categWrapParams.width = categWidth;
+        categoriesParams.width = categWidth;
         showcaseParams.width = showcaseWidth;
         basketParams.width = basketWidth;
 
-        mCategoriesWrapper.setLayoutParams(categWrapParams);
-        mShowcase.setLayoutParams(showcaseParams);
-        mBasket.setLayoutParams(basketParams);
+        mCategoriesContainer.setLayoutParams(categoriesParams);
+        mShowcaseContainer.setLayoutParams(showcaseParams);
+        mBasketContainer.setLayoutParams(basketParams);
     }
 
     // Return value for size of layout between minSize and maxSize corresponding to movX
