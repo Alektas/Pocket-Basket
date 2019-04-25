@@ -34,8 +34,8 @@
                        android:resource="@xml/searchable"/>
         </activity>
         <provider
-            android:authorities="alektas.pocketbasket.ItemsProvider"
-            android:name="alektas.pocketbasket.ItemsProvider"
+            android:authorities="${applicationId}.ItemsProvider"
+            android:name=".ItemsProvider"
             android:exported="false"/>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
