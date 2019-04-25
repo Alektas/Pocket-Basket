@@ -50,7 +50,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintBottom_toTopOf="@id/del_mode_panel"
+        app:layout_constraintBottom_toBottomOf="@id/separator"
         app:layout_constraintStart_toEndOf="@id/fragment_categories"
         app:layout_constraintEnd_toStartOf="@id/fragment_basket"
         app:layout_constraintHorizontal_bias="0"
@@ -69,21 +69,6 @@
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintVertical_chainStyle="packed"
         tools:layout="@layout/fragment_basket"/>
-
-    <!-- Delete and Cancel buttons. Appear in Delete Mode -->
-
-    <include
-        android:id="@+id/del_mode_panel"
-        layout="@layout/del_mode_panel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/separator"
-        app:layout_constraintEnd_toEndOf="@+id/fragment_showcase"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/fragment_showcase"
-        app:layout_constraintTop_toBottomOf="@id/fragment_showcase"
-        app:layout_constraintVertical_bias="1.0"/>
 
     <!-- FAB -->
 
@@ -547,10 +532,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="48dp"
         android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@id/del_mode_panel"
-        app:layout_constraintEnd_toEndOf="@id/del_mode_panel"
+        app:layout_constraintBottom_toBottomOf="@id/fragment_showcase"
+        app:layout_constraintEnd_toEndOf="@id/fragment_showcase"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@id/del_mode_panel"
+        app:layout_constraintStart_toStartOf="@id/fragment_showcase"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.98"
         app:srcCompat="@drawable/ic_tap_rot90_cut"/>
