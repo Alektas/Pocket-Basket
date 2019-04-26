@@ -2,24 +2,20 @@
 <transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
     android:transitionOrdering="together"
     android:duration="250">
-    <changeBounds>
+
+    <changeBounds android:interpolator="@android:interpolator/accelerate_decelerate">
         <targets>
-            <target android:targetId="@id/fragment_categories"/>
-            <target android:targetId="@id/categories_wrapper"/>
             <target android:targetId="@id/fragment_showcase"/>
             <target android:targetId="@id/showcase_list"/>
-            <target android:targetId="@id/fragment_basket"/>
-            <target android:targetId="@id/basket_list"/>
             <target android:targetId="@id/del_mode_panel"/>
-            <target android:targetId="@id/btn_del"/>
-            <target android:targetId="@id/btn_close_panel"/>
+
         </targets>
     </changeBounds>
 
-    <explode>
+    <slide>
         <targets>
-            <target android:targetId="@id/fab"/>
+            <target android:targetId="@id/del_mode_panel"/>
         </targets>
-    </explode>
+    </slide>
 
 </transitionSet>

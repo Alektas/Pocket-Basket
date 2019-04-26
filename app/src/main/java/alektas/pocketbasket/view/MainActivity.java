@@ -108,7 +108,9 @@ public class MainActivity extends AppCompatActivity implements
     private View mSkipGuideBtn;
     private BasketRvAdapter mBasketAdapter;
     private ShowcaseRvAdapter mShowcaseAdapter;
-    private Transition mTransitionSet;
+    private Transition mChangeModeTransition;
+    private Transition mFamTransition;
+    private Transition mDelPanelTransition;
     private ConstraintLayout mConstraintLayout;
     private ShareActionProvider mShareActionProvider;
     private ItemTouchHelper mTouchHelper;
@@ -277,7 +279,6 @@ public class MainActivity extends AppCompatActivity implements
     /* Init methods */
 
     private void init() {
-        initAnimTransition();
         initSearch();
         initFloatingActionMenu();
 
@@ -298,6 +299,7 @@ public class MainActivity extends AppCompatActivity implements
         initGuide(mViewModel);
         initBasket(mViewModel);
         initShowcase(mViewModel);
+        initAnimTransition();
 
         mViewModel.getBasketData().observe(this, (items -> {
             mBasketAdapter.setItems(new ArrayList<>(items));
@@ -321,8 +323,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initAnimTransition() {
-        mTransitionSet = TransitionInflater.from(this)
+        mChangeModeTransition = TransitionInflater.from(this)
                 .inflateTransition(R.transition.change_mode_transition);
+        mFamTransition = TransitionInflater.from(this)
+                .inflateTransition(R.transition.fam_transition);
+        mDelPanelTransition = TransitionInflater.from(this)
+                .inflateTransition(R.transition.del_panel_transition);
     }
 
     private void initDimensions() {
@@ -700,12 +706,11 @@ public class MainActivity extends AppCompatActivity implements
 
     // Set basket or showcase mode in depends of touch moving distance (movX)
     private void setMode(int movX) {
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mTransitionSet);
-
         if (mViewModel.isShowcaseMode()) {
             if (movX < -changeModeDistance) {
                 setBasketMode();
             } else {
+                TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
                 changeLayoutSize(mCategWideWidth,
                         0,
                         mBasketNarrowWidth);
@@ -714,6 +719,7 @@ public class MainActivity extends AppCompatActivity implements
             if (movX > changeModeDistance) {
                 setShowcaseMode();
             } else {
+                TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
                 changeLayoutSize(mCategNarrowWidth,
                         mShowcaseNarrowWidth,
                         0);
@@ -724,13 +730,17 @@ public class MainActivity extends AppCompatActivity implements
     private void setBasketMode() {
         mViewModel.setShowcaseMode(false);
 
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
         changeLayoutSize(mCategNarrowWidth,
                 mShowcaseNarrowWidth,
                 0);
 
         showFloatingButton();
 
-        if (isMenuShown) { hideFloatingMenu(); }
+        if (isMenuShown) {
+            TransitionManager.beginDelayedTransition(mConstraintLayout, mFamTransition);
+            hideFloatingMenu();
+        }
         mDelModePanel.setOrientation(LinearLayout.VERTICAL);
         mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
     }
@@ -738,12 +748,17 @@ public class MainActivity extends AppCompatActivity implements
     private void setShowcaseMode() {
         mViewModel.setShowcaseMode(true);
 
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
         changeLayoutSize(mCategWideWidth,
                 0,
                 mBasketNarrowWidth);
 
         hideFloatingButton();
-        if (isMenuShown) { hideFloatingMenu(); }
+
+        if (isMenuShown) {
+            TransitionManager.beginDelayedTransition(mConstraintLayout, mFamTransition);
+            hideFloatingMenu();
+        }
         mDelModePanel.setOrientation(LinearLayout.HORIZONTAL);
         mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
     }
@@ -814,6 +829,7 @@ public class MainActivity extends AppCompatActivity implements
     private void showFloatingMenu() {
         mAddBtn.setImageResource(R.drawable.ic_close_white_24dp);
 
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mFamTransition);
         mCheckAllBtn.setVisibility(View.VISIBLE);
         mDelAllBtn.setVisibility(View.VISIBLE);
 
@@ -825,6 +841,7 @@ public class MainActivity extends AppCompatActivity implements
     private void hideFloatingMenu() {
         mAddBtn.setImageResource(R.drawable.ic_edit_24dp);
 
+        TransitionManager.beginDelayedTransition(mConstraintLayout, mFamTransition);
         mCheckAllBtn.setVisibility(View.INVISIBLE);
         mDelAllBtn.setVisibility(View.INVISIBLE);
 
@@ -873,13 +890,19 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onDelModeEnable() {
         boolean dmAllowed = mViewModel.setDelMode(true);
-        if (dmAllowed) mDelModePanel.setVisibility(View.VISIBLE);
+        if (dmAllowed) {
+            TransitionManager.beginDelayedTransition(mConstraintLayout, mDelPanelTransition);
+            mDelModePanel.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
     public void onDelModeDisable() {
         boolean dmAllowed = mViewModel.setDelMode(false);
-        if (dmAllowed) mDelModePanel.setVisibility(View.GONE);
+        if (dmAllowed) {
+            TransitionManager.beginDelayedTransition(mConstraintLayout, mDelPanelTransition);
+            mDelModePanel.setVisibility(View.GONE);
+        }
     }
 
     @Override
