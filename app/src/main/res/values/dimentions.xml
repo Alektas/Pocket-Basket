@@ -7,6 +7,9 @@
     <dimen name="item_height">72dp</dimen>
     <dimen name="basket_item_text_margin_end">56dp</dimen>
 
+    <dimen name="del_panel_corners">16dp</dimen>
+    <dimen name="del_panel_stroke">0dp</dimen>
+
     <dimen name="categ_wide_size">145dp</dimen>
     <dimen name="categ_narrow_size">56dp</dimen>
     <dimen name="showcase_narrow_size">72dp</dimen>

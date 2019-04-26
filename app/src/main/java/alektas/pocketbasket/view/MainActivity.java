@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements
 
         initDimensions();
 
-        mDelModePanel = findViewById(R.id.del_mode_panel);
+        mDelModePanel = findViewById(R.id.del_panel);
 
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
         mViewModel.setDeleteModeListener(this);
@@ -731,7 +731,8 @@ public class MainActivity extends AppCompatActivity implements
         showFloatingButton();
 
         if (isMenuShown) { hideFloatingMenu(); }
-        mDelModePanel.setOrientation(LinearLayout.VERTICAL);
+        ((LinearLayout) mDelModePanel.findViewById(R.id.del_panel_content))
+                .setOrientation(LinearLayout.VERTICAL);
         mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
     }
 
@@ -744,7 +745,8 @@ public class MainActivity extends AppCompatActivity implements
 
         hideFloatingButton();
         if (isMenuShown) { hideFloatingMenu(); }
-        mDelModePanel.setOrientation(LinearLayout.HORIZONTAL);
+        ((LinearLayout) mDelModePanel.findViewById(R.id.del_panel_content))
+                .setOrientation(LinearLayout.HORIZONTAL);
         mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
     }
 
