@@ -6,7 +6,7 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
+    android:background="@color/main_bg"
     android:focusableInTouchMode="true"
     tools:context=".view.MainActivity">
 
@@ -50,7 +50,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintBottom_toBottomOf="@id/separator"
+        app:layout_constraintBottom_toTopOf="@id/separator"
         app:layout_constraintStart_toEndOf="@id/fragment_categories"
         app:layout_constraintEnd_toStartOf="@id/fragment_basket"
         app:layout_constraintHorizontal_bias="0"

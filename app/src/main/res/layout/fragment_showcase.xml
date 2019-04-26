@@ -4,6 +4,7 @@
     android:id="@+id/showcase_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimaryLight"
     tools:context=".view.ShowcaseFragment">
 
     <androidx.recyclerview.widget.RecyclerView

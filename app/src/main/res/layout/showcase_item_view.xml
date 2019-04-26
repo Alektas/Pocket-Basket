@@ -72,7 +72,7 @@
             android:layout_toEndOf="@id/item_icon_view"
             android:layout_centerVertical="true"
             android:textSize="@dimen/item_text_size"
-            android:textColor="@android:color/white"
+            android:textColor="@color/item_text_showcase"
             android:text="@{Utils.getDisplayName(item)}"/>
 
     </RelativeLayout>

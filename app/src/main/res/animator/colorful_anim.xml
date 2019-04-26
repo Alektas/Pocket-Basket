@@ -3,7 +3,7 @@
     <objectAnimator
         android:propertyName="backgroundColor"
         android:duration="200"
-        android:valueFrom="@color/item_bg"
-        android:valueTo="@color/item_bg_del"
+        android:valueFrom="@color/item_bg_basket"
+        android:valueTo="@color/item_bg_basket_del"
         android:valueType="colorType"/>
 </set>
