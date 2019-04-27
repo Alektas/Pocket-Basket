@@ -11,15 +11,20 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.transition.ChangeBounds;
+import android.transition.Explode;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
+import android.transition.TransitionSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -73,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements
         ItemSizeProvider {
 
     private static final String TAG = "MainActivity";
+    private static final long CHANGE_BOUNDS_TIME = 250;
 
     private int mCategNarrowWidth;
     private int mCategWideWidth;
@@ -86,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements
     private int initX;
     private int initY;
     private int movX;
+    private float mMaxVelocity;
 
     private boolean isMenuShown;
     private boolean allowChangeMode = true;
@@ -106,13 +113,16 @@ public class MainActivity extends AppCompatActivity implements
     private View mSkipGuideBtn;
     private BasketRvAdapter mBasketAdapter;
     private ShowcaseRvAdapter mShowcaseAdapter;
-    private Transition mChangeModeTransition;
+    private TransitionSet mChangeModeTransition;
     private Transition mFamTransition;
     private Transition mDelPanelTransition;
     private ConstraintLayout mConstraintLayout;
     private ShareActionProvider mShareActionProvider;
     private ItemTouchHelper mTouchHelper;
     private ItemsViewModel mViewModel;
+    private VelocityTracker mVelocityTracker;
+    private VelocityInterpolator mChangeBoundsInterpolator;
+    private Transition mChangeBounds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -297,7 +307,7 @@ public class MainActivity extends AppCompatActivity implements
         initGuide(mViewModel);
         initBasket(mViewModel);
         initShowcase(mViewModel);
-        initAnimTransition();
+        initTransitions();
 
         mViewModel.getBasketData().observe(this, (items -> {
             mBasketAdapter.setItems(new ArrayList<>(items));
@@ -320,9 +330,28 @@ public class MainActivity extends AppCompatActivity implements
         initAd();
     }
 
-    private void initAnimTransition() {
-        mChangeModeTransition = TransitionInflater.from(this)
-                .inflateTransition(R.transition.change_mode_transition);
+    private void initTransitions() {
+        mChangeBounds = new ChangeBounds();
+        mChangeBounds.setInterpolator(mChangeBoundsInterpolator)
+                .addTarget(R.id.fragment_categories)
+                .addTarget(R.id.categories_wrapper)
+                .addTarget(R.id.fragment_showcase)
+                .addTarget(R.id.showcase_list)
+                .addTarget(R.id.fragment_basket)
+                .addTarget(R.id.basket_list)
+                .addTarget(R.id.del_panel)
+                .addTarget(R.id.del_panel_content)
+                .addTarget(R.id.btn_del)
+                .addTarget(R.id.btn_close_panel);
+        Transition explode = new Explode();
+        explode.addTarget(R.id.fab);
+        mChangeBoundsInterpolator = new VelocityInterpolator(0);
+        mChangeModeTransition = new TransitionSet();
+        mChangeModeTransition.setDuration(CHANGE_BOUNDS_TIME)
+                .setOrdering(TransitionSet.ORDERING_TOGETHER)
+                .addTransition(mChangeBounds)
+                .addTransition(explode);
+
         mFamTransition = TransitionInflater.from(this)
                 .inflateTransition(R.transition.fam_transition);
         mDelPanelTransition = TransitionInflater.from(this)
@@ -348,6 +377,8 @@ public class MainActivity extends AppCompatActivity implements
 
         changeModeDistance = getResources().getDimension(R.dimen.change_mode_distance);
         basketTextMarginEnd = (int) getResources().getDimension(R.dimen.basket_item_text_margin_end);
+
+        mMaxVelocity = ViewConfiguration.get(this).getScaledMaximumFlingVelocity();
     }
 
     private void initSearch() {
@@ -1124,6 +1155,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void handleChangeModeByTouch(MotionEvent event) {
+        if (mVelocityTracker == null) {
+            mVelocityTracker = VelocityTracker.obtain();
+        }
+        mVelocityTracker.addMovement(event);
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
                 initX = (int) (event.getX() + 0.5f);
@@ -1178,6 +1214,10 @@ public class MainActivity extends AppCompatActivity implements
 
     private void finishModeChange(MotionEvent event) {
         if (allowChangeMode) {
+            mVelocityTracker.computeCurrentVelocity(1000, mMaxVelocity);
+            float velocity = mVelocityTracker.getXVelocity();
+            mChangeBoundsInterpolator.setVelocity(velocity);
+            mChangeBounds.setInterpolator(mChangeBoundsInterpolator);
             setMode(movX);
             mShowcase.onTouchEvent(event);
             mBasket.onTouchEvent(event);
@@ -1185,6 +1225,10 @@ public class MainActivity extends AppCompatActivity implements
             allowChangeMode = true;
         }
 
+        if (mVelocityTracker != null) {
+            mVelocityTracker.recycle();
+            mVelocityTracker = null;
+        }
         alreadySetChangeModeAllowing = false;
         initX = 0;
         movX = 0;
