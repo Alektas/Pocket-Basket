@@ -64,8 +64,6 @@ import alektas.pocketbasket.view.rvadapters.BasketRvAdapter;
 import alektas.pocketbasket.view.rvadapters.ShowcaseRvAdapter;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
 
-import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
-
 public class MainActivity extends AppCompatActivity implements
         ResetDialog.ResetDialogListener,
         GuideAcceptDialog.GuideAcceptDialogListener,
@@ -697,7 +695,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void setLandscapeLayout() {
         changeLayoutSize(mCategWideWidth,
-                WRAP_CONTENT,
+                mShowcaseWideWidth,
                 0);
 
         showFloatingButton();
