@@ -26,6 +26,9 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.SearchView;
@@ -121,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements
     private ItemTouchHelper mTouchHelper;
     private ItemsViewModel mViewModel;
     private VelocityTracker mVelocityTracker;
-    private VelocityInterpolator mChangeBoundsInterpolator;
+    private SmoothDecelerateInterpolator mChangeBoundsInterpolator;
     private Transition mChangeBounds;
 
     @Override
@@ -345,7 +348,7 @@ public class MainActivity extends AppCompatActivity implements
                 .addTarget(R.id.btn_close_panel);
         Transition explode = new Explode();
         explode.addTarget(R.id.fab);
-        mChangeBoundsInterpolator = new VelocityInterpolator(0);
+        mChangeBoundsInterpolator = new SmoothDecelerateInterpolator();
         mChangeModeTransition = new TransitionSet();
         mChangeModeTransition.setDuration(CHANGE_BOUNDS_TIME)
                 .setOrdering(TransitionSet.ORDERING_TOGETHER)
@@ -1216,8 +1219,8 @@ public class MainActivity extends AppCompatActivity implements
         if (allowChangeMode) {
             mVelocityTracker.computeCurrentVelocity(1000, mMaxVelocity);
             float velocity = mVelocityTracker.getXVelocity();
-            mChangeBoundsInterpolator.setVelocity(velocity);
-            mChangeBounds.setInterpolator(mChangeBoundsInterpolator);
+            Interpolator interpolator = getInterpolator(velocity);
+            mChangeBounds.setInterpolator(interpolator);
             setMode(movX);
             mShowcase.onTouchEvent(event);
             mBasket.onTouchEvent(event);
@@ -1232,6 +1235,27 @@ public class MainActivity extends AppCompatActivity implements
         alreadySetChangeModeAllowing = false;
         initX = 0;
         movX = 0;
+    }
+
+    private Interpolator getInterpolator(float velocity) {
+        int factor = (int) (Math.abs(velocity)/1500);
+        switch (factor) {
+            case 0: {
+                return new AccelerateDecelerateInterpolator();
+            }
+            case 1: {
+                // through it
+            }
+            case 2: {
+                return new SmoothDecelerateInterpolator();
+            }
+            case 3: {
+                return new DecelerateInterpolator(1.5f);
+            }
+            default: {
+                return new DecelerateInterpolator(2.5f);
+            }
+        }
     }
 
     private boolean isAllowChooseCategory(MotionEvent event) {
