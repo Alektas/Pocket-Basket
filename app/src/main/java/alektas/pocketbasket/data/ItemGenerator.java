@@ -1,11 +1,8 @@
 package alektas.pocketbasket.data;
 
-import android.content.res.Resources;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.Utils;
 import alektas.pocketbasket.db.entities.Item;
@@ -14,7 +11,6 @@ public class ItemGenerator {
     private static final String TAG = "ItemGenerator";
 
     private static List<Item> sItems;
-    private static Resources mResources = App.getComponent().context().getResources();
 
     public static List<Item> getAll() {
         if (sItems != null) return sItems;

@@ -6,7 +6,6 @@
     <string name="VERSION_CODE_KEY" translatable="false">versionCode</string>
     <string name="LOCALE_KEY" translatable="false">locale</string>
     <string name="FIRST_START_KEY" translatable="false">isFirstStart</string>
-    <string name="search_provider_authority" translatable="false">alektas.pocketbasket.ItemsProvider</string>
 
     <string name="ad_app_id" translatable="false">ca-app-pub-8494698839376344~8059955012</string>
     <string name="ad_banner_test_id" translatable="false">ca-app-pub-3940256099942544/6300978111</string>

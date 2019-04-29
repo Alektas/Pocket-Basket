@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
         App.getComponent().inject(this);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         init();
@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements
             mViewModel.updateAllItems();
         }
 
-        // If it is the first app launch startGuide the guide
+        // If it is the first app launch offer to start the guide
         if (prefs.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
             prefs.edit().putBoolean(getString(R.string.FIRST_START_KEY), false).apply();
             DialogFragment dialog = new GuideAcceptDialog();
@@ -394,7 +394,7 @@ public class MainActivity extends AppCompatActivity implements
     private void initAd() {
         MobileAds.initialize(this, getString(R.string.ad_app_id));
 
-        mAdView = (AdView) findViewById(R.id.adBanner);
+        mAdView = findViewById(R.id.adBanner);
         mAdView.setAdListener(new AdListener() {
             @Override
             public void onAdLoaded() {

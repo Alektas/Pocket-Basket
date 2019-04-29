@@ -48,6 +48,7 @@ android {
             signingConfig signingConfigs.config
 
             buildConfigField 'String', 'AUTHORITY', '"alektas.pocketbasket.ItemsProvider"'
+            resValue 'string', 'search_authority', 'alektas.pocketbasket.ItemsProvider'
         }
         debug {
             aaptOptions.cruncherEnabled = false
@@ -62,6 +63,7 @@ android {
             versionNameSuffix "-debug"
 
             buildConfigField 'String', 'AUTHORITY', '"alektas.pocketbasket.debug.ItemsProvider"'
+            resValue 'string', 'search_authority', 'alektas.pocketbasket.debug.ItemsProvider'
         }
     }
     flavorDimensions "mode"
