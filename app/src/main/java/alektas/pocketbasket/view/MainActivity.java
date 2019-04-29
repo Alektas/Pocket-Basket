@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements
             if (mViewModel.isGuideMode()) {
                 String curCase = mViewModel.getCurGuideCase();
                 mViewModel.continueGuide();
-                prepareViewToGuide(mViewModel.getGuide(), curCase);
+                restoreGuide(mViewModel.getGuide(), curCase);
             }
         }
     }
@@ -439,6 +439,9 @@ public class MainActivity extends AppCompatActivity implements
         updateAd();
     }
 
+    /**
+     * Send new Ad request to the server
+     */
     private void updateAd() {
         AdRequest request;
         if (BuildConfig.DEBUG) {
@@ -491,7 +494,53 @@ public class MainActivity extends AppCompatActivity implements
         mShowcase.addOnItemTouchListener(new ItemTouchListener());
     }
 
+    /**
+     * Initialize help guide by setting callbacks on it and register it to the ViewModel
+     *
+     * @param model main view model to which the guide should be registered
+     */
     private void initGuide(ItemsViewModel model) {
+        GuideImpl guide = buildGuide();
+
+        guide.setGuideListener(new GuideImpl.GuideListener() {
+            @Override
+            public void onGuideStart() {
+                // Set initial view state
+                model.setGuideStarted(true);
+                hideAdBanner();
+                if (!isLandscape() && !model.isShowcaseMode()) setShowcaseMode();
+                if (model.isDelMode()) {
+                    onDelModeDisable();
+                    mShowcaseAdapter.notifyDataSetChanged(); // update icons (remove deleting selection)
+                }
+                mSkipGuideBtn.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onGuideFinish() {
+                model.setGuideStarted(false);
+                model.setGuideCase(null);
+                mSkipGuideBtn.setVisibility(View.GONE);
+                if (!model.isShowcaseMode()) showFloatingButton();
+                updateAd();
+            }
+
+            @Override
+            public void onGuideCaseStart(String caseKey) {
+                model.setGuideCase(caseKey);
+                prepareViewToCase(guide, caseKey);
+            }
+        });
+
+        model.setGuide(guide);
+    }
+
+    /**
+     * Create guide cases and build the guide with them.
+     *
+     * @return guide instance
+     */
+    private GuideImpl buildGuide() {
         mSkipGuideBtn = findViewById(R.id.skip_guide_btn);
         View bgTop = findViewById(R.id.guide_bg_top_img);
         View bgBottom = findViewById(R.id.guide_bg_bottom_img);
@@ -650,45 +699,18 @@ public class MainActivity extends AppCompatActivity implements
                 .addCase(floatingMenuHelpCase)
                 .addCase(finishCase);
 
-        guide.setGuideListener(new GuideImpl.GuideListener() {
-            @Override
-            public void onGuideStart() {
-                // Set initial view state
-                mViewModel.setGuideStarted(true);
-                hideAdBanner();
-                if (!isLandscape() && !mViewModel.isShowcaseMode()) setShowcaseMode();
-                if (mViewModel.isDelMode()) {
-                    onDelModeDisable();
-                    mShowcaseAdapter.notifyDataSetChanged(); // update icons (remove deleting selection)
-                }
-                mSkipGuideBtn.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onGuideFinish() {
-                mViewModel.setGuideStarted(false);
-                mViewModel.setGuideCase(null);
-                mSkipGuideBtn.setVisibility(View.GONE);
-                if (!mViewModel.isShowcaseMode()) showFloatingButton();
-                updateAd();
-            }
-
-            @Override
-            public void onGuideCaseStart(String caseKey) {
-                mViewModel.setGuideCase(caseKey);
-                prepareViewToCase(guide, caseKey);
-            }
-        });
-
-        model.setGuide(guide);
+        return guide;
     }
 
     /**
-     * Make appropriate view changes to consist to the guide case
-     * @param guide guide object to manage current guide process
-     * @param caseKey key of the case to which a view is prepared
+     * Make appropriate view changes to consist to the interrupted guide case
+     * which should be displayed. Interruption may be caused by the device rotation.
+     * Must be invoked when the device rotated.
+     *
+     * @param guide guide instance to manage current guide process
+     * @param caseKey key of the guide case to which view must be prepared
      */
-    private void prepareViewToGuide(Guide guide, String caseKey) {
+    private void restoreGuide(Guide guide, String caseKey) {
         prepareViewToCase(guide, caseKey);
 
         mSkipGuideBtn.setVisibility(View.VISIBLE);
@@ -706,6 +728,13 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Make some preparations to consist layout for the guide case.
+     * Some guide cases require the visibility or invisibility of some views.
+     *
+     * @param guide guide instance to manage current guide process
+     * @param caseKey key of the guide case to which view must be prepared
+     */
     private void prepareViewToCase(Guide guide, String caseKey) {
         // Change mode in the landscape orientation is not allowed
         // so skip this guide case
@@ -727,6 +756,9 @@ public class MainActivity extends AppCompatActivity implements
 
     /* Layout changes methods */
 
+    /**
+     * Set Landscape Mode: categories, showcase and basket expanded
+     */
     private void setLandscapeLayout() {
         changeLayoutSize(mCategWideWidth,
                 mShowcaseWideWidth,
@@ -736,7 +768,11 @@ public class MainActivity extends AppCompatActivity implements
         mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
     }
 
-    // Set basket or showcase mode in depends of touch moving distance (movX)
+    /**
+     * Set basket or showcase mode in depends of the touch moving distance
+     *
+     * @param movX touch moving distance
+     */
     private void setMode(int movX) {
         if (mViewModel.isShowcaseMode()) {
             if (movX < -changeModeDistance) {
@@ -759,6 +795,9 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Set Basket Mode: categories and showcase narrowed, basket expanded
+     */
     private void setBasketMode() {
         mViewModel.setShowcaseMode(false);
 
@@ -778,6 +817,9 @@ public class MainActivity extends AppCompatActivity implements
         mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
     }
 
+    /**
+     * Set Showcase Mode: categories and showcase expanded, basket narrowed
+     */
     private void setShowcaseMode() {
         mViewModel.setShowcaseMode(true);
 
@@ -798,7 +840,11 @@ public class MainActivity extends AppCompatActivity implements
         mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
     }
 
-    // Set layouts' size in depends of touch moving distance (movX)
+    /**
+     * Set size of the layout parts in depends of touch moving distance
+     *
+     * @param movX touch moving distance
+     */
     private void changeLayoutSizeByTouch(int movX) {
         int showcaseWidth;
         int categWidth;
@@ -826,6 +872,14 @@ public class MainActivity extends AppCompatActivity implements
         changeLayoutSize(categWidth, showcaseWidth, 0);
     }
 
+    /**
+     * Change size of the layout parts: Categories, Showcase and Basket.
+     * If one of the width equal '0' then the corresponding layout part fills in the free space.
+     *
+     * @param categWidth width of the Categories in pixels
+     * @param showcaseWidth width of the Showcase in pixels
+     * @param basketWidth width of the Basket in pixels
+     */
     private void changeLayoutSize(int categWidth, int showcaseWidth, int basketWidth) {
         ViewGroup.LayoutParams categoriesParams = mCategoriesContainer.getLayoutParams();
         ViewGroup.LayoutParams showcaseParams = mShowcaseContainer.getLayoutParams();
@@ -840,7 +894,14 @@ public class MainActivity extends AppCompatActivity implements
         mBasketContainer.setLayoutParams(basketParams);
     }
 
-    // Return value for size of layout between minSize and maxSize corresponding to movX
+    /**
+     * Calculate layout size according to touch gesture distance.
+     *
+     * @param movX touch distance in pixels
+     * @param minSize minimum size of the layout
+     * @param maxSize maximum size of the layout
+     * @return value for size of layout between minSize and maxSize according to movX
+     */
     private int calculateLayoutSize(int movX, int minSize, int maxSize) {
         if (movX <= 0) {
             return minSize;
@@ -1215,6 +1276,12 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Set appropriate mode (Basket or Showcase),
+     * cancel touch handling and clear state
+     *
+     * @param event UP event required to be dispatch to the child views
+     */
     private void finishModeChange(MotionEvent event) {
         if (allowChangeMode) {
             mVelocityTracker.computeCurrentVelocity(1000, mMaxVelocity);
@@ -1222,6 +1289,8 @@ public class MainActivity extends AppCompatActivity implements
             Interpolator interpolator = getInterpolator(velocity);
             mChangeBounds.setInterpolator(interpolator);
             setMode(movX);
+            /* Need to dispatch the touch event to the RecyclerViews
+               to remove the focus from their items */
             mShowcase.onTouchEvent(event);
             mBasket.onTouchEvent(event);
         } else {
@@ -1237,6 +1306,12 @@ public class MainActivity extends AppCompatActivity implements
         movX = 0;
     }
 
+    /**
+     * Gives appropriate animation interpolator according to the gesture velocity
+     *
+     * @param velocity speed of the user gesture
+     * @return appropriate decelerate interpolator
+     */
     private Interpolator getInterpolator(float velocity) {
         int factor = (int) (Math.abs(velocity)/1500);
         switch (factor) {
@@ -1258,6 +1333,13 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    /**
+     * Check if the category selection is allowed while a touch event occurs.
+     * Category selection should be forbidden when change mode occurs and allowed in all other cases.
+     *
+     * @param event touch event
+     * @return true if category change is allowed
+     */
     private boolean isAllowChooseCategory(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
@@ -1303,6 +1385,11 @@ public class MainActivity extends AppCompatActivity implements
         mSearchView.clearFocus();
     }
 
+    /**
+     * Add item to the Basket and (if it's a new) to the Showcase
+     *
+     * @param query name of the item
+     */
     private void addItem(String query) {
         mViewModel.addItem(query);
 
@@ -1311,12 +1398,21 @@ public class MainActivity extends AppCompatActivity implements
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.SEARCH, search);
     }
 
+    /**
+     * Open the link of the apk storage in the web browser
+     */
     private void loadNewVersion() {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse("https://drive.google.com/open?id=1HPHjTYmi7xlY6XO6w2QozXg8c_lyh2-9"));
         startActivity(browserIntent);
     }
 
+    /**
+     * Rewrite shared items (basket items) in the share intent.
+     * Update should be invoked every time when a new item added to the basket.
+     *
+     * @param items shared items
+     */
     private void updateShareIntent(List<Item> items) {
         if (mShareActionProvider != null && items != null) {
 
