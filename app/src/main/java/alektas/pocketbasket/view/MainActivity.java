@@ -177,9 +177,11 @@ public class MainActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         // Remove focus from search view and hide keyboard
-        mSearchView.setQuery("", false);
-        View root = findViewById(R.id.root_layout);
-        root.requestFocus();
+        if (TextUtils.isEmpty(mSearchView.getQuery()) || mSearchView.getQuery() == null) {
+            cancelSearch();
+            View root = findViewById(R.id.root_layout);
+            root.requestFocus();
+        }
 
         if (mAdView != null) {
             mAdView.resume();
@@ -192,6 +194,11 @@ public class MainActivity extends AppCompatActivity implements
             mAdView.pause();
         }
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override
