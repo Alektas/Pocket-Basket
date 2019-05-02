@@ -91,6 +91,29 @@ android {
         exclude 'META-INF/LICENSE-FIREBASE.txt'
         exclude 'META-INF/NOTICE'
     }
+
+    applicationVariants.all { variant ->
+        variant.getAssembleProvider().configure() {
+            it.doLast {
+                //If this is a 'release' build, reveal the compiled apk in finder/explorer
+                if (variant.buildType.name.contains('release')) {
+
+                    def path = null
+                    variant.outputs.each { output ->
+                        path = output.outputFile
+                    }
+
+                    exec {
+                        if (System.properties['os.name'].toLowerCase().contains('mac os x')) {
+                            ['open', '-R', path].execute()
+                        } else if (System.properties['os.name'].toLowerCase().contains('windows')) {
+                            ['explorer', '/select,', path].execute()
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 // Add plugin https://bitbucket.org/hvisser/android-apt
@@ -106,7 +129,7 @@ buildscript {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha5'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'androidx.annotation:annotation:1.0.2'
