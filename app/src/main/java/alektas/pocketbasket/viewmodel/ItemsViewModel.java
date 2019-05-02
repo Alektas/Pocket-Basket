@@ -4,6 +4,12 @@ import android.app.Application;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
@@ -18,26 +24,20 @@ import alektas.pocketbasket.db.entities.BasketMeta;
 import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideContract;
-import alektas.pocketbasket.view.DeleteModeListener;
-import alektas.pocketbasket.view.ShowcaseListener;
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class ItemsViewModel extends AndroidViewModel {
     private static final String TAG = "ItemsViewModel";
     private Guide mGuide;
-    private DeleteModeListener mDmListener;
-    private ShowcaseListener mScListener;
     private LiveData<List<Item>> mShowcaseData;
     private LiveData<List<Item>> mBasketData;
     private List<Item> mDelItems;
     private Repository mRepoManager;
     private String mCurGuideCase;
-    private boolean isDelMode = false;
-    private boolean isShowcaseMode = true;
-    private boolean isGuideMode = false;
+
+    private MutableLiveData<Integer> selectedItemPosition = new MutableLiveData<>();
+    private MutableLiveData<Boolean> delModeState = new MutableLiveData<>();
+    private MutableLiveData<Boolean> showcaseModeState = new MutableLiveData<>();
+    private MutableLiveData<Boolean> guideModeState = new MutableLiveData<>();
 
 
     public ItemsViewModel(@NonNull Application application) {
@@ -48,23 +48,12 @@ public class ItemsViewModel extends AndroidViewModel {
         mDelItems = new ArrayList<>();
     }
 
-    public void setDeleteModeListener(DeleteModeListener dmListener) {
-        mDmListener = dmListener;
-    }
-
-    public void removeDeleteModeListener() {
-        mDmListener = null;
-    }
-
-    public void setShowcaseListener(ShowcaseListener scListener) {
-        mScListener = scListener;
-    }
-
-    public void removeShowcaseListener() {
-        mScListener = null;
-    }
 
     /* Basket methods */
+
+    public LiveData<List<Item>> getBasketData() {
+        return mBasketData;
+    }
 
     /**
      * @param key name of the item
@@ -142,6 +131,10 @@ public class ItemsViewModel extends AndroidViewModel {
 
     /* Showcase methods */
 
+    public LiveData<List<Item>> getShowcaseData() {
+        return mShowcaseData;
+    }
+
     /**
      * Create a new item in the Showcase if it doesn't already exist,
      * then add it to the Basket
@@ -203,7 +196,7 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public boolean onItemLongClick(Item item, RecyclerView.ViewHolder holder) {
         if (!isDelMode()) {
-            enableDelMode();
+            setDelMode(true);
         }
         prepareToDel(item, holder.getAdapterPosition());
         return true;
@@ -212,21 +205,43 @@ public class ItemsViewModel extends AndroidViewModel {
     public void onItemClick(Item item, RecyclerView.ViewHolder holder) {
         int pos = holder.getAdapterPosition();
         if (isDelMode()) {
-            if (mDelItems.contains(item)) { removeFromDel(item, pos); }
-            else { prepareToDel(item, pos); }
+            if (mDelItems.contains(item)) {
+                removeFromDel(item, pos);
+            } else {
+                prepareToDel(item, pos);
+            }
+
         } else {
             if (getBasketMeta(item.getName()) == null) {
                 putToBasket(item.getName());
-                mScListener.onItemChoose(pos);
-            }
-            else {
+            } else {
                 removeFromBasket(item.getName());
-                mScListener.onItemChoose(pos);
             }
         }
     }
 
-    public void deleteChoosedItems() {
+    public LiveData<Boolean> showcaseModeState() {
+        return showcaseModeState;
+    }
+
+    public boolean isShowcaseMode() {
+        if (showcaseModeState.getValue() == null) return true;
+        return showcaseModeState.getValue();
+    }
+
+    public void setShowcaseMode(boolean showcaseMode) {
+        showcaseModeState.setValue(showcaseMode);
+        mGuide.onCaseHappened(GuideContract.GUIDE_CHANGE_MODE);
+    }
+
+
+    /* Handle delete mode */
+
+    /**
+     * Turn off the Delete Mode in which user can delete items from the Showcase
+     * with deleting selected items.
+     */
+    public void deleteSelectedItems() {
         /* Put to argument new List to avoid ConcurrentModificationException.
          * That causes by deleting items in AsyncTask and
          * clearing this list in Main Thread at one time */
@@ -234,39 +249,27 @@ public class ItemsViewModel extends AndroidViewModel {
         cancelDel();
     }
 
+    /**
+     * Turn off the Delete Mode in which user can delete items from the Showcase
+     * without deleting selected items.
+     */
     public void cancelDel() {
-        disableDelMode();
+        setDelMode(false);
         mDelItems.clear();
-        mScListener.onDataSetChange();
     }
 
     private void prepareToDel(Item item, int position) {
         mDelItems.add(item);
-        mScListener.onItemChoose(position);
+        selectedItemPosition.setValue(position);
     }
 
     private void removeFromDel(Item item, int position) {
         mDelItems.remove(item);
-        mScListener.onItemChoose(position);
+        selectedItemPosition.setValue(position);
     }
 
-    private void enableDelMode() {
-        mDmListener.onDelModeEnable();
-    }
-
-    private void disableDelMode() {
-        mDmListener.onDelModeDisable();
-    }
-
-
-    /* Data getters */
-
-    public LiveData<List<Item>> getShowcaseData() {
-        return mShowcaseData;
-    }
-
-    public LiveData<List<Item>> getBasketData() {
-        return mBasketData;
+    public LiveData<Integer> getSelectedItemPosition() {
+        return selectedItemPosition;
     }
 
     /**
@@ -274,21 +277,22 @@ public class ItemsViewModel extends AndroidViewModel {
      */
     public List<Item> getDelItems() { return mDelItems; }
 
-
-    /* Application state methods */
-
     public boolean isDelMode() {
-        return isDelMode;
+        if (delModeState.getValue() == null) return false;
+        return delModeState.getValue();
+    }
+
+    public LiveData<Boolean> delModeState() {
+        return delModeState;
     }
 
     /**
      * Turn on/off the Delete Mode in which user can delete items from the Showcase
-     * @return true if delete mode allowed and was applied
      */
-    public boolean setDelMode(boolean delMode) {
+    private void setDelMode(boolean delMode) {
         if (!isDelModeAllowed()) {
-            isDelMode = false;
-            return false;
+            delModeState.setValue(false);
+            return;
         }
 
         if (delMode) {
@@ -297,50 +301,7 @@ public class ItemsViewModel extends AndroidViewModel {
             mGuide.onCaseHappened(GuideContract.GUIDE_DEL_ITEMS);
         }
 
-        isDelMode = delMode;
-        return true;
-    }
-
-    public boolean isShowcaseMode() {
-        return isShowcaseMode;
-    }
-
-    public void setShowcaseMode(boolean showcaseMode) {
-        isShowcaseMode = showcaseMode;
-        mGuide.onCaseHappened(GuideContract.GUIDE_CHANGE_MODE);
-    }
-
-    public boolean isGuideMode() {
-        return isGuideMode;
-    }
-
-    public void setGuideStarted(boolean guideMode) {
-        isGuideMode = guideMode;
-    }
-
-    public String getCurGuideCase() {
-        return mCurGuideCase;
-    }
-
-    public void setGuideCase(String curGuideCase) {
-        mCurGuideCase = curGuideCase;
-        mGuide.setCase(curGuideCase);
-    }
-
-    /**
-     * Continue guide from the last guide case.
-     * Invoked when the phone has been rotated.
-     */
-    public void continueGuide() {
-        mGuide.startFrom(mCurGuideCase);
-    }
-
-    public void setGuide(Guide guide) {
-        mGuide = guide;
-    }
-
-    public Guide getGuide() {
-        return mGuide;
+        delModeState.setValue(delMode);
     }
 
     /**
@@ -350,24 +311,6 @@ public class ItemsViewModel extends AndroidViewModel {
         if (!mGuide.isGuideStarted()) return true;
         return GuideContract.GUIDE_DEL_MODE.equals(mGuide.currentCaseKey())
                 || GuideContract.GUIDE_DEL_ITEMS.equals(mGuide.currentCaseKey());
-    }
-
-    /**
-     * When the Guide is started touch allowed only in several cases
-     */
-    public boolean isTouchAllowed() {
-        return !( mGuide.isGuideStarted() &&
-                (GuideContract.GUIDE_CATEGORIES_HELP.equals(mGuide.currentCaseKey())
-                || GuideContract.GUIDE_SHOWCASE_HELP.equals(mGuide.currentCaseKey())
-                || GuideContract.GUIDE_BASKET_HELP.equals(mGuide.currentCaseKey())) );
-    }
-
-    public void onFloatingMenuShown() {
-        mGuide.onCaseHappened(GuideContract.GUIDE_FLOATING_MENU);
-    }
-
-    public void onFabClick() {
-        mGuide.onCaseHappened(GuideContract.GUIDE_FLOATING_MENU_HELP);
     }
 
 
@@ -380,7 +323,7 @@ public class ItemsViewModel extends AndroidViewModel {
                     new NullPointerException("GuideImpl is null"));
         }
 
-        isGuideMode = true;
+        guideModeState.setValue(true);
         mGuide.startGuide();
 
         Bundle startGuide = new Bundle();
@@ -389,7 +332,7 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public void finishGuide() {
         mGuide.finishGuide();
-        isGuideMode = false;
+        guideModeState.setValue(false);
 
         Bundle finGuide = new Bundle();
         finGuide.putString(FirebaseAnalytics.Param.LEVEL_NAME,
@@ -403,6 +346,52 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public void nextGuideCase() {
         mGuide.nextCase();
+    }
+
+    public boolean isGuideMode() {
+        if (guideModeState.getValue() == null) return false;
+        return guideModeState.getValue();
+    }
+
+    public LiveData<Boolean> guideModeState() {
+        return guideModeState;
+    }
+
+    public String getCurGuideCase() {
+        return mCurGuideCase;
+    }
+
+    public void setGuideCase(String curGuideCase) {
+        mCurGuideCase = curGuideCase;
+        mGuide.setCase(curGuideCase);
+    }
+
+    public void setGuide(Guide guide) {
+        mGuide = guide;
+    }
+
+    public Guide getGuide() {
+        return mGuide;
+    }
+
+    /* Other methods */
+
+    /**
+     * When the Guide is started touch allowed only in several cases
+     */
+    public boolean isTouchAllowed() {
+        return !( mGuide.isGuideStarted() &&
+                (GuideContract.GUIDE_CATEGORIES_HELP.equals(mGuide.currentCaseKey())
+                        || GuideContract.GUIDE_SHOWCASE_HELP.equals(mGuide.currentCaseKey())
+                        || GuideContract.GUIDE_BASKET_HELP.equals(mGuide.currentCaseKey())) );
+    }
+
+    public void onFloatingMenuShown() {
+        mGuide.onCaseHappened(GuideContract.GUIDE_FLOATING_MENU);
+    }
+
+    public void onFabClick() {
+        mGuide.onCaseHappened(GuideContract.GUIDE_FLOATING_MENU_HELP);
     }
 
 }

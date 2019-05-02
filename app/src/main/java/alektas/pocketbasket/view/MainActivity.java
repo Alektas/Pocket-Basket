@@ -75,13 +75,11 @@ import alektas.pocketbasket.viewmodel.ItemsViewModel;
 public class MainActivity extends AppCompatActivity implements
         ResetDialog.ResetDialogListener,
         GuideAcceptDialog.GuideAcceptDialogListener,
-        DeleteModeListener,
-        ShowcaseListener,
         OnStartDragListener,
         ItemSizeProvider {
 
     private static final String TAG = "MainActivity";
-    private static final long CHANGE_BOUNDS_TIME = 250;
+    private static final long CHANGE_MODE_TIME = 250;
 
     private int mCategNarrowWidth;
     private int mCategWideWidth;
@@ -97,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements
     private int movX;
     private float mMaxVelocity;
 
+    private boolean isAdUpdating;
     private boolean isMenuShown;
     private boolean allowChangeMode = true;
     private boolean alreadySetChangeModeAllowing = false;
@@ -166,9 +165,7 @@ public class MainActivity extends AppCompatActivity implements
             dialog.show(getSupportFragmentManager(), "GuideAcceptDialog");
         } else {
             if (mViewModel.isGuideMode()) {
-                String curCase = mViewModel.getCurGuideCase();
-                mViewModel.continueGuide();
-                restoreGuide(mViewModel.getGuide(), curCase);
+                restoreGuide(mViewModel);
             }
         }
     }
@@ -197,18 +194,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
     public void onDestroy() {
         if (mAdView != null) {
             mAdView.destroy();
         }
 
-        mViewModel.removeDeleteModeListener();
-        mViewModel.removeShowcaseListener();
+        mViewModel.setGuide(null);
 
         super.onDestroy();
     }
@@ -311,33 +302,72 @@ public class MainActivity extends AppCompatActivity implements
         mDelModePanel = findViewById(R.id.del_panel);
 
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
-        mViewModel.setDeleteModeListener(this);
-        mViewModel.setShowcaseListener(this);
 
         initGuide(mViewModel);
         initBasket(mViewModel);
         initShowcase(mViewModel);
         initTransitions();
+        initAd();
 
-        mViewModel.getBasketData().observe(this, (items -> {
+        mViewModel.getBasketData().observe(this, items -> {
             mBasketAdapter.setItems(new ArrayList<>(items));
             updateShareIntent(items);
-        }));
-        mViewModel.getShowcaseData().observe(this, (items) -> {
+        });
+        mViewModel.getShowcaseData().observe(this, items -> {
             mShowcaseAdapter.setItems(new ArrayList<>(items));
         });
 
-        if (isLandscape()) {
-            setLandscapeLayout();
-        } else {
-            if (mViewModel.isShowcaseMode()) {
-                setShowcaseMode();
+        mViewModel.delModeState().observe(this, isDelMode -> {
+            TransitionManager.beginDelayedTransition(mConstraintLayout, mDelPanelTransition);
+            if (isDelMode) {
+                mDelModePanel.setVisibility(View.VISIBLE);
+
             } else {
-                setBasketMode();
+                mDelModePanel.setVisibility(View.GONE);
+                // update icons (remove deleting selection)
+                mShowcaseAdapter.notifyDataSetChanged();
             }
+        });
+
+        mViewModel.getSelectedItemPosition().observe(this, position -> {
+            mShowcaseAdapter.notifyItemChanged(position);
+        });
+
+        mViewModel.guideModeState().observe(this, isGuideMode -> {
+            if (isGuideMode) {
+                // Set initial view state
+                hideAdBanner();
+                if (!isLandscape() && !mViewModel.isShowcaseMode()) {
+                    setShowcaseMode();
+                }
+                if (mViewModel.isDelMode()) {
+                    mViewModel.cancelDel();
+                }
+                mSkipGuideBtn.setVisibility(View.VISIBLE);
+
+            } else {
+                mViewModel.setGuideCase(null);
+                mSkipGuideBtn.setVisibility(View.GONE);
+                if (!mViewModel.isShowcaseMode()) {
+                    showFloatingButton();
+                }
+                if (!isAdUpdating) updateAd();
+            }
+        });
+
+        if (isLandscape()) {
+            applyLandscapeLayout();
+            return;
         }
 
-        initAd();
+        // Subscribe only if it's not a landscape layout
+        mViewModel.showcaseModeState().observe(this, isShowcase -> {
+            if (isShowcase) {
+                applyShowcaseModeLayout();
+            } else {
+                applyBasketModeLayout();
+            }
+        });
     }
 
     private void initTransitions() {
@@ -357,7 +387,7 @@ public class MainActivity extends AppCompatActivity implements
         explode.addTarget(R.id.fab);
         mChangeBoundsInterpolator = new SmoothDecelerateInterpolator();
         mChangeModeTransition = new TransitionSet();
-        mChangeModeTransition.setDuration(CHANGE_BOUNDS_TIME)
+        mChangeModeTransition.setDuration(CHANGE_MODE_TIME)
                 .setOrdering(TransitionSet.ORDERING_TOGETHER)
                 .addTransition(mChangeBounds)
                 .addTransition(explode);
@@ -406,6 +436,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onAdLoaded() {
                 // Code to be executed when an ad finishes loading.
+                isAdUpdating = false;
                 showAdBanner();
             }
 
@@ -421,6 +452,7 @@ public class MainActivity extends AppCompatActivity implements
                     default: errorStr = "UNKNOWN";
                 }
                 Log.d(TAG, "onAdFailedToLoad: code = " + errorStr);
+                isAdUpdating = false;
                 hideAdBanner();
             }
 
@@ -439,7 +471,7 @@ public class MainActivity extends AppCompatActivity implements
             public void onAdClosed() {
                 // Code to be executed when the user is about to return
                 // to the app after tapping on an ad.
-                hideAdBanner();
+                updateAd();
             }
         });
 
@@ -450,6 +482,8 @@ public class MainActivity extends AppCompatActivity implements
      * Send new Ad request to the server
      */
     private void updateAd() {
+        if (mViewModel.isGuideMode()) return;
+
         AdRequest request;
         if (BuildConfig.DEBUG) {
             request = new AdRequest.Builder()
@@ -460,6 +494,7 @@ public class MainActivity extends AppCompatActivity implements
             request = new AdRequest.Builder().build();
         }
 
+        isAdUpdating = true;
         mAdView.loadAd(request);
     }
 
@@ -511,26 +546,10 @@ public class MainActivity extends AppCompatActivity implements
 
         guide.setGuideListener(new GuideImpl.GuideListener() {
             @Override
-            public void onGuideStart() {
-                // Set initial view state
-                model.setGuideStarted(true);
-                hideAdBanner();
-                if (!isLandscape() && !model.isShowcaseMode()) setShowcaseMode();
-                if (model.isDelMode()) {
-                    onDelModeDisable();
-                    mShowcaseAdapter.notifyDataSetChanged(); // update icons (remove deleting selection)
-                }
-                mSkipGuideBtn.setVisibility(View.VISIBLE);
-            }
+            public void onGuideStart() { }
 
             @Override
-            public void onGuideFinish() {
-                model.setGuideStarted(false);
-                model.setGuideCase(null);
-                mSkipGuideBtn.setVisibility(View.GONE);
-                if (!model.isShowcaseMode()) showFloatingButton();
-                updateAd();
-            }
+            public void onGuideFinish() { }
 
             @Override
             public void onGuideCaseStart(String caseKey) {
@@ -712,12 +731,15 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Make appropriate view changes to consist to the interrupted guide case
      * which should be displayed. Interruption may be caused by the device rotation.
+     * Key of the interrupted guide case saved in the ViewModel.
      * Must be invoked when the device rotated.
      *
-     * @param guide guide instance to manage current guide process
-     * @param caseKey key of the guide case to which view must be prepared
+     *  @param model view model instance to manage current guide process
      */
-    private void restoreGuide(Guide guide, String caseKey) {
+    private void restoreGuide(ItemsViewModel model) {
+        String caseKey = model.getCurGuideCase();
+        Guide guide = model.getGuide();
+        guide.startFrom(caseKey);
         prepareViewToCase(guide, caseKey);
 
         mSkipGuideBtn.setVisibility(View.VISIBLE);
@@ -727,10 +749,10 @@ public class MainActivity extends AppCompatActivity implements
         // Set appropriate mode
         if (isLandscape()) return;
         if (curCaseNumb > guide.caseNumb(GuideContract.GUIDE_CHANGE_MODE)
-                && mViewModel.isShowcaseMode()) {
+                && model.isShowcaseMode()) {
             setBasketMode();
         } else if (curCaseNumb <= guide.caseNumb(GuideContract.GUIDE_CHANGE_MODE)
-                && !mViewModel.isShowcaseMode()) {
+                && !model.isShowcaseMode()) {
             setShowcaseMode();
         }
     }
@@ -738,6 +760,7 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Make some preparations to consist layout for the guide case.
      * Some guide cases require the visibility or invisibility of some views.
+     * Is invoked before the start of each guide case.
      *
      * @param guide guide instance to manage current guide process
      * @param caseKey key of the guide case to which view must be prepared
@@ -746,7 +769,7 @@ public class MainActivity extends AppCompatActivity implements
         // Change mode in the landscape orientation is not allowed
         // so skip this guide case
         if (isLandscape() && GuideContract.GUIDE_CHANGE_MODE.equals(caseKey)) {
-            mViewModel.getGuide().onCaseHappened(GuideContract.GUIDE_CHANGE_MODE);
+            guide.onCaseHappened(GuideContract.GUIDE_CHANGE_MODE);
             return;
         }
 
@@ -766,13 +789,12 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Set Landscape Mode: categories, showcase and basket expanded
      */
-    private void setLandscapeLayout() {
+    private void applyLandscapeLayout() {
         changeLayoutSize(mCategWideWidth,
                 mShowcaseWideWidth,
                 0);
 
         showFloatingButton();
-        mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -803,11 +825,23 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Set Basket Mode: categories and showcase narrowed, basket expanded
+     * Set current mode to the Basket mode.
+     * Mode state is observed, so this method also invoke {@link #applyBasketModeLayout()}
+     * which actually resize views to consist the mode.
      */
     private void setBasketMode() {
         mViewModel.setShowcaseMode(false);
+    }
 
+    /**
+     * Apply sizes of the layout parts in consist of the Basket Mode:
+     * categories and showcase narrowed, basket expanded.
+     * Warning! This method don't change global mode state and it should be
+     * invoked only when the mode is not changed, but it's necessary to apply appropriate sizes.
+     *
+     * To actually change mode invoke {@link #setBasketMode() setBasketMode} instead.
+     */
+    private void applyBasketModeLayout() {
         TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
         changeLayoutSize(mCategNarrowWidth,
                 mShowcaseNarrowWidth,
@@ -821,15 +855,26 @@ public class MainActivity extends AppCompatActivity implements
         }
         ((LinearLayout) mDelModePanel.findViewById(R.id.del_panel_content))
                 .setOrientation(LinearLayout.VERTICAL);
-        mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
     }
 
     /**
-     * Set Showcase Mode: categories and showcase expanded, basket narrowed
+     * Set current mode to the Showcase mode.
+     * Mode state is observed, so this method also invoke {@link #applyShowcaseModeLayout()}
+     * which actually resize views to consist the mode.
      */
     private void setShowcaseMode() {
         mViewModel.setShowcaseMode(true);
+    }
 
+    /**
+     * Apply sizes of the layout parts in consist of the Showcase Mode:
+     * categories and showcase expanded, basket narrowed.
+     * Warning! This method don't change global mode state and it should be
+     * invoked only when the mode is not changed, but it's necessary to apply appropriate sizes.
+     *
+     * To actually change mode invoke {@link #setShowcaseMode() setShowcaseMode} instead.
+     */
+    private void applyShowcaseModeLayout() {
         TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
         changeLayoutSize(mCategWideWidth,
                 0,
@@ -844,7 +889,6 @@ public class MainActivity extends AppCompatActivity implements
 
         ((LinearLayout) mDelModePanel.findViewById(R.id.del_panel_content))
                 .setOrientation(LinearLayout.HORIZONTAL);
-        mDelModePanel.setVisibility(mViewModel.isDelMode() ? View.VISIBLE : View.GONE);
     }
 
     /**
@@ -952,16 +996,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void showAdBanner() {
-        if (mAdView != null
-                && !mViewModel.isGuideMode()
-                && mAdView.getVisibility() != View.VISIBLE) {
+        if (mAdView != null) {
             mAdView.setVisibility(View.VISIBLE);
             mAdView.resume();
         }
     }
 
     private void hideAdBanner() {
-        if (mAdView != null && mAdView.getVisibility() != View.GONE) {
+        if (mAdView != null) {
             mAdView.pause();
             mAdView.setVisibility(View.GONE);
         }
@@ -988,34 +1030,6 @@ public class MainActivity extends AppCompatActivity implements
     public void onDialogAcceptGuide() {
         mViewModel.putToBasket(getString(R.string.cabbage));
         startGuide();
-    }
-
-    @Override
-    public void onDelModeEnable() {
-        boolean dmAllowed = mViewModel.setDelMode(true);
-        if (dmAllowed) {
-            TransitionManager.beginDelayedTransition(mConstraintLayout, mDelPanelTransition);
-            mDelModePanel.setVisibility(View.VISIBLE);
-        }
-    }
-
-    @Override
-    public void onDelModeDisable() {
-        boolean dmAllowed = mViewModel.setDelMode(false);
-        if (dmAllowed) {
-            TransitionManager.beginDelayedTransition(mConstraintLayout, mDelPanelTransition);
-            mDelModePanel.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void onDataSetChange() {
-        mShowcaseAdapter.notifyDataSetChanged();  // TODO: replace with point notifier
-    }
-
-    @Override
-    public void onItemChoose(int position) {
-        mShowcaseAdapter.notifyItemChanged(position);
     }
 
     @Override
@@ -1137,7 +1151,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void onDelDmBtnClick(View view) {
-        mViewModel.deleteChoosedItems();
+        mViewModel.deleteSelectedItems();
     }
 
     public void onCancelDmBtnClick(View view) {
