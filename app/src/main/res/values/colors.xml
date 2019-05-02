@@ -5,16 +5,16 @@
     <color name="colorPrimaryDark">#005005</color>
     <color name="colorAccent">@color/colorPrimaryDark</color>
 
-    <color name="main_bg">#fafafa</color>
+    <color name="bg_main">#fafafa</color>
 
-    <color name="del_panel_bg">@color/colorPrimaryDark</color>
+    <color name="bg_del_panel">@color/colorPrimaryDark</color>
 
-    <color name="item_bg_basket">@color/main_bg</color>
-    <color name="item_bg_basket_del">#f44336</color>
-    <color name="item_text_basket">@android:color/black</color>
-    <color name="item_text_showcase">@android:color/white</color>
+    <color name="bg_item_basket">@color/bg_main</color>
+    <color name="bg_item_basket_del">#f44336</color>
+    <color name="text_item_basket">@android:color/black</color>
+    <color name="text_item_showcase">@android:color/white</color>
     <color name="item_handler">@color/colorPrimaryDark</color>
 
-    <color name="guide_bg_color">#dc212121</color>
-    <color name="guide_sub_text_color">#e0e0e0</color>
+    <color name="bg_guide">#dc212121</color>
+    <color name="text_guide_sub">#e0e0e0</color>
 </resources>

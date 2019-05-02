@@ -2,14 +2,14 @@
 <shape
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle"
-    android:tint="@color/del_panel_bg">
+    android:tint="@color/bg_del_panel">
     <corners
         android:radius="1dp"
-        android:topLeftRadius="@dimen/del_panel_corners"
-        android:topRightRadius="@dimen/del_panel_corners"
+        android:topLeftRadius="@dimen/corners_del_panel"
+        android:topRightRadius="@dimen/corners_del_panel"
         android:bottomLeftRadius="0dp"
         android:bottomRightRadius="0dp"/>
     <stroke
         android:color="@color/colorPrimaryDark"
-        android:width="@dimen/del_panel_stroke"/>
+        android:width="@dimen/stroke_del_panel"/>
 </shape>

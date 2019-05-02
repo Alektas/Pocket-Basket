@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_layout);
+        setContentView(R.layout.activity_main);
         App.getComponent().inject(this);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -373,9 +373,9 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initTransitions() {
         mFamTransition = TransitionInflater.from(this)
-                .inflateTransition(R.transition.fam_transition);
+                .inflateTransition(R.transition.transition_fam);
         mDelPanelTransition = TransitionInflater.from(this)
-                .inflateTransition(R.transition.del_panel_transition);
+                .inflateTransition(R.transition.transition_del_panel);
 
         mChangeBounds = new ChangeBounds();
         mChangeBounds.setInterpolator(mChangeBoundsInterpolator)
@@ -385,8 +385,8 @@ public class MainActivity extends AppCompatActivity implements
                 .addTarget(R.id.showcase_list)
                 .addTarget(R.id.fragment_basket)
                 .addTarget(R.id.basket_list)
-                .addTarget(R.id.del_all_btn)
-                .addTarget(R.id.check_all_btn)
+                .addTarget(R.id.fam_del_all)
+                .addTarget(R.id.fam_check_all)
                 .addTarget(R.id.del_panel)
                 .addTarget(R.id.del_panel_content)
                 .addTarget(R.id.btn_del)
@@ -396,8 +396,8 @@ public class MainActivity extends AppCompatActivity implements
         explode.addTarget(R.id.fab);
 
         Transition fade = new Fade();
-        explode.addTarget(R.id.del_all_btn);
-        explode.addTarget(R.id.check_all_btn);
+        explode.addTarget(R.id.fam_del_all);
+        explode.addTarget(R.id.fam_check_all);
 
         mChangeBoundsInterpolator = new SmoothDecelerateInterpolator();
         mChangeModeTransition = new TransitionSet();
@@ -414,10 +414,10 @@ public class MainActivity extends AppCompatActivity implements
         int screenWidth = displaymetrics.widthPixels;
         int screenHeight = displaymetrics.heightPixels;
         int minDisplaySize = Math.min(screenHeight, screenWidth);
-        mCategNarrowWidth = (int) getResources().getDimension(R.dimen.categ_narrow_size);
-        mShowcaseNarrowWidth = (int) getResources().getDimension(R.dimen.showcase_narrow_size);
-        mBasketNarrowWidth = (int) getResources().getDimension(R.dimen.basket_narrow_size);
-        mCategWideWidth = (int) getResources().getDimension(R.dimen.categ_wide_size);
+        mCategNarrowWidth = (int) getResources().getDimension(R.dimen.width_categ_narrow);
+        mShowcaseNarrowWidth = (int) getResources().getDimension(R.dimen.width_showcase_narrow);
+        mBasketNarrowWidth = (int) getResources().getDimension(R.dimen.width_basket_narrow);
+        mCategWideWidth = (int) getResources().getDimension(R.dimen.width_categ_wide);
         mShowcaseWideWidth = minDisplaySize - mCategWideWidth - mBasketNarrowWidth;
         if (isLandscape()) {
             mBasketWideWidth = screenWidth - mCategWideWidth - mShowcaseWideWidth;
@@ -426,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         changeModeDistance = getResources().getDimension(R.dimen.change_mode_distance);
-        basketTextMarginEnd = (int) getResources().getDimension(R.dimen.basket_item_text_margin_end);
+        basketTextMarginEnd = (int) getResources().getDimension(R.dimen.margin_end_basket_item_text);
 
         mMaxVelocity = ViewConfiguration.get(this).getScaledMaximumFlingVelocity();
     }
@@ -510,8 +510,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initFloatingActionMenu() {
         mAddBtn = findViewById(R.id.fab);
-        mCheckAllBtn = findViewById(R.id.check_all_btn);
-        mDelAllBtn = findViewById(R.id.del_all_btn);
+        mCheckAllBtn = findViewById(R.id.fam_check_all);
+        mDelAllBtn = findViewById(R.id.fam_del_all);
         mAddBtn.setOnLongClickListener(view -> {
             if (!isMenuShown) { showFloatingMenu(); }
             return true;
@@ -609,7 +609,7 @@ public class MainActivity extends AppCompatActivity implements
         //  Guide: change mode
         View changeModeImg = findViewById(R.id.guide_scroll_hor_img);
         AnimatorSet scrollHorizAnim = (AnimatorSet) AnimatorInflater
-                .loadAnimator(this, R.animator.scroll_horiz);
+                .loadAnimator(this, R.animator.anim_guide_scroll_horiz);
         scrollHorizAnim.setTarget(changeModeImg);
         GuideCase changeModeCase = new GuideCase(
                 GuideContract.GUIDE_CHANGE_MODE,
@@ -622,7 +622,7 @@ public class MainActivity extends AppCompatActivity implements
         //  Guide: add item
         View addItemImg = findViewById(R.id.guide_tap_add_img);
         AnimatorSet tapAnim = (AnimatorSet) AnimatorInflater
-                .loadAnimator(this, R.animator.tap);
+                .loadAnimator(this, R.animator.anim_guide_tap);
         GuideCase addItemCase = new GuideCase(
                 GuideContract.GUIDE_ADD_ITEM,
                 tapAnim,
@@ -644,7 +644,7 @@ public class MainActivity extends AppCompatActivity implements
 
         //  Guide: move item in Basket
         AnimatorSet scrollVertAnim = (AnimatorSet) AnimatorInflater
-                .loadAnimator(this, R.animator.scroll_vert);
+                .loadAnimator(this, R.animator.anim_guide_scroll_vert);
         View moveItemImg = findViewById(R.id.guide_scroll_vert_img);
         scrollVertAnim.setTarget(moveItemImg);
         GuideCase moveItemCase = new GuideCase(
@@ -658,7 +658,7 @@ public class MainActivity extends AppCompatActivity implements
         //  Guide: remove item from Basket
         View removeItemImg = findViewById(R.id.guide_swipe_right_img);
         AnimatorSet swipeRightAnim = (AnimatorSet) AnimatorInflater
-                .loadAnimator(this, R.animator.swipe_right);
+                .loadAnimator(this, R.animator.anim_guide_swipe_right);
         swipeRightAnim.setTarget(removeItemImg);
         GuideCase removeItemCase = new GuideCase(
                 GuideContract.GUIDE_REMOVE_ITEM,
@@ -671,7 +671,7 @@ public class MainActivity extends AppCompatActivity implements
         //  Guide: turn on delete mode
         View longPressImg = findViewById(R.id.guide_del_mode_img);
         AnimatorSet longPressAnim = (AnimatorSet) AnimatorInflater
-                .loadAnimator(this, R.animator.long_press);
+                .loadAnimator(this, R.animator.anim_guide_long_press);
         GuideCase delModeCase = new GuideCase(
                 GuideContract.GUIDE_DEL_MODE,
                 longPressAnim,
@@ -712,7 +712,7 @@ public class MainActivity extends AppCompatActivity implements
         //  Guide: finishGuide case
         View finishImg = findViewById(R.id.guide_finish_img);
         AnimatorSet finishAnim = (AnimatorSet) AnimatorInflater
-                .loadAnimator(this, R.animator.finish_guide);
+                .loadAnimator(this, R.animator.anim_guide_finish);
         finishAnim.setTarget(finishImg);
         GuideCase finishCase = new GuideCase(
                 GuideContract.GUIDE_FINISH,
@@ -1071,11 +1071,11 @@ public class MainActivity extends AppCompatActivity implements
             if (view.getId() == R.id.fab) {
                 hideFloatingMenu();
             }
-            if (view.getId() == R.id.del_all_btn) {
+            if (view.getId() == R.id.fam_del_all) {
                 mViewModel.deleteChecked();
                 hideFloatingMenu();
             }
-            if (view.getId() == R.id.check_all_btn) {
+            if (view.getId() == R.id.fam_check_all) {
                 mViewModel.checkAllItems();
             }
         }

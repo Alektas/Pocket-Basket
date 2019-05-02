@@ -20,12 +20,12 @@
 
     <style name="CategButton">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/ic_categ_size</item>
+        <item name="android:layout_height">@dimen/size_categ_icon</item>
         <item name="android:layout_weight">1</item>
         <item name="android:paddingStart">@dimen/padding_16</item>
         <item name="android:paddingEnd">@dimen/padding_8</item>
         <item name="android:lines">2</item>
-        <item name="android:textSize">@dimen/category_text_size</item>
+        <item name="android:textSize">@dimen/textsize_category</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@drawable/bg_categ</item>
         <item name="android:onClick">onFilterClick</item>
@@ -49,7 +49,7 @@
         <item name="android:visibility">invisible</item>
         <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/guide_sub_text_color</item>
+        <item name="android:textColor">@color/text_guide_sub</item>
     </style>
 
 </resources>

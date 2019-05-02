@@ -5,8 +5,8 @@
 
     <slide android:slideEdge="right">
         <targets>
-            <target android:targetId="@id/check_all_btn"/>
-            <target android:targetId="@id/del_all_btn"/>
+            <target android:targetId="@id/fam_check_all"/>
+            <target android:targetId="@id/fam_del_all"/>
         </targets>
     </slide>
 

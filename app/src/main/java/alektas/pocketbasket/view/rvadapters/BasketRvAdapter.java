@@ -8,20 +8,21 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.databinding.BasketItemViewBinding;
+import alektas.pocketbasket.databinding.ItemBasketBinding;
 import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.view.ItemSizeProvider;
 import alektas.pocketbasket.view.ItemTouchAdapter;
 import alektas.pocketbasket.view.OnStartDragListener;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
-import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.RecyclerView;
 
 public class BasketRvAdapter extends BaseRecyclerAdapter
         implements ItemTouchAdapter {
@@ -48,10 +49,10 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     @Override
     public ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext)
-                .inflate(R.layout.basket_item_view, parent, false);
+                .inflate(R.layout.item_basket, parent, false);
         itemView.getLayoutParams().width = mItemWidth;
         itemView.requestLayout();
-        BasketItemViewBinding binding = DataBindingUtil.bind(itemView);
+        ItemBasketBinding binding = DataBindingUtil.bind(itemView);
         binding.setModel(mModel);
         binding.setDragListener(mDragListener);
         return new ItemHolder(binding);
@@ -107,8 +108,8 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
 
     private void runColorAnim(View itemView, boolean colorful) {
         int animId;
-        if (colorful) { animId = R.animator.colorful_anim; }
-        else { animId = R.animator.colorless_anim; }
+        if (colorful) { animId = R.animator.anim_colorful; }
+        else { animId = R.animator.anim_colorless; }
         Animator anim = AnimatorInflater.loadAnimator(mContext, animId);
         anim.setTarget(itemView);
         anim.start();

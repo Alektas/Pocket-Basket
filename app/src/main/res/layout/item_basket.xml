@@ -24,18 +24,18 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/basket_item_view"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/item_height"
-        android:background="@color/item_bg_basket">
+        android:layout_height="@dimen/height_item"
+        android:background="@color/bg_item_basket">
 
         <androidx.cardview.widget.CardView
             xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/item_icon_view"
             android:layout_gravity="center_vertical|start"
-            android:layout_width="@dimen/ic_item_size"
-            android:layout_height="@dimen/ic_item_size"
+            android:layout_width="@dimen/size_item_icon"
+            android:layout_height="@dimen/size_item_icon"
             android:layout_margin="@dimen/padding_8"
-            card_view:cardCornerRadius="@dimen/ic_item_corner_rad"
+            card_view:cardCornerRadius="@dimen/corners_item_icon"
             card_view:cardPreventCornerOverlap="true"
             android:onClick="@{() -> model.checkItem(item.name)}">
 
@@ -43,21 +43,21 @@
                 android:id="@+id/item_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="@dimen/ic_padding"
+                android:padding="@dimen/padding_ic"
                 android:src="@{Utils.getImgId(item.imgRes)}"/>
 
             <ImageView
                 android:id="@+id/check_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@{model.isItemChecked(item.name) ? @drawable/ic_checked : null}"/>
+                android:src="@{model.isItemChecked(item.name) ? @drawable/ic_item_checked : null}"/>
 
             <TextView
                 android:id="@+id/info_text"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:textSize="@dimen/icon_text_size"
+                android:textSize="@dimen/textsize_item_icon"
                 android:text="@{Utils.getImgId(item.imgRes) == 0 ? Utils.getDisplayName(item) : null}"/>
         </androidx.cardview.widget.CardView>
 
@@ -66,11 +66,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/padding_8"
-            android:layout_marginEnd="@dimen/basket_item_text_margin_end"
+            android:layout_marginEnd="@dimen/margin_end_basket_item_text"
             android:layout_toEndOf="@id/item_icon_view"
             android:layout_centerVertical="true"
-            android:textSize="@dimen/item_text_size"
-            android:textColor="@color/item_text_basket"
+            android:textSize="@dimen/textsize_item_name"
+            android:textColor="@color/text_item_basket"
             android:text="@{Utils.getDisplayName(item)}"/>
 
         <ImageView
@@ -81,7 +81,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
             android:onTouch="@{() -> dragListener.onStartDrag(holder)}"
-            android:src="@drawable/ic_drag_handle_darkgreen_24dp"/>
+            android:src="@drawable/ic_item_drag_handle_darkgreen_24dp"/>
 
     </RelativeLayout>
 </layout>

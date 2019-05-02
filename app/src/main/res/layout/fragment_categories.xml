@@ -9,13 +9,13 @@
 
     <ScrollView
         android:id="@+id/categories_wrapper"
-        android:layout_width="@dimen/categ_wide_size"
+        android:layout_width="@dimen/width_categ_wide"
         android:layout_height="match_parent"
         android:fillViewport="true"
         android:paddingTop="@dimen/padding_8">
 
         <RadioGroup
-            android:layout_width="@dimen/categ_wide_size"
+            android:layout_width="@dimen/width_categ_wide"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary">
 

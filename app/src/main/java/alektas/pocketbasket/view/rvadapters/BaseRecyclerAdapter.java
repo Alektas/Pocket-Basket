@@ -3,14 +3,15 @@ package alektas.pocketbasket.view.rvadapters;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
-
-import alektas.pocketbasket.databinding.BasketItemViewBinding;
-import alektas.pocketbasket.databinding.ShowcaseItemViewBinding;
-import alektas.pocketbasket.db.entities.Item;
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
+import alektas.pocketbasket.databinding.ItemBasketBinding;
+import alektas.pocketbasket.databinding.ItemShowcaseBinding;
+import alektas.pocketbasket.db.entities.Item;
 
 public abstract class BaseRecyclerAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -34,25 +35,25 @@ public abstract class BaseRecyclerAdapter
         }
 
         void bind(Item item) {
-            if (mBinding instanceof ShowcaseItemViewBinding) {
-                ((ShowcaseItemViewBinding) mBinding).setItem(item);
+            if (mBinding instanceof ItemShowcaseBinding) {
+                ((ItemShowcaseBinding) mBinding).setItem(item);
                 mBinding.executePendingBindings();
             }
-            if (mBinding instanceof BasketItemViewBinding) {
-                ((BasketItemViewBinding) mBinding).setItem(item);
+            if (mBinding instanceof ItemBasketBinding) {
+                ((ItemBasketBinding) mBinding).setItem(item);
                 mBinding.executePendingBindings();
             }
         }
 
         void bind(Item item, RecyclerView.ViewHolder holder) {
-            if (mBinding instanceof ShowcaseItemViewBinding) {
-                ((ShowcaseItemViewBinding) mBinding).setItem(item);
-                ((ShowcaseItemViewBinding) mBinding).setHolder(holder);
+            if (mBinding instanceof ItemShowcaseBinding) {
+                ((ItemShowcaseBinding) mBinding).setItem(item);
+                ((ItemShowcaseBinding) mBinding).setHolder(holder);
                 mBinding.executePendingBindings();
             }
-            if (mBinding instanceof BasketItemViewBinding) {
-                ((BasketItemViewBinding) mBinding).setItem(item);
-                ((BasketItemViewBinding) mBinding).setHolder(holder);
+            if (mBinding instanceof ItemBasketBinding) {
+                ((ItemBasketBinding) mBinding).setItem(item);
+                ((ItemBasketBinding) mBinding).setHolder(holder);
                 mBinding.executePendingBindings();
             }
         }

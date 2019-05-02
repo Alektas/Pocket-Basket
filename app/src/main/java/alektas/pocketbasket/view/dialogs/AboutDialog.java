@@ -9,11 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
-import alektas.pocketbasket.R;
-import alektas.pocketbasket.Utils;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+
+import alektas.pocketbasket.R;
+import alektas.pocketbasket.Utils;
 
 public class AboutDialog extends DialogFragment {
     private View mView;
@@ -24,7 +25,7 @@ public class AboutDialog extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        mView = inflater.inflate(R.layout.about_layout, null);
+        mView = inflater.inflate(R.layout.layout_about, null);
 
         initAboutMenuLinks();
 

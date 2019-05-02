@@ -18,7 +18,7 @@
         android:background="@color/colorPrimaryLight"
         android:divider="@color/colorPrimaryLight"
         android:animateLayoutChanges="false"
-        tools:listitem="@layout/showcase_item_view"/>
+        tools:listitem="@layout/item_showcase"/>
 
     <LinearLayout
         android:id="@+id/del_panel"
@@ -36,14 +36,14 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/del_panel_shape"
+            android:background="@drawable/shape_del_panel"
             android:gravity="center"
             style="?android:attr/buttonBarStyle">
 
             <Button
                 android:id="@+id/btn_del"
-                android:layout_width="@dimen/ic_categ_size"
-                android:layout_height="@dimen/ic_categ_size"
+                android:layout_width="@dimen/size_categ_icon"
+                android:layout_height="@dimen/size_categ_icon"
                 android:layout_margin="@dimen/padding_8"
                 android:background="@drawable/ic_delete_forever_white_24dp"
                 style="?android:attr/buttonBarButtonStyle"
@@ -52,8 +52,8 @@
 
             <Button
                 android:id="@+id/btn_close_panel"
-                android:layout_width="@dimen/ic_categ_size"
-                android:layout_height="@dimen/ic_categ_size"
+                android:layout_width="@dimen/size_categ_icon"
+                android:layout_height="@dimen/size_categ_icon"
                 android:layout_margin="@dimen/padding_8"
                 android:background="@drawable/ic_close_white_24dp"
                 style="?android:attr/buttonBarButtonStyle"
