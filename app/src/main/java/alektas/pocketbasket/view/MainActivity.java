@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.transition.ChangeBounds;
 import android.transition.Explode;
+import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
@@ -371,6 +372,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initTransitions() {
+        mFamTransition = TransitionInflater.from(this)
+                .inflateTransition(R.transition.fam_transition);
+        mDelPanelTransition = TransitionInflater.from(this)
+                .inflateTransition(R.transition.del_panel_transition);
+
         mChangeBounds = new ChangeBounds();
         mChangeBounds.setInterpolator(mChangeBoundsInterpolator)
                 .addTarget(R.id.fragment_categories)
@@ -379,23 +385,27 @@ public class MainActivity extends AppCompatActivity implements
                 .addTarget(R.id.showcase_list)
                 .addTarget(R.id.fragment_basket)
                 .addTarget(R.id.basket_list)
+                .addTarget(R.id.del_all_btn)
+                .addTarget(R.id.check_all_btn)
                 .addTarget(R.id.del_panel)
                 .addTarget(R.id.del_panel_content)
                 .addTarget(R.id.btn_del)
                 .addTarget(R.id.btn_close_panel);
+
         Transition explode = new Explode();
         explode.addTarget(R.id.fab);
+
+        Transition fade = new Fade();
+        explode.addTarget(R.id.del_all_btn);
+        explode.addTarget(R.id.check_all_btn);
+
         mChangeBoundsInterpolator = new SmoothDecelerateInterpolator();
         mChangeModeTransition = new TransitionSet();
         mChangeModeTransition.setDuration(CHANGE_MODE_TIME)
                 .setOrdering(TransitionSet.ORDERING_TOGETHER)
                 .addTransition(mChangeBounds)
+                .addTransition(fade)
                 .addTransition(explode);
-
-        mFamTransition = TransitionInflater.from(this)
-                .inflateTransition(R.transition.fam_transition);
-        mDelPanelTransition = TransitionInflater.from(this)
-                .inflateTransition(R.transition.del_panel_transition);
     }
 
     private void initDimensions() {
