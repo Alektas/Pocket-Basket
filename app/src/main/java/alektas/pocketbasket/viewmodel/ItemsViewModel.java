@@ -24,6 +24,7 @@ import alektas.pocketbasket.db.entities.BasketMeta;
 import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideContract;
+import alektas.pocketbasket.guide.GuideImpl;
 
 public class ItemsViewModel extends AndroidViewModel {
     private static final String TAG = "ItemsViewModel";
@@ -330,6 +331,11 @@ public class ItemsViewModel extends AndroidViewModel {
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_BEGIN, startGuide);
     }
 
+    /**
+     * Finish guide during any case.
+     * Warning! Do not invoke it in the {@link GuideImpl.GuideListener#onGuideFinish()}
+     * to avoid the infinity loop.
+     */
     public void finishGuide() {
         mGuide.finishGuide();
         guideModeState.setValue(false);
