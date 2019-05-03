@@ -28,6 +28,7 @@
         <item name="android:textSize">@dimen/textsize_category</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@drawable/bg_categ</item>
+        <item name="android:stateListAnimator">@animator/anim_category_selection</item>
         <item name="android:onClick">onFilterClick</item>
     </style>
 
