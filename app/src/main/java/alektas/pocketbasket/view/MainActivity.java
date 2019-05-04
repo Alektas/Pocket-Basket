@@ -336,16 +336,8 @@ public class MainActivity extends AppCompatActivity implements
 
         mViewModel.guideModeState().observe(this, isGuideMode -> {
             if (isGuideMode) {
-                // Set initial view state
                 hideAdBanner();
-                if (!isLandscape() && !mViewModel.isShowcaseMode()) {
-                    setShowcaseMode();
-                }
-                if (mViewModel.isDelMode()) {
-                    mViewModel.cancelDel();
-                }
                 mSkipGuideBtn.setVisibility(View.VISIBLE);
-
             } else {
                 mViewModel.setGuideCase(null);
                 mSkipGuideBtn.setVisibility(View.GONE);
@@ -356,19 +348,19 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        if (isLandscape()) {
-            applyLandscapeLayout();
-            return;
-        }
-
-        // Subscribe only if it's not a landscape layout
         mViewModel.showcaseModeState().observe(this, isShowcase -> {
+            // Change mode enabled only if it's not a landscape layout
+            if (isLandscape()) return;
             if (isShowcase) {
                 applyShowcaseModeLayout();
             } else {
                 applyBasketModeLayout();
             }
         });
+
+        if (isLandscape()) {
+            applyLandscapeLayout();
+        }
     }
 
     private void initTransitions() {
@@ -556,7 +548,15 @@ public class MainActivity extends AppCompatActivity implements
 
         guide.setGuideListener(new GuideImpl.GuideListener() {
             @Override
-            public void onGuideStart() { }
+            public void onGuideStart() {
+                // Set initial view state, that appropriate only for the start of the guide.
+                if (!isLandscape() && !mViewModel.isShowcaseMode()) {
+                    setShowcaseMode();
+                }
+                if (mViewModel.isDelMode()) {
+                    mViewModel.cancelDel();
+                }
+            }
 
             @Override
             public void onGuideFinish() {
@@ -565,8 +565,8 @@ public class MainActivity extends AppCompatActivity implements
 
             @Override
             public void onGuideCaseStart(String caseKey) {
-                model.setGuideCase(caseKey);
                 prepareViewToCase(guide, caseKey);
+                model.setGuideCase(caseKey);
             }
         });
 
@@ -752,14 +752,10 @@ public class MainActivity extends AppCompatActivity implements
         String caseKey = model.getCurGuideCase();
         Guide guide = model.getGuide();
         guide.startFrom(caseKey);
-        prepareViewToCase(guide, caseKey);
-
-        mSkipGuideBtn.setVisibility(View.VISIBLE);
-
-        int curCaseNumb = guide.caseNumb(caseKey);
 
         // Set appropriate mode
         if (isLandscape()) return;
+        int curCaseNumb = guide.caseNumb(caseKey);
         if (curCaseNumb > guide.caseNumb(GuideContract.GUIDE_CHANGE_MODE)
                 && model.isShowcaseMode()) {
             setBasketMode();
