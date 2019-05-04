@@ -372,6 +372,10 @@ public class ItemsViewModel extends AndroidViewModel {
         mGuide.setCase(curGuideCase);
     }
 
+    public void disableGuideMode() {
+        guideModeState.setValue(false);
+    }
+
     public void setGuide(Guide guide) {
         mGuide = guide;
     }

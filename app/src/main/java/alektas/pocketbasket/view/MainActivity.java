@@ -559,7 +559,9 @@ public class MainActivity extends AppCompatActivity implements
             public void onGuideStart() { }
 
             @Override
-            public void onGuideFinish() { }
+            public void onGuideFinish() {
+                mViewModel.disableGuideMode();
+            }
 
             @Override
             public void onGuideCaseStart(String caseKey) {
