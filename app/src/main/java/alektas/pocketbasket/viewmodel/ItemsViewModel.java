@@ -369,7 +369,7 @@ public class ItemsViewModel extends AndroidViewModel {
 
     public void setGuideCase(String curGuideCase) {
         mCurGuideCase = curGuideCase;
-        mGuide.setCase(curGuideCase);
+        mGuide.setCase(curGuideCase); // TODO: called twice in "Guide.startFrom" method
     }
 
     public void disableGuideMode() {

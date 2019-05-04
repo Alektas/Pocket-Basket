@@ -14,8 +14,30 @@ public class GuideImpl implements Guide, GuideCase.CaseListener {
     private boolean isStarted = false;
 
     public interface GuideListener {
+
+        /**
+         * This callback is triggered <b>after</b> the guide case with key <i>caseKey</i> is started.
+         *
+         * @param caseKey key of the guide case
+         */
         void onGuideCaseStart(String caseKey);
+
+        /**
+         * There should be applied view states that appropriate only for the start of the guide.
+         * These states can be changed during the guide.
+         * View states that don't change during the guide should be applied in the callbacks
+         * of the guide state observer. In this way they are applied at each device rotation.
+         * This callback is triggered <b>before</b> the guide is started.
+         */
         void onGuideStart();
+
+        /**
+         * There should be applied view states that appropriate only for the end of the guide.
+         * These states can be changed during the guide.
+         * View states that don't change during the guide should be applied in the callbacks
+         * of the guide state observer. In this way they are applied at each device rotation.
+         * This callback is triggered <b>after</b> the guide is finished.
+         */
         void onGuideFinish();
     }
 

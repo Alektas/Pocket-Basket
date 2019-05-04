@@ -335,6 +335,9 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         mViewModel.guideModeState().observe(this, isGuideMode -> {
+            // There applied view states that appropriate for the all guide process.
+            // If something change during the guide it must be in the
+            // {@link GuideImpl.GuideListener} methods.
             if (isGuideMode) {
                 hideAdBanner();
                 mSkipGuideBtn.setVisibility(View.VISIBLE);
@@ -768,10 +771,10 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Make some preparations to consist layout for the guide case.
      * Some guide cases require the visibility or invisibility of some views.
-     * Is invoked before the start of each guide case.
+     * Is invoked before the start of the each guide case.
      *
-     * @param guide guide instance to manage current guide process
-     * @param caseKey key of the guide case to which view must be prepared
+     * @param guide guide instance to manage the current guide process
+     * @param caseKey key of the guide case to which the view must be prepared
      */
     private void prepareViewToCase(Guide guide, String caseKey) {
         // Change mode in the landscape orientation is not allowed
