@@ -12,7 +12,7 @@
     <string name="share_intro">Need goods:</string>
 
     <string name="about_app">About app</string>
-    <string name="about_msg">Pocket Basket is app for product list creation.</string>
+    <string name="about_msg">Pocket Basket is the app for the product list creation.</string>
     <string name="about_title" translatable="false">@string/app_name</string>
     <string name="about_developer">Developer: Alektas</string>
     <string name="about_email" translatable="false">alektas@inbox.ru</string>
@@ -27,29 +27,29 @@
     <string name="guide_accept_title">Do you want to go training?</string>
     <string name="guide_accept_msg">Training can always be repeated by selecting \"Help\" in the menu</string>
 
+    <string name="guide_categ">These are categories</string>
+    <string name="guide_categ_sub">There you can filter items</string>
+    <string name="guide_showcase">This is a showcase</string>
+    <string name="guide_showcase_sub">From here you can take items to the basket</string>
+    <string name="guide_basket">This is a basket</string>
+    <string name="guide_basket_sub">There you store items from the showcase</string>
     <string name="guide">Help</string>
-    <string name="guide_change_mode">Change mode by swipe</string>
-    <string name="guide_add_item">Add items by tap</string>
-    <string name="guide_check_item">Check item by tap on icon</string>
-    <string name="guide_move_item">Move item in basket by drag</string>
-    <string name="guide_remove_item">Remove item by swipe</string>
-    <string name="guide_del_mode">Select for deleting by long press</string>
+    <string name="guide_change_mode">Swipe to switch the mode</string>
+    <string name="guide_change_mode_sub">Just swipe left</string>
+    <string name="guide_add_item">Tap to add an item</string>
+    <string name="guide_add_item_sub">or use the search bar</string>
+    <string name="guide_check_item">Click on the icon to mark an item</string>
+    <string name="guide_move_item">Drag and drop an item to move it</string>
+    <string name="guide_move_item_sub">or drag it by long press</string>
+    <string name="guide_remove_item">Swipe right to remove an item</string>
+    <string name="guide_remove_item_sub">or tap on item in the showcase</string>
+    <string name="guide_del_mode">Press long to turn on the delete mode</string>
     <string name="guide_delete_items">Delete items or close panel</string>
     <string name="guide_delete_items_sub">Items can be restored by \"Reset\" in the menu</string>
-    <string name="guide_floating_menu">Press button to show menu</string>
-    <string name="guide_check_all">Check all items</string>
-    <string name="guide_del_checked">Delete checked items</string>
-    <string name="guide_close_menu">Close menu</string>
-    <string name="guide_add_item_sub">or use search bar</string>
-    <string name="guide_move_item_sub">or by long press on item</string>
-    <string name="guide_remove_item_sub">or by tap on item in showcase</string>
-    <string name="guide_categ">This is categories</string>
-    <string name="guide_categ_sub">There you can filter items you needed</string>
-    <string name="guide_showcase">This is showcase</string>
-    <string name="guide_showcase_sub">From here you can take items to basket</string>
-    <string name="guide_basket">This is basket</string>
-    <string name="guide_basket_sub">There you keep items from showcase</string>
-    <string name="guide_change_mode_sub">Just swipe left</string>
+    <string name="guide_floating_menu">Press button to show the menu</string>
+    <string name="guide_check_all">Mark all items</string>
+    <string name="guide_del_checked">Delete marked items</string>
+    <string name="guide_close_menu">Close the menu</string>
 
     <string name="apache_license_link" translatable="false">https://www.apache.org/licenses/LICENSE-2.0.html</string>
     <string name="cc_license_link" translatable="false">http://creativecommons.org/licenses/by/3.0/</string>

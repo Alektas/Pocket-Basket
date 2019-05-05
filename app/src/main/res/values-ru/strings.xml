@@ -22,11 +22,21 @@
     <string name="guide_accept_title">Хотите пройти обучение?</string>
     <string name="guide_accept_msg">Обучение всегда можно пройти повторно выбрав \"Помощь\" в меню</string>
 
+    <string name="guide_categ">Это категории</string>
+    <string name="guide_categ_sub">Здесь можно выбрать нужный тип товаров</string>
+    <string name="guide_showcase">Это витрина</string>
+    <string name="guide_showcase_sub">Здесь товары выбираются и отсюда кладутся в корзину</string>
+    <string name="guide_basket">Это корзина</string>
+    <string name="guide_basket_sub">Здесь хранятся выбранные из витрины товары</string>
     <string name="guide_change_mode">Смените режим свайпом</string>
+    <string name="guide_change_mode_sub">Просто проведите пальцем влево</string>
     <string name="guide_add_item">Коснитесь, чтобы добавить в корзину</string>
+    <string name="guide_add_item_sub">или используйте строку поиска</string>
     <string name="guide_check_item">Коснитесь иконки, чтобы отметить предмет</string>
     <string name="guide_move_item">Переместите предмет касанием</string>
+    <string name="guide_move_item_sub">или долгим нажатием по предмету</string>
     <string name="guide_remove_item">Уберите предмет из корзины свайпом</string>
+    <string name="guide_remove_item_sub">или коснитесь его иконки в витрине слева</string>
     <string name="guide_del_mode">Перейдите в режим удаления долгим нажатием</string>
     <string name="guide_delete_items">Удалите предметы или закройте панель</string>
     <string name="guide_delete_items_sub">Предметы могут быть восстановлены с помощью пункта меню \"Сброс\"</string>
@@ -34,15 +44,6 @@
     <string name="guide_check_all">Отметить все</string>
     <string name="guide_del_checked">Убрать отмеченные</string>
     <string name="guide_close_menu">Закрыть меню</string>
-    <string name="guide_add_item_sub">или используйте строку поиска</string>
-    <string name="guide_move_item_sub">или долгим нажатием по предмету</string>
-    <string name="guide_remove_item_sub">или коснитесь его иконки в витрине слева</string>
-    <string name="guide_categ">Это категории</string>
-    <string name="guide_categ_sub">Здесь можно выбрать нужный тип товаров</string>
-    <string name="guide_showcase">Это витрина</string>
-    <string name="guide_showcase_sub">Здесь товары выбираются и отсюда кладутся в корзину</string>
-    <string name="guide_basket">Это корзина</string>
-    <string name="guide_basket_sub">Здесь хранятся выбранные из витрины товары</string>
-    <string name="guide_change_mode_sub">Просто проведите пальцем влево</string>
+=
 
 </resources>
