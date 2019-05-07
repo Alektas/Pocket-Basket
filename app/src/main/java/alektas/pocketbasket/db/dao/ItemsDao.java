@@ -1,9 +1,5 @@
 package alektas.pocketbasket.db.dao;
 
-import java.util.List;
-
-import alektas.pocketbasket.db.entities.BasketMeta;
-import alektas.pocketbasket.db.entities.Item;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -12,6 +8,11 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 import androidx.room.Update;
+
+import java.util.List;
+
+import alektas.pocketbasket.db.entities.BasketMeta;
+import alektas.pocketbasket.db.entities.Item;
 
 @Dao
 public abstract class ItemsDao {
@@ -94,6 +95,7 @@ public abstract class ItemsDao {
     @Transaction
     public void updatePositions(List<Item> items) {
         for (int i = 0; i < items.size(); i++) {
+            // start positions from 1
             setPosition(items.get(i).getName(), i + 1);
         }
     }
@@ -107,17 +109,11 @@ public abstract class ItemsDao {
     @Transaction
     public void deleteChecked() {
         deleteCheckedBasket();
-        onDeleteChecked();
+        updatePositions(getBasketItems());
     }
 
     @Query("DELETE FROM basket_items WHERE checked = 1")
     public abstract void deleteCheckedBasket();
-
-    // leads to crush if the positions are not in ascending order
-    @Query("UPDATE basket_items SET position = " +
-            "(SELECT COUNT(*) FROM basket_items AS t " +
-            "WHERE t.position <= basket_items.position)")
-    public abstract void onDeleteChecked();
 
 
     /* Delete basket item queries */
