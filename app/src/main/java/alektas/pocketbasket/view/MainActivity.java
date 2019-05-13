@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements
     private int mBasketWideWidth;
     private int basketTextMarginEnd;
     private float changeModeDistance;
+    private float protectedInterval;
 
     private int initX;
     private int initY;
@@ -421,6 +422,7 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         changeModeDistance = getResources().getDimension(R.dimen.change_mode_distance);
+        protectedInterval = getResources().getDimension(R.dimen.protected_interval);
         basketTextMarginEnd = (int) getResources().getDimension(R.dimen.margin_end_basket_item_text);
 
         mMaxVelocity = ViewConfiguration.get(this).getScaledMaximumFlingVelocity();
@@ -818,7 +820,9 @@ public class MainActivity extends AppCompatActivity implements
             if (movX < -changeModeDistance) {
                 setBasketMode();
             } else {
-                TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
+                if (movX < -protectedInterval) {
+                    TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
+                }
                 changeLayoutSize(mCategWideWidth,
                         0,
                         mBasketNarrowWidth);
@@ -827,7 +831,9 @@ public class MainActivity extends AppCompatActivity implements
             if (movX > changeModeDistance) {
                 setShowcaseMode();
             } else {
-                TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
+                if (movX > protectedInterval) {
+                    TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
+                }
                 changeLayoutSize(mCategNarrowWidth,
                         mShowcaseNarrowWidth,
                         0);

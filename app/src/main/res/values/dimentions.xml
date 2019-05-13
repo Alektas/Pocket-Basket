@@ -22,6 +22,7 @@
     <dimen name="textsize_category">@dimen/textsize_item_name</dimen>
 
     <dimen name="change_mode_distance">72dp</dimen>
+    <dimen name="protected_interval">16dp</dimen>
 
     <dimen name="padding_8">8dp</dimen>
     <dimen name="padding_16">16dp</dimen>
