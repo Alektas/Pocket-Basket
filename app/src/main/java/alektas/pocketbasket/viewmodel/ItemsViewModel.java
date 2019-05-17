@@ -15,9 +15,9 @@ import java.util.List;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.data.ItemGenerator;
-import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.data.RepositoryImpl;
-import alektas.pocketbasket.db.entities.Item;
+import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.usecases.AddItemUseCase;
 import alektas.pocketbasket.domain.usecases.PutItemToBasket;
 import alektas.pocketbasket.domain.usecases.SelectCategoryUseCase;
@@ -82,7 +82,7 @@ public class ItemsViewModel extends AndroidViewModel {
         mGuide.onCaseHappened(GuideContract.GUIDE_CHANGE_MODE);
     }
 
-    public List<Item> getBasketItems() {
+    public List<? extends ItemModel> getBasketItems() {
         return mRepository.getBasketData().getValue();
     }
 

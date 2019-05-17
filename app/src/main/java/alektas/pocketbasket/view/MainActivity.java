@@ -55,7 +55,7 @@ import alektas.pocketbasket.App;
 import alektas.pocketbasket.BuildConfig;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.Utils;
-import alektas.pocketbasket.db.entities.Item;
+import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideCase;
 import alektas.pocketbasket.guide.GuideContract;
@@ -231,6 +231,7 @@ public class MainActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             case R.id.menu_share: {
                 updateShareIntent(mViewModel.getBasketItems());
+                return true;
             }
 
             case R.id.menu_reset: {
@@ -1373,11 +1374,11 @@ public class MainActivity extends AppCompatActivity implements
      *
      * @param items shared items
      */
-    private void updateShareIntent(List<Item> items) {
+    private void updateShareIntent(List<? extends ItemModel> items) {
         if (mShareActionProvider != null && items != null) {
 
             StringBuilder sb = new StringBuilder(getString(R.string.share_intro));
-            for (Item item : items) {
+            for (ItemModel item : items) {
                 sb.append("\n - ").append(item.getName());
             }
 

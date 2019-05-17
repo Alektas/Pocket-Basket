@@ -10,8 +10,8 @@ import androidx.lifecycle.MutableLiveData;
 import java.util.List;
 
 import alektas.pocketbasket.data.RepositoryImpl;
-import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.usecases.MoveBasketItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.Guide;
@@ -20,7 +20,7 @@ import alektas.pocketbasket.guide.GuideContract;
 public class BasketViewModel extends AndroidViewModel {
     private Repository mRepository;
     private Guide mGuide;
-    private MutableLiveData<List<Item>> mBasketData = new MutableLiveData<>();
+    private MutableLiveData<List<? extends ItemModel>> mBasketData = new MutableLiveData<>();
 
     public BasketViewModel(@NonNull Application application) {
         super(application);
@@ -36,7 +36,7 @@ public class BasketViewModel extends AndroidViewModel {
         return mGuide;
     }
 
-    public LiveData<List<Item>> getBasketData() {
+    public LiveData<List<? extends ItemModel>> getBasketData() {
         return mBasketData;
     }
 

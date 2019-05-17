@@ -14,6 +14,7 @@ import java.util.List;
 import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.usecases.SelectShowcaseItem;
 import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideContract;
@@ -25,7 +26,7 @@ public class ShowcaseViewModel extends AndroidViewModel {
      * Items selected by the user for removal from the Showcase
      */
     private List<Item> mDelItems;
-    private MutableLiveData<List<Item>> mShowcaseData = new MutableLiveData<>();
+    private MutableLiveData<List<? extends ItemModel>> mShowcaseData = new MutableLiveData<>();
     private MutableLiveData<Integer> selectedItemPosition = new MutableLiveData<>();
     private MutableLiveData<Boolean> delModeState = new MutableLiveData<>();
     private MutableLiveData<Boolean> showcaseModeState = new MutableLiveData<>();
@@ -47,20 +48,12 @@ public class ShowcaseViewModel extends AndroidViewModel {
         return mGuide;
     }
 
-    public LiveData<List<Item>> getShowcaseData() {
+    public LiveData<List<? extends ItemModel>> getShowcaseData() {
         return mShowcaseData;
     }
 
     public LiveData<Boolean> showcaseModeState() {
         return showcaseModeState;
-    }
-
-    /**
-     * Delete from the Showcase all items presented in list
-     * @param items deleting items
-     */
-    public void deleteItems(List<Item> items) {
-        mRepository.deleteItems(items);
     }
 
     public boolean isItemInBasket(String name) {
@@ -99,10 +92,7 @@ public class ShowcaseViewModel extends AndroidViewModel {
      * with deleting selected items.
      */
     public void deleteSelectedItems() {
-        /* Put to argument new List to avoid ConcurrentModificationException.
-         * That causes by deleting items in AsyncTask and
-         * clearing this list in Main Thread at one time */
-        deleteItems(new ArrayList<>(mDelItems));
+        mRepository.deleteItems(mDelItems);
         cancelDel();
     }
 

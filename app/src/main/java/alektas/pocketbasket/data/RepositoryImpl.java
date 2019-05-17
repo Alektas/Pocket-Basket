@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -19,6 +20,7 @@ import alektas.pocketbasket.db.dao.ItemsDao;
 import alektas.pocketbasket.db.entities.BasketMeta;
 import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.utils.MultiObservableValue;
 import alektas.pocketbasket.domain.utils.Observable;
 import alektas.pocketbasket.domain.utils.SingleObservableValue;
@@ -32,12 +34,12 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     /**
      * Data contains only items consisted to the selected category.
      */
-    private Observable<List<Item>> mShowcaseData;
+    private Observable<List<? extends ItemModel>> mShowcaseData;
 
     /**
      * Data contains only items stored in the basket.
      */
-    private Observable<List<Item>> mBasketData;
+    private Observable<List<? extends ItemModel>> mBasketData;
 
     /**
      * Contains current mode state.
@@ -89,6 +91,15 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         delModeState.setValue(delMode);
     }
 
+    private List<Item> convert(List<? extends ItemModel> models) {
+        List<Item> list = new ArrayList<>();
+        for (ItemModel model : models) {
+            list.add((Item) model);
+        }
+        return list;
+    }
+
+
     /* Basket methods */
 
     /**
@@ -104,7 +115,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         return null;
     }
 
-    private List<Item> getBasketItems() {
+    private List<? extends ItemModel> getBasketItems() {
         try {
             return new getBasketItemsAsync(mItemsDao).execute().get();
         } catch (ExecutionException | InterruptedException e) {
@@ -171,8 +182,8 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     }
 
     @Override
-    public void deleteItems(List<Item> items) {
-        new deleteAllAsync(mItemsDao, this).execute(items);
+    public void deleteItems(List<? extends ItemModel> items) {
+        new deleteAllAsync(mItemsDao, this).execute(convert(items));
     }
 
     // Show in Showcase only items with specified tag
@@ -189,8 +200,8 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     }
 
     @Override
-    public void insertAll(List<Item> items) {
-        new insertAllAsync(mItemsDao, this).execute(items);
+    public void insertAll(List<? extends ItemModel> items) {
+        new insertAllAsync(mItemsDao, this).execute(convert(items));
     }
 
     @Override
@@ -213,12 +224,12 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     /* Data getters */
 
     @Override
-    public Observable<List<Item>> getShowcaseData() {
+    public Observable<List<? extends ItemModel>> getShowcaseData() {
         return mShowcaseData;
     }
 
     @Override
-    public Observable<List<Item>> getBasketData() {
+    public Observable<List<? extends ItemModel>> getBasketData() {
         return mBasketData;
     }
 
