@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryLight"
-    tools:context=".view.fragments.ShowcaseFragment">
+    tools:context=".ui.showcase.ShowcaseFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/showcase_list"

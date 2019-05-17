@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.Utils;
-import alektas.pocketbasket.db.entities.Item;
+import alektas.pocketbasket.utils.ResourcesUtils;
+import alektas.pocketbasket.data.db.entities.Item;
 
 public class ItemGenerator {
     private static final String TAG = "ItemGenerator";
@@ -118,15 +118,15 @@ public class ItemGenerator {
     }
 
     private static void addItem(List<Item> items, int nameRes, int imgRes, int tagRes) {
-        String nameResName = Utils.getResIdName(nameRes);
-        String tagResName = Utils.getResIdName(tagRes);
-        if (tagResName == null) tagResName = Utils.getResIdName(R.string.other);
+        String nameResName = ResourcesUtils.getResIdName(nameRes);
+        String tagResName = ResourcesUtils.getResIdName(tagRes);
+        if (tagResName == null) tagResName = ResourcesUtils.getResIdName(R.string.other);
 
         String iconResName;
         if (imgRes == 0) iconResName = null;
-        else iconResName = Utils.getResIdName(imgRes);
+        else iconResName = ResourcesUtils.getResIdName(imgRes);
 
-        String name = Utils.getString(nameRes);
+        String name = ResourcesUtils.getString(nameRes);
         Item item = new Item(name, nameResName, iconResName, tagResName);
 
         items.add(item);

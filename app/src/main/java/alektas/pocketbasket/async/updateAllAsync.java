@@ -5,8 +5,8 @@ import android.os.AsyncTask;
 import java.util.List;
 
 import alektas.pocketbasket.data.ItemsUpdater;
-import alektas.pocketbasket.db.dao.ItemsDao;
-import alektas.pocketbasket.db.entities.Item;
+import alektas.pocketbasket.data.db.dao.ItemsDao;
+import alektas.pocketbasket.data.db.entities.Item;
 
 public class updateAllAsync extends AsyncTask<List<Item>, Void, Void> {
     private ItemsDao mDao;

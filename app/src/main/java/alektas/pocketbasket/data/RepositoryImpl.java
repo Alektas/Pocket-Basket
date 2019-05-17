@@ -10,25 +10,23 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.Utils;
-import alektas.pocketbasket.async.getAllAsync;
-import alektas.pocketbasket.async.getBasketItemsAsync;
 import alektas.pocketbasket.async.insertAllAsync;
 import alektas.pocketbasket.async.updateAllAsync;
-import alektas.pocketbasket.db.AppDatabase;
-import alektas.pocketbasket.db.dao.ItemsDao;
-import alektas.pocketbasket.db.entities.BasketMeta;
-import alektas.pocketbasket.db.entities.Item;
+import alektas.pocketbasket.data.db.AppDatabase;
+import alektas.pocketbasket.data.db.dao.ItemsDao;
+import alektas.pocketbasket.data.db.entities.BasketMeta;
+import alektas.pocketbasket.data.db.entities.Item;
 import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.utils.MultiObservableValue;
 import alektas.pocketbasket.domain.utils.Observable;
 import alektas.pocketbasket.domain.utils.SingleObservableValue;
+import alektas.pocketbasket.utils.ResourcesUtils;
 
 public class RepositoryImpl implements Repository, ItemsUpdater {
     private static final String TAG = "RepositoryImpl";
     private static Repository INSTANCE;
-    private String mTag = Utils.getResIdName(R.string.all);
+    private String mTag = ResourcesUtils.getResIdName(R.string.all);
     private ItemsDao mItemsDao;
 
     /**
@@ -258,6 +256,17 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
     /* AsyncTasks */
 
+    private static class getBasketItemsAsync extends AsyncTask<Void, Void, List<Item>> {
+        private ItemsDao mDao;
+
+        getBasketItemsAsync(ItemsDao dao) { mDao = dao; }
+
+        @Override
+        protected List<Item> doInBackground(Void... voids) {
+            return mDao.getBasketItems();
+        }
+    }
+
     private static class getItemAsync extends AsyncTask<String, Void, Item> {
         ItemsDao mDao;
 
@@ -271,6 +280,20 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         }
     }
 
+    private static class getAllAsync extends AsyncTask<String, Void, List<Item>> {
+        private ItemsDao mDao;
+
+        getAllAsync(ItemsDao dao) { mDao = dao; }
+
+        @Override
+        protected List<Item> doInBackground(String... tags) {
+            if (tags.length == 0
+                    || tags[0] == null
+                    || tags[0].equals(ResourcesUtils.getResIdName(R.string.all))) return mDao.getItems();
+            else return mDao.getByTag(tags[0]);
+        }
+    }
+
     private static class updatePositionsAsync extends AsyncTask<List<String>, Void, Void> {
         private ItemsDao mDao;
 
@@ -278,8 +301,9 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
             mDao = dao;
         }
 
+        @SafeVarargs
         @Override
-        protected Void doInBackground(List<String>... names) {
+        protected final Void doInBackground(List<String>... names) {
             mDao.updatePositions(names[0]);
             return null;
         }

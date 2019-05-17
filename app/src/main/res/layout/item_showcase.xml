@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
-        <import type="alektas.pocketbasket.Utils"/>
+        <import type="alektas.pocketbasket.utils.ResourcesUtils"/>
 
         <variable
             name="item"
-            type="alektas.pocketbasket.db.entities.Item"/>
+            type="alektas.pocketbasket.data.db.entities.Item"/>
 
         <variable
             name="model"
-            type="alektas.pocketbasket.viewmodel.ShowcaseViewModel"/>
+            type="alektas.pocketbasket.ui.showcase.ShowcaseViewModel"/>
 
         <variable
             name="holder"
@@ -40,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="@dimen/padding_ic"
-                android:src="@{Utils.getImgId(item.imgRes)}"/>
+                android:src="@{ResourcesUtils.getImgId(item.imgRes)}"/>
 
             <ImageView
                 android:id="@+id/check_image"
@@ -60,7 +60,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textSize="@dimen/textsize_item_icon"
-                android:text="@{Utils.getImgId(item.imgRes) == 0 ? Utils.getDisplayName(item) : null}"/>
+                android:text="@{ResourcesUtils.getImgId(item.imgRes) == 0 ? ResourcesUtils.getDisplayName(item) : null}"/>
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -73,7 +73,7 @@
             android:layout_centerVertical="true"
             android:textSize="@dimen/textsize_item_name"
             android:textColor="@color/text_item_showcase"
-            android:text="@{Utils.getDisplayName(item)}"/>
+            android:text="@{ResourcesUtils.getDisplayName(item)}"/>
 
     </RelativeLayout>
 </layout>
