@@ -7,16 +7,17 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import alektas.pocketbasket.async.searchAsync;
 import alektas.pocketbasket.db.AppDatabase;
 import alektas.pocketbasket.db.dao.ItemsDao;
 import alektas.pocketbasket.db.entities.Item;
-import alektas.pocketbasket.async.searchAsync;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 public class ItemsProvider extends ContentProvider {
     private static final String TAG = "ItemsProvider";

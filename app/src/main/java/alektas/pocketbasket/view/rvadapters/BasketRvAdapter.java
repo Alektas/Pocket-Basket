@@ -22,27 +22,35 @@ import alektas.pocketbasket.db.entities.Item;
 import alektas.pocketbasket.view.ItemSizeProvider;
 import alektas.pocketbasket.view.ItemTouchAdapter;
 import alektas.pocketbasket.view.OnStartDragListener;
-import alektas.pocketbasket.viewmodel.ItemsViewModel;
+import alektas.pocketbasket.viewmodel.BasketViewModel;
 
 public class BasketRvAdapter extends BaseRecyclerAdapter
         implements ItemTouchAdapter {
 
     private static final String TAG = "BasketAdapter";
     private Context mContext;
-    private ItemsViewModel mModel;
+    private BasketViewModel mModel;
     private OnStartDragListener mDragListener;
-    private final int mItemWidth;
+    private ItemSizeProvider mSizeProvider;
 
-    public BasketRvAdapter(Context context, @NonNull ItemsViewModel model,
-                    OnStartDragListener dragListener,
-                    ItemSizeProvider itemSizeProvider) {
+    public BasketRvAdapter(Context context, @NonNull BasketViewModel model,
+                    OnStartDragListener dragListener) {
+        super();
+        mContext = context;
+        mModel = model;
+        mDragListener = dragListener;
+    }
+
+    public BasketRvAdapter(Context context, @NonNull BasketViewModel model,
+                           OnStartDragListener dragListener,
+                           ItemSizeProvider itemSizeProvider) {
         super();
         mContext = context;
         mModel = model;
         mDragListener = dragListener;
         // Fix item width
         // Width depends on configuration (landscape or portrait)
-        mItemWidth = itemSizeProvider.getBasketItemWidth();
+        mSizeProvider = itemSizeProvider;
     }
 
     @NonNull
@@ -50,7 +58,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     public ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext)
                 .inflate(R.layout.item_basket, parent, false);
-        itemView.getLayoutParams().width = mItemWidth;
+        itemView.getLayoutParams().width = mSizeProvider.getBasketItemWidth();
         itemView.requestLayout();
         ItemBasketBinding binding = DataBindingUtil.bind(itemView);
         binding.setModel(mModel);
@@ -99,11 +107,11 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
 
     @Override
     public void onMoveEnd() {
-        List<Item> items = new ArrayList<>();
+        List<String> names = new ArrayList<>();
         for (Object obj : getItems()) {
-            if (obj instanceof Item) items.add((Item) obj);
+            if (obj instanceof Item) names.add( ((Item) obj).getName() );
         }
-        mModel.updatePositions(items);
+        mModel.updatePositions(names);
     }
 
     private void runColorAnim(View itemView, boolean colorful) {

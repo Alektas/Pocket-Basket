@@ -36,6 +36,9 @@ public abstract class ItemsDao {
             "END, name")
     public abstract List<Item> getItems();
 
+    @Query("SELECT * FROM items WHERE name = :name")
+    public abstract Item getItem(String name);
+
     @Query("SELECT * FROM items WHERE tag_res = :tag ORDER BY name ASC")
     public abstract List<Item> getByTag(String tag);
 
@@ -43,14 +46,22 @@ public abstract class ItemsDao {
     public abstract List<Item> search(String query);
 
     @Query("SELECT name, name_res, img_res, tag_res FROM items " +
-            "INNER JOIN basket_items ON items.name = basket_items.item_name " +
+            "INNER JOIN basket_items " +
+            "ON items.name = basket_items.item_name " +
             "GROUP BY basket_items.position")
     public abstract LiveData<List<Item>> getBasketData();
 
     @Query("SELECT name, name_res, img_res, tag_res FROM items " +
-            "INNER JOIN basket_items ON items.name = basket_items.item_name " +
+            "INNER JOIN basket_items " +
+            "ON items.name = basket_items.item_name " +
             "GROUP BY basket_items.position")
     public abstract List<Item> getBasketItems();
+
+    @Query("SELECT name FROM items " +
+            "INNER JOIN basket_items " +
+            "ON items.name = basket_items.item_name " +
+            "GROUP BY basket_items.position")
+    protected abstract List<String> getBasketItemNames();
 
     @Query("SELECT checked FROM basket_items WHERE item_name = :name")
     public abstract int isChecked(String name);
@@ -65,7 +76,7 @@ public abstract class ItemsDao {
     }
 
     @Query("UPDATE basket_items SET checked = :state WHERE item_name = :name")
-    public abstract void check(String name, int state);
+    protected abstract void check(String name, int state);
 
     @Query("SELECT * FROM basket_items WHERE item_name = :name")
     public abstract BasketMeta getItemMeta(String name);
@@ -84,7 +95,7 @@ public abstract class ItemsDao {
     }
 
     @Query("UPDATE basket_items SET checked = :checked ")
-    public abstract void checkAll(int checked);
+    protected abstract void checkAll(int checked);
 
     @Query("SELECT item_name FROM basket_items WHERE checked = 0 LIMIT 1")
     public abstract String findUnchecked();
@@ -93,15 +104,15 @@ public abstract class ItemsDao {
     /* Update item positions queries */
 
     @Transaction
-    public void updatePositions(List<Item> items) {
-        for (int i = 0; i < items.size(); i++) {
+    public void updatePositions(List<String> names) {
+        for (int i = 0; i < names.size(); i++) {
             // start positions from 1
-            setPosition(items.get(i).getName(), i + 1);
+            setPosition(names.get(i), i + 1);
         }
     }
 
     @Query("UPDATE basket_items SET position = :position WHERE item_name = :name")
-    public abstract void setPosition(String name, int position);
+    protected abstract void setPosition(String name, int position);
 
 
     /* Delete checked items queries */
@@ -109,11 +120,11 @@ public abstract class ItemsDao {
     @Transaction
     public void deleteChecked() {
         deleteCheckedBasket();
-        updatePositions(getBasketItems());
+        updatePositions(getBasketItemNames());
     }
 
     @Query("DELETE FROM basket_items WHERE checked = 1")
-    public abstract void deleteCheckedBasket();
+    protected abstract void deleteCheckedBasket();
 
 
     /* Delete basket item queries */
@@ -150,10 +161,11 @@ public abstract class ItemsDao {
 
     /* Add new item to showcase and put item to basket queries */
     @Transaction
-    public void addNewItem(Item item) {
+    public void addNewItem(String name) {
+        Item item = new Item(name);
         insert(item);
         BasketMeta basketMeta = new BasketMeta();
-        basketMeta.setItemName(item.getName());
+        basketMeta.setItemName(name);
         basketMeta.setPosition(getMaxPosition() + 1);
         putItemToBasket(basketMeta);
     }

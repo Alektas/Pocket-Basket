@@ -126,7 +126,6 @@ public class ItemGenerator {
         if (imgRes == 0) iconResName = null;
         else iconResName = Utils.getResIdName(imgRes);
 
-
         String name = Utils.getString(nameRes);
         Item item = new Item(name, nameResName, iconResName, tagResName);
 

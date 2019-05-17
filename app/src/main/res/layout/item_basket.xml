@@ -9,7 +9,7 @@
 
         <variable
             name="model"
-            type="alektas.pocketbasket.viewmodel.ItemsViewModel"/>
+            type="alektas.pocketbasket.viewmodel.BasketViewModel"/>
 
         <variable
             name="dragListener"

@@ -3,6 +3,8 @@ package alektas.pocketbasket.data;
 import android.content.Context;
 import android.os.AsyncTask;
 
+import androidx.annotation.NonNull;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -16,29 +18,84 @@ import alektas.pocketbasket.db.AppDatabase;
 import alektas.pocketbasket.db.dao.ItemsDao;
 import alektas.pocketbasket.db.entities.BasketMeta;
 import alektas.pocketbasket.db.entities.Item;
-import androidx.annotation.NonNull;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
+import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.utils.MultiObservableValue;
+import alektas.pocketbasket.domain.utils.Observable;
+import alektas.pocketbasket.domain.utils.SingleObservableValue;
 
-public class RepositoryImpl implements Repository, Observer {
+public class RepositoryImpl implements Repository, ItemsUpdater {
     private static final String TAG = "RepositoryImpl";
+    private static Repository INSTANCE;
     private String mTag = Utils.getResIdName(R.string.all);
     private ItemsDao mItemsDao;
-    private MutableLiveData<List<Item>> mShowcaseItems;
-    private LiveData<List<Item>> mBasketItems;
 
-    public RepositoryImpl(Context context) {
-        mShowcaseItems = new MutableLiveData<>();
+    /**
+     * Data contains only items consisted to the selected category.
+     */
+    private Observable<List<Item>> mShowcaseData;
+
+    /**
+     * Data contains only items stored in the basket.
+     */
+    private Observable<List<Item>> mBasketData;
+
+    /**
+     * Contains current mode state.
+     * 'true' = showcase mode, 'false' = basket mode.
+     */
+    private Observable<Boolean> showcaseModeState;
+
+    /**
+     * Contains 'true' if the delete mode is active.
+     */
+    private Observable<Boolean> delModeState;
+
+    private RepositoryImpl(Context context) {
         mItemsDao = AppDatabase.getInstance(context, this).getDao();
-        update();
-        mBasketItems = mItemsDao.getBasketData();
+        mShowcaseData = new SingleObservableValue<>(getItems(mTag));
+        mBasketData = new SingleObservableValue<>(getBasketItems());
+        showcaseModeState = new MultiObservableValue<>(true);
+        delModeState = new SingleObservableValue<>(false);
     }
 
+    public static Repository getInstance(Context context) {
+        if (INSTANCE == null) {
+            synchronized (RepositoryImpl.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new RepositoryImpl(context);
+                }
+            }
+        }
+        return INSTANCE;
+    }
+
+    @Override
+    public Observable<Boolean> showcaseModeState() {
+        return showcaseModeState;
+    }
+
+    @Override
+    public void setShowcaseMode(boolean showcaseMode) {
+        showcaseModeState.setValue(showcaseMode);
+    }
+
+    @Override
+    public Observable<Boolean> delModeState() {
+        return delModeState;
+    }
+
+    @Override
+    public void setDelMode(boolean delMode) {
+        delModeState.setValue(delMode);
+    }
 
     /* Basket methods */
 
-    @Override
-    public BasketMeta getItemMeta(String name) {
+    /**
+     * @param name key of the item
+     * @return contain item position in Basket and check state
+     */
+    private BasketMeta getItemMeta(String name) {
         try {
             return new getItemMetaAsync(mItemsDao).execute(name).get();
         } catch (ExecutionException | InterruptedException e) {
@@ -47,20 +104,35 @@ public class RepositoryImpl implements Repository, Observer {
         return null;
     }
 
+    private List<Item> getBasketItems() {
+        try {
+            return new getBasketItemsAsync(mItemsDao).execute().get();
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isItemInBasket(String name) {
+        return getItemMeta(name) != null;
+    }
+
+
     @Override
     public void putToBasket(@NonNull String name) {
         new putToBasketAsync(mItemsDao, this).execute(name);
     }
 
     @Override
-    public void updatePositions(List<Item> items) {
-        new updatePositionsAsync(mItemsDao).execute(items);
+    public void updatePositions(List<String> names) {
+        new updatePositionsAsync(mItemsDao).execute(names);
     }
 
     // Change item state in "Basket"
     @Override
     public void checkItem(@NonNull String name) {
-        new checkAsync(mItemsDao).execute(name);
+        new checkAsync(mItemsDao, this).execute(name);
     }
 
     public boolean isChecked(String name) {
@@ -75,7 +147,7 @@ public class RepositoryImpl implements Repository, Observer {
     // Check all items in Basket (or uncheck if already all items are checked)
     @Override
     public void checkAll() {
-        new checkAllAsync(mItemsDao).execute();
+        new checkAllAsync(mItemsDao, this).execute();
     }
 
     // Delete item from "Basket"
@@ -94,8 +166,8 @@ public class RepositoryImpl implements Repository, Observer {
     /* Showcase methods */
 
     @Override
-    public void addNewItem(Item item) {
-        new addNewItem(mItemsDao, this).execute(item);
+    public void addNewItem(String name) {
+        new addNewItem(mItemsDao, this).execute(name);
     }
 
     @Override
@@ -107,7 +179,7 @@ public class RepositoryImpl implements Repository, Observer {
     @Override
     public void setFilter(String tag) {
         mTag = tag;
-        update();
+        updateShowcase();
     }
 
     // Return default showcase items
@@ -128,49 +200,43 @@ public class RepositoryImpl implements Repository, Observer {
 
     // Set value to Showcase LiveData to notify observers
     @Override
-    public void update() {
-        mShowcaseItems.setValue(getItems(mTag));
+    public void updateShowcase() {
+        mShowcaseData.setValue(getItems(mTag));
+    }
+
+    @Override
+    public void updateBasket() {
+        mBasketData.setValue(getBasketItems());
     }
 
 
     /* Data getters */
 
     @Override
-    public LiveData<List<Item>> getShowcaseData() {
-        return mShowcaseItems;
+    public Observable<List<Item>> getShowcaseData() {
+        return mShowcaseData;
     }
 
     @Override
-    public LiveData<List<Item>> getBasketData() {
-        return mBasketItems;
+    public Observable<List<Item>> getBasketData() {
+        return mBasketData;
     }
 
     @Override
-    public List<Item> getBasketItems() {
+    public Item getItem(String name) {
         try {
-            return new getBasketItemsAsync(mItemsDao).execute().get();
-        }
-        catch (InterruptedException | ExecutionException e) {
+            return new getItemAsync(mItemsDao).execute(name).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    @Override
-    public List<Item> getItems(String tag) {
+    private List<Item> getItems(String tag) {
         try {
             return new getAllAsync(mItemsDao).execute(tag).get();
-        }
-        catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    @Override
-    public List<Item> getItems() {
-        try {
-            return new getAllAsync(mItemsDao).execute().get();
         }
         catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
@@ -181,7 +247,20 @@ public class RepositoryImpl implements Repository, Observer {
 
     /* AsyncTasks */
 
-    private static class updatePositionsAsync extends AsyncTask<List<Item>, Void, Void> {
+    private static class getItemAsync extends AsyncTask<String, Void, Item> {
+        ItemsDao mDao;
+
+        getItemAsync(ItemsDao dao) {
+            mDao = dao;
+        }
+
+        @Override
+        protected Item doInBackground(String... strings) {
+            return mDao.getItem(strings[0]);
+        }
+    }
+
+    private static class updatePositionsAsync extends AsyncTask<List<String>, Void, Void> {
         private ItemsDao mDao;
 
         updatePositionsAsync(ItemsDao dao) {
@@ -189,8 +268,8 @@ public class RepositoryImpl implements Repository, Observer {
         }
 
         @Override
-        protected Void doInBackground(List<Item>... items) {
-            mDao.updatePositions(items[0]);
+        protected Void doInBackground(List<String>... names) {
+            mDao.updatePositions(names[0]);
             return null;
         }
     }
@@ -206,15 +285,79 @@ public class RepositoryImpl implements Repository, Observer {
         }
     }
 
+    private static class putToBasketAsync extends AsyncTask<String, Void, Void> {
+        private ItemsDao mDao;
+        private ItemsUpdater mUpdater;
+
+        putToBasketAsync(ItemsDao dao) { mDao = dao; }
+
+        putToBasketAsync(ItemsDao dao, ItemsUpdater updater) {
+            this(dao);
+            mUpdater = updater;
+        }
+
+        @Override
+        protected final Void doInBackground(String... names) {
+            mDao.putItemToBasket(names[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mUpdater != null) {
+                mUpdater.updateShowcase();
+                mUpdater.updateBasket();
+            }
+        }
+    }
+
+    private static class checkAsync extends AsyncTask<String, Void, Void> {
+        private ItemsDao mDao;
+        private ItemsUpdater mUpdater;
+
+        checkAsync(ItemsDao dao) { mDao = dao; }
+
+        checkAsync(ItemsDao dao, ItemsUpdater updater) {
+            this(dao);
+            mUpdater = updater;
+        }
+
+        @Override
+        protected final Void doInBackground(String... state) {
+            mDao.check(state[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mUpdater != null) {
+                mUpdater.updateBasket();
+            }
+        }
+    }
+
     private static class checkAllAsync extends AsyncTask<Void, Void, Void> {
         private ItemsDao mDao;
+        private ItemsUpdater mUpdater;
 
         checkAllAsync(ItemsDao dao) { mDao = dao; }
+
+        checkAllAsync(ItemsDao dao, ItemsUpdater updater) {
+            mDao = dao;
+            mUpdater = updater;
+        }
 
         @Override
         protected Void doInBackground(Void... voids) {
             mDao.checkAll();
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mUpdater != null) {
+                mUpdater.updateBasket();
+            }
         }
     }
 
@@ -229,50 +372,15 @@ public class RepositoryImpl implements Repository, Observer {
         }
     }
 
-    private static class putToBasketAsync extends AsyncTask<String, Void, Void> {
-        private ItemsDao mDao;
-        private Observer mObserver;
-
-        putToBasketAsync(ItemsDao dao) { mDao = dao; }
-
-        putToBasketAsync(ItemsDao dao, Observer observer) {
-            this(dao);
-            mObserver = observer;
-        }
-
-        @Override
-        protected final Void doInBackground(String... names) {
-            mDao.putItemToBasket(names[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mObserver != null) mObserver.update();
-        }
-    }
-
-    private static class checkAsync extends AsyncTask<String, Void, Void> {
-        private ItemsDao mDao;
-
-        checkAsync(ItemsDao dao) { mDao = dao; }
-
-        @Override
-        protected final Void doInBackground(String... state) {
-            mDao.check(state[0]);
-            return null;
-        }
-    }
-
     private static class deleteCheckedAsync extends AsyncTask<Void, Void, Void> {
         private ItemsDao mDao;
-        private Observer mObserver;
+        private ItemsUpdater mUpdater;
 
         deleteCheckedAsync(ItemsDao dao) { mDao = dao; }
 
-        deleteCheckedAsync(ItemsDao dao, Observer observer) {
+        deleteCheckedAsync(ItemsDao dao, ItemsUpdater updater) {
             this(dao);
-            mObserver = observer;
+            mUpdater = updater;
         }
 
         @Override
@@ -283,19 +391,22 @@ public class RepositoryImpl implements Repository, Observer {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (mObserver != null) mObserver.update();
+            if (mUpdater != null) {
+                mUpdater.updateShowcase();
+                mUpdater.updateBasket();
+            }
         }
     }
 
     private static class removeBasketItemAsync extends AsyncTask<String, Void, Void> {
         private ItemsDao mDao;
-        private Observer mObserver;
+        private ItemsUpdater mUpdater;
 
         removeBasketItemAsync(ItemsDao dao) { mDao = dao; }
 
-        removeBasketItemAsync(ItemsDao dao, Observer observer) {
+        removeBasketItemAsync(ItemsDao dao, ItemsUpdater updater) {
             this(dao);
-            mObserver = observer;
+            mUpdater = updater;
         }
 
         @Override
@@ -306,42 +417,48 @@ public class RepositoryImpl implements Repository, Observer {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (mObserver != null) mObserver.update();
+            if (mUpdater != null) {
+                mUpdater.updateShowcase();
+                mUpdater.updateBasket();
+            }
         }
     }
 
-    private static class addNewItem extends AsyncTask<Item, Void, Void> {
+    private static class addNewItem extends AsyncTask<String, Void, Void> {
         private ItemsDao mDao;
-        private Observer mObserver;
+        private ItemsUpdater mUpdater;
 
         addNewItem(ItemsDao dao) { mDao = dao; }
 
-        addNewItem(ItemsDao dao, Observer observer) {
+        addNewItem(ItemsDao dao, ItemsUpdater updater) {
             this(dao);
-            mObserver = observer;
+            mUpdater = updater;
         }
 
         @Override
-        protected final Void doInBackground(Item... items) {
-            mDao.addNewItem(items[0]);
+        protected final Void doInBackground(String... name) {
+            mDao.addNewItem(name[0]);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (mObserver != null) mObserver.update();
+            if (mUpdater != null) {
+                mUpdater.updateShowcase();
+                mUpdater.updateBasket();
+            }
         }
     }
 
     private static class deleteAllAsync extends AsyncTask<List<Item>, Void, Void> {
         private ItemsDao mDao;
-        private Observer mObserver;
+        private ItemsUpdater mUpdater;
 
         deleteAllAsync(ItemsDao dao) { mDao = dao; }
 
-        deleteAllAsync(ItemsDao dao, Observer observer) {
+        deleteAllAsync(ItemsDao dao, ItemsUpdater updater) {
             this(dao);
-            mObserver = observer;
+            mUpdater = updater;
         }
 
         @SafeVarargs
@@ -353,19 +470,22 @@ public class RepositoryImpl implements Repository, Observer {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (mObserver != null) mObserver.update();
+            if (mUpdater != null) {
+                mUpdater.updateShowcase();
+                mUpdater.updateBasket();
+            }
         }
     }
 
     private static class resetAsync extends AsyncTask<List<Item>, Void, Void> {
         private ItemsDao mDao;
-        private Observer mObserver;
+        private ItemsUpdater mUpdater;
 
         resetAsync(ItemsDao dao) { mDao = dao; }
 
-        resetAsync(ItemsDao dao, Observer observer) {
+        resetAsync(ItemsDao dao, ItemsUpdater updater) {
             this(dao);
-            mObserver = observer;
+            mUpdater = updater;
         }
 
         @SafeVarargs
@@ -377,7 +497,10 @@ public class RepositoryImpl implements Repository, Observer {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (mObserver != null) mObserver.update();
+            if (mUpdater != null) {
+                mUpdater.updateShowcase();
+                mUpdater.updateBasket();
+            }
         }
     }
 }

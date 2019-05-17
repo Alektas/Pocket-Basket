@@ -67,4 +67,5 @@ public class AboutDialog extends DialogFragment {
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         tv.setText(ss);
     }
+
 }

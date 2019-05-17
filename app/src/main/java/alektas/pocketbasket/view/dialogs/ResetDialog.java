@@ -4,10 +4,11 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 
-import alektas.pocketbasket.R;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+
+import alektas.pocketbasket.R;
 
 public class ResetDialog extends DialogFragment {
     /* The activity that creates an instance of this dialog fragment must

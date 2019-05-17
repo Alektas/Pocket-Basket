@@ -4,10 +4,11 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 
-import alektas.pocketbasket.R;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+
+import alektas.pocketbasket.R;
 
 public class GuideAcceptDialog extends DialogFragment {
     /* The activity that creates an instance of this dialog fragment must
@@ -19,8 +20,6 @@ public class GuideAcceptDialog extends DialogFragment {
 
     // Use this instance of the interface to deliver action events
     private GuideAcceptDialogListener mListener;
-
-    private boolean isFullReset = false;
 
     // Override the Fragment.onAttach() method to instantiate the ResetDialogListener
     @Override

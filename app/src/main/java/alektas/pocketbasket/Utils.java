@@ -3,10 +3,11 @@ package alektas.pocketbasket;
 import android.content.res.Resources;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.util.Locale;
 
 import alektas.pocketbasket.db.entities.Item;
-import androidx.annotation.NonNull;
 
 public class Utils {
     private static final String TAG = "Utils";
@@ -68,6 +69,10 @@ public class Utils {
         return Locale.getDefault();
     }
 
+    public interface Measurable {
+        void run();
+    }
+
     public static long measureProcessTime(Measurable process) {
         long start = System.nanoTime();
         process.run();
@@ -87,7 +92,4 @@ public class Utils {
         return time;
     }
 
-    public interface Measurable {
-        void run();
-    }
 }

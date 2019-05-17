@@ -7,6 +7,7 @@ import java.util.List;
 
 public class GuideImpl implements Guide, GuideCase.CaseListener {
     private static final String TAG = "GuideImpl";
+    private static Guide INSTANCE;
     private List<GuideCase> mCases;
     private GuideListener mListener;
     private int mCurrentCaseNumb;
@@ -14,7 +15,6 @@ public class GuideImpl implements Guide, GuideCase.CaseListener {
     private boolean isStarted = false;
 
     public interface GuideListener {
-
         /**
          * This callback is triggered <b>after</b> the guide case with key <i>caseKey</i> is started.
          *
@@ -41,8 +41,19 @@ public class GuideImpl implements Guide, GuideCase.CaseListener {
         void onGuideFinish();
     }
 
-    public GuideImpl() {
+    private GuideImpl() {
         mCases = new ArrayList<>();
+    }
+
+    public static Guide getInstance() {
+        if (INSTANCE == null) {
+            synchronized (Guide.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = new GuideImpl();
+                }
+            }
+        }
+        return INSTANCE;
     }
 
     @Override

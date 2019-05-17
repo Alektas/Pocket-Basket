@@ -12,8 +12,8 @@ import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(tableName = "basket_items",
         indices = {
-            @Index(value = "item_name", unique = true),
-            @Index(value = "position")},
+                @Index(value = "item_name", unique = true),
+                @Index(value = "position")},
         foreignKeys = @ForeignKey(
                 entity = Item.class,
                 parentColumns = "name",

@@ -1,20 +1,22 @@
 package alektas.pocketbasket.db.entities;
 
-import alektas.pocketbasket.R;
-import alektas.pocketbasket.Utils;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
-import androidx.annotation.NonNull;
+
+import alektas.pocketbasket.R;
+import alektas.pocketbasket.Utils;
+import alektas.pocketbasket.domain.entities.ItemModel;
 
 @Entity(tableName = "items",
         indices = {
             @Index(value = {"name"}, unique = true),
             @Index("tag_res")})
-public class Item {
+public class Item implements ItemModel {
 
     @PrimaryKey
     @ColumnInfo(name = "name")
@@ -60,6 +62,7 @@ public class Item {
     }
 
     @NonNull
+    @Override
     public String getName() {
         return mName;
     }
@@ -70,6 +73,7 @@ public class Item {
     public void setNameRes(String nameRes) {
         mNameRes = nameRes;
     }
+    @Override
     public String getNameRes() {
         return mNameRes;
     }
@@ -77,22 +81,28 @@ public class Item {
     public void setImgRes(String imgRes) {
         mImgRes = imgRes;
     }
+    @Override
     public String getImgRes() {
         return mImgRes;
     }
 
-    public void setTagRes(String tagRes) {
+    public void setTagRes(@NonNull String tagRes) {
         mTagRes = tagRes;
     }
+    @Override
     public String getTagRes() {
         return mTagRes;
     }
 
-    public String toString() { return mName; }
+    @NonNull
+    public String toString() {
+        return "[ name = " + mName + "; tag = " + mTagRes + " ]";
+    }
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (obj.getClass() != Item.class) return false;
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != getClass()) return false;
         return ((Item) obj).getName().equals(this.mName);
     }
 }

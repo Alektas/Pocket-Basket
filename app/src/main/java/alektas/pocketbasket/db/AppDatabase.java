@@ -1,25 +1,25 @@
 package alektas.pocketbasket.db;
 
-import alektas.pocketbasket.R;
-import alektas.pocketbasket.Utils;
-import alektas.pocketbasket.async.insertAllAsync;
-import alektas.pocketbasket.db.entities.BasketMeta;
-import alektas.pocketbasket.data.Observer;
-import androidx.room.migration.Migration;
-import androidx.sqlite.db.SupportSQLiteDatabase;
-import androidx.room.Database;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
 import android.content.Context;
 import android.database.Cursor;
 
+import androidx.annotation.NonNull;
+import androidx.room.Database;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+import androidx.room.migration.Migration;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+
 import java.util.List;
 
-import androidx.annotation.NonNull;
-
-import alektas.pocketbasket.db.entities.Item;
-import alektas.pocketbasket.db.dao.ItemsDao;
+import alektas.pocketbasket.R;
+import alektas.pocketbasket.Utils;
+import alektas.pocketbasket.async.insertAllAsync;
 import alektas.pocketbasket.data.ItemGenerator;
+import alektas.pocketbasket.data.ItemsUpdater;
+import alektas.pocketbasket.db.dao.ItemsDao;
+import alektas.pocketbasket.db.entities.BasketMeta;
+import alektas.pocketbasket.db.entities.Item;
 
 @Database(entities = {Item.class, BasketMeta.class}, version = 8)
 public abstract class AppDatabase extends RoomDatabase {
@@ -29,7 +29,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract ItemsDao getDao();
 
-    public static AppDatabase getInstance(final Context context, Observer observer) {
+    public static AppDatabase getInstance(final Context context, ItemsUpdater updater) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
@@ -40,8 +40,8 @@ public abstract class AppDatabase extends RoomDatabase {
                                 @Override
                                 public void onCreate(@NonNull SupportSQLiteDatabase db) {
                                     super.onCreate(db);
-                                    new insertAllAsync(getInstance(context, observer).getDao(),
-                                            observer)
+                                    new insertAllAsync(getInstance(context, updater).getDao(),
+                                            updater)
                                             .execute(ItemGenerator.getAll());
                                 }
                             })

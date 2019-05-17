@@ -30,11 +30,9 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.SearchView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
@@ -43,9 +41,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -54,7 +49,6 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.App;
@@ -69,14 +63,14 @@ import alektas.pocketbasket.guide.GuideImpl;
 import alektas.pocketbasket.view.dialogs.AboutDialog;
 import alektas.pocketbasket.view.dialogs.GuideAcceptDialog;
 import alektas.pocketbasket.view.dialogs.ResetDialog;
-import alektas.pocketbasket.view.rvadapters.BasketRvAdapter;
-import alektas.pocketbasket.view.rvadapters.ShowcaseRvAdapter;
+import alektas.pocketbasket.view.fragments.ShowcaseFragment;
 import alektas.pocketbasket.viewmodel.ItemsViewModel;
+import alektas.pocketbasket.viewmodel.ShowcaseViewModel;
 
 public class MainActivity extends AppCompatActivity implements
         ResetDialog.ResetDialogListener,
         GuideAcceptDialog.GuideAcceptDialogListener,
-        OnStartDragListener,
+        ChangeModeListener,
         ItemSizeProvider {
 
     private static final String TAG = "MainActivity";
@@ -88,14 +82,13 @@ public class MainActivity extends AppCompatActivity implements
     private int mShowcaseNarrowWidth;
     private int mBasketNarrowWidth;
     private int mBasketWideWidth;
-    private int basketTextMarginEnd;
-    private float changeModeDistance;
-    private float protectedInterval;
 
     private int initX;
     private int initY;
     private int movX;
     private float mMaxVelocity;
+    private float protectedInterval;
+    private float changeModeDistance;
 
     private boolean isAdUpdating;
     private boolean isMenuShown;
@@ -103,11 +96,8 @@ public class MainActivity extends AppCompatActivity implements
     private boolean alreadySetChangeModeAllowing = false;
     private boolean allowChooseCategory = true;
 
-    private RecyclerView mBasket;
     private View mBasketContainer;
-    private RecyclerView mShowcase;
     private View mShowcaseContainer;
-    private LinearLayout mDelModePanel;
     private View mCategoriesContainer;
     private FloatingActionButton mAddBtn;
     private SearchView mSearchView;
@@ -115,18 +105,18 @@ public class MainActivity extends AppCompatActivity implements
     private View mDelAllBtn;
     private View mCheckAllBtn;
     private View mSkipGuideBtn;
-    private BasketRvAdapter mBasketAdapter;
-    private ShowcaseRvAdapter mShowcaseAdapter;
     private TransitionSet mChangeModeTransition;
     private Transition mFamTransition;
-    private Transition mDelPanelTransition;
     private ConstraintLayout mConstraintLayout;
     private ShareActionProvider mShareActionProvider;
-    private ItemTouchHelper mTouchHelper;
     private ItemsViewModel mViewModel;
+    private ShowcaseViewModel mShowcaseViewModel;
     private VelocityTracker mVelocityTracker;
     private SmoothDecelerateInterpolator mChangeBoundsInterpolator;
     private Transition mChangeBounds;
+    private ShowcaseFragment mShowcaseFragment;
+    private View mShowcase;
+    private View mBasket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,9 +131,9 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences prefs =
                 getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
 
-        /* Update items in database when other app version is launched or locale is changed.
-        It allow to display correct icons, which were added or removed in other version,
-        and correct item names */
+        /* Update items in the database when other app version is launched or locale is changed.
+         * It allow to display correct icons, which were added or removed in other version,
+         * and correct item names */
         String curLang = Utils.getCurrentLocale().getLanguage();
         String savedLang = prefs.getString(getString(R.string.LOCALE_KEY), "lang");
         if (savedLang == null) savedLang = "lang";
@@ -230,8 +220,7 @@ public class MainActivity extends AppCompatActivity implements
             App.getAnalytics().logEvent(FirebaseAnalytics.Event.SHARE, bundle);
             return false;
         });
-        // Put current basket items to share intent
-        updateShareIntent(mViewModel.getBasketData().getValue());
+
 
         return true;
     }
@@ -240,6 +229,9 @@ public class MainActivity extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+            case R.id.menu_share: {
+                updateShareIntent(mViewModel.getBasketItems());
+            }
 
             case R.id.menu_reset: {
                 DialogFragment dialog = new ResetDialog();
@@ -287,6 +279,7 @@ public class MainActivity extends AppCompatActivity implements
         handleSearch(intent);
     }
 
+
     /* Init methods */
 
     private void init() {
@@ -298,69 +291,20 @@ public class MainActivity extends AppCompatActivity implements
         mCategoriesContainer = findViewById(R.id.fragment_categories);
         mShowcaseContainer = findViewById(R.id.fragment_showcase);
         mBasketContainer = findViewById(R.id.fragment_basket);
+        mShowcase = mShowcaseContainer.findViewById(R.id.showcase_list);
+        mBasket = mBasketContainer.findViewById(R.id.basket_list);
 
         initDimensions();
 
-        mDelModePanel = findViewById(R.id.del_panel);
-
         mViewModel = ViewModelProviders.of(this).get(ItemsViewModel.class);
+        mShowcaseFragment = (ShowcaseFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.fragment_showcase);
+        mShowcaseViewModel = mShowcaseFragment.getViewModel();
 
         initGuide(mViewModel);
-        initBasket(mViewModel);
-        initShowcase(mViewModel);
         initTransitions();
         initAd();
-
-        mViewModel.getBasketData().observe(this, items -> {
-            mBasketAdapter.setItems(new ArrayList<>(items));
-            updateShareIntent(items);
-        });
-        mViewModel.getShowcaseData().observe(this, items -> {
-            mShowcaseAdapter.setItems(new ArrayList<>(items));
-        });
-
-        mViewModel.delModeState().observe(this, isDelMode -> {
-            TransitionManager.beginDelayedTransition(mConstraintLayout, mDelPanelTransition);
-            if (isDelMode) {
-                mDelModePanel.setVisibility(View.VISIBLE);
-
-            } else {
-                mDelModePanel.setVisibility(View.GONE);
-                // update icons (remove deleting selection)
-                mShowcaseAdapter.notifyDataSetChanged();
-            }
-        });
-
-        mViewModel.getSelectedItemPosition().observe(this, position -> {
-            mShowcaseAdapter.notifyItemChanged(position);
-        });
-
-        mViewModel.guideModeState().observe(this, isGuideMode -> {
-            // There applied view states that appropriate for the all guide process.
-            // If something change during the guide it must be in the
-            // {@link GuideImpl.GuideListener} methods.
-            if (isGuideMode) {
-                hideAdBanner();
-                mSkipGuideBtn.setVisibility(View.VISIBLE);
-            } else {
-                mViewModel.setGuideCase(null);
-                mSkipGuideBtn.setVisibility(View.GONE);
-                if (!mViewModel.isShowcaseMode()) {
-                    showFloatingButton();
-                }
-                if (!isAdUpdating) updateAd();
-            }
-        });
-
-        mViewModel.showcaseModeState().observe(this, isShowcase -> {
-            // Change mode enabled only if it's not a landscape layout
-            if (isLandscape()) return;
-            if (isShowcase) {
-                applyShowcaseModeLayout();
-            } else {
-                applyBasketModeLayout();
-            }
-        });
+        subscribeOnModel();
 
         if (isLandscape()) {
             applyLandscapeLayout();
@@ -370,8 +314,6 @@ public class MainActivity extends AppCompatActivity implements
     private void initTransitions() {
         mFamTransition = TransitionInflater.from(this)
                 .inflateTransition(R.transition.transition_fam);
-        mDelPanelTransition = TransitionInflater.from(this)
-                .inflateTransition(R.transition.transition_del_panel);
 
         mChangeBounds = new ChangeBounds();
         mChangeBounds.setInterpolator(mChangeBoundsInterpolator)
@@ -423,7 +365,6 @@ public class MainActivity extends AppCompatActivity implements
 
         changeModeDistance = getResources().getDimension(R.dimen.change_mode_distance);
         protectedInterval = getResources().getDimension(R.dimen.protected_interval);
-        basketTextMarginEnd = (int) getResources().getDimension(R.dimen.margin_end_basket_item_text);
 
         mMaxVelocity = ViewConfiguration.get(this).getScaledMaximumFlingVelocity();
     }
@@ -505,6 +446,35 @@ public class MainActivity extends AppCompatActivity implements
         mAdView.loadAd(request);
     }
 
+    private void subscribeOnModel() {
+        mViewModel.guideModeState().observe(this, isGuideMode -> {
+            // There applied view states that appropriate for the all guide process.
+            // If something change during the guide it must be in the
+            // {@link GuideImpl.GuideListener} methods.
+            if (isGuideMode) {
+                hideAdBanner();
+                mSkipGuideBtn.setVisibility(View.VISIBLE);
+            } else {
+                mViewModel.setGuideCase(null);
+                mSkipGuideBtn.setVisibility(View.GONE);
+                if (!mViewModel.isShowcaseMode()) {
+                    showFloatingButton();
+                }
+                if (!isAdUpdating) updateAd();
+            }
+        });
+
+        mViewModel.showcaseModeState().observe(this, isShowcase -> {
+            // Change mode enabled only if it's not a landscape layout
+            if (isLandscape()) return;
+            if (isShowcase) {
+                applyShowcaseModeLayout();
+            } else {
+                applyBasketModeLayout();
+            }
+        });
+    }
+
     private void initFloatingActionMenu() {
         mAddBtn = findViewById(R.id.fab);
         mCheckAllBtn = findViewById(R.id.fam_check_all);
@@ -515,41 +485,13 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-    private void initBasket(ItemsViewModel model) {
-        mBasket = findViewById(R.id.basket_list);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        mBasket.setLayoutManager(layoutManager);
-        mBasket.setHasFixedSize(true);
-        mBasketAdapter = new BasketRvAdapter(this, model,
-                this,this);
-        mBasket.setAdapter(mBasketAdapter);
-
-        ItemTouchHelper.Callback callback = new ItemTouchCallback(mBasketAdapter);
-        mTouchHelper = new ItemTouchHelper(callback);
-        mTouchHelper.attachToRecyclerView(mBasket);
-
-        mBasket.addOnItemTouchListener(new ItemTouchListener());
-    }
-
-    private void initShowcase(ItemsViewModel model) {
-        mShowcase = findViewById(R.id.showcase_list);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-        mShowcase.setLayoutManager(layoutManager);
-        mShowcase.setHasFixedSize(true);
-        mShowcaseAdapter = new ShowcaseRvAdapter(
-                this, model);
-        mShowcase.setAdapter(mShowcaseAdapter);
-
-        mShowcase.addOnItemTouchListener(new ItemTouchListener());
-    }
-
     /**
      * Initialize help guide by setting callbacks on it and register it to the ViewModel
      *
      * @param model main view model to which the guide should be registered
      */
     private void initGuide(ItemsViewModel model) {
-        GuideImpl guide = buildGuide();
+        GuideImpl guide = (GuideImpl) buildGuide();
 
         guide.setGuideListener(new GuideImpl.GuideListener() {
             @Override
@@ -558,8 +500,9 @@ public class MainActivity extends AppCompatActivity implements
                 if (!isLandscape() && !mViewModel.isShowcaseMode()) {
                     setShowcaseMode();
                 }
-                if (mViewModel.isDelMode()) {
-                    mViewModel.cancelDel();
+                // TODO: Cancel del panel without ShowcaseViewModel
+                if (mShowcaseViewModel.isDelMode()) {
+                    mShowcaseViewModel.cancelDel();
                 }
             }
 
@@ -583,7 +526,7 @@ public class MainActivity extends AppCompatActivity implements
      *
      * @return guide instance
      */
-    private GuideImpl buildGuide() {
+    private Guide buildGuide() {
         mSkipGuideBtn = findViewById(R.id.skip_guide_btn);
         View bgTop = findViewById(R.id.guide_bg_top_img);
         View bgBottom = findViewById(R.id.guide_bg_bottom_img);
@@ -727,7 +670,7 @@ public class MainActivity extends AppCompatActivity implements
                 finishImg);
         finishCase.setAutoNext(true);
 
-        GuideImpl guide = new GuideImpl();
+        Guide guide = GuideImpl.getInstance();
         guide.addCase(categoriesHelpCase)
                 .addCase(showcaseHelpCase)
                 .addCase(basketHelpCase)
@@ -820,7 +763,7 @@ public class MainActivity extends AppCompatActivity implements
             if (movX < -changeModeDistance) {
                 setBasketMode();
             } else {
-                if (movX < -protectedInterval) {
+                if (movX < -protectedInterval)  {
                     TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
                 }
                 changeLayoutSize(mCategWideWidth,
@@ -831,7 +774,7 @@ public class MainActivity extends AppCompatActivity implements
             if (movX > changeModeDistance) {
                 setShowcaseMode();
             } else {
-                if (movX > protectedInterval) {
+                if (movX > protectedInterval)  {
                     TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
                 }
                 changeLayoutSize(mCategNarrowWidth,
@@ -870,8 +813,6 @@ public class MainActivity extends AppCompatActivity implements
             TransitionManager.beginDelayedTransition(mConstraintLayout, mFamTransition);
             hideFloatingMenu();
         }
-        ((LinearLayout) mDelModePanel.findViewById(R.id.del_panel_content))
-                .setOrientation(LinearLayout.VERTICAL);
     }
 
     /**
@@ -903,9 +844,6 @@ public class MainActivity extends AppCompatActivity implements
             TransitionManager.beginDelayedTransition(mConstraintLayout, mFamTransition);
             hideFloatingMenu();
         }
-
-        ((LinearLayout) mDelModePanel.findViewById(R.id.del_panel_content))
-                .setOrientation(LinearLayout.HORIZONTAL);
     }
 
     /**
@@ -1026,10 +964,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void setFilter(int tag) {
-        mViewModel.setFilter(Utils.getResIdName(tag));
-    }
-
 
     /* Interfaces methods */
 
@@ -1050,12 +984,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        mTouchHelper.startDrag(viewHolder);
-        return true;
-    }
-
-    @Override
     public int getItemWidth() {
         return mShowcaseWideWidth;
     }
@@ -1066,9 +994,15 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public int getBasketTextMarginEnd() {
-        return basketTextMarginEnd;
+    public boolean isChangeModeAllowed() {
+        return allowChangeMode;
     }
+
+    @Override
+    public boolean isChangeModeHandled() {
+        return alreadySetChangeModeAllowing;
+    }
+
 
     /* On click methods */
 
@@ -1089,7 +1023,7 @@ public class MainActivity extends AppCompatActivity implements
         else if (view.getId() == R.id.fab){
             if (mSearchView.hasFocus()) {
                 if (!TextUtils.isEmpty(mSearchView.getQuery())) {
-                    addItem(mSearchView.getQuery().toString());
+                    onSearch(mSearchView.getQuery().toString());
                 }
                 cancelSearch();
             } else {
@@ -1167,12 +1101,8 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void onDelDmBtnClick(View view) {
-        mViewModel.deleteSelectedItems();
-    }
-
-    public void onCancelDmBtnClick(View view) {
-        mViewModel.cancelDel();
+    private void setFilter(int tag) {
+        mViewModel.setFilter(Utils.getResIdName(tag));
     }
 
     public void onLinkClick(View view) {
@@ -1211,19 +1141,12 @@ public class MainActivity extends AppCompatActivity implements
         startActivity(browserIntent);
     }
 
-    /* Touch events */
 
-    // Avoid animation and touch conflict by intercept event if changing mode
-    class ItemTouchListener extends RecyclerView.SimpleOnItemTouchListener {
-        @Override
-        public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent event) {
-            return alreadySetChangeModeAllowing && allowChangeMode;
-        }
-    }
+    /* Touch events */
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        // Do not allow touch in some guide cases.
+        // Do not allow a touch in some guide cases.
         if (!mViewModel.isTouchAllowed()) {
             int[] loc = new int[2];
             mSkipGuideBtn.getLocationOnScreen(loc);
@@ -1239,16 +1162,17 @@ public class MainActivity extends AppCompatActivity implements
             }
             return true;
         }
-        // do not allow mode change in the landscape orientation
+        // Do not allow a mode change in the landscape orientation
         if (!isLandscape() && (!mViewModel.isGuideMode()
                 || GuideContract.GUIDE_CHANGE_MODE.equals(mViewModel.getCurGuideCase()))) {
             handleChangeModeByTouch(event);
         }
 
-        // disallow category selection when resizing layout
+        // disallow category selection when resizing layout by returning 'true'
         if (!isAllowChooseCategory(event)) {
-            /* Provide a touch to showcase, otherwise delete mode would be triggered on each swipe
-             * (touch would be perceived as a long press on items in showcase) */
+            /* Provide a touch to the showcase recycler view, otherwise the delete mode
+             * would be triggered on each swipe
+             * (touch would be perceived as a long press on items in the showcase) */
             mShowcase.dispatchTouchEvent(event);
             return true;
         }
@@ -1267,7 +1191,7 @@ public class MainActivity extends AppCompatActivity implements
                 initX = (int) (event.getX() + 0.5f);
                 initY = (int) (event.getY() + 0.5f);
 
-                /* Disable change mode from the basket in basket mode
+                /* Disable the change mode from the basket in the basket mode
                  * because direction of the swipe is match to direction of the item delete swipe */
                 if (!mViewModel.isShowcaseMode()
                         && initX > (mCategNarrowWidth + mShowcaseNarrowWidth)) {
@@ -1302,10 +1226,7 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             }
 
-            case MotionEvent.ACTION_UP: {
-                finishModeChange(event);
-                break;
-            }
+            case MotionEvent.ACTION_UP:
 
             case MotionEvent.ACTION_CANCEL: {
                 finishModeChange(event);
@@ -1329,7 +1250,7 @@ public class MainActivity extends AppCompatActivity implements
             setMode(movX);
             /* Need to dispatch the touch event to the RecyclerViews
                to remove the focus from their items */
-            mShowcase.onTouchEvent(event);
+            mShowcase.onTouchEvent(event); // TODO: think how to repair without dispatching event
             mBasket.onTouchEvent(event);
         } else {
             allowChangeMode = true;
@@ -1395,6 +1316,7 @@ public class MainActivity extends AppCompatActivity implements
         return allowChooseCategory;
     }
 
+
     /* Private methods */
 
     private boolean isLandscape() {
@@ -1411,10 +1333,10 @@ public class MainActivity extends AppCompatActivity implements
          * Intent.ACTION_VIEW - on click in search suggestions  */
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            addItem(query);
+            onSearch(query);
         } else if (Intent.ACTION_VIEW.equals(intent.getAction())) {
             String itemName = intent.getDataString();
-            addItem(itemName);
+            onSearch(itemName);
         }
     }
 
@@ -1428,8 +1350,8 @@ public class MainActivity extends AppCompatActivity implements
      *
      * @param query name of the item
      */
-    private void addItem(String query) {
-        mViewModel.addItem(query);
+    private void onSearch(String query) {
+        mViewModel.onSearch(query);
 
         Bundle search = new Bundle();
         search.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
