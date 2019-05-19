@@ -54,18 +54,20 @@ import java.util.List;
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.BuildConfig;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.utils.ResourcesUtils;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideCase;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.GuideImpl;
+import alektas.pocketbasket.ui.basket.BasketFragment;
+import alektas.pocketbasket.ui.basket.BasketViewModel;
 import alektas.pocketbasket.ui.dialogs.AboutDialog;
 import alektas.pocketbasket.ui.dialogs.GuideAcceptDialog;
 import alektas.pocketbasket.ui.dialogs.ResetDialog;
 import alektas.pocketbasket.ui.showcase.ShowcaseFragment;
 import alektas.pocketbasket.ui.showcase.ShowcaseViewModel;
 import alektas.pocketbasket.ui.utils.SmoothDecelerateInterpolator;
+import alektas.pocketbasket.utils.ResourcesUtils;
 
 public class MainActivity extends AppCompatActivity implements
         ResetDialog.ResetDialogListener,
@@ -114,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements
     private VelocityTracker mVelocityTracker;
     private SmoothDecelerateInterpolator mChangeBoundsInterpolator;
     private Transition mChangeBounds;
-    private ShowcaseFragment mShowcaseFragment;
     private View mShowcase;
     private View mBasket;
 
@@ -245,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 // Log analytic event
                 Bundle bundle = new Bundle();
-                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "check for new app version");
+                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "check for the new app version");
                 App.getAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
 
                 return true;
@@ -298,11 +299,14 @@ public class MainActivity extends AppCompatActivity implements
         initDimensions();
 
         mViewModel = ViewModelProviders.of(this).get(ActivityViewModel.class);
-        mShowcaseFragment = (ShowcaseFragment) getSupportFragmentManager()
-                        .findFragmentById(R.id.fragment_showcase);
+        ShowcaseFragment mShowcaseFragment = (ShowcaseFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_showcase);
         mShowcaseViewModel = mShowcaseFragment.getViewModel();
+        BasketFragment mBasketFragment = (BasketFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.fragment_basket);
+        BasketViewModel mBasketViewModel = mBasketFragment.getViewModel();
 
-        initGuide(mViewModel);
+        initGuide(mViewModel, mShowcaseViewModel, mBasketViewModel);
         initTransitions();
         initAd();
         subscribeOnModel();
@@ -491,7 +495,9 @@ public class MainActivity extends AppCompatActivity implements
      *
      * @param model main view model to which the guide should be registered
      */
-    private void initGuide(ActivityViewModel model) {
+    private void initGuide(ActivityViewModel model,
+                           ShowcaseViewModel showcaseModel,
+                           BasketViewModel basketModel) {
         GuideImpl guide = (GuideImpl) buildGuide();
 
         guide.setGuideListener(new GuideImpl.GuideListener() {
@@ -520,6 +526,8 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         model.setGuide(guide);
+        showcaseModel.setGuide(guide);
+        basketModel.setGuide(guide);
     }
 
     /**
@@ -671,7 +679,7 @@ public class MainActivity extends AppCompatActivity implements
                 finishImg);
         finishCase.setAutoNext(true);
 
-        Guide guide = GuideImpl.getInstance();
+        Guide guide = new GuideImpl();
         guide.addCase(categoriesHelpCase)
                 .addCase(showcaseHelpCase)
                 .addCase(basketHelpCase)

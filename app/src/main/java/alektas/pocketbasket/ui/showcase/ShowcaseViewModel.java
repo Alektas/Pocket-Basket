@@ -84,7 +84,19 @@ public class ShowcaseViewModel extends AndroidViewModel {
                 prepareToDel(item, pos);
             }
         } else {
-            new SelectShowcaseItem(mRepository).execute(item.getName(), null);
+            new SelectShowcaseItem(mRepository).execute(item.getName(), (isAdded) -> {
+                if (isAdded) {
+                    mGuide.onCaseHappened(GuideContract.GUIDE_ADD_ITEM);
+
+                    Bundle bundle = new Bundle();
+                    bundle.putString(FirebaseAnalytics.Param.ITEM_ID, item.getName());
+                    bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, item.getName());
+                    bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, item.getTagRes());
+                    App.getAnalytics().logEvent(FirebaseAnalytics.Event.ADD_TO_CART, bundle);
+                } else {
+                    mGuide.onCaseHappened(GuideContract.GUIDE_REMOVE_ITEM);
+                }
+            });
         }
     }
 

@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.guide.GuideImpl;
 import alektas.pocketbasket.ui.ChangeModeListener;
 import alektas.pocketbasket.ui.ItemSizeProvider;
 
@@ -59,7 +58,6 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
         super.onCreate(savedInstanceState);
 
         mViewModel = ViewModelProviders.of(this).get(BasketViewModel.class);
-        mViewModel.setGuide(GuideImpl.getInstance());
         mBasketAdapter = new BasketRvAdapter(getContext(), mViewModel,this, mItemSizeProvider);
         subscribeOnModel();
     }
@@ -93,6 +91,10 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
         mTouchHelper.attachToRecyclerView(mBasket);
 
         return root;
+    }
+
+    public BasketViewModel getViewModel() {
+        return mViewModel;
     }
 
     private void subscribeOnModel() {

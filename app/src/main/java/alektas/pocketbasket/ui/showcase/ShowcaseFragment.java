@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.guide.GuideImpl;
 import alektas.pocketbasket.ui.ChangeModeListener;
 import alektas.pocketbasket.ui.ItemSizeProvider;
 
@@ -66,7 +65,6 @@ public class ShowcaseFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         mViewModel = ViewModelProviders.of(this).get(ShowcaseViewModel.class);
-        mViewModel.setGuide(GuideImpl.getInstance());
         mShowcaseAdapter = new ShowcaseRvAdapter(mViewModel, mItemSizeProvider);
         subscribeOnModel();
         initTransitions();
