@@ -583,7 +583,7 @@ public class MainActivity extends AppCompatActivity implements
                 findViewById(R.id.guide_add_item_text),
                 findViewById(R.id.guide_add_item_sub_text));
 
-        //  Guide: check item in Basket
+        //  Guide: mark item in Basket
         View checkItemImg = findViewById(R.id.guide_tap_check_img);
         GuideCase checkItemCase = new GuideCase(
                 GuideContract.GUIDE_CHECK_ITEM,
@@ -1014,11 +1014,11 @@ public class MainActivity extends AppCompatActivity implements
                 hideFloatingMenu();
             }
             if (view.getId() == R.id.fam_del_all) {
-                mViewModel.deleteChecked();
+                mViewModel.deleteMarked();
                 hideFloatingMenu();
             }
             if (view.getId() == R.id.fam_check_all) {
-                mViewModel.checkAllItems();
+                mViewModel.markAllItems();
             }
         }
         else if (view.getId() == R.id.fab){

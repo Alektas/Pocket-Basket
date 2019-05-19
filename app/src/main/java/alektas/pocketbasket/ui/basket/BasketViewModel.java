@@ -12,6 +12,7 @@ import java.util.List;
 import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.usecases.MarkBasketItem;
 import alektas.pocketbasket.domain.usecases.MoveBasketItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.Guide;
@@ -54,16 +55,17 @@ public class BasketViewModel extends AndroidViewModel {
     /**
      * Check or uncheck item in the Basket
      */
-    public void checkItem(String name) {
-        mRepository.checkItem(name);
+    public void markItem(String name) {
+        UseCase<String, Void> useCase = new MarkBasketItem(mRepository);
+        useCase.execute(name, null);
         mGuide.onCaseHappened(GuideContract.GUIDE_CHECK_ITEM);
     }
 
     /**
      * Verify if item in the Basket is checked.
      */
-    public boolean isItemChecked(String name) {
-        return mRepository.isChecked(name);
+    public boolean isItemMarked(String name) {
+        return mRepository.isMarked(name);
     }
 
     public void removeFromBasket(String name) {

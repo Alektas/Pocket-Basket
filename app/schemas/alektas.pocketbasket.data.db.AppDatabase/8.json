@@ -82,7 +82,7 @@
             "notNull": true
           },
           {
-            "fieldPath": "checked",
+            "fieldPath": "marked",
             "columnName": "checked",
             "affinity": "INTEGER",
             "notNull": true

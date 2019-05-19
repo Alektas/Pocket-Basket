@@ -113,15 +113,15 @@ public class ActivityViewModel extends AndroidViewModel {
     /**
      * Verify if all items in the Basket are checked.
      */
-    public void checkAllItems() {
-        mRepository.checkAll();
+    public void markAllItems() {
+        mRepository.markAll();
     }
 
     /**
      * Delete all checked items in the Basket.
      */
-    public void deleteChecked() {
-        mRepository.deleteChecked();
+    public void deleteMarked() {
+        mRepository.deleteMarked();
     }
 
     /* Guide methods */

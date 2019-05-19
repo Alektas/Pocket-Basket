@@ -11,6 +11,6 @@ public class MarkBasketItem implements UseCase<String, Void> {
 
     @Override
     public void execute(String s, Callback<Void> callback) {
-        mRepository.putToBasket(s);
+        mRepository.markItem(s);
     }
 }

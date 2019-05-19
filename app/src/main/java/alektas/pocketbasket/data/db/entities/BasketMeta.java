@@ -32,8 +32,9 @@ public class BasketMeta {
     @NonNull
     private int position;
 
+    @ColumnInfo(name = "checked")
     @NonNull
-    private int checked;
+    private int marked;
 
     public BasketMeta() { }
 
@@ -66,22 +67,22 @@ public class BasketMeta {
         this.position = position;
     }
 
-    public int getChecked() {
-        return checked;
+    public int getMarked() {
+        return marked;
     }
-    public boolean isChecked() {
-        return checked != 0;
-    }
-
-    public void setChecked(int checked) {
-        this.checked = checked;
-    }
-    public void setChecked(boolean checked) {
-        if (checked) this.checked = 1;
-        else this.checked = 0;
+    public boolean isMarked() {
+        return marked != 0;
     }
 
-    public String toString() { return (itemName + ": pos=" + position + " checked=" + checked); }
+    public void setMarked(int marked) {
+        this.marked = marked;
+    }
+    public void setMarked(boolean marked) {
+        if (marked) this.marked = 1;
+        else this.marked = 0;
+    }
+
+    public String toString() { return (itemName + ": pos=" + position + " marked=" + marked); }
 
     @Override
     public boolean equals(@Nullable Object obj) {

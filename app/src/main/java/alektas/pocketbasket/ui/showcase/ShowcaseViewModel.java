@@ -1,6 +1,7 @@
 package alektas.pocketbasket.ui.showcase;
 
 import android.app.Application;
+import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -8,9 +9,12 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import alektas.pocketbasket.App;
 import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.data.db.entities.Item;
 import alektas.pocketbasket.domain.Repository;

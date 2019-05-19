@@ -12,10 +12,10 @@ public interface Repository {
     void putToBasket(String name);
     void removeFromBasket(String name);
     void updatePositions(List<String> names);
-    boolean isChecked(String name);
-    void checkItem(String name);
-    void checkAll();
-    void deleteChecked();
+    boolean isMarked(String name);
+    void markItem(String name);
+    void markAll();
+    void deleteMarked();
 
     Observable<List<? extends ItemModel>> getShowcaseData();
     void addNewItem(String name);

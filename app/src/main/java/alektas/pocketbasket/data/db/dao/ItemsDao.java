@@ -1,6 +1,5 @@
 package alektas.pocketbasket.data.db.dao;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -49,12 +48,6 @@ public abstract class ItemsDao {
             "INNER JOIN basket_items " +
             "ON items.name = basket_items.item_name " +
             "GROUP BY basket_items.position")
-    public abstract LiveData<List<Item>> getBasketData();
-
-    @Query("SELECT name, name_res, img_res, tag_res FROM items " +
-            "INNER JOIN basket_items " +
-            "ON items.name = basket_items.item_name " +
-            "GROUP BY basket_items.position")
     public abstract List<Item> getBasketItems();
 
     @Query("SELECT name FROM items " +
@@ -64,19 +57,19 @@ public abstract class ItemsDao {
     protected abstract List<String> getBasketItemNames();
 
     @Query("SELECT checked FROM basket_items WHERE item_name = :name")
-    public abstract int isChecked(String name);
+    public abstract int isMarked(String name);
 
 
     /* Check item queries */
 
     @Transaction
-    public void check(String name) {
-        if (getItemMeta(name).isChecked()) check(name, 0);
-        else check(name, 1);
+    public void mark(String name) {
+        if (getItemMeta(name).isMarked()) mark(name, 0);
+        else mark(name, 1);
     }
 
     @Query("UPDATE basket_items SET checked = :state WHERE item_name = :name")
-    protected abstract void check(String name, int state);
+    protected abstract void mark(String name, int state);
 
     @Query("SELECT * FROM basket_items WHERE item_name = :name")
     public abstract BasketMeta getItemMeta(String name);
@@ -85,20 +78,20 @@ public abstract class ItemsDao {
     /* Check all items queries */
 
     @Transaction
-    public void checkAll() {
-        if (findUnchecked() == null) {
-            checkAll(0);
+    public void markAll() {
+        if (findUnmarked() == null) {
+            markAll(0);
         }
         else {
-            checkAll(1);
+            markAll(1);
         }
     }
 
     @Query("UPDATE basket_items SET checked = :checked ")
-    protected abstract void checkAll(int checked);
+    protected abstract void markAll(int checked);
 
     @Query("SELECT item_name FROM basket_items WHERE checked = 0 LIMIT 1")
-    public abstract String findUnchecked();
+    public abstract String findUnmarked();
 
 
     /* Update item positions queries */

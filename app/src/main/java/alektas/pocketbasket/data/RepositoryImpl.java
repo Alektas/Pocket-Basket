@@ -102,7 +102,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
     /**
      * @param name key of the item
-     * @return contain item position in Basket and check state
+     * @return contain item position in Basket and mark state
      */
     private BasketMeta getItemMeta(String name) {
         try {
@@ -140,13 +140,13 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
     // Change item state in "Basket"
     @Override
-    public void checkItem(@NonNull String name) {
-        new checkAsync(mItemsDao, this).execute(name);
+    public void markItem(@NonNull String name) {
+        new markAsync(mItemsDao, this).execute(name);
     }
 
-    public boolean isChecked(String name) {
+    public boolean isMarked(String name) {
         try {
-            return (new isCheckedAsync(mItemsDao).execute(name).get()) != 0;
+            return (new isMarkedAsync(mItemsDao).execute(name).get()) != 0;
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -155,8 +155,8 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
     // Check all items in Basket (or uncheck if already all items are checked)
     @Override
-    public void checkAll() {
-        new checkAllAsync(mItemsDao, this).execute();
+    public void markAll() {
+        new markAllAsync(mItemsDao, this).execute();
     }
 
     // Delete item from "Basket"
@@ -167,8 +167,8 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
     // Delete all checked items from "Basket"
     @Override
-    public void deleteChecked() {
-        new deleteCheckedAsync(mItemsDao, this).execute();
+    public void deleteMarked() {
+        new deleteMarkedAsync(mItemsDao, this).execute();
     }
 
 
@@ -346,20 +346,20 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         }
     }
 
-    private static class checkAsync extends AsyncTask<String, Void, Void> {
+    private static class markAsync extends AsyncTask<String, Void, Void> {
         private ItemsDao mDao;
         private ItemsUpdater mUpdater;
 
-        checkAsync(ItemsDao dao) { mDao = dao; }
+        markAsync(ItemsDao dao) { mDao = dao; }
 
-        checkAsync(ItemsDao dao, ItemsUpdater updater) {
+        markAsync(ItemsDao dao, ItemsUpdater updater) {
             this(dao);
             mUpdater = updater;
         }
 
         @Override
         protected final Void doInBackground(String... state) {
-            mDao.check(state[0]);
+            mDao.mark(state[0]);
             return null;
         }
 
@@ -371,20 +371,20 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         }
     }
 
-    private static class checkAllAsync extends AsyncTask<Void, Void, Void> {
+    private static class markAllAsync extends AsyncTask<Void, Void, Void> {
         private ItemsDao mDao;
         private ItemsUpdater mUpdater;
 
-        checkAllAsync(ItemsDao dao) { mDao = dao; }
+        markAllAsync(ItemsDao dao) { mDao = dao; }
 
-        checkAllAsync(ItemsDao dao, ItemsUpdater updater) {
+        markAllAsync(ItemsDao dao, ItemsUpdater updater) {
             mDao = dao;
             mUpdater = updater;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            mDao.checkAll();
+            mDao.markAll();
             return null;
         }
 
@@ -396,24 +396,24 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         }
     }
 
-    private static class isCheckedAsync extends AsyncTask<String, Void, Integer> {
+    private static class isMarkedAsync extends AsyncTask<String, Void, Integer> {
         private ItemsDao mDao;
 
-        isCheckedAsync(ItemsDao dao) { mDao = dao; }
+        isMarkedAsync(ItemsDao dao) { mDao = dao; }
 
         @Override
         protected Integer doInBackground(String... name) {
-            return mDao.isChecked(name[0]);
+            return mDao.isMarked(name[0]);
         }
     }
 
-    private static class deleteCheckedAsync extends AsyncTask<Void, Void, Void> {
+    private static class deleteMarkedAsync extends AsyncTask<Void, Void, Void> {
         private ItemsDao mDao;
         private ItemsUpdater mUpdater;
 
-        deleteCheckedAsync(ItemsDao dao) { mDao = dao; }
+        deleteMarkedAsync(ItemsDao dao) { mDao = dao; }
 
-        deleteCheckedAsync(ItemsDao dao, ItemsUpdater updater) {
+        deleteMarkedAsync(ItemsDao dao, ItemsUpdater updater) {
             this(dao);
             mUpdater = updater;
         }
