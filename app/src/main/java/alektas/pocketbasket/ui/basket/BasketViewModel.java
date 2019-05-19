@@ -29,6 +29,14 @@ public class BasketViewModel extends AndroidViewModel {
         mRepository.getBasketData().observe(mBasketData::setValue);
     }
 
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        mRepository.getBasketData().clearObservers();
+        mRepository = null;
+        mGuide = null;
+    }
+
     public void setGuide(Guide guide) {
         mGuide = guide;
     }

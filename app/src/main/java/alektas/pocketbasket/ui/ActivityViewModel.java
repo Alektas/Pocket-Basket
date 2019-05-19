@@ -41,6 +41,14 @@ public class ActivityViewModel extends AndroidViewModel {
         mRepository.showcaseModeState().observe(showcaseModeState::setValue);
     }
 
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        mRepository.showcaseModeState().clearObservers();
+        mRepository = null;
+        mGuide = null;
+    }
+
     /**
      * Show in the Showcase only items with specified tag
      * @param tag item type or category
@@ -102,12 +110,6 @@ public class ActivityViewModel extends AndroidViewModel {
         useCase.execute(name, isAdded -> {
             mGuide.onCaseHappened(GuideContract.GUIDE_ADD_ITEM);
         });
-
-        Bundle bundle = new Bundle();
-        bundle.putString(FirebaseAnalytics.Param.ITEM_ID, name);
-        bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, name);
-//        bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, getCategory(name));
-        App.getAnalytics().logEvent(FirebaseAnalytics.Event.ADD_TO_CART, bundle);
     }
 
     /**

@@ -44,6 +44,16 @@ public class ShowcaseViewModel extends AndroidViewModel {
         mDelItems = new ArrayList<>();
     }
 
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        mRepository.getShowcaseData().clearObservers();
+        mRepository.showcaseModeState().clearObservers();
+        mRepository.delModeState().clearObservers();
+        mRepository = null;
+        mGuide = null;
+    }
+
     public void setGuide(Guide guide) {
         mGuide = guide;
     }
