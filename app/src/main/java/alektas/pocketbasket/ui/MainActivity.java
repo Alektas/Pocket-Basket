@@ -1,7 +1,7 @@
 package alektas.pocketbasket.ui;
 
+import android.animation.Animator;
 import android.animation.AnimatorInflater;
-import android.animation.AnimatorSet;
 import android.annotation.SuppressLint;
 import android.app.SearchManager;
 import android.content.Context;
@@ -56,7 +56,7 @@ import alektas.pocketbasket.BuildConfig;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.guide.Guide;
-import alektas.pocketbasket.guide.GuideCase;
+import alektas.pocketbasket.guide.GuideCaseView;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.GuideImpl;
 import alektas.pocketbasket.ui.basket.BasketFragment;
@@ -541,143 +541,153 @@ public class MainActivity extends AppCompatActivity implements
         View bgBottom = findViewById(R.id.guide_bg_bottom_img);
 
         // Guide: categories help
-        GuideCase categoriesHelpCase = new GuideCase(
-                GuideContract.GUIDE_CATEGORIES_HELP,
-                bgBottom,
-                findViewById(R.id.guide_bg_right_large_img),
-                findViewById(R.id.guide_categories_help_text),
-                findViewById(R.id.guide_categories_help_sub_text));
+        GuideCaseView categoriesHelpCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_CATEGORIES_HELP)
+                .addViews(bgBottom,
+                        findViewById(R.id.guide_bg_right_large_img),
+                        findViewById(R.id.guide_categories_help_text),
+                        findViewById(R.id.guide_categories_help_sub_text))
+                .build();
 
         // Guide: showcase help
-        GuideCase showcaseHelpCase = new GuideCase(
-                GuideContract.GUIDE_SHOWCASE_HELP,
-                bgBottom,
-                findViewById(R.id.guide_bg_right_small_img),
-                findViewById(R.id.guide_bg_left_small_img),
-                findViewById(R.id.guide_showcase_help_text),
-                findViewById(R.id.guide_showcase_help_sub_text));
+        GuideCaseView showcaseHelpCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_SHOWCASE_HELP)
+                .addViews(bgBottom,
+                        findViewById(R.id.guide_bg_right_small_img),
+                        findViewById(R.id.guide_bg_left_small_img),
+                        findViewById(R.id.guide_showcase_help_text),
+                        findViewById(R.id.guide_showcase_help_sub_text))
+                .build();
 
         // Guide: basket help
-        GuideCase basketHelpCase = new GuideCase(
-                GuideContract.GUIDE_BASKET_HELP,
-                bgBottom,
-                findViewById(R.id.guide_bg_left_large_img),
-                findViewById(R.id.guide_basket_help_text),
-                findViewById(R.id.guide_basket_help_sub_text));
+        GuideCaseView basketHelpCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_BASKET_HELP)
+                .addViews(bgBottom,
+                        findViewById(R.id.guide_bg_left_large_img),
+                        findViewById(R.id.guide_basket_help_text),
+                        findViewById(R.id.guide_basket_help_sub_text))
+                .build();
 
         //  Guide: change mode
         View changeModeImg = findViewById(R.id.guide_scroll_hor_img);
-        AnimatorSet scrollHorizAnim = (AnimatorSet) AnimatorInflater
+        Animator scrollHorizAnim = AnimatorInflater
                 .loadAnimator(this, R.animator.anim_guide_scroll_horiz);
-        scrollHorizAnim.setTarget(changeModeImg);
-        GuideCase changeModeCase = new GuideCase(
-                GuideContract.GUIDE_CHANGE_MODE,
-                scrollHorizAnim,
-                changeModeImg,
-                bgBottom,
-                findViewById(R.id.guide_change_mode_text),
-                findViewById(R.id.guide_change_mode_sub_text));
+        GuideCaseView changeModeCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_CHANGE_MODE)
+                .addViews(bgBottom,
+                        changeModeImg,
+                        findViewById(R.id.guide_change_mode_text),
+                        findViewById(R.id.guide_change_mode_sub_text))
+                .setAnimation(scrollHorizAnim, changeModeImg)
+                .build();
 
         //  Guide: add item
         View addItemImg = findViewById(R.id.guide_tap_add_img);
-        AnimatorSet tapAnim = (AnimatorSet) AnimatorInflater
+        Animator tapAnim = AnimatorInflater
                 .loadAnimator(this, R.animator.anim_guide_tap);
-        GuideCase addItemCase = new GuideCase(
-                GuideContract.GUIDE_ADD_ITEM,
-                tapAnim,
-                true,
-                addItemImg,
-                bgBottom,
-                findViewById(R.id.guide_add_item_text),
-                findViewById(R.id.guide_add_item_sub_text));
+        GuideCaseView addItemCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_ADD_ITEM)
+                .addViews(bgBottom,
+                        addItemImg,
+                        findViewById(R.id.guide_add_item_text),
+                        findViewById(R.id.guide_add_item_sub_text))
+                .setAnimation(tapAnim, addItemImg)
+                .build();
 
         //  Guide: mark item in Basket
+        Animator tapAnim2 = AnimatorInflater
+                .loadAnimator(this, R.animator.anim_guide_tap);
         View checkItemImg = findViewById(R.id.guide_tap_check_img);
-        GuideCase checkItemCase = new GuideCase(
-                GuideContract.GUIDE_CHECK_ITEM,
-                tapAnim,
-                true,
-                checkItemImg,
-                bgBottom,
-                findViewById(R.id.guide_check_item_text));
+        GuideCaseView checkItemCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_CHECK_ITEM)
+                .addViews(bgBottom,
+                        checkItemImg,
+                        findViewById(R.id.guide_check_item_text))
+                .setAnimation(tapAnim2, checkItemImg)
+                .build();
 
         //  Guide: move item in Basket
-        AnimatorSet scrollVertAnim = (AnimatorSet) AnimatorInflater
+        Animator scrollVertAnim = AnimatorInflater
                 .loadAnimator(this, R.animator.anim_guide_scroll_vert);
         View moveItemImg = findViewById(R.id.guide_scroll_vert_img);
-        scrollVertAnim.setTarget(moveItemImg);
-        GuideCase moveItemCase = new GuideCase(
-                GuideContract.GUIDE_MOVE_ITEM,
-                scrollVertAnim,
-                moveItemImg,
-                bgBottom,
-                findViewById(R.id.guide_move_item_text),
-                findViewById(R.id.guide_move_item_sub_text));
+        GuideCaseView moveItemCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_MOVE_ITEM)
+                .addViews(bgBottom,
+                        moveItemImg,
+                        findViewById(R.id.guide_move_item_text),
+                        findViewById(R.id.guide_move_item_sub_text))
+                .setAnimation(scrollVertAnim, moveItemImg)
+                .build();
 
         //  Guide: remove item from Basket
         View removeItemImg = findViewById(R.id.guide_swipe_right_img);
-        AnimatorSet swipeRightAnim = (AnimatorSet) AnimatorInflater
+        Animator swipeRightAnim = AnimatorInflater
                 .loadAnimator(this, R.animator.anim_guide_swipe_right);
-        swipeRightAnim.setTarget(removeItemImg);
-        GuideCase removeItemCase = new GuideCase(
-                GuideContract.GUIDE_REMOVE_ITEM,
-                swipeRightAnim,
-                removeItemImg,
-                bgBottom,
-                findViewById(R.id.guide_remove_text),
-                findViewById(R.id.guide_remove_sub_text));
+        GuideCaseView removeItemCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_REMOVE_ITEM)
+                .addViews(bgBottom,
+                        removeItemImg,
+                        findViewById(R.id.guide_remove_text),
+                        findViewById(R.id.guide_remove_sub_text))
+                .setAnimation(swipeRightAnim, removeItemImg)
+                .build();
 
         //  Guide: turn on delete mode
         View longPressImg = findViewById(R.id.guide_del_mode_img);
-        AnimatorSet longPressAnim = (AnimatorSet) AnimatorInflater
+        Animator longPressAnim = AnimatorInflater
                 .loadAnimator(this, R.animator.anim_guide_long_press);
-        GuideCase delModeCase = new GuideCase(
-                GuideContract.GUIDE_DEL_MODE,
-                longPressAnim,
-                true,
-                longPressImg,
-                bgBottom,
-                findViewById(R.id.guide_del_mode_text));
+        GuideCaseView delModeCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_DEL_MODE)
+                .addViews(bgBottom,
+                        longPressImg,
+                        findViewById(R.id.guide_del_mode_text))
+                .setAnimation(longPressAnim, longPressImg)
+                .build();
 
         //  Guide: delete items from Showcase
+        Animator tapAnim3 = AnimatorInflater
+                .loadAnimator(this, R.animator.anim_guide_tap);
         View tapToDelImg = findViewById(R.id.guide_tap_delete_img);
-        GuideCase deleteItemsCase = new GuideCase(
-                GuideContract.GUIDE_DEL_ITEMS,
-                tapAnim,
-                true,
-                tapToDelImg,
-                bgTop,
-                findViewById(R.id.guide_delete_text),
-                findViewById(R.id.guide_delete_sub_text));
+        GuideCaseView deleteItemsCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_DEL_ITEMS)
+                .addViews(bgTop,
+                        tapToDelImg,
+                        findViewById(R.id.guide_delete_text),
+                        findViewById(R.id.guide_delete_sub_text))
+                .setAnimation(tapAnim3, tapToDelImg)
+                .build();
 
         //  Guide: floating menu invoke
+        Animator longPressAnim2 = AnimatorInflater
+                .loadAnimator(this, R.animator.anim_guide_long_press);
         View pressFabImg = findViewById(R.id.guide_show_floating_menu_img);
-        GuideCase floatingMenuCase = new GuideCase(
-                GuideContract.GUIDE_FLOATING_MENU,
-                longPressAnim,
-                true,
-                pressFabImg,
-                bgTop,
-                findViewById(R.id.guide_show_floating_menu_text));
+        GuideCaseView floatingMenuCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_FLOATING_MENU)
+                .addViews(bgTop,
+                        pressFabImg,
+                        findViewById(R.id.guide_show_floating_menu_text))
+                .setAnimation(longPressAnim2, pressFabImg)
+                .build();
 
         //  Guide: floating menu help
-        GuideCase floatingMenuHelpCase = new GuideCase(
-                GuideContract.GUIDE_FLOATING_MENU_HELP,
-                findViewById(R.id.guide_bg_full_img),
-                findViewById(R.id.guide_floating_menu_close_text),
-                findViewById(R.id.guide_floating_menu_check_all_text),
-                findViewById(R.id.guide_floating_menu_del_checked_text));
+        GuideCaseView floatingMenuHelpCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_FLOATING_MENU_HELP)
+                .addViews(findViewById(R.id.guide_bg_full_img),
+                        findViewById(R.id.guide_floating_menu_close_text),
+                        findViewById(R.id.guide_floating_menu_check_all_text),
+                        findViewById(R.id.guide_floating_menu_del_checked_text))
+                .build();
 
         //  Guide: finishGuide case
         View finishImg = findViewById(R.id.guide_finish_img);
-        AnimatorSet finishAnim = (AnimatorSet) AnimatorInflater
+        Animator finishAnim = AnimatorInflater
                 .loadAnimator(this, R.animator.anim_guide_finish);
-        finishAnim.setTarget(finishImg);
-        GuideCase finishCase = new GuideCase(
-                GuideContract.GUIDE_FINISH,
-                finishAnim,
-                finishImg);
-        finishCase.setAutoNext(true);
+        GuideCaseView finishCase = new GuideCaseView
+                .Builder(GuideContract.GUIDE_FINISH)
+                .addViews(finishImg)
+                .setAnimation(finishAnim, finishImg)
+                .setAutoNext(true)
+                .build();
 
         Guide guide = new GuideImpl();
         guide.addCase(categoriesHelpCase)
