@@ -2,31 +2,27 @@ package alektas.pocketbasket.domain;
 
 import java.util.List;
 
+import alektas.pocketbasket.domain.entities.BasketItemModel;
 import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 import alektas.pocketbasket.domain.utils.Observable;
 
 public interface Repository {
 
-    Observable<List<? extends ItemModel>> getBasketData();
+    Observable<List<BasketItemModel>> getBasketData();
     boolean isItemInBasket(String name);
     void putToBasket(String name);
     void removeFromBasket(String name);
     void updatePositions(List<String> names);
-    boolean isMarked(String name);
     void markItem(String name);
     void markAll();
-    void deleteMarked();
+    void removeMarked();
 
-    Observable<List<? extends ItemModel>> getShowcaseData();
+    Observable<List<ShowcaseItemModel>> getShowcaseData();
     void addNewItem(String name);
-    /**
-     * Delete from the Showcase all items presented in the list
-     * @param items deleting items
-     */
-    void deleteItems(List<? extends ItemModel> items);
     void setFilter(String tag);
     void resetShowcase();
-    void insertAll(List<? extends ItemModel> items);
+    void insertPredefinedItems();
     void updateAll();
     ItemModel getItem(String name);
 
@@ -35,5 +31,11 @@ public interface Repository {
 
     Observable<Boolean> delModeState();
     void setDelMode(boolean delMode);
+
+    void selectForDeleting(ShowcaseItemModel item);
+    /**
+     * Delete from the Showcase all items selected by user for the deleting.
+     */
+    void deleteSelectedItems();
 
 }

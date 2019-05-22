@@ -36,13 +36,14 @@ public class MultiObservableValue<T> implements Observable<T> {
     }
 
     @Override
-    public void clearObservers() {
-        mObservers.clear();
-    }
-
-    private void notifyObservers() {
+    public void notifyObservers() {
         for (Observer<T> observer : mObservers) {
             observer.onChanged(mValue);
         }
+    }
+
+    @Override
+    public void clearObservers() {
+        mObservers.clear();
     }
 }

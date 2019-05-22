@@ -9,7 +9,7 @@ import java.util.Locale;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.BuildConfig;
-import alektas.pocketbasket.data.db.entities.Item;
+import alektas.pocketbasket.domain.entities.ItemModel;
 
 public class ResourcesUtils {
     private static final String TAG = "ResourcesUtils";
@@ -62,7 +62,7 @@ public class ResourcesUtils {
         return null;
     }
 
-    public static String getDisplayName(@NonNull Item item) {
+    public static String getDisplayName(@NonNull ItemModel item) {
         if (item.getNameRes() == null) return item.getName();
         return getString(item.getNameRes());
     }

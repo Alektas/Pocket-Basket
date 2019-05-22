@@ -5,12 +5,13 @@ import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import static androidx.room.ForeignKey.CASCADE;
 
-@Entity(tableName = "basket_items",
+@Entity(tableName = "basket_meta",
         indices = {
                 @Index(value = "item_name", unique = true),
                 @Index(value = "position")},
@@ -21,7 +22,6 @@ import static androidx.room.ForeignKey.CASCADE;
                 onDelete = CASCADE,
                 onUpdate = CASCADE))
 public class BasketMeta {
-
     @PrimaryKey(autoGenerate = true)
     private int _id;
 
@@ -32,15 +32,14 @@ public class BasketMeta {
     @NonNull
     private int position;
 
-    @ColumnInfo(name = "checked")
     @NonNull
     private int marked;
 
-    public BasketMeta() { }
+    public BasketMeta() {}
 
-    public BasketMeta(String name, int position) {
+    @Ignore
+    public BasketMeta(@NonNull String name) {
         itemName = name;
-        this.position = position;
     }
 
     public int get_id() {
@@ -78,17 +77,16 @@ public class BasketMeta {
         this.marked = marked;
     }
     public void setMarked(boolean marked) {
-        if (marked) this.marked = 1;
-        else this.marked = 0;
+        this.marked = marked ? 1 : 0;
     }
 
-    public String toString() { return (itemName + ": pos=" + position + " marked=" + marked); }
+    @NonNull
+    public String toString() { return ("[basket_meta: name=" + itemName + ": pos=" + position + " marked=" + marked + "]"); }
 
     @Override
     public boolean equals(@Nullable Object obj) {
-        if (obj instanceof BasketMeta) {
-            return ((BasketMeta) obj).getItemName().equals(this.itemName);
-        }
-        return false;
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != getClass()) return false;
+        return ((BasketMeta) obj).getItemName().equals(this.itemName);
     }
 }

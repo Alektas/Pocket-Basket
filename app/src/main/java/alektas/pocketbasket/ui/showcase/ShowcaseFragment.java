@@ -142,7 +142,7 @@ public class ShowcaseFragment extends Fragment {
                 .inflateTransition(R.transition.transition_del_panel);
     }
 
-    public void setDelPanelOrientation(int orientation) {
+    private void setDelPanelOrientation(int orientation) {
         ((LinearLayout) mDelModePanel.findViewById(R.id.del_panel_content))
                 .setOrientation(orientation);
     }

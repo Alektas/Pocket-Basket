@@ -5,7 +5,7 @@
 
         <variable
             name="item"
-            type="alektas.pocketbasket.data.db.entities.Item"/>
+            type="alektas.pocketbasket.domain.entities.BasketItemModel"/>
 
         <variable
             name="model"
@@ -50,7 +50,7 @@
                 android:id="@+id/check_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@{model.isItemMarked(item.name) ? @drawable/ic_item_checked : null}"/>
+                android:src="@{item.isMarked ? @drawable/ic_item_checked : null}"/>
 
             <TextView
                 android:id="@+id/info_text"

@@ -11,7 +11,9 @@ import java.util.List;
 
 import alektas.pocketbasket.databinding.ItemBasketBinding;
 import alektas.pocketbasket.databinding.ItemShowcaseBinding;
-import alektas.pocketbasket.data.db.entities.Item;
+import alektas.pocketbasket.domain.entities.BasketItemModel;
+import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 
 public abstract class BaseRecyclerAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -34,28 +36,15 @@ public abstract class BaseRecyclerAdapter
             mBinding = binding;
         }
 
-        void bind(Item item) {
+        void bind(ItemModel item, RecyclerView.ViewHolder holder) {
             if (mBinding instanceof ItemShowcaseBinding) {
-                ((ItemShowcaseBinding) mBinding).setItem(item);
-                mBinding.executePendingBindings();
+                ((ItemShowcaseBinding) mBinding).setItem((ShowcaseItemModel) item);
             }
             if (mBinding instanceof ItemBasketBinding) {
-                ((ItemBasketBinding) mBinding).setItem(item);
-                mBinding.executePendingBindings();
-            }
-        }
-
-        void bind(Item item, RecyclerView.ViewHolder holder) {
-            if (mBinding instanceof ItemShowcaseBinding) {
-                ((ItemShowcaseBinding) mBinding).setItem(item);
-                ((ItemShowcaseBinding) mBinding).setHolder(holder);
-                mBinding.executePendingBindings();
-            }
-            if (mBinding instanceof ItemBasketBinding) {
-                ((ItemBasketBinding) mBinding).setItem(item);
+                ((ItemBasketBinding) mBinding).setItem((BasketItemModel) item);
                 ((ItemBasketBinding) mBinding).setHolder(holder);
-                mBinding.executePendingBindings();
             }
+            mBinding.executePendingBindings();
         }
     }
 
@@ -68,7 +57,7 @@ public abstract class BaseRecyclerAdapter
     @Override
     public long getItemId(int position) {
         Object obj = mItems.get(position);
-        if (obj instanceof Item) return ((Item) obj).getName().hashCode();
+        if (obj instanceof ItemModel) return ((ItemModel) obj).getName().hashCode();
         return obj.hashCode();
     }
 
@@ -79,9 +68,9 @@ public abstract class BaseRecyclerAdapter
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         Object obj = mItems.get(position);
-        if (obj instanceof Item) {
+        if (obj instanceof ItemModel) {
             ItemHolder vh = (ItemHolder) viewHolder;
-            Item item = (Item) obj;
+            ItemModel item = (ItemModel) obj;
             vh.bind(item, viewHolder);
         }
     }

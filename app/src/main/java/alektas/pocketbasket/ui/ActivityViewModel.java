@@ -14,7 +14,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import java.util.List;
 
 import alektas.pocketbasket.App;
-import alektas.pocketbasket.data.ItemGenerator;
 import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.ItemModel;
@@ -64,7 +63,7 @@ public class ActivityViewModel extends AndroidViewModel {
      */
     public void resetShowcase(boolean fullReset) {
         if (fullReset) mRepository.resetShowcase();
-        else mRepository.insertAll(ItemGenerator.getAll());
+        else mRepository.insertPredefinedItems();
     }
 
     /**
@@ -123,7 +122,7 @@ public class ActivityViewModel extends AndroidViewModel {
      * Delete all checked items in the Basket.
      */
     public void deleteMarked() {
-        mRepository.deleteMarked();
+        mRepository.removeMarked();
     }
 
     /* Guide methods */

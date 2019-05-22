@@ -10,14 +10,17 @@ import androidx.room.Update;
 
 import java.util.List;
 
+import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.data.db.entities.BasketMeta;
 import alektas.pocketbasket.data.db.entities.Item;
+import alektas.pocketbasket.data.db.entities.ShowcaseItem;
 
 @Dao
 public abstract class ItemsDao {
     private static final String TAG = "ItemsDao";
 
-    @Query("SELECT * FROM items ORDER BY CASE " +
+    @Query("SELECT name, name_res, img_res, tag_res " +
+            "FROM items ORDER BY CASE " +
             "WHEN tag_res = 'drink' THEN 1 " +
             "WHEN tag_res = 'fruit' THEN 2 " +
             "WHEN tag_res = 'vegetable' THEN 3 " +
@@ -33,34 +36,36 @@ public abstract class ItemsDao {
             "WHEN tag_res = 'other' THEN 13 " +
             "ELSE 14 " +
             "END, name")
-    public abstract List<Item> getItems();
+    public abstract List<ShowcaseItem> getShowcaseItems();
 
-    @Query("SELECT * FROM items WHERE name = :name")
-    public abstract Item getItem(String name);
+    @Query("SELECT name, name_res, img_res, tag_res " +
+            "FROM items WHERE items.name = :name")
+    public abstract ShowcaseItem getShowcaseItem(String name);
 
-    @Query("SELECT * FROM items WHERE tag_res = :tag ORDER BY name ASC")
-    public abstract List<Item> getByTag(String tag);
+    @Query("SELECT name, name_res, img_res, tag_res " +
+            "FROM items WHERE items.tag_res = :tag ORDER BY name ASC")
+    public abstract List<ShowcaseItem> getShowcaseItems(String tag);
 
     @Query("SELECT * FROM items WHERE name LIKE :query")
     public abstract List<Item> search(String query);
 
-    @Query("SELECT name, name_res, img_res, tag_res FROM items " +
-            "INNER JOIN basket_items " +
-            "ON items.name = basket_items.item_name " +
-            "GROUP BY basket_items.position")
-    public abstract List<Item> getBasketItems();
+    @Query("SELECT name, name_res, img_res, tag_res, basket_meta.marked " +
+            "FROM items INNER JOIN basket_meta " +
+            "ON items.name = basket_meta.item_name " +
+            "GROUP BY basket_meta.position")
+    public abstract List<BasketItem> getBasketItems();
+
+    @Query("SELECT * FROM basket_meta WHERE item_name = :name")
+    public abstract BasketMeta getItemMeta(String name);
 
     @Query("SELECT name FROM items " +
-            "INNER JOIN basket_items " +
-            "ON items.name = basket_items.item_name " +
-            "GROUP BY basket_items.position")
+            "INNER JOIN basket_meta " +
+            "ON items.name = basket_meta.item_name " +
+            "GROUP BY basket_meta.position")
     protected abstract List<String> getBasketItemNames();
 
-    @Query("SELECT checked FROM basket_items WHERE item_name = :name")
-    public abstract int isMarked(String name);
 
-
-    /* Check item queries */
+    /* Mark an item queries */
 
     @Transaction
     public void mark(String name) {
@@ -68,14 +73,11 @@ public abstract class ItemsDao {
         else mark(name, 1);
     }
 
-    @Query("UPDATE basket_items SET checked = :state WHERE item_name = :name")
+    @Query("UPDATE basket_meta SET marked = :state WHERE item_name = :name")
     protected abstract void mark(String name, int state);
 
-    @Query("SELECT * FROM basket_items WHERE item_name = :name")
-    public abstract BasketMeta getItemMeta(String name);
 
-
-    /* Check all items queries */
+    /* Mark all items queries */
 
     @Transaction
     public void markAll() {
@@ -87,10 +89,10 @@ public abstract class ItemsDao {
         }
     }
 
-    @Query("UPDATE basket_items SET checked = :checked ")
+    @Query("UPDATE basket_meta SET marked = :checked ")
     protected abstract void markAll(int checked);
 
-    @Query("SELECT item_name FROM basket_items WHERE checked = 0 LIMIT 1")
+    @Query("SELECT item_name FROM basket_meta WHERE marked = 0 LIMIT 1")
     public abstract String findUnmarked();
 
 
@@ -104,7 +106,7 @@ public abstract class ItemsDao {
         }
     }
 
-    @Query("UPDATE basket_items SET position = :position WHERE item_name = :name")
+    @Query("UPDATE basket_meta SET position = :position WHERE item_name = :name")
     protected abstract void setPosition(String name, int position);
 
 
@@ -116,7 +118,7 @@ public abstract class ItemsDao {
         updatePositions(getBasketItemNames());
     }
 
-    @Query("DELETE FROM basket_items WHERE checked = 1")
+    @Query("DELETE FROM basket_meta WHERE marked = 1")
     protected abstract void deleteCheckedBasket();
 
 
@@ -129,13 +131,13 @@ public abstract class ItemsDao {
         onItemDeleted(position);
     }
 
-    @Query("SELECT position FROM basket_items WHERE item_name = :name")
+    @Query("SELECT position FROM basket_meta WHERE item_name = :name")
     public abstract int getPosition(String name);
 
-    @Query("DELETE FROM basket_items WHERE item_name = :name")
+    @Query("DELETE FROM basket_meta WHERE item_name = :name")
     public abstract void deleteFromBasket(String name);
 
-    @Query("UPDATE basket_items SET position = (position - 1) " +
+    @Query("UPDATE basket_meta SET position = (position - 1) " +
             "WHERE position > :position")
     public abstract void onItemDeleted(int position);
 
@@ -149,7 +151,7 @@ public abstract class ItemsDao {
     }
 
     @Query("DELETE FROM items")
-    public abstract void deleteAll();
+    protected abstract void deleteAll();
 
 
     /* Add new item to showcase and put item to basket queries */
@@ -157,29 +159,27 @@ public abstract class ItemsDao {
     public void addNewItem(String name) {
         Item item = new Item(name);
         insert(item);
-        BasketMeta basketMeta = new BasketMeta();
-        basketMeta.setItemName(name);
+        BasketMeta basketMeta = new BasketMeta(name);
         basketMeta.setPosition(getMaxPosition() + 1);
-        putItemToBasket(basketMeta);
+        putBasketMeta(basketMeta);
     }
 
     @Transaction
     public void putItemToBasket(String name) {
         if (getItemMeta(name) != null) return;
-        BasketMeta item = new BasketMeta();
-        item.setItemName(name);
-        item.setPosition(getMaxPosition() + 1);
-        putItemToBasket(item);
+        BasketMeta basketMeta = new BasketMeta(name);
+        basketMeta.setPosition(getMaxPosition() + 1);
+        putBasketMeta(basketMeta);
     }
 
-    @Query("SELECT MAX(position) FROM basket_items")
+    @Query("SELECT MAX(position) FROM basket_meta")
     public abstract int getMaxPosition();
 
 
     /* Default Insert, Update, Delete queries */
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void putItemToBasket(BasketMeta item);
+    protected abstract void putBasketMeta(BasketMeta meta);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     public abstract void insert(Item item);

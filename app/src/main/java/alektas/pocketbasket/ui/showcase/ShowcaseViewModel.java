@@ -7,18 +7,15 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.data.RepositoryImpl;
-import alektas.pocketbasket.data.db.entities.Item;
 import alektas.pocketbasket.domain.Repository;
-import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 import alektas.pocketbasket.domain.usecases.SelectShowcaseItem;
 import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideContract;
@@ -26,11 +23,7 @@ import alektas.pocketbasket.guide.GuideContract;
 public class ShowcaseViewModel extends AndroidViewModel {
     private Repository mRepository;
     private Guide mGuide;
-    /**
-     * Items selected by the user for removal from the Showcase
-     */
-    private List<Item> mDelItems;
-    private MutableLiveData<List<? extends ItemModel>> mShowcaseData = new MutableLiveData<>();
+    private MutableLiveData<List<ShowcaseItemModel>> mShowcaseData = new MutableLiveData<>();
     private MutableLiveData<Integer> selectedItemPosition = new MutableLiveData<>();
     private MutableLiveData<Boolean> delModeState = new MutableLiveData<>();
     private MutableLiveData<Boolean> showcaseModeState = new MutableLiveData<>();
@@ -41,7 +34,6 @@ public class ShowcaseViewModel extends AndroidViewModel {
         mRepository.getShowcaseData().observe(mShowcaseData::setValue);
         mRepository.showcaseModeState().observe(showcaseModeState::setValue);
         mRepository.delModeState().observe(delModeState::setValue);
-        mDelItems = new ArrayList<>();
     }
 
     @Override
@@ -62,7 +54,7 @@ public class ShowcaseViewModel extends AndroidViewModel {
         return mGuide;
     }
 
-    public LiveData<List<? extends ItemModel>> getShowcaseData() {
+    public LiveData<List<ShowcaseItemModel>> getShowcaseData() {
         return mShowcaseData;
     }
 
@@ -77,22 +69,17 @@ public class ShowcaseViewModel extends AndroidViewModel {
 
     /* On Click */
 
-    public boolean onItemLongClick(Item item, RecyclerView.ViewHolder holder) {
+    public boolean onItemLongClick(ShowcaseItemModel item) {
         if (!isDelMode() && isDelModeAllowed()) {
             setDelMode(true);
         }
-        prepareToDel(item, holder.getAdapterPosition());
+        mRepository.selectForDeleting(item);
         return true;
     }
 
-    public void onItemClick(Item item, RecyclerView.ViewHolder holder) {
-        int pos = holder.getAdapterPosition();
+    public void onItemClick(ShowcaseItemModel item) {
         if (isDelMode()) {
-            if (mDelItems.contains(item)) {
-                removeFromDel(item, pos);
-            } else {
-                prepareToDel(item, pos);
-            }
+            mRepository.selectForDeleting(item);
         } else {
             new SelectShowcaseItem(mRepository).execute(item.getName(), (isAdded) -> {
                 if (isAdded) {
@@ -118,7 +105,7 @@ public class ShowcaseViewModel extends AndroidViewModel {
      * with deleting selected items.
      */
     public void deleteSelectedItems() {
-        mRepository.deleteItems(mDelItems);
+        mRepository.deleteSelectedItems();
         cancelDel();
     }
 
@@ -128,22 +115,6 @@ public class ShowcaseViewModel extends AndroidViewModel {
      */
     public void cancelDel() {
         setDelMode(false);
-        mDelItems.clear();
-    }
-
-    private void prepareToDel(Item item, int position) {
-        mDelItems.add(item);
-        selectedItemPosition.setValue(position);
-    }
-
-    private void removeFromDel(Item item, int position) {
-        mDelItems.remove(item);
-        selectedItemPosition.setValue(position);
-    }
-
-    // Used in the showcase data binding
-    public List<Item> getDelItems() {
-        return mDelItems;
     }
 
     public LiveData<Integer> getSelectedItemPosition() {

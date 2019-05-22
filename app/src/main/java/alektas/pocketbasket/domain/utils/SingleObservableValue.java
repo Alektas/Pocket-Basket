@@ -14,7 +14,7 @@ public class SingleObservableValue<T> implements Observable<T> {
     public void setValue(T value) {
         mValue = value;
         if (mObserver == null) return;
-        mObserver.onChanged(mValue);
+        notifyObservers();
     }
 
     @Override
@@ -26,6 +26,11 @@ public class SingleObservableValue<T> implements Observable<T> {
     public void observe(Observer<T> observer) {
         if (observer == null) return;
         mObserver = observer;
+        notifyObservers();
+    }
+
+    @Override
+    public void notifyObservers() {
         mObserver.onChanged(mValue);
     }
 

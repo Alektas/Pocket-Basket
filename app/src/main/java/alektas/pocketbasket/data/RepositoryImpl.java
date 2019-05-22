@@ -17,7 +17,9 @@ import alektas.pocketbasket.data.db.dao.ItemsDao;
 import alektas.pocketbasket.data.db.entities.BasketMeta;
 import alektas.pocketbasket.data.db.entities.Item;
 import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.entities.BasketItemModel;
 import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 import alektas.pocketbasket.domain.utils.MultiObservableValue;
 import alektas.pocketbasket.domain.utils.Observable;
 import alektas.pocketbasket.domain.utils.SingleObservableValue;
@@ -32,12 +34,12 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     /**
      * Data contains only items consisted to the selected category.
      */
-    private Observable<List<? extends ItemModel>> mShowcaseData;
+    private Observable<List<ShowcaseItemModel>> mShowcaseData;
 
     /**
      * Data contains only items stored in the basket.
      */
-    private Observable<List<? extends ItemModel>> mBasketData;
+    private Observable<List<BasketItemModel>> mBasketData;
 
     /**
      * Contains current mode state.
@@ -50,12 +52,18 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
      */
     private Observable<Boolean> delModeState;
 
+    /**
+     * Items selected by the user for removal from the Showcase
+     */
+    private List<ShowcaseItemModel> mDelItems;
+
     private RepositoryImpl(Context context) {
         mItemsDao = AppDatabase.getInstance(context, this).getDao();
         mShowcaseData = new SingleObservableValue<>(getItems(mTag));
         mBasketData = new SingleObservableValue<>(getBasketItems());
         showcaseModeState = new MultiObservableValue<>(true);
         delModeState = new SingleObservableValue<>(false);
+        mDelItems = new ArrayList<>();
     }
 
     public static Repository getInstance(Context context) {
@@ -87,9 +95,30 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     @Override
     public void setDelMode(boolean delMode) {
         delModeState.setValue(delMode);
+        if (!delMode) {
+            mDelItems.clear();
+            updateShowcase();
+        }
     }
 
-    private List<Item> convert(List<? extends ItemModel> models) {
+    @Override
+    public void selectForDeleting(ShowcaseItemModel item) {
+        if (item.isRemoval()) {
+            mDelItems.remove(item);
+        } else {
+            mDelItems.add(item);
+        }
+
+        updateShowcase();
+    }
+
+    @Override
+    public void deleteSelectedItems() {
+        new deleteAllAsync(mItemsDao, this).execute(convert(mDelItems));
+    }
+
+    // TODO: make without converting
+    private List<Item> convert(@NonNull List<? extends ItemModel> models) {
         List<Item> list = new ArrayList<>();
         for (ItemModel model : models) {
             list.add((Item) model);
@@ -113,7 +142,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         return null;
     }
 
-    private List<? extends ItemModel> getBasketItems() {
+    private List<BasketItemModel> getBasketItems() {
         try {
             return new getBasketItemsAsync(mItemsDao).execute().get();
         } catch (ExecutionException | InterruptedException e) {
@@ -144,15 +173,6 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         new markAsync(mItemsDao, this).execute(name);
     }
 
-    public boolean isMarked(String name) {
-        try {
-            return (new isMarkedAsync(mItemsDao).execute(name).get()) != 0;
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
     // Check all items in Basket (or uncheck if already all items are checked)
     @Override
     public void markAll() {
@@ -167,7 +187,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
     // Delete all checked items from "Basket"
     @Override
-    public void deleteMarked() {
+    public void removeMarked() {
         new deleteMarkedAsync(mItemsDao, this).execute();
     }
 
@@ -177,11 +197,6 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     @Override
     public void addNewItem(String name) {
         new addNewItem(mItemsDao, this).execute(name);
-    }
-
-    @Override
-    public void deleteItems(List<? extends ItemModel> items) {
-        new deleteAllAsync(mItemsDao, this).execute(convert(items));
     }
 
     // Show in Showcase only items with specified tag
@@ -198,8 +213,8 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     }
 
     @Override
-    public void insertAll(List<? extends ItemModel> items) {
-        new insertAllAsync(mItemsDao, this).execute(convert(items));
+    public void insertPredefinedItems() {
+        new insertAllAsync(mItemsDao, this).execute(convert(ItemGenerator.getAll()));
     }
 
     @Override
@@ -207,12 +222,21 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         new updateAllAsync(mItemsDao, this).execute(ItemGenerator.getAll());
     }
 
-    // Set value to Showcase LiveData to notify observers
+    // Set value to Showcase Data to notify observers
     @Override
     public void updateShowcase() {
-        mShowcaseData.setValue(getItems(mTag));
+        List<ShowcaseItemModel> items = getItems(mTag);
+        if (items != null && delModeState.getValue()) {
+            for (ShowcaseItemModel delItem : mDelItems) {
+                int i = items.indexOf(delItem);
+                if (i >= 0) items.get(i).setRemoval(true);
+            }
+        }
+
+        mShowcaseData.setValue(items);
     }
 
+    // Set value to the Basket Data to notify observers
     @Override
     public void updateBasket() {
         mBasketData.setValue(getBasketItems());
@@ -222,17 +246,17 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     /* Data getters */
 
     @Override
-    public Observable<List<? extends ItemModel>> getShowcaseData() {
+    public Observable<List<ShowcaseItemModel>> getShowcaseData() {
         return mShowcaseData;
     }
 
     @Override
-    public Observable<List<? extends ItemModel>> getBasketData() {
+    public Observable<List<BasketItemModel>> getBasketData() {
         return mBasketData;
     }
 
     @Override
-    public Item getItem(String name) {
+    public ItemModel getItem(String name) {
         try {
             return new getItemAsync(mItemsDao).execute(name).get();
         } catch (ExecutionException e) {
@@ -243,7 +267,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         return null;
     }
 
-    private List<Item> getItems(String tag) {
+    private List<ShowcaseItemModel> getItems(String tag) {
         try {
             return new getAllAsync(mItemsDao).execute(tag).get();
         }
@@ -256,18 +280,18 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
     /* AsyncTasks */
 
-    private static class getBasketItemsAsync extends AsyncTask<Void, Void, List<Item>> {
+    private static class getBasketItemsAsync extends AsyncTask<Void, Void, List<BasketItemModel>> {
         private ItemsDao mDao;
 
         getBasketItemsAsync(ItemsDao dao) { mDao = dao; }
 
         @Override
-        protected List<Item> doInBackground(Void... voids) {
-            return mDao.getBasketItems();
+        protected List<BasketItemModel> doInBackground(Void... voids) {
+            return new ArrayList<>(mDao.getBasketItems());
         }
     }
 
-    private static class getItemAsync extends AsyncTask<String, Void, Item> {
+    private static class getItemAsync extends AsyncTask<String, Void, ItemModel> {
         ItemsDao mDao;
 
         getItemAsync(ItemsDao dao) {
@@ -275,22 +299,26 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         }
 
         @Override
-        protected Item doInBackground(String... strings) {
-            return mDao.getItem(strings[0]);
+        protected ItemModel doInBackground(String... strings) {
+            return mDao.getShowcaseItem(strings[0]);
         }
     }
 
-    private static class getAllAsync extends AsyncTask<String, Void, List<Item>> {
+    private static class getAllAsync extends AsyncTask<String, Void, List<ShowcaseItemModel>> {
         private ItemsDao mDao;
 
         getAllAsync(ItemsDao dao) { mDao = dao; }
 
         @Override
-        protected List<Item> doInBackground(String... tags) {
+        protected List<ShowcaseItemModel> doInBackground(String... tags) {
             if (tags.length == 0
                     || tags[0] == null
-                    || tags[0].equals(ResourcesUtils.getResIdName(R.string.all))) return mDao.getItems();
-            else return mDao.getByTag(tags[0]);
+                    || tags[0].equals(ResourcesUtils.getResIdName(R.string.all))) {
+                return new ArrayList<>(mDao.getShowcaseItems());
+            }
+            else {
+                return new ArrayList<>(mDao.getShowcaseItems(tags[0]));
+            }
         }
     }
 
@@ -393,17 +421,6 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
             if (mUpdater != null) {
                 mUpdater.updateBasket();
             }
-        }
-    }
-
-    private static class isMarkedAsync extends AsyncTask<String, Void, Integer> {
-        private ItemsDao mDao;
-
-        isMarkedAsync(ItemsDao dao) { mDao = dao; }
-
-        @Override
-        protected Integer doInBackground(String... name) {
-            return mDao.isMarked(name[0]);
         }
     }
 

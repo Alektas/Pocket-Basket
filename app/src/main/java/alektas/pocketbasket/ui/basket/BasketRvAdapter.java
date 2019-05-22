@@ -18,7 +18,7 @@ import java.util.List;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.databinding.ItemBasketBinding;
-import alektas.pocketbasket.data.db.entities.Item;
+import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.ui.ItemSizeProvider;
 import alektas.pocketbasket.ui.utils.BaseRecyclerAdapter;
 
@@ -66,7 +66,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
 
     @Override
     public void onItemDismiss(int position) {
-        mModel.removeFromBasket(((Item) getItems().get(position)).getName());
+        mModel.removeFromBasket(((ItemModel) getItems().get(position)).getName());
     }
 
     @Override
@@ -107,7 +107,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     public void onMoveEnd() {
         List<String> names = new ArrayList<>();
         for (Object obj : getItems()) {
-            if (obj instanceof Item) names.add( ((Item) obj).getName() );
+            if (obj instanceof ItemModel) names.add( ((ItemModel) obj).getName() );
         }
         mModel.updatePositions(names);
     }

@@ -11,7 +11,7 @@ import java.util.List;
 
 import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.domain.Repository;
-import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.BasketItemModel;
 import alektas.pocketbasket.domain.usecases.MarkBasketItem;
 import alektas.pocketbasket.domain.usecases.MoveBasketItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
@@ -21,7 +21,7 @@ import alektas.pocketbasket.guide.GuideContract;
 public class BasketViewModel extends AndroidViewModel {
     private Repository mRepository;
     private Guide mGuide;
-    private MutableLiveData<List<? extends ItemModel>> mBasketData = new MutableLiveData<>();
+    private MutableLiveData<List<BasketItemModel>> mBasketData = new MutableLiveData<>();
 
     public BasketViewModel(@NonNull Application application) {
         super(application);
@@ -45,7 +45,7 @@ public class BasketViewModel extends AndroidViewModel {
         return mGuide;
     }
 
-    public LiveData<List<? extends ItemModel>> getBasketData() {
+    public LiveData<List<BasketItemModel>> getBasketData() {
         return mBasketData;
     }
 
@@ -67,13 +67,6 @@ public class BasketViewModel extends AndroidViewModel {
         UseCase<String, Void> useCase = new MarkBasketItem(mRepository);
         useCase.execute(name, null);
         mGuide.onCaseHappened(GuideContract.GUIDE_CHECK_ITEM);
-    }
-
-    /**
-     * Verify if item in the Basket is checked.
-     */
-    public boolean isItemMarked(String name) {
-        return mRepository.isMarked(name);
     }
 
     public void removeFromBasket(String name) {
