@@ -300,7 +300,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
         @Override
         protected ItemModel doInBackground(String... strings) {
-            return mDao.getShowcaseItem(strings[0]);
+            return mDao.getItem(strings[0]);
         }
     }
 

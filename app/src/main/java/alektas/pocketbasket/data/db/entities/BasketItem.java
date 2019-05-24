@@ -29,7 +29,6 @@ public class BasketItem extends Item implements BasketItemModel {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != getClass()) return false;
         BasketItem item = (BasketItem) obj;
-        return item.getName().equals(getName())
-                && item.isMarked() == isMarked;
+        return item.getName().equals(getName());
     }
 }

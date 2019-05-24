@@ -42,7 +42,7 @@
                 android:id="@+id/check_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@{model.isItemInBasket(item.name) ? @drawable/ic_item_choosed : null}"/>
+                android:src="@{item.existInBasket ? @drawable/ic_item_choosed : null}"/>
 
             <ImageView
                 android:id="@+id/del_image"

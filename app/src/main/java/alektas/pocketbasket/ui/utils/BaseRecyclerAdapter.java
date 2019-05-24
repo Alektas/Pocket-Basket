@@ -5,6 +5,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 
 public abstract class BaseRecyclerAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<Object> mItems;
+    private List<ItemModel> mItems;
 
     public BaseRecyclerAdapter() {
         setHasStableIds(true);
@@ -36,7 +37,7 @@ public abstract class BaseRecyclerAdapter
             mBinding = binding;
         }
 
-        void bind(ItemModel item, RecyclerView.ViewHolder holder) {
+        void bind(alektas.pocketbasket.domain.entities.ItemModel item, RecyclerView.ViewHolder holder) {
             if (mBinding instanceof ItemShowcaseBinding) {
                 ((ItemShowcaseBinding) mBinding).setItem((ShowcaseItemModel) item);
             }
@@ -50,15 +51,14 @@ public abstract class BaseRecyclerAdapter
 
     @Override
     public int getItemCount() {
-        if (mItems != null) return mItems.size();
-        return 0;
+        if (mItems == null) return 0;
+        return mItems.size();
     }
 
     @Override
     public long getItemId(int position) {
-        Object obj = mItems.get(position);
-        if (obj instanceof ItemModel) return ((ItemModel) obj).getName().hashCode();
-        return obj.hashCode();
+        ItemModel obj = mItems.get(position);
+        return obj.getName().hashCode();
     }
 
     @NonNull
@@ -67,21 +67,19 @@ public abstract class BaseRecyclerAdapter
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
-        Object obj = mItems.get(position);
-        if (obj instanceof ItemModel) {
-            ItemHolder vh = (ItemHolder) viewHolder;
-            ItemModel item = (ItemModel) obj;
-            vh.bind(item, viewHolder);
-        }
+        ItemModel obj = mItems.get(position);
+        ItemHolder vh = (ItemHolder) viewHolder;
+        vh.bind(obj, viewHolder);
     }
 
-    public List<Object> getItems() {
+    public List<ItemModel> getItems() {
         return mItems;
     }
 
-    public void setItems(List<Object> items) {
+    public void setItems(List<ItemModel> items) {
+        ItemsDiffCallback diffCallback = new ItemsDiffCallback(mItems, items);
+        DiffUtil.DiffResult result = DiffUtil.calculateDiff(diffCallback);
         mItems = items;
-        notifyDataSetChanged();
+        result.dispatchUpdatesTo(this);
     }
-
 }

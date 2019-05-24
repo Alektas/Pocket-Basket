@@ -19,7 +19,10 @@ import alektas.pocketbasket.data.db.entities.ShowcaseItem;
 public abstract class ItemsDao {
     private static final String TAG = "ItemsDao";
 
-    @Query("SELECT name, name_res, img_res, tag_res " +
+    @Query("SELECT name, name_res, img_res, tag_res, " +
+                "(CASE WHEN EXISTS " +
+                    "(SELECT 1 FROM basket_meta WHERE items.name = basket_meta.item_name) " +
+                "THEN 1 ELSE 0 END) AS in_basket " +
             "FROM items ORDER BY CASE " +
             "WHEN tag_res = 'drink' THEN 1 " +
             "WHEN tag_res = 'fruit' THEN 2 " +
@@ -40,9 +43,12 @@ public abstract class ItemsDao {
 
     @Query("SELECT name, name_res, img_res, tag_res " +
             "FROM items WHERE items.name = :name")
-    public abstract ShowcaseItem getShowcaseItem(String name);
+    public abstract Item getItem(String name);
 
-    @Query("SELECT name, name_res, img_res, tag_res " +
+    @Query("SELECT name, name_res, img_res, tag_res, " +
+                "(CASE WHEN EXISTS " +
+                    "(SELECT 1 FROM basket_meta WHERE items.name = basket_meta.item_name) " +
+                "THEN 1 ELSE 0 END) AS in_basket " +
             "FROM items WHERE items.tag_res = :tag ORDER BY name ASC")
     public abstract List<ShowcaseItem> getShowcaseItems(String tag);
 
