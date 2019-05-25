@@ -45,7 +45,7 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
             mAdapter.onSwipeEnd(viewHolder);
             isSwipe = false;
         } else if (isMove) {
-            mAdapter.onMoveEnd();
+            mAdapter.onItemMoveEnd();
             isMove = false;
         }
     }

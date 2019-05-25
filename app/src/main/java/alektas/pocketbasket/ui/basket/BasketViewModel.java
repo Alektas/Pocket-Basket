@@ -12,8 +12,9 @@ import java.util.List;
 import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.BasketItemModel;
+import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.usecases.MarkBasketItem;
-import alektas.pocketbasket.domain.usecases.MoveBasketItem;
+import alektas.pocketbasket.domain.usecases.ChangeItemsPositions;
 import alektas.pocketbasket.domain.usecases.RemoveItemFromBasket;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.Guide;
@@ -55,9 +56,8 @@ public class BasketViewModel extends AndroidViewModel {
      * Save items' positions in the Basket like a positions in the list.
      * @param names names of all basket items
      */
-    public void updatePositions(List<String> names) {
-        UseCase<List<String>, Void> useCase = new MoveBasketItem(mRepository);
-        useCase.execute(names, null);
+    public void updatePositions(List<ItemModel> names) {
+        new ChangeItemsPositions(mRepository).execute(names, null);
         mGuide.onCaseHappened(GuideContract.GUIDE_MOVE_ITEM);
     }
 

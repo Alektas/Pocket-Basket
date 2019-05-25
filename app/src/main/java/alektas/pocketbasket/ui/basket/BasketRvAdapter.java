@@ -12,9 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.databinding.ItemBasketBinding;
@@ -104,12 +102,8 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     }
 
     @Override
-    public void onMoveEnd() {
-        List<String> names = new ArrayList<>();
-        for (Object obj : getItems()) {
-            if (obj instanceof ItemModel) names.add( ((ItemModel) obj).getName() );
-        }
-        mModel.updatePositions(names);
+    public void onItemMoveEnd() {
+        mModel.updatePositions(getItems());
     }
 
     private void runColorAnim(View itemView, boolean colorful) {

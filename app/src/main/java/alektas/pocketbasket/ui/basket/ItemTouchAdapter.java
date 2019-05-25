@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView;
 public interface ItemTouchAdapter {
 
     boolean onItemMove(int fromPosition, int toPosition);
-    void onMoveEnd();
+    void onItemMoveEnd();
 
     void onItemDismiss(int position);
 

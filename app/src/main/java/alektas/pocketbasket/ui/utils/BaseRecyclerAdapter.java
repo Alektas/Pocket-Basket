@@ -76,10 +76,11 @@ public abstract class BaseRecyclerAdapter
         return mItems;
     }
 
-    public void setItems(List<ItemModel> items) {
-        ItemsDiffCallback diffCallback = new ItemsDiffCallback(mItems, items);
+    public void setItems(List<ItemModel> newItems) {
+        ItemsDiffCallback diffCallback = new ItemsDiffCallback(mItems, newItems);
         DiffUtil.DiffResult result = DiffUtil.calculateDiff(diffCallback);
-        mItems = items;
+        mItems = newItems;
         result.dispatchUpdatesTo(this);
     }
+
 }
