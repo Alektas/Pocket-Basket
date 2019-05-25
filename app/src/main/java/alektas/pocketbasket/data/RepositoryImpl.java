@@ -148,7 +148,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
     @Override
     public void updatePositions(List<String> names) {
-        new updatePositionsAsync(mItemsDao).execute(names);
+        new updatePositionsAsync(mItemsDao, this).execute(names);
     }
 
     // Change item state in "Basket"
@@ -306,9 +306,15 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
     private static class updatePositionsAsync extends AsyncTask<List<String>, Void, Void> {
         private ItemsDao mDao;
+        private ItemsUpdater mUpdater;
 
         updatePositionsAsync(ItemsDao dao) {
             mDao = dao;
+        }
+
+        updatePositionsAsync(ItemsDao dao, ItemsUpdater updater) {
+            mDao = dao;
+            mUpdater = updater;
         }
 
         @SafeVarargs
@@ -316,6 +322,13 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         protected final Void doInBackground(List<String>... names) {
             mDao.updatePositions(names[0]);
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mUpdater != null) {
+                mUpdater.updateBasket();
+            }
         }
     }
 
