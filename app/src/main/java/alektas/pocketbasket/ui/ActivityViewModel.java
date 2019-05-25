@@ -18,8 +18,12 @@ import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.usecases.AddItemUseCase;
+import alektas.pocketbasket.domain.usecases.MarkAllBasketItems;
 import alektas.pocketbasket.domain.usecases.PutItemToBasket;
+import alektas.pocketbasket.domain.usecases.RemoveMarkedItems;
+import alektas.pocketbasket.domain.usecases.ResetItemsUseCase;
 import alektas.pocketbasket.domain.usecases.SelectCategoryUseCase;
+import alektas.pocketbasket.domain.usecases.UpdateItemsUseCase;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideContract;
@@ -62,8 +66,7 @@ public class ActivityViewModel extends AndroidViewModel {
      * @param fullReset if true delete all user items
      */
     public void resetShowcase(boolean fullReset) {
-        if (fullReset) mRepository.resetShowcase();
-        else mRepository.insertPredefinedItems();
+        new ResetItemsUseCase(mRepository).execute(fullReset, null);
     }
 
     /**
@@ -72,7 +75,7 @@ public class ActivityViewModel extends AndroidViewModel {
      * were changed with localization.
      */
     public void updateAllItems() {
-        mRepository.updateAll();
+        new UpdateItemsUseCase(mRepository).execute(null, null);
     }
 
     public LiveData<Boolean> showcaseModeState() {
@@ -115,14 +118,14 @@ public class ActivityViewModel extends AndroidViewModel {
      * Verify if all items in the Basket are checked.
      */
     public void markAllItems() {
-        mRepository.markAll();
+        new MarkAllBasketItems(mRepository).execute(null, null);
     }
 
     /**
      * Delete all checked items in the Basket.
      */
     public void deleteMarked() {
-        mRepository.removeMarked();
+        new RemoveMarkedItems(mRepository).execute(null, null);
     }
 
     /* Guide methods */

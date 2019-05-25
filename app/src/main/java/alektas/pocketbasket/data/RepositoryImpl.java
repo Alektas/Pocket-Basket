@@ -31,25 +31,9 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     private String mTag = ResourcesUtils.getResIdName(R.string.all);
     private ItemsDao mItemsDao;
 
-    /**
-     * Data contains only items consisted to the selected category.
-     */
     private Observable<List<ShowcaseItemModel>> mShowcaseData;
-
-    /**
-     * Data contains only items stored in the basket.
-     */
     private Observable<List<BasketItemModel>> mBasketData;
-
-    /**
-     * Contains current mode state.
-     * 'true' = showcase mode, 'false' = basket mode.
-     */
     private Observable<Boolean> showcaseModeState;
-
-    /**
-     * Contains 'true' if the delete mode is active.
-     */
     private Observable<Boolean> delModeState;
 
     /**
@@ -259,9 +243,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     public ItemModel getItem(String name) {
         try {
             return new getItemAsync(mItemsDao).execute(name).get();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
         return null;

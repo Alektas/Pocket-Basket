@@ -14,6 +14,7 @@ import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.BasketItemModel;
 import alektas.pocketbasket.domain.usecases.MarkBasketItem;
 import alektas.pocketbasket.domain.usecases.MoveBasketItem;
+import alektas.pocketbasket.domain.usecases.RemoveItemFromBasket;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideContract;
@@ -70,7 +71,7 @@ public class BasketViewModel extends AndroidViewModel {
     }
 
     public void removeFromBasket(String name) {
-        mRepository.removeFromBasket(name);
+        new RemoveItemFromBasket(mRepository).execute(name, null);
         mGuide.onCaseHappened(GuideContract.GUIDE_REMOVE_ITEM);
     }
 

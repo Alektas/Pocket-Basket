@@ -9,6 +9,9 @@ import alektas.pocketbasket.domain.utils.Observable;
 
 public interface Repository {
 
+    /**
+     * Data contains only items stored in the basket.
+     */
     Observable<List<BasketItemModel>> getBasketData();
     boolean isItemInBasket(String name);
     void putToBasket(String name);
@@ -18,17 +21,34 @@ public interface Repository {
     void markAll();
     void removeMarked();
 
+    /**
+     * Data contains only items consisted to the selected category.
+     */
     Observable<List<ShowcaseItemModel>> getShowcaseData();
     void addNewItem(String name);
     void setFilter(String tag);
     void resetShowcase();
     void insertPredefinedItems();
     void updateAll();
+    /**
+     * Find item by name in all categories.
+     * Case sensitive.
+     *
+     * @param name key of the item
+     * @return item domain model or null
+     */
     ItemModel getItem(String name);
 
+    /**
+     * Contains current mode state.
+     * 'true' = showcase mode, 'false' = basket mode.
+     */
     Observable<Boolean> showcaseModeState();
     void setShowcaseMode(boolean showcaseMode);
 
+    /**
+     * Contains 'true' if the delete mode is active.
+     */
     Observable<Boolean> delModeState();
     void setDelMode(boolean delMode);
 
