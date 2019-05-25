@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
-        <import type="alektas.pocketbasket.Utils"/>
+        <import type="alektas.pocketbasket.utils.ResourcesUtils"/>
 
         <variable
             name="item"
-            type="alektas.pocketbasket.db.entities.Item"/>
+            type="alektas.pocketbasket.domain.entities.ShowcaseItemModel"/>
 
         <variable
             name="model"
-            type="alektas.pocketbasket.viewmodel.ItemsViewModel"/>
-
-        <variable
-            name="holder"
-            type="androidx.recyclerview.widget.RecyclerView.ViewHolder"/>
+            type="alektas.pocketbasket.ui.showcase.ShowcaseViewModel"/>
     </data>
 
     <RelativeLayout
@@ -21,8 +17,8 @@
         android:id="@+id/item_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/height_item"
-        android:onClick="@{() -> model.onItemClick(item, holder)}"
-        android:onLongClick="@{() -> model.onItemLongClick(item, holder)}">
+        android:onClick="@{() -> model.onItemClick(item)}"
+        android:onLongClick="@{() -> model.onItemLongClick(item)}">
 
         <androidx.cardview.widget.CardView
             xmlns:android="http://schemas.android.com/apk/res/android"
@@ -40,19 +36,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="@dimen/padding_ic"
-                android:src="@{Utils.getImgId(item.imgRes)}"/>
+                android:src="@{ResourcesUtils.getImgId(item.imgRes)}"/>
 
             <ImageView
                 android:id="@+id/check_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@{model.isItemInBasket(item) ? @drawable/ic_item_choosed : null}"/>
+                android:src="@{item.existInBasket ? @drawable/ic_item_choosed : null}"/>
 
             <ImageView
                 android:id="@+id/del_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@{model.delMode &amp;&amp; model.delItems.contains(item) ? @drawable/ic_item_deleting : null}"/>
+                android:src="@{model.delMode &amp;&amp; item.isRemoval ? @drawable/ic_item_deleting : null}"/>
 
             <TextView
                 android:id="@+id/info_text"
@@ -60,7 +56,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textSize="@dimen/textsize_item_icon"
-                android:text="@{Utils.getImgId(item.imgRes) == 0 ? Utils.getDisplayName(item) : null}"/>
+                android:text="@{ResourcesUtils.getImgId(item.imgRes) == 0 ? ResourcesUtils.getDisplayName(item) : null}"/>
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -73,7 +69,7 @@
             android:layout_centerVertical="true"
             android:textSize="@dimen/textsize_item_name"
             android:textColor="@color/text_item_showcase"
-            android:text="@{Utils.getDisplayName(item)}"/>
+            android:text="@{ResourcesUtils.getDisplayName(item)}"/>
 
     </RelativeLayout>
 </layout>

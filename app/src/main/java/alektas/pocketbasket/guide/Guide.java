@@ -8,7 +8,7 @@ public interface Guide {
      */
     void onCaseHappened(String caseKey);
 
-    Guide addCase(GuideCase guideCase);
+    Guide addCase(GuideCaseView guideCase);
 
     String currentCaseKey();
 

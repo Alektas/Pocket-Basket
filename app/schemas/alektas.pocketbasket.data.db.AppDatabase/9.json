@@ -1,0 +1,135 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 9,
+    "identityHash": "37bc36a07deb5414e8f134e988aa88e1",
+    "entities": [
+      {
+        "tableName": "items",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `name_res` TEXT, `img_res` TEXT, `tag_res` TEXT NOT NULL, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "mName",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mNameRes",
+            "columnName": "name_res",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mImgRes",
+            "columnName": "img_res",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mTagRes",
+            "columnName": "tag_res",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "name"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_items_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_items_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_items_tag_res",
+            "unique": false,
+            "columnNames": [
+              "tag_res"
+            ],
+            "createSql": "CREATE  INDEX `index_items_tag_res` ON `${TABLE_NAME}` (`tag_res`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "basket_meta",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `item_name` TEXT NOT NULL, `position` INTEGER NOT NULL, `marked` INTEGER NOT NULL, FOREIGN KEY(`item_name`) REFERENCES `items`(`name`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemName",
+            "columnName": "item_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "marked",
+            "columnName": "marked",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_basket_meta_item_name",
+            "unique": true,
+            "columnNames": [
+              "item_name"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_basket_meta_item_name` ON `${TABLE_NAME}` (`item_name`)"
+          },
+          {
+            "name": "index_basket_meta_position",
+            "unique": false,
+            "columnNames": [
+              "position"
+            ],
+            "createSql": "CREATE  INDEX `index_basket_meta_position` ON `${TABLE_NAME}` (`position`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "items",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "item_name"
+            ],
+            "referencedColumns": [
+              "name"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"37bc36a07deb5414e8f134e988aa88e1\")"
+    ]
+  }
+}

@@ -47,8 +47,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
 
-            buildConfigField 'String', 'AUTHORITY', '"alektas.pocketbasket.ItemsProvider"'
-            resValue 'string', 'search_authority', 'alektas.pocketbasket.ItemsProvider'
+            buildConfigField 'String', 'AUTHORITY', '"alektas.pocketbasket.services.ItemsProvider"'
+            resValue 'string', 'search_authority', 'alektas.pocketbasket.services.ItemsProvider'
         }
         debug {
             aaptOptions.cruncherEnabled = false

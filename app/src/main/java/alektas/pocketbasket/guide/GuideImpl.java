@@ -5,16 +5,15 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GuideImpl implements Guide, GuideCase.CaseListener {
+public class GuideImpl implements Guide, GuideCaseView.CaseListener {
     private static final String TAG = "GuideImpl";
-    private List<GuideCase> mCases;
+    private List<GuideCaseView> mCases;
     private GuideListener mListener;
     private int mCurrentCaseNumb;
-    private GuideCase mCurrentCase;
+    private GuideCaseView mCurrentCase;
     private boolean isStarted = false;
 
     public interface GuideListener {
-
         /**
          * This callback is triggered <b>after</b> the guide case with key <i>caseKey</i> is started.
          *
@@ -52,7 +51,7 @@ public class GuideImpl implements Guide, GuideCase.CaseListener {
 
     @Override
     public void onCaseFinish(String caseKey) {
-        GuideCase guideCase = getCase(caseKey);
+        GuideCaseView guideCase = getCase(caseKey);
         if (guideCase != null && guideCase.isAutoNext()) {
             nextCase();
         }
@@ -69,15 +68,15 @@ public class GuideImpl implements Guide, GuideCase.CaseListener {
         }
     }
 
-    private GuideCase getCase(String key) {
-        for (GuideCase guideCase : mCases) {
+    private GuideCaseView getCase(String key) {
+        for (GuideCaseView guideCase : mCases) {
             if (key.equals(guideCase.getKey())) return guideCase;
         }
         return null;
     }
 
     @Override
-    public GuideImpl addCase(GuideCase guideCase) {
+    public GuideImpl addCase(GuideCaseView guideCase) {
         guideCase.setCaseListener(this);
         mCases.add(guideCase);
         return this;
@@ -91,7 +90,7 @@ public class GuideImpl implements Guide, GuideCase.CaseListener {
     @Override
     public void setCase(String caseKey) {
         for(int i = 0; i < mCases.size(); i++) {
-            GuideCase gc = mCases.get(i);
+            GuideCaseView gc = mCases.get(i);
             if (gc.getKey().equals(caseKey)) {
                 mCurrentCase = gc;
                 mCurrentCaseNumb = i;

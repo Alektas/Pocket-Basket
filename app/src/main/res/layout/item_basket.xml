@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
     <data>
-        <import type="alektas.pocketbasket.Utils"/>
+        <import type="alektas.pocketbasket.utils.ResourcesUtils"/>
 
         <variable
             name="item"
-            type="alektas.pocketbasket.db.entities.Item"/>
+            type="alektas.pocketbasket.domain.entities.BasketItemModel"/>
 
         <variable
             name="model"
-            type="alektas.pocketbasket.viewmodel.ItemsViewModel"/>
+            type="alektas.pocketbasket.ui.basket.BasketViewModel"/>
 
         <variable
             name="dragListener"
-            type="alektas.pocketbasket.view.OnStartDragListener"/>
+            type="alektas.pocketbasket.ui.basket.OnStartDragListener"/>
 
         <variable
             name="holder"
@@ -37,20 +37,20 @@
             android:layout_margin="@dimen/padding_8"
             card_view:cardCornerRadius="@dimen/corners_item_icon"
             card_view:cardPreventCornerOverlap="true"
-            android:onClick="@{() -> model.checkItem(item.name)}">
+            android:onClick="@{() -> model.markItem(item.name)}">
 
             <ImageView
                 android:id="@+id/item_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="@dimen/padding_ic"
-                android:src="@{Utils.getImgId(item.imgRes)}"/>
+                android:src="@{ResourcesUtils.getImgId(item.imgRes)}"/>
 
             <ImageView
                 android:id="@+id/check_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@{model.isItemChecked(item.name) ? @drawable/ic_item_checked : null}"/>
+                android:src="@{item.isMarked ? @drawable/ic_item_checked : null}"/>
 
             <TextView
                 android:id="@+id/info_text"
@@ -58,7 +58,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textSize="@dimen/textsize_item_icon"
-                android:text="@{Utils.getImgId(item.imgRes) == 0 ? Utils.getDisplayName(item) : null}"/>
+                android:text="@{ResourcesUtils.getImgId(item.imgRes) == 0 ? ResourcesUtils.getDisplayName(item) : null}"/>
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -71,7 +71,7 @@
             android:layout_centerVertical="true"
             android:textSize="@dimen/textsize_item_name"
             android:textColor="@color/text_item_basket"
-            android:text="@{Utils.getDisplayName(item)}"/>
+            android:text="@{ResourcesUtils.getDisplayName(item)}"/>
 
         <ImageView
             android:id="@+id/drag_handle"
