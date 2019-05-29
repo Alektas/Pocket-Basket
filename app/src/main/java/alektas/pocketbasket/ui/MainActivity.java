@@ -642,6 +642,7 @@ public class MainActivity extends AppCompatActivity implements
         GuideCaseView floatingMenuHelpCase = new GuideCaseView
                 .Builder(GuideContract.GUIDE_FLOATING_MENU_HELP)
                 .addViews(findViewById(R.id.guide_bg_full_img),
+                        findViewById(R.id.guide_floating_menu_help_clicker),
                         findViewById(R.id.guide_floating_menu_close_text),
                         findViewById(R.id.guide_floating_menu_check_all_text),
                         findViewById(R.id.guide_floating_menu_del_checked_text))
@@ -1136,6 +1137,8 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.guide_basket_help_clicker:
                 mViewModel.onEventHappened(GuideContract.GUIDE_BASKET_HELP);
                 break;
+            case R.id.guide_floating_menu_help_clicker:
+                mViewModel.onEventHappened(GuideContract.GUIDE_FLOATING_MENU_HELP);
         }
     }
 

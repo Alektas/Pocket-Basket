@@ -617,6 +617,15 @@
 
     <!-- Guide: floating menu help -->
 
+    <FrameLayout
+        android:id="@+id/guide_floating_menu_help_clicker"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:onClick="onGuideViewClick"
+        android:clickable="true"
+        android:focusable="true" />
+
     <TextView
         android:id="@+id/guide_floating_menu_check_all_text"
         android:layout_width="wrap_content"
