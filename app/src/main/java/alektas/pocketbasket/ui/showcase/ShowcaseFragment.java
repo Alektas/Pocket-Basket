@@ -71,12 +71,6 @@ public class ShowcaseFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        mViewModel.setGuide(null);
-        super.onDestroy();
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_showcase, container, false);
@@ -101,10 +95,6 @@ public class ShowcaseFragment extends Fragment {
             }
         });
         return root;
-    }
-
-    public ShowcaseViewModel getViewModel() {
-        return mViewModel;
     }
 
     private void subscribeOnModel() {

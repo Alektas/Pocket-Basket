@@ -25,23 +25,26 @@ import alektas.pocketbasket.domain.usecases.ResetItemsUseCase;
 import alektas.pocketbasket.domain.usecases.SelectCategoryUseCase;
 import alektas.pocketbasket.domain.usecases.UpdateItemsUseCase;
 import alektas.pocketbasket.domain.usecases.UseCase;
-import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideContract;
-import alektas.pocketbasket.guide.GuideImpl;
+import alektas.pocketbasket.guide.GuideObserver;
+import alektas.pocketbasket.guide.domain.Guide;
+import alektas.pocketbasket.guide.domain.SequentialGuide;
 
-public class ActivityViewModel extends AndroidViewModel {
+public class ActivityViewModel extends AndroidViewModel implements GuideObserver {
     private static final String TAG = "ActivityViewModel";
     private Guide mGuide;
     private Repository mRepository;
-    private String mCurGuideCase;
 
     private MutableLiveData<Boolean> showcaseModeState = new MutableLiveData<>();
     private MutableLiveData<Boolean> guideModeState = new MutableLiveData<>();
+    private MutableLiveData<String> mCurGuideCase = new MutableLiveData<>();
 
     public ActivityViewModel(@NonNull Application application) {
         super(application);
         mRepository = RepositoryImpl.getInstance(application);
         mRepository.showcaseModeState().observe(showcaseModeState::setValue);
+        mGuide = SequentialGuide.getInstance();
+        mGuide.observe(this);
     }
 
     @Override
@@ -49,7 +52,7 @@ public class ActivityViewModel extends AndroidViewModel {
         super.onCleared();
         mRepository.showcaseModeState().clearObservers();
         mRepository = null;
-        mGuide = null;
+        mGuide.removeObserver(this);
     }
 
     /**
@@ -128,43 +131,29 @@ public class ActivityViewModel extends AndroidViewModel {
         new RemoveMarkedItems(mRepository).execute(null, null);
     }
 
+
     /* Guide methods */
 
-    public void startGuide() {
+    public void onStartGuideSelected() {
         if (mGuide == null) {
-            Log.e(TAG, "startGuide: to start the guide " +
-                            "you need to set Guide by setGuide method",
-                    new NullPointerException("GuideImpl is null"));
+            Log.e(TAG, "start: to start " +
+                            "you need to set the Guide by #setGuide method",
+                    new NullPointerException("SequentialGuide is null"));
         }
+        mGuide.start();
+    }
 
-        guideModeState.setValue(true);
-        mGuide.startGuide();
-
-        Bundle startGuide = new Bundle();
-        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_BEGIN, startGuide);
+    public void onEventHappened(String eventKey) {
+        mGuide.onCaseHappened(eventKey);
     }
 
     /**
      * Finish guide during any case.
-     * Warning! Do not invoke it in the {@link GuideImpl.GuideListener#onGuideFinish()}
+     * Warning! Do not invoke it in the {@link GuideObserver#onGuideFinish()}
      * to avoid the infinity loop.
      */
-    public void finishGuide() {
-        mGuide.finishGuide();
-        guideModeState.setValue(false);
-
-        Bundle finGuide = new Bundle();
-        finGuide.putString(FirebaseAnalytics.Param.LEVEL_NAME,
-                "finishGuide guide at case: " + mGuide.currentCaseKey());
-        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_COMPLETE, finGuide);
-    }
-
     public void onSkipGuideBtnClick() {
-        finishGuide();
-    }
-
-    public void nextGuideCase() {
-        mGuide.nextCase();
+        mGuide.finish();
     }
 
     public boolean isGuideMode() {
@@ -176,40 +165,52 @@ public class ActivityViewModel extends AndroidViewModel {
         return guideModeState;
     }
 
-    public String getCurGuideCase() {
+    public LiveData<String> curGuideCaseData() {
         return mCurGuideCase;
     }
 
-    public void setGuideCase(String curGuideCase) {
-        mCurGuideCase = curGuideCase;
-        mGuide.setCase(curGuideCase); // TODO: called twice in "Guide.startFrom" method
+
+    /* Guide listener interface methods */
+
+    @Override
+    public void onGuideStart() {
+        guideModeState.setValue(true);
+
+        Bundle startGuide = new Bundle();
+        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_BEGIN, startGuide);
     }
 
-    public void disableGuideMode() {
+    @Override
+    public void onGuideFinish() {
+        mCurGuideCase.setValue(null);
         guideModeState.setValue(false);
+
+        Bundle finGuide = new Bundle();
+        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_COMPLETE, finGuide);
     }
 
-    public void setGuide(Guide guide) {
-        mGuide = guide;
+    @Override
+    public void onGuideCaseStart(String caseKey) {
+        mCurGuideCase.setValue(caseKey);
     }
 
-    public Guide getGuide() {
-        return mGuide;
+    @Override
+    public void onGuideCaseFinish(String caseKey) {
+
     }
+
 
     /* Other methods */
 
-    /**
-     * When the Guide is started touch allowed only in several cases
-     */
-    public boolean isTouchAllowed() {
-        return !( mGuide.isGuideStarted() &&
-                (GuideContract.GUIDE_CATEGORIES_HELP.equals(mGuide.currentCaseKey())
-                        || GuideContract.GUIDE_SHOWCASE_HELP.equals(mGuide.currentCaseKey())
-                        || GuideContract.GUIDE_BASKET_HELP.equals(mGuide.currentCaseKey())) );
+    public void cancelDelMode() {
+        mRepository.setDelMode(false);
     }
 
-    public void onFloatingMenuShown() {
+    public boolean isDelMode() {
+        return mRepository.delModeState().getValue();
+    }
+
+    public void onFloatingMenuCalled() {
         mGuide.onCaseHappened(GuideContract.GUIDE_FLOATING_MENU);
     }
 

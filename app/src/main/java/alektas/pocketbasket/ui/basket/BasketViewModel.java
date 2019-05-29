@@ -13,12 +13,13 @@ import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.BasketItemModel;
 import alektas.pocketbasket.domain.entities.ItemModel;
-import alektas.pocketbasket.domain.usecases.MarkBasketItem;
 import alektas.pocketbasket.domain.usecases.ChangeItemsPositions;
+import alektas.pocketbasket.domain.usecases.MarkBasketItem;
 import alektas.pocketbasket.domain.usecases.RemoveItemFromBasket;
 import alektas.pocketbasket.domain.usecases.UseCase;
-import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideContract;
+import alektas.pocketbasket.guide.domain.Guide;
+import alektas.pocketbasket.guide.domain.SequentialGuide;
 
 public class BasketViewModel extends AndroidViewModel {
     private Repository mRepository;
@@ -29,6 +30,7 @@ public class BasketViewModel extends AndroidViewModel {
         super(application);
         mRepository = RepositoryImpl.getInstance(application);
         mRepository.getBasketData().observe(mBasketData::setValue);
+        mGuide = SequentialGuide.getInstance();
     }
 
     @Override
@@ -36,15 +38,6 @@ public class BasketViewModel extends AndroidViewModel {
         super.onCleared();
         mRepository.getBasketData().clearObservers();
         mRepository = null;
-        mGuide = null;
-    }
-
-    public void setGuide(Guide guide) {
-        mGuide = guide;
-    }
-
-    public Guide getGuide() {
-        return mGuide;
     }
 
     public LiveData<List<BasketItemModel>> getBasketData() {

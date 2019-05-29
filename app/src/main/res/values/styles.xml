@@ -35,8 +35,8 @@
     <style name="GuideMainText">
         <item name="android:paddingStart">@dimen/padding_16</item>
         <item name="android:paddingEnd">@dimen/padding_16</item>
-        <item name="android:textAlignment">center</item>
         <item name="android:visibility">invisible</item>
+        <item name="android:textAlignment">center</item>
         <item name="android:textSize">24sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/white</item>
@@ -46,8 +46,8 @@
         <item name="android:paddingStart">@dimen/padding_16</item>
         <item name="android:paddingEnd">@dimen/padding_16</item>
         <item name="android:paddingTop">@dimen/padding_16</item>
-        <item name="android:textAlignment">center</item>
         <item name="android:visibility">invisible</item>
+        <item name="android:textAlignment">center</item>
         <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/text_guide_sub</item>

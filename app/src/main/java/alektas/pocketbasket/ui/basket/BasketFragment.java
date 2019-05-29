@@ -63,12 +63,6 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
     }
 
     @Override
-    public void onDestroy() {
-        mViewModel.setGuide(null);
-        super.onDestroy();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_basket, container, false);
@@ -91,10 +85,6 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
         mTouchHelper.attachToRecyclerView(mBasket);
 
         return root;
-    }
-
-    public BasketViewModel getViewModel() {
-        return mViewModel;
     }
 
     private void subscribeOnModel() {

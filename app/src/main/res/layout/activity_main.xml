@@ -257,6 +257,15 @@
 
     <!-- Guide: categories help -->
 
+    <FrameLayout
+        android:id="@+id/guide_categories_help_clicker"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:onClick="onGuideViewClick"
+        android:clickable="true"
+        android:focusable="true" />
+
     <TextView
         android:id="@+id/guide_categories_help_text"
         android:layout_width="wrap_content"
@@ -281,6 +290,16 @@
 
     <!-- Guide: showcase help -->
 
+    <FrameLayout
+        android:id="@+id/guide_showcase_help_clicker"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:onClick="onGuideViewClick"
+        android:clickable="true"
+        android:focusable="true" />
+
+
     <TextView
         android:id="@+id/guide_showcase_help_text"
         android:layout_width="wrap_content"
@@ -304,6 +323,15 @@
         app:layout_constraintTop_toBottomOf="@id/guide_showcase_help_text"/>
 
     <!-- Guide: basket help -->
+
+    <FrameLayout
+        android:id="@+id/guide_basket_help_clicker"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:onClick="onGuideViewClick"
+        android:clickable="true"
+        android:focusable="true" />
 
     <TextView
         android:id="@+id/guide_basket_help_text"

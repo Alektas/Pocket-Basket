@@ -17,8 +17,9 @@ import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 import alektas.pocketbasket.domain.usecases.SelectShowcaseItem;
-import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideContract;
+import alektas.pocketbasket.guide.domain.Guide;
+import alektas.pocketbasket.guide.domain.SequentialGuide;
 
 public class ShowcaseViewModel extends AndroidViewModel {
     private Repository mRepository;
@@ -34,6 +35,7 @@ public class ShowcaseViewModel extends AndroidViewModel {
         mRepository.getShowcaseData().observe(mShowcaseData::setValue);
         mRepository.showcaseModeState().observe(showcaseModeState::setValue);
         mRepository.delModeState().observe(delModeState::setValue);
+        mGuide = SequentialGuide.getInstance();
     }
 
     @Override
@@ -43,15 +45,6 @@ public class ShowcaseViewModel extends AndroidViewModel {
         mRepository.showcaseModeState().clearObservers();
         mRepository.delModeState().clearObservers();
         mRepository = null;
-        mGuide = null;
-    }
-
-    public void setGuide(Guide guide) {
-        mGuide = guide;
-    }
-
-    public Guide getGuide() {
-        return mGuide;
     }
 
     public LiveData<List<ShowcaseItemModel>> getShowcaseData() {
@@ -143,8 +136,8 @@ public class ShowcaseViewModel extends AndroidViewModel {
      * When the Guide is started the Delete Mode allowed only in several cases
      */
     private boolean isDelModeAllowed() {
-        if (!mGuide.isGuideStarted()) return true;
-        return GuideContract.GUIDE_DEL_MODE.equals(mGuide.currentCaseKey())
-                || GuideContract.GUIDE_DEL_ITEMS.equals(mGuide.currentCaseKey());
+        if (!mGuide.isStarted()) return true;
+        return GuideContract.GUIDE_DEL_MODE.equals(mGuide.currentCase())
+                || GuideContract.GUIDE_DEL_ITEMS.equals(mGuide.currentCase());
     }
 }
