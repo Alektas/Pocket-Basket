@@ -35,5 +35,5 @@ public interface GuideObserver {
      *
      * @param caseKey key of the guide case
      */
-    void onGuideCaseFinish(String caseKey);
+    void onGuideCaseComplete(String caseKey);
 }

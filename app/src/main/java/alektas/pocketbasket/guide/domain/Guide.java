@@ -10,7 +10,7 @@ public interface Guide {
      * Inform the guide that the case has happened
      * @param caseKey name of the case that is happened
      */
-    void onCaseHappened(String caseKey);
+    void onUserEvent(String caseKey);
 
     void start();
 

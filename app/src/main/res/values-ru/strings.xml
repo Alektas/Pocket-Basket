@@ -10,7 +10,7 @@
     <string name="share">Поделиться</string>
     <string name="update">Обновить</string>
     <string name="share_intro">Нужны товары:</string>
-    <string name="guide">Помощь</string>
+    <string name="guide">Подсказки</string>
 
     <string name="about_app">О приложении</string>
     <string name="about_msg">Pocket Basket это приложение для составления списка продуктов.</string>
@@ -19,8 +19,8 @@
     <string name="about_icons_by">Иконки:</string>
     <string name="about_license">(лицензия)</string>
 
-    <string name="guide_accept_title">Хотите пройти обучение?</string>
-    <string name="guide_accept_msg">Обучение всегда можно пройти повторно выбрав \"Помощь\" в меню</string>
+    <string name="guide_accept_title">Хотите получать обучающие подсказки?</string>
+    <string name="guide_accept_msg">Включить/отключить подсказки всегда можно выбрав \"Подсказки\" в меню</string>
 
     <string name="guide_categ">Это категории</string>
     <string name="guide_categ_sub">Здесь можно выбрать нужный тип товаров</string>

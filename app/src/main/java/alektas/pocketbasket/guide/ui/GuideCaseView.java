@@ -59,7 +59,7 @@ public class GuideCaseView {
          * {@link Builder#setAnimation(Animator, View...)} method.
          * Disposable means that an animation played once and then a guide case finished.
          * Warning! On disposable cases finish
-         * {@link alektas.pocketbasket.guide.domain.Guide#onCaseHappened(String)} should be invoked
+         * {@link alektas.pocketbasket.guide.domain.Guide#onUserEvent(String)} should be invoked
          * to continue a guide process.
          *
          * @param anim animation which would be started with the guide case.
@@ -95,7 +95,7 @@ public class GuideCaseView {
          * To add views use {@link Builder#addViews(View...)}
          * Disposable means that an animation played once and then a guide case finished.
          * Warning! On disposable cases finish
-         * {@link alektas.pocketbasket.guide.domain.Guide#onCaseHappened(String)} should be invoked
+         * {@link alektas.pocketbasket.guide.domain.Guide#onUserEvent(String)} should be invoked
          * to continue a guide process.
          *
          * @param anim animation which would be started with the guide case.

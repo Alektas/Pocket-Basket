@@ -1,13 +1,10 @@
 package alektas.pocketbasket.guide.domain;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
-import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.GuideObserver;
 
 public class SequentialGuide implements Guide {
@@ -39,12 +36,8 @@ public class SequentialGuide implements Guide {
         return this;
     }
 
-    /**
-     * Inform the guide that the case has happened
-     * @param caseKey name of the case that is happened
-     */
     @Override
-    public void onCaseHappened(String caseKey) {
+    public void onUserEvent(String caseKey) {
         if (!isStarted) return;
         if (caseKey.equals(mCurrentCase.getKey())) {
             nextCase();
@@ -68,7 +61,6 @@ public class SequentialGuide implements Guide {
 
     @Override
     public void start() {
-        fillGuide();
         isStarted = true;
         notifyGuideStarted();
         startCase(0); // start from the first case in the list
@@ -81,7 +73,6 @@ public class SequentialGuide implements Guide {
 
     @Override
     public void startFrom(String caseKey) {
-        fillGuide();
         isStarted = true;
         notifyGuideStarted();
         startCase(caseKey);
@@ -92,29 +83,12 @@ public class SequentialGuide implements Guide {
         notifyGuideCaseStarted(key);
     }
 
-    private void fillGuide() {
-        mCases.clear();
-        this.addCase(new GuideCaseImpl(GuideContract.GUIDE_CATEGORIES_HELP))
-                .addCase(new GuideCaseImpl(GuideContract.GUIDE_SHOWCASE_HELP))
-                .addCase(new GuideCaseImpl(GuideContract.GUIDE_BASKET_HELP))
-                .addCase(new GuideCaseImpl(GuideContract.GUIDE_CHANGE_MODE))
-                .addCase(new GuideCaseImpl(GuideContract.GUIDE_ADD_ITEM))
-                .addCase(new GuideCaseImpl(GuideContract.GUIDE_CHECK_ITEM))
-                .addCase(new GuideCaseImpl(GuideContract.GUIDE_REMOVE_ITEM))
-                .addCase(new GuideCaseImpl(GuideContract.GUIDE_MOVE_ITEM))
-                .addCase(new GuideCaseImpl(GuideContract.GUIDE_DEL_MODE))
-                .addCase(new GuideCaseImpl(GuideContract.GUIDE_DEL_ITEMS))
-                .addCase(new GuideCaseImpl(GuideContract.GUIDE_FLOATING_MENU))
-                .addCase(new GuideCaseImpl(GuideContract.GUIDE_FLOATING_MENU_HELP))
-                .addCase(new GuideCaseImpl(GuideContract.GUIDE_FINISH));
-    }
-
     @Nullable
     private GuideCase getCase(String key) {
         for (GuideCase guideCase : mCases) {
             if (key.equals(guideCase.getKey())) return guideCase;
         }
-        Log.e("GUIDE_EXCEPTION",
+        System.out.println("GUIDE_EXCEPTION: " +
                 "getCase: Guide case with name '" + key + "' doesn't exist.");
         return null;
     }
@@ -133,7 +107,7 @@ public class SequentialGuide implements Guide {
 
     @Override
     public String currentCase() {
-        return mCurrentCase.getKey();
+        return mCurrentCase == null ? null : mCurrentCase.getKey();
     }
 
     @Override
@@ -168,7 +142,7 @@ public class SequentialGuide implements Guide {
 
     private void notifyGuideCaseFinished(String caseKey) {
         for(GuideObserver listener : mListeners) {
-            listener.onGuideCaseFinish(caseKey);
+            listener.onGuideCaseComplete(caseKey);
         }
     }
 

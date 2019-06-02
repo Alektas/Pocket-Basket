@@ -90,11 +90,13 @@ public class MainActivity extends AppCompatActivity implements
     private float protectedInterval;
     private float changeModeDistance;
 
-    private boolean isAdUpdating;
     private boolean isMenuShown;
     private boolean allowChangeMode = true;
     private boolean alreadySetChangeModeAllowing = false;
     private boolean allowChooseCategory = true;
+
+    private SharedPreferences mGuidePrefs;
+    private SharedPreferences mPrefs;
 
     private View mBasketContainer;
     private View mShowcaseContainer;
@@ -126,23 +128,25 @@ public class MainActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
 
         init();
+        mViewModel.setOrientationState(isLandscape());
 
-        SharedPreferences prefs =
-                getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
+        mPrefs = getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
+        mGuidePrefs = getSharedPreferences(getString(R.string.GUIDE_PREFERENCES_FILE_KEY), MODE_PRIVATE);
+
 
         /* Update items in the database when other app version is launched or locale is changed.
          * It allow to display correct icons, which were added or removed in other version,
          * and correct item names */
         String curLang = ResourcesUtils.getCurrentLocale().getLanguage();
-        String savedLang = prefs.getString(getString(R.string.LOCALE_KEY), "lang");
+        String savedLang = mPrefs.getString(getString(R.string.LOCALE_KEY), "lang");
         if (savedLang == null) savedLang = "lang";
 
         int vc = ResourcesUtils.getVersionCode();
         boolean isVersionChanged =
-                prefs.getInt(getString(R.string.VERSION_CODE_KEY), 1) != vc;
+                mPrefs.getInt(getString(R.string.VERSION_CODE_KEY), 1) != vc;
 
         if (!savedLang.equals(curLang) || isVersionChanged) {
-            prefs.edit()
+            mPrefs.edit()
                     .putString(getString(R.string.LOCALE_KEY), curLang)
                     .putInt(getString(R.string.VERSION_CODE_KEY), vc)
                     .apply();
@@ -150,10 +154,9 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         // If it is the first app launch offer to start the guide
-        if (prefs.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
-            prefs.edit().putBoolean(getString(R.string.FIRST_START_KEY), false).apply();
-            DialogFragment dialog = new GuideAcceptDialog();
-            dialog.show(getSupportFragmentManager(), "GuideAcceptDialog");
+        if (mPrefs.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
+            mPrefs.edit().putBoolean(getString(R.string.FIRST_START_KEY), false).apply();
+            showHintsAcceptDialog();
         }
     }
 
@@ -244,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             case R.id.menu_guide: {
-                mViewModel.onStartGuideSelected();
+                showHintsAcceptDialog();
                 return true;
             }
 
@@ -262,6 +265,11 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showHintsAcceptDialog() {
+        DialogFragment dialog = new GuideAcceptDialog();
+        dialog.show(getSupportFragmentManager(), "GuideAcceptDialog");
     }
 
     // Used for search handle
@@ -374,7 +382,6 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onAdLoaded() {
                 // Code to be executed when an ad finishes loading.
-                isAdUpdating = false;
                 showAdBanner();
             }
 
@@ -390,7 +397,6 @@ public class MainActivity extends AppCompatActivity implements
                     default: errorStr = "UNKNOWN";
                 }
                 Log.d(TAG, "onAdFailedToLoad: code = " + errorStr);
-                isAdUpdating = false;
                 hideAdBanner();
             }
 
@@ -432,40 +438,29 @@ public class MainActivity extends AppCompatActivity implements
             request = new AdRequest.Builder().build();
         }
 
-        isAdUpdating = true;
         mAdView.loadAd(request);
     }
 
     private void subscribeOnModel() {
         mViewModel.guideModeState().observe(this, isGuideMode -> {
-            // There applied view states that appropriate for the all guide process.
-            // If something change during the guide it must be in the #guideCaseData.observe.
-            if (isGuideMode) {
-                hideAdBanner();
-                mSkipGuideBtn.setVisibility(View.VISIBLE);
-//                if (mViewModel.isDelMode()) {
-//                    mViewModel.cancelDelMode();v
-//                }
-            } else {
-                mSkipGuideBtn.setVisibility(View.GONE);
-                if (!mViewModel.isShowcaseMode()) {
-                    showFloatingButton();
-                }
-                if (!isAdUpdating) updateAd();
-            }
+
         });
 
         mViewModel.curGuideCaseData().observe(this, caseKey -> {
             mGuidePresenter.hideCurrentCase();
-            if (caseKey == null) return;
-            // Change mode in the landscape orientation is not allowed
-            // so skip this guide case
-            if (isLandscape() && GuideContract.GUIDE_CHANGE_MODE.equals(caseKey)) {
-                mViewModel.onEventHappened(GuideContract.GUIDE_CHANGE_MODE);
+            if (caseKey == null) {
+                mSkipGuideBtn.setVisibility(View.GONE);
                 return;
             }
-            prepareForGuideCase(caseKey);
+            if (mGuidePrefs.getBoolean(caseKey, false)) {
+                mViewModel.onEventHappened(caseKey);
+            }
             mGuidePresenter.showCase(caseKey);
+            mSkipGuideBtn.setVisibility(View.VISIBLE);
+        });
+
+        mViewModel.completedGuideCaseData().observe(this, finishedCase -> {
+            mGuidePrefs.edit().putBoolean(finishedCase, true).apply();
         });
 
         mViewModel.showcaseModeState().observe(this, isShowcase -> {
@@ -506,37 +501,6 @@ public class MainActivity extends AppCompatActivity implements
         View bgTop = findViewById(R.id.guide_bg_top_img);
         View bgBottom = findViewById(R.id.guide_bg_bottom_img);
 
-        // Guide: categories help
-        GuideCaseView categoriesHelpCase = new GuideCaseView
-                .Builder(GuideContract.GUIDE_CATEGORIES_HELP)
-                .addViews(bgBottom,
-                        findViewById(R.id.guide_categories_help_clicker),
-                        findViewById(R.id.guide_bg_right_large_img),
-                        findViewById(R.id.guide_categories_help_text),
-                        findViewById(R.id.guide_categories_help_sub_text))
-                .build();
-
-        // Guide: showcase help
-        GuideCaseView showcaseHelpCase = new GuideCaseView
-                .Builder(GuideContract.GUIDE_SHOWCASE_HELP)
-                .addViews(bgBottom,
-                        findViewById(R.id.guide_showcase_help_clicker),
-                        findViewById(R.id.guide_bg_right_small_img),
-                        findViewById(R.id.guide_bg_left_small_img),
-                        findViewById(R.id.guide_showcase_help_text),
-                        findViewById(R.id.guide_showcase_help_sub_text))
-                .build();
-
-        // Guide: basket help
-        GuideCaseView basketHelpCase = new GuideCaseView
-                .Builder(GuideContract.GUIDE_BASKET_HELP)
-                .addViews(bgBottom,
-                        findViewById(R.id.guide_basket_help_clicker),
-                        findViewById(R.id.guide_bg_left_large_img),
-                        findViewById(R.id.guide_basket_help_text),
-                        findViewById(R.id.guide_basket_help_sub_text))
-                .build();
-
         //  Guide: change mode
         View changeModeImg = findViewById(R.id.guide_scroll_hor_img);
         Animator scrollHorizAnim = AnimatorInflater
@@ -555,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements
         Animator tapAnim = AnimatorInflater
                 .loadAnimator(this, R.animator.anim_guide_tap);
         GuideCaseView addItemCase = new GuideCaseView
-                .Builder(GuideContract.GUIDE_ADD_ITEM)
+                .Builder(GuideContract.GUIDE_ADD_ITEM_BY_TAP)
                 .addViews(bgBottom,
                         addItemImg,
                         findViewById(R.id.guide_add_item_text),
@@ -593,7 +557,7 @@ public class MainActivity extends AppCompatActivity implements
         Animator swipeRightAnim = AnimatorInflater
                 .loadAnimator(this, R.animator.anim_guide_swipe_right);
         GuideCaseView removeItemCase = new GuideCaseView
-                .Builder(GuideContract.GUIDE_REMOVE_ITEM)
+                .Builder(GuideContract.GUIDE_SWIPE_REMOVE_ITEM)
                 .addViews(bgBottom,
                         removeItemImg,
                         findViewById(R.id.guide_remove_text),
@@ -618,7 +582,7 @@ public class MainActivity extends AppCompatActivity implements
                 .loadAnimator(this, R.animator.anim_guide_tap);
         View tapToDelImg = findViewById(R.id.guide_tap_delete_img);
         GuideCaseView deleteItemsCase = new GuideCaseView
-                .Builder(GuideContract.GUIDE_DEL_ITEMS)
+                .Builder(GuideContract.GUIDE_DEL_SELECTED_ITEMS)
                 .addViews(bgTop,
                         tapToDelImg,
                         findViewById(R.id.guide_delete_text),
@@ -648,20 +612,8 @@ public class MainActivity extends AppCompatActivity implements
                         findViewById(R.id.guide_floating_menu_del_checked_text))
                 .build();
 
-        //  Guide: finish case
-        View finishImg = findViewById(R.id.guide_finish_img);
-        Animator finishAnim = AnimatorInflater
-                .loadAnimator(this, R.animator.anim_guide_finish);
-        GuideCaseView finishCase = new GuideCaseView
-                .Builder(GuideContract.GUIDE_FINISH)
-                .addViews(finishImg)
-                .setAnimation(finishAnim, true, finishImg)
-                .build();
-
         GuidePresenter guidePresenter = new SequentialGuidePresenter(this);
-        guidePresenter.addCase(categoriesHelpCase)
-                .addCase(showcaseHelpCase)
-                .addCase(basketHelpCase)
+        guidePresenter
                 .addCase(changeModeCase)
                 .addCase(addItemCase)
                 .addCase(checkItemCase)
@@ -670,51 +622,9 @@ public class MainActivity extends AppCompatActivity implements
                 .addCase(delModeCase)
                 .addCase(deleteItemsCase)
                 .addCase(floatingMenuCase)
-                .addCase(floatingMenuHelpCase)
-                .addCase(finishCase);
+                .addCase(floatingMenuHelpCase);
 
         return guidePresenter;
-    }
-
-    /**
-     * Make some preparations to consist layout for the guide case.
-     * Some guide cases require the visibility or invisibility of some views and certain modes.
-     * Is invoked before the start of the each guide case.
-     *
-     * @param caseKey key of the guide case to which the view must be prepared
-     */
-    private void prepareForGuideCase(String caseKey) {
-        // Show the floating button only when it's needed in the Guide
-        switch (caseKey) {
-            case GuideContract.GUIDE_FLOATING_MENU:
-            case GuideContract.GUIDE_FLOATING_MENU_HELP:
-            case GuideContract.GUIDE_FINISH:
-                showFloatingButton();
-                break;
-            default:
-                hideFloatingButton();
-        }
-
-        // Set appropriate mode
-        switch (caseKey) {
-            case GuideContract.GUIDE_CATEGORIES_HELP:
-            case GuideContract.GUIDE_SHOWCASE_HELP:
-            case GuideContract.GUIDE_BASKET_HELP:
-                if (!mViewModel.isShowcaseMode()) {
-                    setShowcaseMode();
-                }
-                break;
-            case GuideContract.GUIDE_CHANGE_MODE:
-                break;
-            default:
-                if (mViewModel.isShowcaseMode()) {
-                    setBasketMode();
-                }
-        }
-
-        if (GuideContract.GUIDE_SHOWCASE_HELP.equals(caseKey) && mViewModel.isDelMode()) {
-            mViewModel.cancelDelMode();
-        }
     }
 
 
@@ -928,6 +838,8 @@ public class MainActivity extends AppCompatActivity implements
         mDelAllBtn.setVisibility(View.INVISIBLE);
 
         isMenuShown = false;
+
+        mViewModel.onFloatingMenuHide();
     }
 
     private void showAdBanner() {
@@ -958,9 +870,17 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onDialogAcceptGuide() {
-        mViewModel.putToBasket(getString(R.string.cabbage));
-        mViewModel.onStartGuideSelected();
+    public void onDialogAcceptHints() {
+        mPrefs.edit().putBoolean(getString(R.string.SHOW_HINTS_KEY), true).apply();
+        mGuidePrefs.edit().clear().apply();
+        mViewModel.startGuide(mGuidePrefs);
+    }
+
+    @Override
+    public void onDialogRejectHints() {
+        mPrefs.edit().putBoolean(getString(R.string.SHOW_HINTS_KEY), false).apply();
+        mGuidePrefs.edit().clear().apply();
+        mViewModel.stopGuide();
     }
 
     @Override
@@ -1128,17 +1048,9 @@ public class MainActivity extends AppCompatActivity implements
 
     public void onGuideViewClick(View view) {
         switch (view.getId()) {
-            case R.id.guide_categories_help_clicker:
-                mViewModel.onEventHappened(GuideContract.GUIDE_CATEGORIES_HELP);
-                break;
-            case R.id.guide_showcase_help_clicker:
-                mViewModel.onEventHappened(GuideContract.GUIDE_SHOWCASE_HELP);
-                break;
-            case R.id.guide_basket_help_clicker:
-                mViewModel.onEventHappened(GuideContract.GUIDE_BASKET_HELP);
-                break;
             case R.id.guide_floating_menu_help_clicker:
                 mViewModel.onEventHappened(GuideContract.GUIDE_FLOATING_MENU_HELP);
+                break;
         }
     }
 
@@ -1148,9 +1060,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         // Do not allow a mode change in the landscape orientation
-        if (!isLandscape() && (!mViewModel.isGuideMode()
-                || GuideContract.GUIDE_CHANGE_MODE
-                .equals(mViewModel.curGuideCaseData().getValue()))) {
+        if (!isLandscape()) {
             handleChangeModeByTouch(event);
         }
 

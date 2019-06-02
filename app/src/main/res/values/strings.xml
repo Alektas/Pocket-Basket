@@ -24,8 +24,9 @@
     <string name="about_icons_by">Icons by:</string>
     <string name="about_version">Version: %s</string>
 
-    <string name="guide_accept_title">Do you want to go training?</string>
-    <string name="guide_accept_msg">Training can always be repeated by selecting \"Help\" in the menu</string>
+    <string name="guide">Hints</string>
+    <string name="guide_accept_title">Do you want to get hints?</string>
+    <string name="guide_accept_msg">Hints can always be turned on/off by selecting \"Hints\" in the menu</string>
 
     <string name="guide_categ">These are categories</string>
     <string name="guide_categ_sub">There you can filter items</string>
@@ -33,7 +34,6 @@
     <string name="guide_showcase_sub">From here you can take items to the basket</string>
     <string name="guide_basket">This is a basket</string>
     <string name="guide_basket_sub">There you store items from the showcase</string>
-    <string name="guide">Help</string>
     <string name="guide_change_mode">Swipe to switch the mode</string>
     <string name="guide_change_mode_sub">Just swipe left</string>
     <string name="guide_add_item">Tap to add an item</string>

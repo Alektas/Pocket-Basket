@@ -18,8 +18,9 @@ import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 import alektas.pocketbasket.domain.usecases.SelectShowcaseItem;
 import alektas.pocketbasket.guide.GuideContract;
+import alektas.pocketbasket.guide.domain.ContextualGuide;
 import alektas.pocketbasket.guide.domain.Guide;
-import alektas.pocketbasket.guide.domain.SequentialGuide;
+import alektas.pocketbasket.ui.ActivityViewModel;
 
 public class ShowcaseViewModel extends AndroidViewModel {
     private Repository mRepository;
@@ -33,17 +34,20 @@ public class ShowcaseViewModel extends AndroidViewModel {
         super(application);
         mRepository = RepositoryImpl.getInstance(application);
         mRepository.getShowcaseData().observe(mShowcaseData::setValue);
-        mRepository.showcaseModeState().observe(showcaseModeState::setValue);
-        mRepository.delModeState().observe(delModeState::setValue);
-        mGuide = SequentialGuide.getInstance();
+        mRepository.showcaseModeData().observe(showcaseModeState::setValue);
+        mRepository.delModeData().observe((delMode) -> {
+            delModeState.setValue(delMode);
+            ActivityViewModel.delModeState.setState(delMode);
+        });
+        mGuide = ContextualGuide.getInstance();
     }
 
     @Override
     protected void onCleared() {
         super.onCleared();
         mRepository.getShowcaseData().clearObservers();
-        mRepository.showcaseModeState().clearObservers();
-        mRepository.delModeState().clearObservers();
+        mRepository.showcaseModeData().clearObservers();
+        mRepository.delModeData().clearObservers();
         mRepository = null;
     }
 
@@ -59,7 +63,7 @@ public class ShowcaseViewModel extends AndroidViewModel {
     /* On Click */
 
     public boolean onItemLongClick(ShowcaseItemModel item) {
-        if (!isDelMode() && isDelModeAllowed()) {
+        if (!isDelMode()) {
             setDelMode(true);
         }
         mRepository.selectForDeleting(item);
@@ -73,7 +77,7 @@ public class ShowcaseViewModel extends AndroidViewModel {
         }
         new SelectShowcaseItem(mRepository).execute(item.getName(), (isAdded) -> {
             if (isAdded) {
-                mGuide.onCaseHappened(GuideContract.GUIDE_ADD_ITEM);
+                mGuide.onUserEvent(GuideContract.GUIDE_ADD_ITEM_BY_TAP);
 
                 Bundle bundle = new Bundle();
                 bundle.putString(FirebaseAnalytics.Param.ITEM_ID, item.getName());
@@ -81,7 +85,11 @@ public class ShowcaseViewModel extends AndroidViewModel {
                 bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, item.getTagRes());
                 App.getAnalytics().logEvent(FirebaseAnalytics.Event.ADD_TO_CART, bundle);
             } else {
-                mGuide.onCaseHappened(GuideContract.GUIDE_REMOVE_ITEM);
+                if (showcaseModeState != null && !showcaseModeState.getValue()) {
+                    ActivityViewModel.removeByTapInBasketModeState.setState(true);
+                    ActivityViewModel.removeCountState
+                            .setState(ActivityViewModel.removeCountState.getState() + 1);
+                }
             }
         });
     }
@@ -124,20 +132,12 @@ public class ShowcaseViewModel extends AndroidViewModel {
      */
     private void setDelMode(boolean delMode) {
         if (delMode) {
-            mGuide.onCaseHappened(GuideContract.GUIDE_DEL_MODE);
+            mGuide.onUserEvent(GuideContract.GUIDE_DEL_MODE);
         } else {
-            mGuide.onCaseHappened(GuideContract.GUIDE_DEL_ITEMS);
+            mGuide.onUserEvent(GuideContract.GUIDE_DEL_SELECTED_ITEMS);
         }
 
         mRepository.setDelMode(delMode);
     }
 
-    /**
-     * When the Guide is started the Delete Mode allowed only in several cases
-     */
-    private boolean isDelModeAllowed() {
-        if (!mGuide.isStarted()) return true;
-        return GuideContract.GUIDE_DEL_MODE.equals(mGuide.currentCase())
-                || GuideContract.GUIDE_DEL_ITEMS.equals(mGuide.currentCase());
-    }
 }
