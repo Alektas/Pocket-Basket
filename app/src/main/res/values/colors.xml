@@ -5,7 +5,7 @@
     <color name="colorPrimaryDark">#005005</color>
     <color name="colorAccent">@color/colorPrimaryDark</color>
 
-    <color name="bg_main">#fafafa</color>
+    <color name="bg_main">#F0F0F0</color>
 
     <color name="bg_del_panel">@color/colorPrimaryDark</color>
 
@@ -16,5 +16,6 @@
     <color name="item_handler">@color/colorPrimaryDark</color>
 
     <color name="bg_guide">#dc212121</color>
+    <color name="bg_guide_hint">#FBFBFB</color>
     <color name="text_guide_sub">#e0e0e0</color>
 </resources>

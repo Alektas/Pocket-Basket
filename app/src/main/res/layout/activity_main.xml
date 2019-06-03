@@ -151,11 +151,11 @@
         app:layout_constraintGuide_percent="0.25"/>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_bottom_hor_85"
+        android:id="@+id/guideline_bottom_hor_80"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.85"/>
+        app:layout_constraintGuide_percent="0.80"/>
 
     <!-- Guide: skip button -->
 
@@ -204,7 +204,7 @@
         app:iconSize="@dimen/size_guide_hint_icon"
         android:text="@string/guide_change_mode"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_80"/>
 
     <ImageView
         android:id="@+id/guide_scroll_hor_img"
@@ -233,7 +233,7 @@
         app:iconSize="@dimen/size_guide_hint_icon"
         android:text="@string/guide_add_item"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_80"/>
 
     <ImageView
         android:id="@+id/guide_tap_add_img"
@@ -262,7 +262,7 @@
         app:iconSize="@dimen/size_guide_hint_icon"
         android:text="@string/guide_check_item"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_80"/>
 
     <ImageView
         android:id="@+id/guide_tap_check_img"
@@ -292,7 +292,7 @@
         app:iconSize="@dimen/size_guide_hint_icon"
         android:text="@string/guide_move_item"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_80"/>
 
     <ImageView
         android:id="@+id/guide_scroll_vert_img"
@@ -322,7 +322,7 @@
         app:iconSize="@dimen/size_guide_hint_icon"
         android:text="@string/guide_remove_item"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_80"/>
 
     <ImageView
         android:id="@+id/guide_swipe_right_img"
@@ -351,7 +351,7 @@
         app:iconSize="@dimen/size_guide_hint_icon"
         android:text="@string/guide_del_mode"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_80"/>
 
     <ImageView
         android:id="@+id/guide_del_mode_img"
@@ -380,7 +380,7 @@
         app:iconSize="@dimen/size_guide_hint_icon"
         android:text="@string/guide_delete_items"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_80"/>
 
     <ImageView
         android:id="@+id/guide_tap_delete_img"
@@ -411,7 +411,7 @@
         app:iconSize="@dimen/size_guide_hint_icon"
         android:text="@string/guide_floating_menu"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_80"/>
 
     <ImageView
         android:id="@+id/guide_show_floating_menu_img"

@@ -38,7 +38,7 @@
         <item name="android:paddingBottom">16dp</item>
         <item name="android:layout_margin">32dp</item>
         <item name="android:textColor">@color/colorPrimaryDark</item>
-        <item name="android:backgroundTint">@color/bg_main</item>
+        <item name="android:backgroundTint">@color/bg_guide_hint</item>
         <item name="android:onClick">onGuideViewClick</item>
     </style>
 

@@ -26,29 +26,18 @@
 
     <string name="guide">Hints</string>
     <string name="guide_accept_title">Do you want to get hints?</string>
-    <string name="guide_accept_msg">Hints can always be turned on/off by selecting \"Hints\" in the menu</string>
+    <string name="guide_accept_msg">Hints can be turned on/off by selecting \"Hints\" in the menu</string>
 
-    <string name="guide_categ">These are categories</string>
-    <string name="guide_categ_sub">There you can filter items</string>
-    <string name="guide_showcase">This is a showcase</string>
-    <string name="guide_showcase_sub">From here you can take items to the basket</string>
-    <string name="guide_basket">This is a basket</string>
-    <string name="guide_basket_sub">There you store items from the showcase</string>
-    <string name="guide_change_mode">Swipe to switch the mode</string>
-    <string name="guide_change_mode_sub">Just swipe left</string>
-    <string name="guide_add_item">Tap to add an item</string>
-    <string name="guide_add_item_sub">or use the search bar</string>
-    <string name="guide_check_item">Click on the icon to mark an item</string>
-    <string name="guide_move_item">Drag and drop an item to move it</string>
-    <string name="guide_move_item_sub">or drag it by long press</string>
-    <string name="guide_remove_item">Swipe right to remove an item</string>
-    <string name="guide_remove_item_sub">or tap on item in the showcase</string>
-    <string name="guide_del_mode">Press long to turn on the delete mode</string>
-    <string name="guide_delete_items">Delete items or close panel</string>
-    <string name="guide_delete_items_sub">Items can be restored by \"Reset\" in the menu</string>
-    <string name="guide_floating_menu">Press button to show the menu</string>
+    <string name="guide_change_mode">Display mode can be changed by swipe</string>
+    <string name="guide_add_item">Items are added to the basket by tap</string>
+    <string name="guide_check_item">Products are marked by tap on the icon</string>
+    <string name="guide_move_item">Items in the basket are moved by the handler or a long press on the icon</string>
+    <string name="guide_remove_item">You can also remove an item from the basket with a swipe to the right</string>
+    <string name="guide_del_mode">You can go to the deletion mode by long pressing on the item</string>
+    <string name="guide_delete_items">You can delete selected items or close the panel. Non-user items can be restored by \"Reset\" in the menu.</string>
+    <string name="guide_floating_menu">Extra menu is called by long pressing on the button</string>
     <string name="guide_check_all">Mark all items</string>
-    <string name="guide_del_checked">Delete marked items</string>
+    <string name="guide_del_checked">Remove marked items</string>
     <string name="guide_close_menu">Close the menu</string>
 
     <string name="apache_license_link" translatable="false">https://www.apache.org/licenses/LICENSE-2.0.html</string>
