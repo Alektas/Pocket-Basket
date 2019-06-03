@@ -43,13 +43,13 @@ public interface Repository {
      * Contains current mode state.
      * 'true' = showcase mode, 'false' = basket mode.
      */
-    Observable<Boolean> showcaseModeState();
+    Observable<Boolean> showcaseModeData();
     void setShowcaseMode(boolean showcaseMode);
 
     /**
      * Contains 'true' if the delete mode is active.
      */
-    Observable<Boolean> delModeState();
+    Observable<Boolean> delModeData();
     void setDelMode(boolean delMode);
 
     void selectForDeleting(ShowcaseItemModel item);

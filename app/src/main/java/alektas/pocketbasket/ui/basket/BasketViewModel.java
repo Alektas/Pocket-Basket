@@ -13,12 +13,14 @@ import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.BasketItemModel;
 import alektas.pocketbasket.domain.entities.ItemModel;
-import alektas.pocketbasket.domain.usecases.MarkBasketItem;
 import alektas.pocketbasket.domain.usecases.ChangeItemsPositions;
+import alektas.pocketbasket.domain.usecases.MarkBasketItem;
 import alektas.pocketbasket.domain.usecases.RemoveItemFromBasket;
 import alektas.pocketbasket.domain.usecases.UseCase;
-import alektas.pocketbasket.guide.Guide;
 import alektas.pocketbasket.guide.GuideContract;
+import alektas.pocketbasket.guide.domain.ContextualGuide;
+import alektas.pocketbasket.guide.domain.Guide;
+import alektas.pocketbasket.ui.ActivityViewModel;
 
 public class BasketViewModel extends AndroidViewModel {
     private Repository mRepository;
@@ -28,7 +30,11 @@ public class BasketViewModel extends AndroidViewModel {
     public BasketViewModel(@NonNull Application application) {
         super(application);
         mRepository = RepositoryImpl.getInstance(application);
-        mRepository.getBasketData().observe(mBasketData::setValue);
+        mRepository.getBasketData().observe(basketItems -> {
+            mBasketData.setValue(basketItems);
+            ActivityViewModel.basketSizeState.setState(basketItems.size());
+        });
+        mGuide = ContextualGuide.getInstance();
     }
 
     @Override
@@ -36,15 +42,6 @@ public class BasketViewModel extends AndroidViewModel {
         super.onCleared();
         mRepository.getBasketData().clearObservers();
         mRepository = null;
-        mGuide = null;
-    }
-
-    public void setGuide(Guide guide) {
-        mGuide = guide;
-    }
-
-    public Guide getGuide() {
-        return mGuide;
     }
 
     public LiveData<List<BasketItemModel>> getBasketData() {
@@ -58,7 +55,7 @@ public class BasketViewModel extends AndroidViewModel {
      */
     public void updatePositions(List<ItemModel> names) {
         new ChangeItemsPositions(mRepository).execute(names, null);
-        mGuide.onCaseHappened(GuideContract.GUIDE_MOVE_ITEM);
+        mGuide.onUserEvent(GuideContract.GUIDE_MOVE_ITEM);
     }
 
     /**
@@ -67,12 +64,14 @@ public class BasketViewModel extends AndroidViewModel {
     public void markItem(String name) {
         UseCase<String, Void> useCase = new MarkBasketItem(mRepository);
         useCase.execute(name, null);
-        mGuide.onCaseHappened(GuideContract.GUIDE_CHECK_ITEM);
+        ActivityViewModel.markCountState.setState(ActivityViewModel.markCountState.getState() + 1);
+        mGuide.onUserEvent(GuideContract.GUIDE_CHECK_ITEM);
     }
 
     public void removeFromBasket(String name) {
         new RemoveItemFromBasket(mRepository).execute(name, null);
-        mGuide.onCaseHappened(GuideContract.GUIDE_REMOVE_ITEM);
+        ActivityViewModel.removeCountState.setState(ActivityViewModel.removeCountState.getState() + 1);
+        mGuide.onUserEvent(GuideContract.GUIDE_SWIPE_REMOVE_ITEM);
     }
 
 }

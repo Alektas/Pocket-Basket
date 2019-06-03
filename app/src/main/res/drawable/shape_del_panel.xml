@@ -9,7 +9,4 @@
         android:topRightRadius="@dimen/corners_del_panel"
         android:bottomLeftRadius="0dp"
         android:bottomRightRadius="0dp"/>
-    <stroke
-        android:color="@color/colorPrimaryDark"
-        android:width="@dimen/stroke_del_panel"/>
 </shape>

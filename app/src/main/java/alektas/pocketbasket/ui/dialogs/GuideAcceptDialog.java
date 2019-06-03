@@ -15,7 +15,8 @@ public class GuideAcceptDialog extends DialogFragment {
      * implement this interface in order to receive event callbacks.
      * Each method passes the DialogFragment in case the host needs to query it. */
     public interface GuideAcceptDialogListener {
-        void onDialogAcceptGuide();
+        void onDialogAcceptHints();
+        void onDialogRejectHints();
     }
 
     // Use this instance of the interface to deliver action events
@@ -43,10 +44,10 @@ public class GuideAcceptDialog extends DialogFragment {
         builder.setTitle(R.string.guide_accept_title)
                 .setMessage(R.string.guide_accept_msg)
                 .setPositiveButton(R.string.yes, (dialog, id) -> {
-                    mListener.onDialogAcceptGuide();
+                    mListener.onDialogAcceptHints();
                 })
                 .setNegativeButton(R.string.no, (dialog, id) -> {
-                    // User cancelled the dialog
+                    mListener.onDialogRejectHints();
                 });
         return builder.create();
     }

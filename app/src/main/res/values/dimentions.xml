@@ -3,9 +3,14 @@
     <dimen name="size_item_icon">56dp</dimen>
     <dimen name="corners_item_icon">8dp</dimen>
     <dimen name="size_categ_icon">40dp</dimen>
+    <dimen name="size_del_panel_btn">56dp</dimen>
 
     <dimen name="height_item">72dp</dimen>
     <dimen name="margin_end_basket_item_text">56dp</dimen>
+
+    <dimen name="size_guide_gesture_icon">96dp</dimen>
+    <dimen name="size_guide_hint_icon">32dp</dimen>
+    <dimen name="corners_guide_hint">8dp</dimen>
 
     <dimen name="corners_del_panel">16dp</dimen>
     <dimen name="stroke_del_panel">0dp</dimen>

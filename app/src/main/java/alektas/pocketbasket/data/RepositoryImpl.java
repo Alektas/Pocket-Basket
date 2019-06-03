@@ -62,7 +62,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     }
 
     @Override
-    public Observable<Boolean> showcaseModeState() {
+    public Observable<Boolean> showcaseModeData() {
         return showcaseModeState;
     }
 
@@ -72,7 +72,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     }
 
     @Override
-    public Observable<Boolean> delModeState() {
+    public Observable<Boolean> delModeData() {
         return delModeState;
     }
 
