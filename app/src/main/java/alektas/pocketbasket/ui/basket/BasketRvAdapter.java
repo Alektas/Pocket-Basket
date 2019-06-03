@@ -3,7 +3,6 @@ package alektas.pocketbasket.ui.basket;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,13 +27,21 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     private BasketViewModel mModel;
     private OnStartDragListener mDragListener;
     private ItemSizeProvider mSizeProvider;
+    private Animator mRemoveOnAnimator;
+    private Animator mRemoveOffAnimator;
+    private Animator mMoveOnAnimator;
+    private Animator mMoveOffAnimator;
 
     public BasketRvAdapter(Context context, @NonNull BasketViewModel model,
-                    OnStartDragListener dragListener) {
+                           OnStartDragListener dragListener) {
         super();
         mContext = context;
         mModel = model;
         mDragListener = dragListener;
+        mRemoveOnAnimator = AnimatorInflater.loadAnimator(mContext, R.animator.anim_item_remove_on);
+        mRemoveOffAnimator = AnimatorInflater.loadAnimator(mContext, R.animator.anim_item_remove_on);
+        mMoveOnAnimator = AnimatorInflater.loadAnimator(mContext, R.animator.anim_item_move_on);
+        mMoveOffAnimator = AnimatorInflater.loadAnimator(mContext, R.animator.anim_item_move_off);
     }
 
     public BasketRvAdapter(Context context, @NonNull BasketViewModel model,
@@ -47,6 +54,11 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
         // Fix item width
         // Width depends on configuration (landscape or portrait)
         mSizeProvider = itemSizeProvider;
+
+        mRemoveOnAnimator = AnimatorInflater.loadAnimator(mContext, R.animator.anim_item_remove_on);
+        mRemoveOffAnimator = AnimatorInflater.loadAnimator(mContext, R.animator.anim_item_remove_off);
+        mMoveOnAnimator = AnimatorInflater.loadAnimator(mContext, R.animator.anim_item_move_on);
+        mMoveOffAnimator = AnimatorInflater.loadAnimator(mContext, R.animator.anim_item_move_off);
     }
 
     @NonNull
@@ -69,20 +81,14 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
 
     @Override
     public void onSwipeStart(RecyclerView.ViewHolder viewHolder) {
-        try {
-            runColorAnim(viewHolder.itemView, true);
-        } catch (ClassCastException e) {
-            Log.e(TAG, "onSwipeStart: viewHolder must be from BaseRecyclerAdapter", e);
-        }
+        mRemoveOnAnimator.setTarget(viewHolder.itemView);
+        mRemoveOnAnimator.start();
     }
 
     @Override
     public void onSwipeEnd(RecyclerView.ViewHolder viewHolder) {
-        try {
-            runColorAnim(viewHolder.itemView, false);
-        } catch (ClassCastException e) {
-            Log.e(TAG, "onSwipeEnd: viewHolder must be from BaseRecyclerAdapter", e);
-        }
+        mRemoveOffAnimator.setTarget(viewHolder.itemView);
+        mRemoveOffAnimator.start();
     }
 
     @Override
@@ -102,16 +108,14 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     }
 
     @Override
-    public void onItemMoveEnd() {
-        mModel.updatePositions(getItems());
+    public void onItemMoveStart(RecyclerView.ViewHolder viewHolder) {
+        mMoveOnAnimator.setTarget(viewHolder.itemView);
+        mMoveOnAnimator.start();
     }
 
-    private void runColorAnim(View itemView, boolean colorful) {
-        int animId;
-        if (colorful) { animId = R.animator.anim_colorful; }
-        else { animId = R.animator.anim_colorless; }
-        Animator anim = AnimatorInflater.loadAnimator(mContext, animId);
-        anim.setTarget(itemView);
-        anim.start();
+    @Override
+    public void onItemMoveEnd(RecyclerView.ViewHolder viewHolder) {
+        mMoveOffAnimator.setTarget(viewHolder.itemView);
+        mMoveOffAnimator.start();
     }
 }

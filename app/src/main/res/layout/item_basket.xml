@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
         <import type="alektas.pocketbasket.utils.ResourcesUtils"/>
 
@@ -21,14 +21,14 @@
     </data>
 
     <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/basket_item_view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/height_item"
-        android:background="@color/bg_item_basket">
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/bg_basket_item_ripple">
 
         <androidx.cardview.widget.CardView
-            xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/item_icon_view"
             android:layout_gravity="center_vertical|start"

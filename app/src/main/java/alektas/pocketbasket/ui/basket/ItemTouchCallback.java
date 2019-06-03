@@ -45,7 +45,7 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
             mAdapter.onSwipeEnd(viewHolder);
             isSwipe = false;
         } else if (isMove) {
-            mAdapter.onItemMoveEnd();
+            mAdapter.onItemMoveEnd(viewHolder);
             isMove = false;
         }
     }
@@ -58,6 +58,7 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
             mAdapter.onSwipeStart(viewHolder);
             isSwipe = true;
         } else if (ItemTouchHelper.ACTION_STATE_DRAG == actionState) {
+            mAdapter.onItemMoveStart(viewHolder);
             isMove = true;
         }
     }
