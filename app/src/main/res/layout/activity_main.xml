@@ -151,11 +151,11 @@
         app:layout_constraintGuide_percent="0.25"/>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline_bottom_hor"
+        android:id="@+id/guideline_bottom_hor_85"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.75"/>
+        app:layout_constraintGuide_percent="0.85"/>
 
     <!-- Guide: skip button -->
 
@@ -189,178 +189,27 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <ImageView
-        android:id="@+id/guide_bg_right_large_img"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
-        app:srcCompat="@color/bg_guide"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/fragment_showcase"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <ImageView
-        android:id="@+id/guide_bg_right_small_img"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
-        app:srcCompat="@color/bg_guide"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/fragment_basket"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <ImageView
-        android:id="@+id/guide_bg_left_large_img"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
-        app:srcCompat="@color/bg_guide"
-        app:layout_constraintEnd_toEndOf="@id/fragment_showcase"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <ImageView
-        android:id="@+id/guide_bg_left_small_img"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
-        app:srcCompat="@color/bg_guide"
-        app:layout_constraintEnd_toEndOf="@id/fragment_categories"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <ImageView
-        android:id="@+id/guide_bg_bottom_img"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:visibility="invisible"
-        app:srcCompat="@drawable/bg_guide_bottom"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/guideline_top_hor"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <ImageView
-        android:id="@+id/guide_bg_top_img"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:visibility="invisible"
-        app:srcCompat="@drawable/bg_guide_top"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/guideline_bottom_hor"/>
-
-    <!-- Guide: categories help -->
-
-    <FrameLayout
-        android:id="@+id/guide_categories_help_clicker"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
-        android:onClick="onGuideViewClick"
-        android:clickable="true"
-        android:focusable="true" />
-
-    <TextView
-        android:id="@+id/guide_categories_help_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideMainText"
-        android:text="@string/guide_categ"
-        app:layout_constraintVertical_bias="0.75"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/guide_categories_help_sub_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideSubText"
-        android:text="@string/guide_categ_sub"
-        app:layout_constraintStart_toStartOf="@id/guide_categories_help_text"
-        app:layout_constraintEnd_toEndOf="@id/guide_categories_help_text"
-        app:layout_constraintTop_toBottomOf="@id/guide_categories_help_text"/>
-
-    <!-- Guide: showcase help -->
-
-    <FrameLayout
-        android:id="@+id/guide_showcase_help_clicker"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
-        android:onClick="onGuideViewClick"
-        android:clickable="true"
-        android:focusable="true" />
-
-
-    <TextView
-        android:id="@+id/guide_showcase_help_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideMainText"
-        android:text="@string/guide_showcase"
-        app:layout_constraintVertical_bias="0.75"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/guide_showcase_help_sub_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideSubText"
-        android:text="@string/guide_showcase_sub"
-        app:layout_constraintStart_toStartOf="@id/guide_showcase_help_text"
-        app:layout_constraintEnd_toEndOf="@id/guide_showcase_help_text"
-        app:layout_constraintTop_toBottomOf="@id/guide_showcase_help_text"/>
-
-    <!-- Guide: basket help -->
-
-    <FrameLayout
-        android:id="@+id/guide_basket_help_clicker"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
-        android:onClick="onGuideViewClick"
-        android:clickable="true"
-        android:focusable="true" />
-
-    <TextView
-        android:id="@+id/guide_basket_help_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideMainText"
-        android:text="@string/guide_basket"
-        app:layout_constraintVertical_bias="0.75"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/guide_basket_help_sub_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideSubText"
-        android:text="@string/guide_basket_sub"
-        app:layout_constraintStart_toStartOf="@id/guide_basket_help_text"
-        app:layout_constraintEnd_toEndOf="@id/guide_basket_help_text"
-        app:layout_constraintTop_toBottomOf="@id/guide_basket_help_text"/>
 
     <!-- Guide: change mode -->
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/guide_change_mode_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Hint"
+        app:cornerRadius="@dimen/corners_guide_hint"
+        app:rippleColor="@color/colorPrimaryDark"
+        app:icon="@drawable/ic_menu_info_outline_darkgreen_24dp"
+        app:iconTint="@color/colorPrimaryDark"
+        app:iconSize="@dimen/size_guide_hint_icon"
+        android:text="@string/guide_change_mode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+
     <ImageView
         android:id="@+id/guide_scroll_hor_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/size_guide_gesture_icon"
+        android:layout_height="@dimen/size_guide_gesture_icon"
         android:visibility="invisible"
         app:srcCompat="@drawable/ic_guide_scroll_horizontal"
         app:layout_constraintVertical_bias="0.25"
@@ -369,34 +218,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <TextView
-        android:id="@+id/guide_change_mode_text"
-        style="@style/GuideMainText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/guide_change_mode"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.75"/>
-
-    <TextView
-        android:id="@+id/guide_change_mode_sub_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideSubText"
-        android:text="@string/guide_change_mode_sub"
-        app:layout_constraintStart_toStartOf="@id/guide_change_mode_text"
-        app:layout_constraintEnd_toEndOf="@id/guide_change_mode_text"
-        app:layout_constraintTop_toBottomOf="@id/guide_change_mode_text"/>
 
     <!-- Guide: add item -->
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/guide_add_by_tap_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Hint"
+        app:cornerRadius="@dimen/corners_guide_hint"
+        app:rippleColor="@color/colorPrimaryDark"
+        app:icon="@drawable/ic_menu_info_outline_darkgreen_24dp"
+        app:iconTint="@color/colorPrimaryDark"
+        app:iconSize="@dimen/size_guide_hint_icon"
+        android:text="@string/guide_add_item"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+
     <ImageView
         android:id="@+id/guide_tap_add_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/size_guide_gesture_icon"
+        android:layout_height="@dimen/size_guide_gesture_icon"
         android:visibility="invisible"
         app:srcCompat="@drawable/ic_guide_tap"
         app:layout_constraintVertical_bias="0.25"
@@ -405,61 +247,57 @@
         app:layout_constraintStart_toStartOf="@id/fragment_showcase"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <TextView
-        android:id="@+id/guide_add_item_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideMainText"
-        android:text="@string/guide_add_item"
-        app:layout_constraintVertical_bias="0.75"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/guide_add_item_sub_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideSubText"
-        android:text="@string/guide_add_item_sub"
-        app:layout_constraintStart_toStartOf="@id/guide_add_item_text"
-        app:layout_constraintEnd_toEndOf="@id/guide_add_item_text"
-        app:layout_constraintTop_toBottomOf="@id/guide_add_item_text"/>
 
     <!-- Guide: mark item in Basket -->
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/guide_check_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Hint"
+        app:cornerRadius="@dimen/corners_guide_hint"
+        app:rippleColor="@color/colorPrimaryDark"
+        app:icon="@drawable/ic_menu_info_outline_darkgreen_24dp"
+        app:iconTint="@color/colorPrimaryDark"
+        app:iconSize="@dimen/size_guide_hint_icon"
+        android:text="@string/guide_check_item"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+
     <ImageView
         android:id="@+id/guide_tap_check_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/size_guide_gesture_icon"
+        android:layout_height="@dimen/size_guide_gesture_icon"
         android:visibility="invisible"
-        app:srcCompat="@drawable/ic_guide_tap"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintVertical_bias="0.05"
+        app:layout_constraintBottom_toBottomOf="@id/fragment_basket"
         app:layout_constraintEnd_toEndOf="@id/fragment_basket"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@id/fragment_basket"
         app:layout_constraintTop_toTopOf="@id/fragment_basket"
-        app:layout_constraintBottom_toBottomOf="@id/fragment_basket"/>
+        app:layout_constraintVertical_bias="0.05"
+        app:srcCompat="@drawable/ic_guide_tap" />
 
-    <TextView
-        android:id="@+id/guide_check_item_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideMainText"
-        android:text="@string/guide_check_item"
-        app:layout_constraintVertical_bias="0.75"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
 
     <!-- Guide: move item in Basket -->
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/guide_move_item_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Hint"
+        app:cornerRadius="@dimen/corners_guide_hint"
+        app:rippleColor="@color/colorPrimaryDark"
+        app:icon="@drawable/ic_menu_info_outline_darkgreen_24dp"
+        app:iconTint="@color/colorPrimaryDark"
+        app:iconSize="@dimen/size_guide_hint_icon"
+        android:text="@string/guide_move_item"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+
     <ImageView
         android:id="@+id/guide_scroll_vert_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/size_guide_gesture_icon"
+        android:layout_height="@dimen/size_guide_gesture_icon"
         android:visibility="invisible"
         app:srcCompat="@drawable/ic_guide_scroll_vertical_mir_cut"
         app:layout_constraintHorizontal_bias="1"
@@ -469,34 +307,27 @@
         app:layout_constraintTop_toTopOf="@id/fragment_basket"
         app:layout_constraintBottom_toBottomOf="@id/fragment_basket"/>
 
-    <TextView
-        android:id="@+id/guide_move_item_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideMainText"
-        android:text="@string/guide_move_item"
-        app:layout_constraintVertical_bias="0.75"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/guide_move_item_sub_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideSubText"
-        android:text="@string/guide_move_item_sub"
-        app:layout_constraintStart_toStartOf="@id/guide_move_item_text"
-        app:layout_constraintEnd_toEndOf="@id/guide_move_item_text"
-        app:layout_constraintTop_toBottomOf="@id/guide_move_item_text"/>
 
     <!-- Guide: remove item from Basket -->
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/guide_swipe_remove_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Hint"
+        app:cornerRadius="@dimen/corners_guide_hint"
+        app:rippleColor="@color/colorPrimaryDark"
+        app:icon="@drawable/ic_menu_info_outline_darkgreen_24dp"
+        app:iconTint="@color/colorPrimaryDark"
+        app:iconSize="@dimen/size_guide_hint_icon"
+        android:text="@string/guide_remove_item"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+
     <ImageView
         android:id="@+id/guide_swipe_right_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/size_guide_gesture_icon"
+        android:layout_height="@dimen/size_guide_gesture_icon"
         android:visibility="invisible"
         app:srcCompat="@drawable/ic_guide_swipe_right"
         app:layout_constraintHorizontal_bias="0"
@@ -505,60 +336,56 @@
         app:layout_constraintStart_toStartOf="@id/fragment_basket"
         app:layout_constraintTop_toTopOf="@id/fragment_basket"/>
 
-    <TextView
-        android:id="@+id/guide_remove_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideMainText"
-        android:text="@string/guide_remove_item"
-        app:layout_constraintVertical_bias="0.75"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/guide_remove_sub_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideSubText"
-        android:text="@string/guide_remove_item_sub"
-        app:layout_constraintStart_toStartOf="@id/guide_remove_text"
-        app:layout_constraintEnd_toEndOf="@id/guide_remove_text"
-        app:layout_constraintTop_toBottomOf="@id/guide_remove_text"/>
 
     <!-- Guide: turn on delete mode -->
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/guide_del_mode_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Hint"
+        app:cornerRadius="@dimen/corners_guide_hint"
+        app:rippleColor="@color/colorPrimaryDark"
+        app:icon="@drawable/ic_menu_info_outline_darkgreen_24dp"
+        app:iconTint="@color/colorPrimaryDark"
+        app:iconSize="@dimen/size_guide_hint_icon"
+        android:text="@string/guide_del_mode"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+
     <ImageView
         android:id="@+id/guide_del_mode_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/size_guide_gesture_icon"
+        android:layout_height="@dimen/size_guide_gesture_icon"
         android:visibility="invisible"
         app:srcCompat="@drawable/ic_guide_press_and_hold"
         app:layout_constraintVertical_bias="0.25"
         app:layout_constraintEnd_toEndOf="@id/fragment_showcase"
         app:layout_constraintStart_toStartOf="@id/fragment_showcase"
         app:layout_constraintTop_toTopOf="@id/fragment_showcase"
-        app:layout_constraintBottom_toTopOf="@id/guide_del_mode_text"/>
+        app:layout_constraintBottom_toBottomOf="@id/fragment_showcase"/>
 
-    <TextView
-        android:id="@+id/guide_del_mode_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideMainText"
-        android:text="@string/guide_del_mode"
-        app:layout_constraintVertical_bias="0.75"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
 
     <!-- Guide: delete items from Showcase -->
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/guide_delete_items_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Hint"
+        app:cornerRadius="@dimen/corners_guide_hint"
+        app:rippleColor="@color/colorPrimaryDark"
+        app:icon="@drawable/ic_menu_info_outline_darkgreen_24dp"
+        app:iconTint="@color/colorPrimaryDark"
+        app:iconSize="@dimen/size_guide_hint_icon"
+        android:text="@string/guide_delete_items"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+
     <ImageView
         android:id="@+id/guide_tap_delete_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/size_guide_gesture_icon"
+        android:layout_height="@dimen/size_guide_gesture_icon"
         android:layout_marginStart="48dp"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@id/fragment_showcase"
@@ -569,51 +396,33 @@
         app:layout_constraintVertical_bias="0.98"
         app:srcCompat="@drawable/ic_guide_tap_rot90_cut"/>
 
-    <TextView
-        android:id="@+id/guide_delete_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideMainText"
-        android:text="@string/guide_delete_items"
-        app:layout_constraintVertical_bias="0.25"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <TextView
-        android:id="@+id/guide_delete_sub_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideSubText"
-        android:text="@string/guide_delete_items_sub"
-        app:layout_constraintStart_toStartOf="@id/guide_delete_text"
-        app:layout_constraintEnd_toEndOf="@id/guide_delete_text"
-        app:layout_constraintTop_toBottomOf="@id/guide_delete_text"/>
 
     <!-- Guide: floating menu invoke -->
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/guide_show_floating_menu_body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Hint"
+        app:cornerRadius="@dimen/corners_guide_hint"
+        app:rippleColor="@color/colorPrimaryDark"
+        app:icon="@drawable/ic_menu_info_outline_darkgreen_24dp"
+        app:iconTint="@color/colorPrimaryDark"
+        app:iconSize="@dimen/size_guide_hint_icon"
+        android:text="@string/guide_floating_menu"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/guideline_bottom_hor_85"/>
+
     <ImageView
         android:id="@+id/guide_show_floating_menu_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/size_guide_gesture_icon"
+        android:layout_height="@dimen/size_guide_gesture_icon"
         android:visibility="invisible"
         app:srcCompat="@drawable/ic_guide_press_and_hold_rot90_cut"
         app:layout_constraintEnd_toStartOf="@id/fab"
         app:layout_constraintTop_toTopOf="@id/fab"
         app:layout_constraintBottom_toBottomOf="@id/fab"/>
 
-    <TextView
-        android:id="@+id/guide_show_floating_menu_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@style/GuideMainText"
-        android:text="@string/guide_floating_menu"
-        app:layout_constraintVertical_bias="0.25"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
 
     <!-- Guide: floating menu help -->
 
@@ -661,18 +470,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/fab"
         app:layout_constraintTop_toTopOf="@id/fab"/>
-
-    <!-- Guide: finish case -->
-
-    <ImageView
-        android:id="@+id/guide_finish_img"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        app:srcCompat="@drawable/ic_guide_check"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -40,25 +40,21 @@
             android:gravity="center"
             style="?android:attr/buttonBarStyle">
 
-            <Button
+            <ImageButton
                 android:id="@+id/btn_del"
-                android:layout_width="@dimen/size_categ_icon"
-                android:layout_height="@dimen/size_categ_icon"
-                android:layout_margin="@dimen/padding_8"
-                android:background="@drawable/ic_delete_forever_white_24dp"
-                style="?android:attr/buttonBarButtonStyle"
-                android:onClick="onDelDmBtnClick"
-                tools:ignore="OnClick" />
+                android:layout_width="@dimen/size_del_panel_btn"
+                android:layout_height="@dimen/size_del_panel_btn"
+                android:src="@drawable/ic_delete_forever_white_24dp"
+                android:scaleType="centerCrop"
+                style="?android:attr/buttonBarButtonStyle"/>
 
-            <Button
+            <ImageButton
                 android:id="@+id/btn_close_panel"
-                android:layout_width="@dimen/size_categ_icon"
-                android:layout_height="@dimen/size_categ_icon"
-                android:layout_margin="@dimen/padding_8"
-                android:background="@drawable/ic_close_white_24dp"
-                style="?android:attr/buttonBarButtonStyle"
-                android:onClick="onCancelDmBtnClick"
-                tools:ignore="OnClick" />
+                android:layout_width="@dimen/size_del_panel_btn"
+                android:layout_height="@dimen/size_del_panel_btn"
+                android:src="@drawable/ic_close_white_24dp"
+                android:scaleType="centerCrop"
+                style="?android:attr/buttonBarButtonStyle"/>
 
         </LinearLayout>
     </LinearLayout>

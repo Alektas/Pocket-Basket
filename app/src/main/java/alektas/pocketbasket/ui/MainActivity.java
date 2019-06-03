@@ -449,14 +449,12 @@ public class MainActivity extends AppCompatActivity implements
         mViewModel.curGuideCaseData().observe(this, caseKey -> {
             mGuidePresenter.hideCurrentCase();
             if (caseKey == null) {
-                mSkipGuideBtn.setVisibility(View.GONE);
                 return;
             }
             if (mGuidePrefs.getBoolean(caseKey, false)) {
                 mViewModel.onEventHappened(caseKey);
             }
             mGuidePresenter.showCase(caseKey);
-            mSkipGuideBtn.setVisibility(View.VISIBLE);
         });
 
         mViewModel.completedGuideCaseData().observe(this, finishedCase -> {
@@ -498,19 +496,14 @@ public class MainActivity extends AppCompatActivity implements
      * @return guide presenter instance
      */
     private GuidePresenter buildGuide() {
-        View bgTop = findViewById(R.id.guide_bg_top_img);
-        View bgBottom = findViewById(R.id.guide_bg_bottom_img);
-
         //  Guide: change mode
         View changeModeImg = findViewById(R.id.guide_scroll_hor_img);
         Animator scrollHorizAnim = AnimatorInflater
                 .loadAnimator(this, R.animator.anim_guide_scroll_horiz);
         GuideCaseView changeModeCase = new GuideCaseView
                 .Builder(GuideContract.GUIDE_CHANGE_MODE)
-                .addViews(bgBottom,
-                        changeModeImg,
-                        findViewById(R.id.guide_change_mode_text),
-                        findViewById(R.id.guide_change_mode_sub_text))
+                .addViews(changeModeImg,
+                        findViewById(R.id.guide_change_mode_body))
                 .setAnimation(scrollHorizAnim, changeModeImg)
                 .build();
 
@@ -520,10 +513,8 @@ public class MainActivity extends AppCompatActivity implements
                 .loadAnimator(this, R.animator.anim_guide_tap);
         GuideCaseView addItemCase = new GuideCaseView
                 .Builder(GuideContract.GUIDE_ADD_ITEM_BY_TAP)
-                .addViews(bgBottom,
-                        addItemImg,
-                        findViewById(R.id.guide_add_item_text),
-                        findViewById(R.id.guide_add_item_sub_text))
+                .addViews(addItemImg,
+                        findViewById(R.id.guide_add_by_tap_body))
                 .setAnimation(tapAnim, addItemImg)
                 .build();
 
@@ -533,9 +524,8 @@ public class MainActivity extends AppCompatActivity implements
         View checkItemImg = findViewById(R.id.guide_tap_check_img);
         GuideCaseView checkItemCase = new GuideCaseView
                 .Builder(GuideContract.GUIDE_CHECK_ITEM)
-                .addViews(bgBottom,
-                        checkItemImg,
-                        findViewById(R.id.guide_check_item_text))
+                .addViews(checkItemImg,
+                        findViewById(R.id.guide_check_body))
                 .setAnimation(tapAnim2, checkItemImg)
                 .build();
 
@@ -545,10 +535,8 @@ public class MainActivity extends AppCompatActivity implements
         View moveItemImg = findViewById(R.id.guide_scroll_vert_img);
         GuideCaseView moveItemCase = new GuideCaseView
                 .Builder(GuideContract.GUIDE_MOVE_ITEM)
-                .addViews(bgBottom,
-                        moveItemImg,
-                        findViewById(R.id.guide_move_item_text),
-                        findViewById(R.id.guide_move_item_sub_text))
+                .addViews(moveItemImg,
+                        findViewById(R.id.guide_move_item_body))
                 .setAnimation(scrollVertAnim, moveItemImg)
                 .build();
 
@@ -558,10 +546,8 @@ public class MainActivity extends AppCompatActivity implements
                 .loadAnimator(this, R.animator.anim_guide_swipe_right);
         GuideCaseView removeItemCase = new GuideCaseView
                 .Builder(GuideContract.GUIDE_SWIPE_REMOVE_ITEM)
-                .addViews(bgBottom,
-                        removeItemImg,
-                        findViewById(R.id.guide_remove_text),
-                        findViewById(R.id.guide_remove_sub_text))
+                .addViews(removeItemImg,
+                        findViewById(R.id.guide_swipe_remove_body))
                 .setAnimation(swipeRightAnim, removeItemImg)
                 .build();
 
@@ -571,9 +557,8 @@ public class MainActivity extends AppCompatActivity implements
                 .loadAnimator(this, R.animator.anim_guide_long_press);
         GuideCaseView delModeCase = new GuideCaseView
                 .Builder(GuideContract.GUIDE_DEL_MODE)
-                .addViews(bgBottom,
-                        longPressImg,
-                        findViewById(R.id.guide_del_mode_text))
+                .addViews(longPressImg,
+                        findViewById(R.id.guide_del_mode_body))
                 .setAnimation(longPressAnim, longPressImg)
                 .build();
 
@@ -583,10 +568,8 @@ public class MainActivity extends AppCompatActivity implements
         View tapToDelImg = findViewById(R.id.guide_tap_delete_img);
         GuideCaseView deleteItemsCase = new GuideCaseView
                 .Builder(GuideContract.GUIDE_DEL_SELECTED_ITEMS)
-                .addViews(bgTop,
-                        tapToDelImg,
-                        findViewById(R.id.guide_delete_text),
-                        findViewById(R.id.guide_delete_sub_text))
+                .addViews(tapToDelImg,
+                        findViewById(R.id.guide_delete_items_body))
                 .setAnimation(tapAnim3, tapToDelImg)
                 .build();
 
@@ -595,10 +578,9 @@ public class MainActivity extends AppCompatActivity implements
                 .loadAnimator(this, R.animator.anim_guide_long_press);
         View pressFabImg = findViewById(R.id.guide_show_floating_menu_img);
         GuideCaseView floatingMenuCase = new GuideCaseView
-                .Builder(GuideContract.GUIDE_FLOATING_MENU)
-                .addViews(bgTop,
-                        pressFabImg,
-                        findViewById(R.id.guide_show_floating_menu_text))
+                .Builder(GuideContract.GUIDE_SHOW_FLOATING_MENU)
+                .addViews(pressFabImg,
+                        findViewById(R.id.guide_show_floating_menu_body))
                 .setAnimation(longPressAnim2, pressFabImg)
                 .build();
 
@@ -1048,6 +1030,30 @@ public class MainActivity extends AppCompatActivity implements
 
     public void onGuideViewClick(View view) {
         switch (view.getId()) {
+            case R.id.guide_add_by_tap_body:
+                mViewModel.onEventHappened(GuideContract.GUIDE_ADD_ITEM_BY_TAP);
+                break;
+            case R.id.guide_change_mode_body:
+                mViewModel.onEventHappened(GuideContract.GUIDE_CHANGE_MODE);
+                break;
+            case R.id.guide_move_item_body:
+                mViewModel.onEventHappened(GuideContract.GUIDE_MOVE_ITEM);
+                break;
+            case R.id.guide_swipe_remove_body:
+                mViewModel.onEventHappened(GuideContract.GUIDE_SWIPE_REMOVE_ITEM);
+                break;
+            case R.id.guide_check_body:
+                mViewModel.onEventHappened(GuideContract.GUIDE_CHECK_ITEM);
+                break;
+            case R.id.guide_del_mode_body:
+                mViewModel.onEventHappened(GuideContract.GUIDE_DEL_MODE);
+                break;
+            case R.id.guide_delete_items_body:
+                mViewModel.onEventHappened(GuideContract.GUIDE_DEL_SELECTED_ITEMS);
+                break;
+            case R.id.guide_show_floating_menu_body:
+                mViewModel.onEventHappened(GuideContract.GUIDE_SHOW_FLOATING_MENU);
+                break;
             case R.id.guide_floating_menu_help_clicker:
                 mViewModel.onEventHappened(GuideContract.GUIDE_FLOATING_MENU_HELP);
                 break;

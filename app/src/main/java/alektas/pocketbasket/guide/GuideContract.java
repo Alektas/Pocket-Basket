@@ -9,7 +9,7 @@ public class GuideContract {
     public static final String GUIDE_SWIPE_REMOVE_ITEM = "swipe_remove_item_case";
     public static final String GUIDE_DEL_SELECTED_ITEMS = "delete_selected_items_case";
     public static final String GUIDE_DEL_MODE = "delete_mode_case";
-    public static final String GUIDE_FLOATING_MENU = "floating_menu_case";
+    public static final String GUIDE_SHOW_FLOATING_MENU = "floating_menu_case";
     public static final String GUIDE_FLOATING_MENU_HELP = "floating_menu_help_case";
 
     public static final String STATE_MODE = "mode_state";

@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -32,12 +32,22 @@
         <item name="android:onClick">onFilterClick</item>
     </style>
 
+    <style name="Hint" parent="Widget.MaterialComponents.Button.Icon">
+        <item name="android:visibility">invisible</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:layout_margin">32dp</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:backgroundTint">@color/bg_main</item>
+        <item name="android:onClick">onGuideViewClick</item>
+    </style>
+
     <style name="GuideMainText">
         <item name="android:paddingStart">@dimen/padding_16</item>
         <item name="android:paddingEnd">@dimen/padding_16</item>
         <item name="android:visibility">invisible</item>
         <item name="android:textAlignment">center</item>
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
@@ -48,9 +58,9 @@
         <item name="android:paddingTop">@dimen/padding_16</item>
         <item name="android:visibility">invisible</item>
         <item name="android:textAlignment">center</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/text_guide_sub</item>
+        <item name="android:textColor">@android:color/darker_gray</item>
     </style>
 
 </resources>

@@ -153,7 +153,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         useCase.execute(name, isNewItemAdded -> {
             if (isNewItemAdded) {
                 newItemAddedState.setState(true);
-                mGuide.onUserEvent(GuideContract.GUIDE_ADD_ITEM_BY_TAP);
             }
         });
     }
@@ -204,8 +203,8 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
                 prefs.getBoolean(GuideContract.GUIDE_DEL_MODE, false));
         GuideCase delSelectedCase = new GuideCaseImpl(GuideContract.GUIDE_DEL_SELECTED_ITEMS,
                 prefs.getBoolean(GuideContract.GUIDE_DEL_SELECTED_ITEMS, false));
-        GuideCase famCase = new GuideCaseImpl(GuideContract.GUIDE_FLOATING_MENU,
-                prefs.getBoolean(GuideContract.GUIDE_FLOATING_MENU, false));
+        GuideCase famCase = new GuideCaseImpl(GuideContract.GUIDE_SHOW_FLOATING_MENU,
+                prefs.getBoolean(GuideContract.GUIDE_SHOW_FLOATING_MENU, false));
         GuideCase famHelpCase = new GuideCaseImpl(GuideContract.GUIDE_FLOATING_MENU_HELP,
                 prefs.getBoolean(GuideContract.GUIDE_FLOATING_MENU_HELP, false));
 
@@ -330,7 +329,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
             guide.completeCase(GuideContract.GUIDE_CHECK_ITEM);
         }
         if (famShowingState.getState()) {
-            guide.completeCase(GuideContract.GUIDE_FLOATING_MENU);
+            guide.completeCase(GuideContract.GUIDE_SHOW_FLOATING_MENU);
             guide.completeCase(GuideContract.GUIDE_FLOATING_MENU_HELP);
         }
         if (delModeState.getState()) {
@@ -376,7 +375,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
 
     public void onFloatingMenuCalled() {
         famShowingState.setState(true);
-        mGuide.onUserEvent(GuideContract.GUIDE_FLOATING_MENU);
+        mGuide.onUserEvent(GuideContract.GUIDE_SHOW_FLOATING_MENU);
     }
 
     public void onFloatingMenuHide() {
