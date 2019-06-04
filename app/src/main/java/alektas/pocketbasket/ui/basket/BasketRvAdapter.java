@@ -117,5 +117,6 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
     public void onItemMoveEnd(RecyclerView.ViewHolder viewHolder) {
         mMoveOffAnimator.setTarget(viewHolder.itemView);
         mMoveOffAnimator.start();
+        mModel.updatePositions(getItems());
     }
 }
