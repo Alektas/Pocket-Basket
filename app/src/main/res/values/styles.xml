@@ -39,7 +39,7 @@
         <item name="android:layout_margin">32dp</item>
         <item name="android:textColor">@color/colorPrimaryDark</item>
         <item name="android:backgroundTint">@color/bg_guide_hint</item>
-        <item name="android:onClick">onGuideViewClick</item>
+        <item name="android:onClick">onHintClick</item>
     </style>
 
     <style name="GuideMainText">

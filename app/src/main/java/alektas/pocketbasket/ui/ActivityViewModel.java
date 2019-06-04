@@ -300,7 +300,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     /**
      * Complete current guide case.
      */
-    public void onSkipGuideBtnClick() {
+    public void onHintClick() {
         mGuide.onUserEvent(mGuide.currentCase());
     }
 

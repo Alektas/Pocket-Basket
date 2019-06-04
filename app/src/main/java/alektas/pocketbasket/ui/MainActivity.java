@@ -928,8 +928,8 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    public void onSkipGuideBtnClick(View view) {
-        mViewModel.onSkipGuideBtnClick();
+    public void onHintClick(View view) {
+        mViewModel.onHintClick();
     }
 
     public void onCloseDelModeClick(View view) {
@@ -1039,38 +1039,6 @@ public class MainActivity extends AppCompatActivity implements
         if (link == null) return;
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
         startActivity(browserIntent);
-    }
-
-    public void onGuideViewClick(View view) {
-        switch (view.getId()) {
-            case R.id.guide_add_by_tap_body:
-                mViewModel.onEventHappened(GuideContract.GUIDE_ADD_ITEM_BY_TAP);
-                break;
-            case R.id.guide_change_mode_body:
-                mViewModel.onEventHappened(GuideContract.GUIDE_CHANGE_MODE);
-                break;
-            case R.id.guide_move_item_body:
-                mViewModel.onEventHappened(GuideContract.GUIDE_MOVE_ITEM);
-                break;
-            case R.id.guide_swipe_remove_body:
-                mViewModel.onEventHappened(GuideContract.GUIDE_SWIPE_REMOVE_ITEM);
-                break;
-            case R.id.guide_check_body:
-                mViewModel.onEventHappened(GuideContract.GUIDE_CHECK_ITEM);
-                break;
-            case R.id.guide_del_mode_body:
-                mViewModel.onEventHappened(GuideContract.GUIDE_DEL_MODE);
-                break;
-            case R.id.guide_delete_items_body:
-                mViewModel.onEventHappened(GuideContract.GUIDE_DEL_SELECTED_ITEMS);
-                break;
-            case R.id.guide_show_floating_menu_body:
-                mViewModel.onEventHappened(GuideContract.GUIDE_SHOW_FLOATING_MENU);
-                break;
-            case R.id.guide_floating_menu_help_clicker:
-                mViewModel.onEventHappened(GuideContract.GUIDE_FLOATING_MENU_HELP);
-                break;
-        }
     }
 
 
