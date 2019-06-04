@@ -26,7 +26,7 @@
         android:layout_height="@dimen/height_item"
         android:clickable="true"
         android:focusable="true"
-        android:background="@drawable/bg_basket_item_ripple">
+        android:background="@drawable/bg_item_ripple">
 
         <androidx.cardview.widget.CardView
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
