@@ -16,6 +16,7 @@ import alektas.pocketbasket.App;
 import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
+import alektas.pocketbasket.domain.usecases.DelModeUseCase;
 import alektas.pocketbasket.domain.usecases.SelectShowcaseItem;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.domain.ContextualGuide;
@@ -137,7 +138,7 @@ public class ShowcaseViewModel extends AndroidViewModel {
             mGuide.onUserEvent(GuideContract.GUIDE_DEL_SELECTED_ITEMS);
         }
 
-        mRepository.setDelMode(delMode);
+        new DelModeUseCase(mRepository).execute(delMode, null);
     }
 
 }

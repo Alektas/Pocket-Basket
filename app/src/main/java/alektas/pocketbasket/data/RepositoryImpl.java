@@ -40,13 +40,15 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
      * Items selected by the user for removal from the Showcase
      */
     private List<ShowcaseItemModel> mDelItems;
+    private Observable<Integer> mDelItemsCountData;
 
     private RepositoryImpl(Context context) {
         mItemsDao = AppDatabase.getInstance(context, this).getDao();
         mShowcaseData = new SingleObservableValue<>(getItems(mTag));
         mBasketData = new SingleObservableValue<>(getBasketItems());
+        mDelItemsCountData = new SingleObservableValue<>(0);
         showcaseModeState = new MultiObservableValue<>(true);
-        delModeState = new SingleObservableValue<>(false);
+        delModeState = new MultiObservableValue<>(false);
         mDelItems = new ArrayList<>();
     }
 
@@ -77,6 +79,11 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     }
 
     @Override
+    public Observable<Integer> getDelItemsCountData() {
+        return mDelItemsCountData;
+    }
+
+    @Override
     public void setDelMode(boolean delMode) {
         delModeState.setValue(delMode);
         if (!delMode) {
@@ -92,6 +99,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         } else {
             mDelItems.add(item);
         }
+        mDelItemsCountData.setValue(mDelItems.size());
 
         updateShowcase();
     }

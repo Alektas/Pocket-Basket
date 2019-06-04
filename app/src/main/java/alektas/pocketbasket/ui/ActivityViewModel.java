@@ -20,20 +20,21 @@ import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.usecases.AddItemUseCase;
+import alektas.pocketbasket.domain.usecases.DelModeUseCase;
 import alektas.pocketbasket.domain.usecases.MarkAllBasketItems;
 import alektas.pocketbasket.domain.usecases.RemoveMarkedItems;
 import alektas.pocketbasket.domain.usecases.ResetItemsUseCase;
 import alektas.pocketbasket.domain.usecases.SelectCategoryUseCase;
 import alektas.pocketbasket.domain.usecases.UpdateItemsUseCase;
 import alektas.pocketbasket.domain.usecases.UseCase;
-import alektas.pocketbasket.guide.domain.AppState;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.GuideObserver;
-import alektas.pocketbasket.guide.domain.Requirement;
+import alektas.pocketbasket.guide.domain.AppState;
 import alektas.pocketbasket.guide.domain.ContextualGuide;
 import alektas.pocketbasket.guide.domain.Guide;
 import alektas.pocketbasket.guide.domain.GuideCase;
 import alektas.pocketbasket.guide.domain.GuideCaseImpl;
+import alektas.pocketbasket.guide.domain.Requirement;
 import alektas.pocketbasket.utils.ResourcesUtils;
 
 public class ActivityViewModel extends AndroidViewModel implements GuideObserver {
@@ -43,6 +44,8 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
 
     private MutableLiveData<Boolean> showcaseModeData = new MutableLiveData<>();
     private MutableLiveData<Boolean> guideModeData = new MutableLiveData<>();
+    private MutableLiveData<Boolean> deleteModeData = new MutableLiveData<>();
+    private MutableLiveData<Integer> deleteItemsCountData = new MutableLiveData<>();
     private MutableLiveData<String> mCurGuideCaseData = new MutableLiveData<>();
     private MutableLiveData<String> mCompletedGuideCase = new MutableLiveData<>();
 
@@ -68,7 +71,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     public ActivityViewModel(@NonNull Application application) {
         super(application);
         mRepository = RepositoryImpl.getInstance(application);
-        mRepository.showcaseModeData().observe((showcaseMode) -> {
+        mRepository.showcaseModeData().observe(showcaseMode -> {
             showcaseModeData.setValue(showcaseMode);
             showcaseModeState.setState(showcaseMode);
             if (showcaseMode) {
@@ -76,6 +79,12 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
                 removeCountState.setState(0);
                 markCountState.setState(0);
             }
+        });
+        mRepository.delModeData().observe(delMode -> {
+            deleteModeData.setValue(delMode);
+        });
+        mRepository.getDelItemsCountData().observe(delCount -> {
+            deleteItemsCountData.setValue(delCount);
         });
 
         SharedPreferences guidePrefs = application.getSharedPreferences(
@@ -96,6 +105,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     protected void onCleared() {
         super.onCleared();
         mRepository.showcaseModeData().clearObservers();
+        mRepository.delModeData().clearObservers();
         mRepository = null;
         mGuide.removeObserver(this);
     }
@@ -262,7 +272,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
                         return delModeState.getState();
                     }
                 })
-                .showAfter(delModeCase)
                 .addCase(famCase)
                 .require(new Requirement(showcaseModeState, basketSizeState, markCountState) {
                     @Override
@@ -280,7 +289,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
                         return !showcaseModeState.getState() && famShowingState.getState();
                     }
                 })
-                .showAfter(famCase)
                 .build();
 
     }
@@ -290,9 +298,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     }
 
     /**
-     * Finish guide during any case.
-     * Warning! Do not invoke it in the {@link GuideObserver#onGuideFinish()}
-     * to avoid the infinity loop.
+     * Complete current guide case.
      */
     public void onSkipGuideBtnClick() {
         mGuide.onUserEvent(mGuide.currentCase());
@@ -303,8 +309,16 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         return guideModeData.getValue();
     }
 
-    public LiveData<Boolean> guideModeState() {
+    public LiveData<Boolean> guideModeData() {
         return guideModeData;
+    }
+
+    public LiveData<Boolean> deleteModeData() {
+        return deleteModeData;
+    }
+
+    public LiveData<Integer> deleteItemsCountData() {
+        return deleteItemsCountData;
     }
 
     public LiveData<String> curGuideCaseData() {
@@ -380,6 +394,11 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
 
     public void onFloatingMenuHide() {
         famShowingState.setState(false);
+    }
+
+    public void onCloseDelMode() {
+        mGuide.onUserEvent(GuideContract.GUIDE_DEL_SELECTED_ITEMS);
+        new DelModeUseCase(mRepository).execute(false, null);
     }
 
     public void onFabClick() {

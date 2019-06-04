@@ -32,6 +32,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.RadioButton;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
@@ -106,7 +107,6 @@ public class MainActivity extends AppCompatActivity implements
     private AdView mAdView;
     private View mDelAllBtn;
     private View mCheckAllBtn;
-    private View mSkipGuideBtn;
     private TransitionSet mChangeModeTransition;
     private Transition mFamTransition;
     private ConstraintLayout mConstraintLayout;
@@ -442,8 +442,18 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void subscribeOnModel() {
-        mViewModel.guideModeState().observe(this, isGuideMode -> {
+        mViewModel.guideModeData().observe(this, isGuideMode -> {
 
+        });
+
+        View delModeToolbar = findViewById(R.id.toolbar_del_mode);
+        mViewModel.deleteModeData().observe(this, delMode -> {
+            delModeToolbar.setVisibility(delMode ? View.VISIBLE : View.GONE);
+        });
+
+        TextView counter = findViewById(R.id.toolbar_del_mode_counter);
+        mViewModel.deleteItemsCountData().observe(this, delCount -> {
+            counter.setText(delCount.toString());
         });
 
         mViewModel.curGuideCaseData().observe(this, caseKey -> {
@@ -486,7 +496,6 @@ public class MainActivity extends AppCompatActivity implements
      * Initialize help guide
      */
     private void initGuide() {
-        mSkipGuideBtn = findViewById(R.id.skip_guide_btn);
         mGuidePresenter = buildGuide();
     }
 
@@ -921,6 +930,10 @@ public class MainActivity extends AppCompatActivity implements
 
     public void onSkipGuideBtnClick(View view) {
         mViewModel.onSkipGuideBtnClick();
+    }
+
+    public void onCloseDelModeClick(View view) {
+        mViewModel.onCloseDelMode();
     }
 
     public void onFilterClick(View view) {

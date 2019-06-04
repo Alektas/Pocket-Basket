@@ -45,5 +45,6 @@
     <string name="jeff_link" translatable="false">https://pixelbuddha.net/freebie/touch-gestures-icons</string>
     <string name="bom_link" translatable="false">https://www.iconfinder.com/korawan_m</string>
     <string name="google_material_link" translatable="false">https://material.io/tools/icons/</string>
+    <string name="del_toolbar_text">Selected for deletion: </string>
 
 </resources>

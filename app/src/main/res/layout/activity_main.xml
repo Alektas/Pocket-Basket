@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:elevation="4dp"
+        android:elevation="6dp"
         android:gravity="center"
         android:theme="@style/AppBar"
         app:layout_constraintTop_toTopOf="parent"
@@ -29,6 +29,56 @@
             android:layout_height="wrap_content"
             android:iconifiedByDefault="false"
             android:imeOptions="actionDone"/>
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_del_mode"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="6dp"
+        android:theme="@style/AppBar"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:popupTheme="@style/AppBar">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/toolbar_del_mode_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_centerVertical="true"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/textsize_del_toolbar"
+                android:text="@string/del_toolbar_text"/>
+
+            <TextView
+                android:id="@+id/toolbar_del_mode_counter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/toolbar_del_mode_text"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/textsize_del_toolbar"/>
+
+            <ImageButton
+                android:id="@+id/toolbar_del_mode_btn_close"
+                android:layout_width="@dimen/size_categ_icon"
+                android:layout_height="@dimen/size_categ_icon"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="@dimen/padding_8"
+                android:layout_marginEnd="@dimen/padding_16"
+                android:src="@drawable/ic_close_white_24dp"
+                android:background="@drawable/lb_selectable_item_rounded_rect"
+                android:onClick="onCloseDelModeClick"/>
+        </RelativeLayout>
+
+
     </androidx.appcompat.widget.Toolbar>
 
     <fragment
@@ -140,7 +190,6 @@
         app:layout_constraintStart_toStartOf="parent">
     </com.google.android.gms.ads.AdView>
 
-
     <!-- Guidelines -->
 
     <androidx.constraintlayout.widget.Guideline
@@ -157,25 +206,6 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.80"/>
 
-    <!-- Guide: skip button -->
-
-    <ImageButton
-        android:id="@+id/skip_guide_btn"
-        android:layout_width="@dimen/width_categ_narrow"
-        android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_close_white_24dp"
-        android:background="@drawable/shape_skip_btn"
-        android:backgroundTint="@color/colorAccent"
-        android:visibility="invisible"
-        android:translationZ="1dp"
-        android:onClick="onSkipGuideBtnClick"
-        app:layout_constraintVertical_bias="1"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
     <!-- Guide: bg -->
 
     <ImageView
@@ -188,7 +218,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
-
 
     <!-- Guide: change mode -->
 
@@ -218,7 +247,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-
     <!-- Guide: add item -->
 
     <com.google.android.material.button.MaterialButton
@@ -246,7 +274,6 @@
         app:layout_constraintEnd_toEndOf="@id/fragment_showcase"
         app:layout_constraintStart_toStartOf="@id/fragment_showcase"
         app:layout_constraintBottom_toBottomOf="parent"/>
-
 
     <!-- Guide: mark item in Basket -->
 
@@ -277,7 +304,6 @@
         app:layout_constraintVertical_bias="0.05"
         app:srcCompat="@drawable/ic_guide_tap" />
 
-
     <!-- Guide: move item in Basket -->
 
     <com.google.android.material.button.MaterialButton
@@ -307,7 +333,6 @@
         app:layout_constraintTop_toTopOf="@id/fragment_basket"
         app:layout_constraintBottom_toBottomOf="@id/fragment_basket"/>
 
-
     <!-- Guide: remove item from Basket -->
 
     <com.google.android.material.button.MaterialButton
@@ -336,7 +361,6 @@
         app:layout_constraintStart_toStartOf="@id/fragment_basket"
         app:layout_constraintTop_toTopOf="@id/fragment_basket"/>
 
-
     <!-- Guide: turn on delete mode -->
 
     <com.google.android.material.button.MaterialButton
@@ -364,7 +388,6 @@
         app:layout_constraintStart_toStartOf="@id/fragment_showcase"
         app:layout_constraintTop_toTopOf="@id/fragment_showcase"
         app:layout_constraintBottom_toBottomOf="@id/fragment_showcase"/>
-
 
     <!-- Guide: delete items from Showcase -->
 
@@ -396,7 +419,6 @@
         app:layout_constraintVertical_bias="0.98"
         app:srcCompat="@drawable/ic_guide_tap_rot90_cut"/>
 
-
     <!-- Guide: floating menu invoke -->
 
     <com.google.android.material.button.MaterialButton
@@ -423,7 +445,6 @@
         app:layout_constraintTop_toTopOf="@id/fab"
         app:layout_constraintBottom_toBottomOf="@id/fab"/>
 
-
     <!-- Guide: floating menu help -->
 
     <FrameLayout
@@ -431,7 +452,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="invisible"
-        android:onClick="onGuideViewClick"
+        android:onClick="onSkipGuideBtnClick"
         android:clickable="true"
         android:focusable="true" />
 
