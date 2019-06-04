@@ -33,6 +33,7 @@
     <string name="guide_check_all">Отметить все товары</string>
     <string name="guide_del_checked">Убрать отмеченные товары</string>
     <string name="guide_close_menu">Закрыть меню</string>
-=
+    <string name="del_toolbar_text">Выбрано для удаления: </string>
+    =
 
 </resources>

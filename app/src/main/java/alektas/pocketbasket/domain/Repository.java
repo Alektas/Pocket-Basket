@@ -52,6 +52,8 @@ public interface Repository {
     Observable<Boolean> delModeData();
     void setDelMode(boolean delMode);
 
+    Observable<Integer> getDelItemsCountData();
+
     void selectForDeleting(ShowcaseItemModel item);
     /**
      * Delete from the Showcase all items selected by user for the deleting.
