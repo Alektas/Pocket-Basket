@@ -43,7 +43,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     private Repository mRepository;
 
     private MutableLiveData<Boolean> showcaseModeData = new MutableLiveData<>();
-    private MutableLiveData<Boolean> guideModeData = new MutableLiveData<>();
     private MutableLiveData<Boolean> deleteModeData = new MutableLiveData<>();
     private MutableLiveData<Integer> deleteItemsCountData = new MutableLiveData<>();
     private MutableLiveData<String> mCurGuideCaseData = new MutableLiveData<>();
@@ -80,12 +79,8 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
                 markCountState.setState(0);
             }
         });
-        mRepository.delModeData().observe(delMode -> {
-            deleteModeData.setValue(delMode);
-        });
-        mRepository.getDelItemsCountData().observe(delCount -> {
-            deleteItemsCountData.setValue(delCount);
-        });
+        mRepository.delModeData().observe(deleteModeData::setValue);
+        mRepository.getDelItemsCountData().observe(deleteItemsCountData::setValue);
 
         SharedPreferences guidePrefs = application.getSharedPreferences(
                 ResourcesUtils.getString(R.string.GUIDE_PREFERENCES_FILE_KEY),
@@ -304,15 +299,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         mGuide.onUserEvent(mGuide.currentCase());
     }
 
-    public boolean isGuideMode() {
-        if (guideModeData.getValue() == null) return false;
-        return guideModeData.getValue();
-    }
-
-    public LiveData<Boolean> guideModeData() {
-        return guideModeData;
-    }
-
     public LiveData<Boolean> deleteModeData() {
         return deleteModeData;
     }
@@ -334,7 +320,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
 
     @Override
     public void onGuideStart() {
-        guideModeData.setValue(true);
         ContextualGuide guide = (ContextualGuide) mGuide;
         if (basketSizeState.getState() > 0) {
             guide.completeCase(GuideContract.GUIDE_ADD_ITEM_BY_TAP);
@@ -359,7 +344,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     @Override
     public void onGuideFinish() {
         mCurGuideCaseData.setValue(null);
-        guideModeData.setValue(false);
         newItemAddedState.setState(false);
         removeByTapInBasketModeState.setState(false);
         markCountState.setState(0);

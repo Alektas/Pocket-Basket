@@ -31,6 +31,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String TAG = "MainActivity";
     private static final long CHANGE_MODE_TIME = 250;
+    private static final String SAVED_CATEGORY_KEY = "saved_category";
 
     private int mCategNarrowWidth;
     private int mCategWideWidth;
@@ -130,9 +132,9 @@ public class MainActivity extends AppCompatActivity implements
         init();
         mViewModel.setOrientationState(isLandscape());
 
-        mPrefs = getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
         mGuidePrefs = getSharedPreferences(getString(R.string.GUIDE_PREFERENCES_FILE_KEY), MODE_PRIVATE);
-
+        mPrefs = getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
+        initCategorySelection(mPrefs);
 
         /* Update items in the database when other app version is launched or locale is changed.
          * It allow to display correct icons, which were added or removed in other version,
@@ -181,6 +183,12 @@ public class MainActivity extends AppCompatActivity implements
             mAdView.pause();
         }
         super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        mPrefs.edit().putInt(SAVED_CATEGORY_KEY, getSelectedCategoryId()).apply();
+        super.onStop();
     }
 
     @Override
@@ -426,8 +434,6 @@ public class MainActivity extends AppCompatActivity implements
      * Send new Ad request to the server
      */
     private void updateAd() {
-        if (mViewModel.isGuideMode()) return;
-
         AdRequest request;
         if (BuildConfig.DEBUG) {
             request = new AdRequest.Builder()
@@ -442,20 +448,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void subscribeOnModel() {
-        mViewModel.guideModeData().observe(this, isGuideMode -> {
-
-        });
-
-        View delModeToolbar = findViewById(R.id.toolbar_del_mode);
-        mViewModel.deleteModeData().observe(this, delMode -> {
-            delModeToolbar.setVisibility(delMode ? View.VISIBLE : View.GONE);
-        });
-
-        TextView counter = findViewById(R.id.toolbar_del_mode_counter);
-        mViewModel.deleteItemsCountData().observe(this, delCount -> {
-            counter.setText(delCount.toString());
-        });
-
         mViewModel.curGuideCaseData().observe(this, caseKey -> {
             mGuidePresenter.hideCurrentCase();
             if (caseKey == null) {
@@ -469,6 +461,16 @@ public class MainActivity extends AppCompatActivity implements
 
         mViewModel.completedGuideCaseData().observe(this, finishedCase -> {
             mGuidePrefs.edit().putBoolean(finishedCase, true).apply();
+        });
+
+        View delModeToolbar = findViewById(R.id.toolbar_del_mode);
+        mViewModel.deleteModeData().observe(this, delMode -> {
+            delModeToolbar.setVisibility(delMode ? View.VISIBLE : View.GONE);
+        });
+
+        TextView counter = findViewById(R.id.toolbar_del_mode_counter);
+        mViewModel.deleteItemsCountData().observe(this, delCount -> {
+            counter.setText(delCount.toString());
         });
 
         mViewModel.showcaseModeState().observe(this, isShowcase -> {
@@ -616,6 +618,18 @@ public class MainActivity extends AppCompatActivity implements
                 .addCase(floatingMenuHelpCase);
 
         return guidePresenter;
+    }
+
+    private void initCategorySelection(SharedPreferences prefs) {
+        RadioGroup rg = mCategoriesContainer.findViewById(R.id.categories_radiogroup);
+        int catId = prefs.getInt(SAVED_CATEGORY_KEY, 0);
+        rg.check(catId);
+    }
+
+    private int getSelectedCategoryId() {
+        if (mCategoriesContainer == null) return 0;
+        RadioGroup rg = mCategoriesContainer.findViewById(R.id.categories_radiogroup);
+        return rg.getCheckedRadioButtonId();
     }
 
 
