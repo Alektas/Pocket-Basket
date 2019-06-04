@@ -623,7 +623,9 @@ public class MainActivity extends AppCompatActivity implements
     private void initCategorySelection(SharedPreferences prefs) {
         RadioGroup rg = mCategoriesContainer.findViewById(R.id.categories_radiogroup);
         int catId = prefs.getInt(SAVED_CATEGORY_KEY, 0);
+        if (catId == 0) return;
         rg.check(catId);
+        onFilterClick(rg.findViewById(catId));
     }
 
     private int getSelectedCategoryId() {
@@ -951,6 +953,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void onFilterClick(View view) {
+        if (view == null) {
+            setFilter(R.string.all);
+            return;
+        }
+
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
 
