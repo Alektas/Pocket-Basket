@@ -3,15 +3,15 @@
     <item android:state_checked="true">
         <set>
             <objectAnimator android:propertyName="scaleX"
-                android:duration="@android:integer/config_shortAnimTime"
+                android:duration="@integer/duration_category_selection"
                 android:valueTo="1.05"
                 android:valueType="floatType"/>
             <objectAnimator android:propertyName="scaleY"
-                android:duration="@android:integer/config_shortAnimTime"
+                android:duration="@integer/duration_category_selection"
                 android:valueTo="1.05"
                 android:valueType="floatType"/>
             <objectAnimator android:propertyName="translationX"
-                android:duration="@android:integer/config_shortAnimTime"
+                android:duration="@integer/duration_category_selection"
                 android:valueTo="8dp"
                 android:valueType="floatType"/>
         </set>
@@ -19,15 +19,15 @@
     <item android:state_checked="false">
         <set>
             <objectAnimator android:propertyName="scaleX"
-                android:duration="@android:integer/config_shortAnimTime"
+                android:duration="@integer/duration_category_selection"
                 android:valueTo="1"
                 android:valueType="floatType"/>
             <objectAnimator android:propertyName="scaleY"
-                android:duration="@android:integer/config_shortAnimTime"
+                android:duration="@integer/duration_category_selection"
                 android:valueTo="1"
                 android:valueType="floatType"/>
             <objectAnimator android:propertyName="translationX"
-                android:duration="@android:integer/config_shortAnimTime"
+                android:duration="@integer/duration_category_selection"
                 android:valueTo="0dp"
                 android:valueType="floatType"/>
         </set>
