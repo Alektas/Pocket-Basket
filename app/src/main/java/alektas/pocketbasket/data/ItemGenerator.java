@@ -16,7 +16,7 @@ public class ItemGenerator {
         if (sItems != null) return sItems;
         sItems = new ArrayList<>();
         addItem(sItems, R.string.lemonade, R.drawable.ic_lemonade, R.string.drink);
-        addItem(sItems, R.string.juice, 0, R.string.drink);
+        addItem(sItems, R.string.juice, R.drawable.ic_juice, R.string.drink);
         addItem(sItems, R.string.tea, R.drawable.ic_tea, R.string.drink);
         addItem(sItems, R.string.coffee, R.drawable.ic_coffee, R.string.drink);
         addItem(sItems, R.string.cacao, 0, R.string.drink);
@@ -24,22 +24,22 @@ public class ItemGenerator {
         addItem(sItems, R.string.wine, R.drawable.ic_wine, R.string.drink);
         addItem(sItems, R.string.vodka, 0, R.string.drink);
         addItem(sItems, R.string.chicory, 0, R.string.drink);
-        addItem(sItems, R.string.water, 0, R.string.drink);
+        addItem(sItems, R.string.water, R.drawable.ic_water, R.string.drink);
 
         addItem(sItems, R.string.milk, R.drawable.ic_milk, R.string.milky);
         addItem(sItems, R.string.curd, R.drawable.ic_curd, R.string.milky);
         addItem(sItems, R.string.sour_cream, R.drawable.ic_sourcream, R.string.milky);
         addItem(sItems, R.string.cheese, R.drawable.ic_cheese, R.string.milky);
-        addItem(sItems, R.string.kefir, 0, R.string.milky);
-        addItem(sItems, R.string.yogurt, 0, R.string.milky);
+        addItem(sItems, R.string.kefir, R.drawable.ic_kefir, R.string.milky);
+        addItem(sItems, R.string.yogurt, R.drawable.ic_yogurt, R.string.milky);
 
         addItem(sItems, R.string.ice_cream, R.drawable.ic_icecream, R.string.sweets);
         addItem(sItems, R.string.cookies, R.drawable.ic_cookies, R.string.sweets);
         addItem(sItems, R.string.pie, 0, R.string.sweets);
         addItem(sItems, R.string.cake, 0, R.string.sweets);
         addItem(sItems, R.string.gingerbread, 0, R.string.sweets);
-        addItem(sItems, R.string.waffles, 0, R.string.sweets);
-        addItem(sItems, R.string.candies, 0, R.string.sweets);
+        addItem(sItems, R.string.waffles, R.drawable.ic_waffels, R.string.sweets);
+        addItem(sItems, R.string.candies, R.drawable.ic_candies, R.string.sweets);
         addItem(sItems, R.string.sugar, R.drawable.ic_sugar, R.string.sweets);
         addItem(sItems, R.string.condensed_milk, 0, R.string.sweets);
 

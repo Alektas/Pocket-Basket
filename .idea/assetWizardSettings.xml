@@ -179,11 +179,11 @@
                           <map>
                             <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="005005" />
-                            <entry key="height" value="100" />
-                            <entry key="outputName" value="ic_guide_tap" />
+                            <entry key="height" value="192" />
+                            <entry key="outputName" value="ic_kefir" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="D:\YandexDisk\Изображения\icons\Hand Gestures\SVG\1-Finger_Thumb-In\Tap_narrow.svg" />
-                            <entry key="width" value="70" />
+                            <entry key="sourceFile" value="D:\YandexDisk\Изображения\icons\vector\ic_kefir.svg" />
+                            <entry key="width" value="192" />
                           </map>
                         </option>
                       </PersistentState>
