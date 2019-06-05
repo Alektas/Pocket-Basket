@@ -455,6 +455,7 @@ public class MainActivity extends AppCompatActivity implements
             }
             if (mGuidePrefs.getBoolean(caseKey, false)) {
                 mViewModel.onEventHappened(caseKey);
+                return;
             }
             mGuidePresenter.showCase(caseKey);
         });

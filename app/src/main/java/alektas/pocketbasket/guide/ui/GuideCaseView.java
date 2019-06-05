@@ -2,6 +2,7 @@ package alektas.pocketbasket.guide.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -167,7 +168,27 @@ public class GuideCaseView {
 
     private void setVisibility(int visibility) {
         for (View view : mViews) {
-            view.setVisibility(visibility);
+            if (visibility == View.VISIBLE) {
+                Animator fadeIn = ObjectAnimator.ofFloat(view, "alpha", 0f, 1f);
+                fadeIn.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        super.onAnimationStart(animation);
+                        view.setVisibility(View.VISIBLE);
+                    }
+                });
+                fadeIn.start();
+            } else {
+                Animator fadeOut = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f);
+                fadeOut.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        view.setVisibility(View.INVISIBLE);
+                    }
+                });
+                fadeOut.start();
+            }
         }
     }
 
