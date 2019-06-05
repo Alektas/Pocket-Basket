@@ -123,24 +123,6 @@ public class GuideCaseView {
         mViews = builder.views;
         mAnim = builder.animation;
         isDisposable = builder.isDisposable;
-
-        if (mAnim != null) {
-            mAnim.addListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    super.onAnimationStart(animation);
-                    setVisibility(View.VISIBLE);
-                    if (mListener != null) mListener.onCaseStart(mKey);
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    super.onAnimationEnd(animation);
-                    setVisibility(View.INVISIBLE);
-                    if (mListener != null) mListener.onCaseFinish(mKey);
-                }
-            });
-        }
     }
 
     public void setCaseViewListener(GuideViewListener listener) {
@@ -150,20 +132,14 @@ public class GuideCaseView {
     public void show() {
         if (mAnim != null) {
             mAnim.start();
-        } else {
-            setVisibility(View.VISIBLE);
-            if (mListener != null) mListener.onCaseStart(mKey);
         }
-
+        setVisibility(View.VISIBLE);
+        if (mListener != null) mListener.onCaseStart(mKey);
     }
 
     public void hide() {
-        if (mAnim != null) {
-            mAnim.end();
-        } else {
-            setVisibility(View.INVISIBLE);
-            if (mListener != null) mListener.onCaseFinish(mKey);
-        }
+        setVisibility(View.INVISIBLE);
+        if (mListener != null) mListener.onCaseFinish(mKey);
     }
 
     private void setVisibility(int visibility) {
@@ -185,6 +161,9 @@ public class GuideCaseView {
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
                         view.setVisibility(View.INVISIBLE);
+                        if (mAnim != null && mAnim.isStarted()) {
+                            mAnim.end();
+                        }
                     }
                 });
                 fadeOut.start();
