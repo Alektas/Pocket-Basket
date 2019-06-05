@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private static final String TAG = "MainActivity";
     private static final long CHANGE_MODE_TIME = 250;
+    private static final float CHANGE_MODE_VELOCITY = 150;
     private static final String SAVED_CATEGORY_KEY = "saved_category";
 
     private int mCategNarrowWidth;
@@ -650,13 +651,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Set basket or showcase mode in depends of the touch moving distance
+     * Set basket or showcase mode in depends of the touch moving distance and velocity
      *
-     * @param movX touch moving distance
+     * @param velocity touch moving velocity
      */
-    private void setMode(int movX) {
+    private void setMode(int movX, float velocity) {
         if (mViewModel.isShowcaseMode()) {
-            if (movX < -changeModeDistance) {
+            if (velocity < CHANGE_MODE_VELOCITY && movX < -changeModeDistance) {
                 setBasketMode();
             } else {
                 if (movX < -protectedInterval)  {
@@ -667,7 +668,7 @@ public class MainActivity extends AppCompatActivity implements
                         mBasketNarrowWidth);
             }
         } else {
-            if (movX > changeModeDistance) {
+            if (velocity > -CHANGE_MODE_VELOCITY && movX > changeModeDistance) {
                 setShowcaseMode();
             } else {
                 if (movX > protectedInterval)  {
@@ -1132,7 +1133,6 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             case MotionEvent.ACTION_UP:
-
             case MotionEvent.ACTION_CANCEL: {
                 finishModeChange(event);
                 break;
@@ -1152,7 +1152,7 @@ public class MainActivity extends AppCompatActivity implements
             float velocity = mVelocityTracker.getXVelocity();
             Interpolator interpolator = getInterpolator(velocity);
             mChangeBounds.setInterpolator(interpolator);
-            setMode(movX);
+            setMode(movX, velocity);
             /* Need to dispatch the touch event to the RecyclerViews
                to remove the focus from their items */
             mShowcase.onTouchEvent(event); // TODO: think how to repair without dispatching event
