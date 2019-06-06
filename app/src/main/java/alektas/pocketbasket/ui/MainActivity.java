@@ -320,19 +320,6 @@ public class MainActivity extends AppCompatActivity implements
                 .inflateTransition(R.transition.transition_fam);
 
         mChangeBounds = new ChangeBounds();
-        mChangeBounds.setInterpolator(mChangeBoundsInterpolator)
-                .addTarget(R.id.fragment_categories)
-                .addTarget(R.id.categories_wrapper)
-                .addTarget(R.id.fragment_showcase)
-                .addTarget(R.id.showcase_list)
-                .addTarget(R.id.fragment_basket)
-                .addTarget(R.id.basket_list)
-                .addTarget(R.id.fam_del_all)
-                .addTarget(R.id.fam_check_all)
-                .addTarget(R.id.del_panel)
-                .addTarget(R.id.del_panel_content)
-                .addTarget(R.id.btn_del)
-                .addTarget(R.id.btn_close_panel);
 
         Transition explode = new Explode();
         explode.addTarget(R.id.fab);
