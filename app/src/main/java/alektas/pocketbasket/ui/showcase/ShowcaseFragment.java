@@ -8,7 +8,6 @@ import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -23,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.ui.ChangeModeListener;
 import alektas.pocketbasket.ui.ItemSizeProvider;
 
 /**
@@ -32,13 +30,11 @@ import alektas.pocketbasket.ui.ItemSizeProvider;
 public class ShowcaseFragment extends Fragment {
     private static final String TAG = "ShowcaseFragment";
     private ShowcaseViewModel mViewModel;
-    private RecyclerView mShowcase;
     private ShowcaseRvAdapter mShowcaseAdapter;
     private LinearLayout mDelModePanel;
     private Transition mDelPanelTransition;
 
     private ItemSizeProvider mItemSizeProvider;
-    private ChangeModeListener mModeListener;
 
     public ShowcaseFragment() {
         // Required empty public constructor
@@ -50,13 +46,12 @@ public class ShowcaseFragment extends Fragment {
 
         // Verify that the host activity implements the callback interface
         try {
-            // Instantiate the ResetDialogListener so we can send events to the host
+            // Instantiate the interface so we can get data from the host
             mItemSizeProvider = (ItemSizeProvider) getContext();
-            mModeListener = (ChangeModeListener) getContext();
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
             throw new ClassCastException(getContext().toString()
-                    + " must implement ItemSizeProvider and ChangeModeListener");
+                    + " must implement ItemSizeProvider");
         }
     }
 
@@ -81,19 +76,12 @@ public class ShowcaseFragment extends Fragment {
         View closeBtn = mDelModePanel.findViewById(R.id.btn_close_panel);
         closeBtn.setOnClickListener(view -> mViewModel.cancelDel());
 
-        mShowcase = root.findViewById(R.id.showcase_list);
+        RecyclerView showcase = root.findViewById(R.id.showcase_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mShowcase.setLayoutManager(layoutManager);
-        mShowcase.setHasFixedSize(true);
-        mShowcase.setAdapter(mShowcaseAdapter);
+        showcase.setLayoutManager(layoutManager);
+        showcase.setHasFixedSize(true);
+        showcase.setAdapter(mShowcaseAdapter);
 
-        // Avoid animation and touch conflict by intercept event if changing mode
-        mShowcase.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener() {
-            @Override
-            public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent event) {
-                return mModeListener.isChangeModeHandled() && mModeListener.isChangeModeAllowed();
-            }
-        });
         return root;
     }
 

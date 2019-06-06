@@ -43,6 +43,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -72,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements
         ResetDialog.ResetDialogListener,
         GuideAcceptDialog.GuideAcceptDialogListener,
         DisposableGuideCaseListener,
-        ChangeModeListener,
         ItemSizeProvider {
 
     private static final String TAG = "MainActivity";
@@ -96,8 +96,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private boolean isMenuShown;
     private boolean allowChangeMode = true;
-    private boolean alreadySetChangeModeAllowing = false;
-    private boolean allowChooseCategory = true;
+    private boolean isChangeModeHandled = false;
 
     private SharedPreferences mGuidePrefs;
     private SharedPreferences mPrefs;
@@ -118,8 +117,8 @@ public class MainActivity extends AppCompatActivity implements
     private VelocityTracker mVelocityTracker;
     private SmoothDecelerateInterpolator mChangeBoundsInterpolator;
     private Transition mChangeBounds;
-    private View mShowcase;
-    private View mBasket;
+    private RecyclerView mShowcase;
+    private RecyclerView mBasket;
     private GuidePresenter mGuidePresenter;
 
     @Override
@@ -907,16 +906,6 @@ public class MainActivity extends AppCompatActivity implements
         return mBasketWideWidth;
     }
 
-    @Override
-    public boolean isChangeModeAllowed() {
-        return allowChangeMode;
-    }
-
-    @Override
-    public boolean isChangeModeHandled() {
-        return alreadySetChangeModeAllowing;
-    }
-
 
     /* On click methods */
 
@@ -1072,15 +1061,13 @@ public class MainActivity extends AppCompatActivity implements
         // Do not allow a mode change in the landscape orientation
         if (!isLandscape()) {
             handleChangeModeByTouch(event);
-        }
-
-        // disallow category selection when resizing layout by returning 'true'
-        if (!isAllowChooseCategory(event)) {
-            /* Provide a touch to the showcase recycler view, otherwise the delete mode
-             * would be triggered on each swipe
-             * (touch would be perceived as a long press on items in the showcase) */
-            mShowcase.dispatchTouchEvent(event);
-            return true;
+            // When changing mode cancel all other actions to avoid fake clicks
+            // Also stop scrolling to avoid crashing
+            if (isModeChanging()) {
+                mShowcase.stopScroll();
+                mBasket.stopScroll();
+                event.setAction(MotionEvent.ACTION_CANCEL);
+            }
         }
 
         return super.dispatchTouchEvent(event);
@@ -1102,14 +1089,14 @@ public class MainActivity extends AppCompatActivity implements
                 if (!mViewModel.isShowcaseMode()
                         && initX > (mCategNarrowWidth + mShowcaseNarrowWidth)) {
                     allowChangeMode = false;
-                    alreadySetChangeModeAllowing = true;
+                    isChangeModeHandled = true;
                 }
                 break;
             }
 
             case MotionEvent.ACTION_MOVE: {
                 // Do not handle change mode if it didn't allowed
-                if (!allowChangeMode && alreadySetChangeModeAllowing) {
+                if (!allowChangeMode && isChangeModeHandled) {
                     return;
                 }
 
@@ -1117,8 +1104,8 @@ public class MainActivity extends AppCompatActivity implements
                 int movY = (int) (event.getY() + 0.5f - initY);
 
                 // Allow or disallow changing mode
-                if (!alreadySetChangeModeAllowing) {
-                    alreadySetChangeModeAllowing = true;
+                if (!isChangeModeHandled) {
+                    isChangeModeHandled = true;
                     if (Math.abs(movY) > Math.abs(movX)) {
                         allowChangeMode = false;
                         return;
@@ -1134,29 +1121,26 @@ public class MainActivity extends AppCompatActivity implements
 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
-                finishModeChange(event);
+                finishModeChange();
                 break;
             }
         }
     }
 
+    private boolean isModeChanging() {
+        return allowChangeMode && isChangeModeHandled;
+    }
+
     /**
-     * Set appropriate mode (Basket or Showcase),
-     * cancel touch handling and clear state
-     *
-     * @param event UP event required to be dispatch to the child views
+     * Set appropriate mode (Basket or Showcase), cancel touch handling and clear the state
      */
-    private void finishModeChange(MotionEvent event) {
+    private void finishModeChange() {
         if (allowChangeMode) {
             mVelocityTracker.computeCurrentVelocity(1000, mMaxVelocity);
             float velocity = mVelocityTracker.getXVelocity();
             Interpolator interpolator = getInterpolator(velocity);
             mChangeBounds.setInterpolator(interpolator);
             setMode(movX, velocity);
-            /* Need to dispatch the touch event to the RecyclerViews
-               to remove the focus from their items */
-            mShowcase.onTouchEvent(event); // TODO: think how to repair without dispatching event
-            mBasket.onTouchEvent(event);
         } else {
             allowChangeMode = true;
         }
@@ -1165,7 +1149,7 @@ public class MainActivity extends AppCompatActivity implements
             mVelocityTracker.recycle();
             mVelocityTracker = null;
         }
-        alreadySetChangeModeAllowing = false;
+        isChangeModeHandled = false;
         initX = 0;
         movX = 0;
     }
@@ -1195,30 +1179,6 @@ public class MainActivity extends AppCompatActivity implements
                 return new DecelerateInterpolator(2.5f);
             }
         }
-    }
-
-    /**
-     * Check if the category selection is allowed while a touch event occurs.
-     * Category selection should be forbidden when change mode occurs and allowed in all other cases.
-     *
-     * @param event touch event
-     * @return true if category change is allowed
-     */
-    private boolean isAllowChooseCategory(MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
-                allowChooseCategory = true;
-                break;
-            }
-
-            case MotionEvent.ACTION_MOVE: {
-                if (allowChangeMode && alreadySetChangeModeAllowing) {
-                    allowChooseCategory = false;
-                }
-                break;
-            }
-        }
-        return allowChooseCategory;
     }
 
 
