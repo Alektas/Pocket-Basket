@@ -101,25 +101,23 @@ public class MainActivity extends AppCompatActivity implements
     private SharedPreferences mGuidePrefs;
     private SharedPreferences mPrefs;
 
+    private ActivityViewModel mViewModel;
+    private VelocityTracker mVelocityTracker;
+    private ShareActionProvider mShareActionProvider;
+    private ConstraintLayout mConstraintLayout;
     private View mBasketContainer;
     private View mShowcaseContainer;
     private View mCategoriesContainer;
-    private FloatingActionButton mAddBtn;
-    private SearchView mSearchView;
-    private AdView mAdView;
-    private View mDelAllBtn;
-    private View mCheckAllBtn;
-    private TransitionSet mChangeModeTransition;
-    private Transition mFamTransition;
-    private ConstraintLayout mConstraintLayout;
-    private ShareActionProvider mShareActionProvider;
-    private ActivityViewModel mViewModel;
-    private VelocityTracker mVelocityTracker;
-    private SmoothDecelerateInterpolator mChangeBoundsInterpolator;
-    private Transition mChangeBounds;
     private RecyclerView mShowcase;
     private RecyclerView mBasket;
-    private GuidePresenter mGuidePresenter;
+    private FloatingActionButton mAddBtn;
+    private View mDelAllBtn;
+    private View mCheckAllBtn;
+    private SearchView mSearchView;
+    private AdView mAdView;
+    private TransitionSet mChangeModeTransition;
+    private Transition mFamTransition;
+    private Transition mChangeBounds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,11 +128,6 @@ public class MainActivity extends AppCompatActivity implements
         setSupportActionBar(toolbar);
 
         init();
-        mViewModel.setOrientationState(isLandscape());
-
-        mGuidePrefs = getSharedPreferences(getString(R.string.GUIDE_PREFERENCES_FILE_KEY), MODE_PRIVATE);
-        mPrefs = getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
-        initCategorySelection(mPrefs);
 
         /* Update items in the database when other app version is launched or locale is changed.
          * It allow to display correct icons, which were added or removed in other version,
@@ -292,25 +285,30 @@ public class MainActivity extends AppCompatActivity implements
     /* Init methods */
 
     private void init() {
+        mGuidePrefs = getSharedPreferences(getString(R.string.GUIDE_PREFERENCES_FILE_KEY), MODE_PRIVATE);
+        mPrefs = getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
+
+        initAd();
         initSearch();
+        initTransitions();
         initFloatingActionMenu();
 
         mConstraintLayout = findViewById(R.id.root_layout);
-
         mCategoriesContainer = findViewById(R.id.fragment_categories);
         mShowcaseContainer = findViewById(R.id.fragment_showcase);
-        mBasketContainer = findViewById(R.id.fragment_basket);
         mShowcase = mShowcaseContainer.findViewById(R.id.showcase_list);
+        mBasketContainer = findViewById(R.id.fragment_basket);
         mBasket = mBasketContainer.findViewById(R.id.basket_list);
-
         initDimensions();
 
         mViewModel = ViewModelProviders.of(this).get(ActivityViewModel.class);
+        mViewModel.setOrientationState(isLandscape());
+        GuidePresenter guidePresenter = buildGuide();
 
-        initGuide();
-        initTransitions();
-        initAd();
-        subscribeOnModel();
+        subscribeOnModel(mViewModel, mGuidePrefs, guidePresenter);
+
+        RadioGroup rg = mCategoriesContainer.findViewById(R.id.categories_radiogroup);
+        initCategorySelection(mPrefs, rg);
 
         if (isLandscape()) {
             applyLandscapeLayout();
@@ -343,7 +341,6 @@ public class MainActivity extends AppCompatActivity implements
         explode.addTarget(R.id.fam_del_all);
         explode.addTarget(R.id.fam_check_all);
 
-        mChangeBoundsInterpolator = new SmoothDecelerateInterpolator();
         mChangeModeTransition = new TransitionSet();
         mChangeModeTransition.setDuration(CHANGE_MODE_TIME)
                 .setOrdering(TransitionSet.ORDERING_TOGETHER)
@@ -447,34 +444,36 @@ public class MainActivity extends AppCompatActivity implements
         mAdView.loadAd(request);
     }
 
-    private void subscribeOnModel() {
-        mViewModel.curGuideCaseData().observe(this, caseKey -> {
-            mGuidePresenter.hideCurrentCase();
+    private void subscribeOnModel(ActivityViewModel viewModel,
+                                  SharedPreferences guidePrefs,
+                                  GuidePresenter guidePresenter) {
+        viewModel.curGuideCaseData().observe(this, caseKey -> {
+            guidePresenter.hideCurrentCase();
             if (caseKey == null) {
                 return;
             }
-            if (mGuidePrefs.getBoolean(caseKey, false)) {
-                mViewModel.onEventHappened(caseKey);
+            if (guidePrefs.getBoolean(caseKey, false)) {
+                viewModel.onEventHappened(caseKey);
                 return;
             }
-            mGuidePresenter.showCase(caseKey);
+            guidePresenter.showCase(caseKey);
         });
 
-        mViewModel.completedGuideCaseData().observe(this, finishedCase -> {
-            mGuidePrefs.edit().putBoolean(finishedCase, true).apply();
+        viewModel.completedGuideCaseData().observe(this, finishedCase -> {
+            guidePrefs.edit().putBoolean(finishedCase, true).apply();
         });
 
         View delModeToolbar = findViewById(R.id.toolbar_del_mode);
-        mViewModel.deleteModeData().observe(this, delMode -> {
+        viewModel.deleteModeData().observe(this, delMode -> {
             delModeToolbar.setVisibility(delMode ? View.VISIBLE : View.GONE);
         });
 
         TextView counter = findViewById(R.id.toolbar_del_mode_counter);
-        mViewModel.deleteItemsCountData().observe(this, delCount -> {
+        viewModel.deleteItemsCountData().observe(this, delCount -> {
             counter.setText(delCount.toString());
         });
 
-        mViewModel.showcaseModeState().observe(this, isShowcase -> {
+        viewModel.showcaseModeState().observe(this, isShowcase -> {
             // Change mode enabled only if it's not a landscape layout
             if (isLandscape()) return;
             if (isShowcase) {
@@ -493,13 +492,6 @@ public class MainActivity extends AppCompatActivity implements
             if (!isMenuShown) { showFloatingMenu(); }
             return true;
         });
-    }
-
-    /**
-     * Initialize help guide
-     */
-    private void initGuide() {
-        mGuidePresenter = buildGuide();
     }
 
     /**
@@ -621,8 +613,7 @@ public class MainActivity extends AppCompatActivity implements
         return guidePresenter;
     }
 
-    private void initCategorySelection(SharedPreferences prefs) {
-        RadioGroup rg = mCategoriesContainer.findViewById(R.id.categories_radiogroup);
+    private void initCategorySelection(SharedPreferences prefs, RadioGroup rg) {
         int catId = prefs.getInt(SAVED_CATEGORY_KEY, 0);
         if (catId == 0) return;
         rg.check(catId);
@@ -636,7 +627,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    /* Layout changes methods */
+    /* Layout changes (size and visibility) methods */
 
     /**
      * Set Landscape Mode: categories, showcase and basket expanded
@@ -1182,7 +1173,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    /* Private methods */
+    /* Other methods */
 
     private boolean isLandscape() {
         return getResources().getConfiguration().orientation
