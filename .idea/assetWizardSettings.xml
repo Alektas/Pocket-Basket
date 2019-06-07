@@ -179,11 +179,11 @@
                           <map>
                             <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="005005" />
-                            <entry key="height" value="192" />
-                            <entry key="outputName" value="ic_kefir" />
+                            <entry key="height" value="91" />
+                            <entry key="outputName" value="ic_watermelon" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="D:\YandexDisk\Изображения\icons\vector\ic_kefir.svg" />
-                            <entry key="width" value="192" />
+                            <entry key="sourceFile" value="D:\YandexDisk\Изображения\icons\Food Set 3\SVG\91\2427890 - food fresh fruit summer watermelon.svg" />
+                            <entry key="width" value="91" />
                           </map>
                         </option>
                       </PersistentState>

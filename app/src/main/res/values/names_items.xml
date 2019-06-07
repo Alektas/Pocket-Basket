@@ -86,5 +86,26 @@
     <string name="garbage_bags">Garbage bags</string>
     <string name="plastic_bags">Plastic bags</string>
     <string name="washing_powder">Washing powder</string>
+    <string name="wet_wipes">Wet wipes</string>
+    <string name="shaving_razors">Shaving razors</string>
+    <string name="shaving_foam">Shaving foam</string>
+    <string name="mouth_rinse">Mouth rinse</string>
+    <string name="sunflower_seeds">Sunflower seeds</string>
+    <string name="chips">Chips</string>
+    <string name="caviar">Caviar</string>
+    <string name="fish_preserves">Fish preserves</string>
+    <string name="sushi">Sushi</string>
+    <string name="shrimp">Shrimp</string>
+    <string name="shellfish">Shellfish</string>
+    <string name="crab">Crab</string>
+    <string name="minced_meat">Minced meat</string>
+    <string name="corn">Corn</string>
+    <string name="watermelon">Watermelon</string>
+    <string name="peaches">Peaches</string>
+    <string name="apricots">Apricots</string>
+    <string name="pears">Pears</string>
+    <string name="hotdog">Hotdog</string>
+    <string name="burger">Burger</string>
+    <string name="donuts">Donuts</string>
 
 </resources>

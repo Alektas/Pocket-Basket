@@ -86,5 +86,26 @@
     <string name="garbage_bags">Мешки для мусора</string>
     <string name="plastic_bags">Пакеты</string>
     <string name="washing_powder">Стиральный порошок</string>
+    <string name="wet_wipes">Влажные салфетки</string>
+    <string name="shaving_razors">Бритвенные станки</string>
+    <string name="shaving_foam">Пена для бритья</string>
+    <string name="mouth_rinse">Ополаскиватель</string>
+    <string name="sunflower_seeds">Семечки</string>
+    <string name="chips">Чипсы</string>
+    <string name="caviar">Рыбная икра</string>
+    <string name="fish_preserves">Рыбные пресервы</string>
+    <string name="sushi">Суши</string>
+    <string name="shrimp">Креветки</string>
+    <string name="shellfish">Моллюски</string>
+    <string name="crab">Крабовые палочки</string>
+    <string name="minced_meat">Мясной фарш</string>
+    <string name="corn">Кукуруза</string>
+    <string name="watermelon">Арбуз</string>
+    <string name="peaches">Персики</string>
+    <string name="apricots">Абрикосы</string>
+    <string name="pears">Груши</string>
+    <string name="hotdog">Хотдог</string>
+    <string name="burger">Бургер</string>
+    <string name="donuts">Пончики</string>
 
 </resources>
