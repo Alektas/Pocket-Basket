@@ -7,5 +7,10 @@
     <dimen name="width_showcase_narrow">56dp</dimen>
     <dimen name="width_basket_narrow">56dp</dimen>
 
+    <dimen name="textsize_item_name">14sp</dimen>
     <dimen name="textsize_item_icon">10sp</dimen>
+    <dimen name="textsize_category">@dimen/textsize_item_name</dimen>
+    <dimen name="textsize_guide">16sp</dimen>
+    <dimen name="textsize_appbar">16sp</dimen>
+
 </resources>

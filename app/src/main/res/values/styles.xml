@@ -44,25 +44,14 @@
         <item name="android:onClick">onHintClick</item>
     </style>
 
-    <style name="GuideMainText">
+    <style name="GuideTextMainLight">
         <item name="android:paddingStart">@dimen/padding_16</item>
         <item name="android:paddingEnd">@dimen/padding_16</item>
         <item name="android:visibility">invisible</item>
         <item name="android:textAlignment">center</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">@dimen/textsize_guide</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/white</item>
-    </style>
-
-    <style name="GuideSubText" parent="GuideMainText">
-        <item name="android:paddingStart">@dimen/padding_16</item>
-        <item name="android:paddingEnd">@dimen/padding_16</item>
-        <item name="android:paddingTop">@dimen/padding_16</item>
-        <item name="android:visibility">invisible</item>
-        <item name="android:textAlignment">center</item>
-        <item name="android:textSize">16sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@android:color/darker_gray</item>
     </style>
 
 </resources>
