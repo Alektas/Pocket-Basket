@@ -1177,6 +1177,7 @@ public class MainActivity extends AppCompatActivity implements
             String itemName = intent.getDataString();
             onSearch(itemName);
         }
+        cancelSearch();
     }
 
     private void cancelSearch() {
