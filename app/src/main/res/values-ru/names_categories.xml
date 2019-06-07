@@ -8,10 +8,10 @@
     <string name="drink">Напитки</string>
     <string name="floury">Мучное</string>
     <string name="sweets">Сладости</string>
-    <string name="seafood">Рыбные</string>
-    <string name="sauce_n_oil">Соусы/Масла</string>
+    <string name="seafood">Морепродукты</string>
+    <string name="sauce_n_oil">Соусы</string>
     <string name="other">Другое</string>
-    <string name="semis">Полуфабр.</string>
+    <string name="semis">Полуфабрикаты</string>
     <string name="household">Хозтовары</string>
     <string name="meat">Мясо</string>
 </resources>

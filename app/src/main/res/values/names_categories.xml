@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="all">All</string>
-    <string name="drink">Drink</string>
-    <string name="fruit">Fruit</string>
-    <string name="vegetable">Vegetable</string>
+    <string name="drink">Drinks</string>
+    <string name="fruit">Fruits</string>
+    <string name="vegetable">Veggies</string>
     <string name="floury">Floury</string>
     <string name="milky">Milky</string>
     <string name="groats">Groats</string>
@@ -11,7 +11,7 @@
     <string name="meat">Meat</string>
     <string name="seafood">Seafood</string>
     <string name="semis">Semis</string>
-    <string name="sauce_n_oil">Sauce/Oil</string>
+    <string name="sauce_n_oil">Sauces</string>
     <string name="household">Household</string>
     <string name="other">Other</string>
 </resources>

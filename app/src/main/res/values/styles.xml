@@ -24,9 +24,11 @@
         <item name="android:layout_weight">1</item>
         <item name="android:paddingStart">@dimen/padding_16</item>
         <item name="android:paddingEnd">@dimen/padding_8</item>
-        <item name="android:lines">2</item>
         <item name="android:textSize">@dimen/textsize_category</item>
         <item name="android:textColor">@android:color/white</item>
+        <item name="android:lines">1</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:marqueeRepeatLimit">0</item>
         <item name="android:background">@drawable/bg_categ</item>
         <item name="android:stateListAnimator">@animator/anim_category_selection</item>
         <item name="android:onClick">onFilterClick</item>
