@@ -66,7 +66,7 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
         basket.setHasFixedSize(true);
         basket.setAdapter(mBasketAdapter);
 
-        ItemTouchHelper.Callback callback = new ItemTouchCallback(mBasketAdapter);
+        ItemTouchHelper.Callback callback = new ItemTouchCallback(getContext(), mBasketAdapter);
         mTouchHelper = new ItemTouchHelper(callback);
         mTouchHelper.attachToRecyclerView(basket);
 

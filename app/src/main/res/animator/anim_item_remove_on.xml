@@ -8,8 +8,4 @@
         android:propertyName="scaleX"
         android:duration="300"
         android:valueTo="0.95"/>
-    <objectAnimator
-        android:propertyName="alpha"
-        android:duration="400"
-        android:valueTo="0.6"/>
 </set>
