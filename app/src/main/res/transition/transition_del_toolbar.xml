@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
+    <slide android:duration="250" android:slideEdge="top">
+        <targets>
+            <target android:targetId="@id/toolbar_del_mode"/>
+        </targets>
+    </slide>
+</transitionSet>

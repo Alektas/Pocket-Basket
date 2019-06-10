@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements
     private TransitionSet mChangeModeTransition;
     private Transition mFamTransition;
     private Transition mChangeBounds;
+    private Transition mDelToolbarTransition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -319,6 +320,9 @@ public class MainActivity extends AppCompatActivity implements
         mFamTransition = TransitionInflater.from(this)
                 .inflateTransition(R.transition.transition_fam);
 
+        mDelToolbarTransition = TransitionInflater.from(this)
+                .inflateTransition(R.transition.transition_del_toolbar);
+
         mChangeBounds = new ChangeBounds();
 
         Transition explode = new Explode();
@@ -452,6 +456,7 @@ public class MainActivity extends AppCompatActivity implements
 
         View delModeToolbar = findViewById(R.id.toolbar_del_mode);
         viewModel.deleteModeData().observe(this, delMode -> {
+            TransitionManager.beginDelayedTransition(mConstraintLayout, mDelToolbarTransition);
             delModeToolbar.setVisibility(delMode ? View.VISIBLE : View.GONE);
         });
 
