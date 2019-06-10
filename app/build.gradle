@@ -27,8 +27,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
 
-        versionName "0.7.1"
-        versionCode 5
+        versionName "0.8.0"
+        versionCode 6
         project.ext.set("archivesBaseName", "PocketBasket-" + defaultConfig.versionName)
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
