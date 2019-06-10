@@ -87,12 +87,7 @@ public abstract class ItemsDao {
 
     @Transaction
     public void markAll() {
-        if (findUnmarked() == null) {
-            markAll(0);
-        }
-        else {
-            markAll(1);
-        }
+        markAll(findUnmarked() == null ? 0 : 1);
     }
 
     @Query("UPDATE basket_meta SET marked = :checked ")
@@ -106,9 +101,11 @@ public abstract class ItemsDao {
 
     @Transaction
     public void updatePositions(List<String> names) {
-        for (int i = 0; i < names.size(); i++) {
-            // start positions from 1
-            setPosition(names.get(i), i + 1);
+        // start positions from 1
+        int i = 1;
+        for (String name : names) {
+            setPosition(name, i);
+            i++;
         }
     }
 
@@ -128,24 +125,24 @@ public abstract class ItemsDao {
     protected abstract void deleteCheckedBasket();
 
 
-    /* Delete basket item queries */
+    /* Remove basket item queries */
 
     @Transaction
-    public void deleteBasketItem(String name) {
+    public void removeBasketItem(String name) {
         int position = getPosition(name);
-        deleteFromBasket(name);
+        removeFromBasket(name);
         onItemDeleted(position);
     }
 
     @Query("SELECT position FROM basket_meta WHERE item_name = :name")
-    public abstract int getPosition(String name);
+    protected abstract int getPosition(String name);
 
     @Query("DELETE FROM basket_meta WHERE item_name = :name")
-    public abstract void deleteFromBasket(String name);
+    protected abstract void removeFromBasket(String name);
 
     @Query("UPDATE basket_meta SET position = (position - 1) " +
             "WHERE position > :position")
-    public abstract void onItemDeleted(int position);
+    protected abstract void onItemDeleted(int position);
 
 
     /* Reset showcase queries */

@@ -466,7 +466,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
         @Override
         protected final Void doInBackground(String... name) {
-            mDao.deleteBasketItem(name[0]);
+            mDao.removeBasketItem(name[0]);
             return null;
         }
 
