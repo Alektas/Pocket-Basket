@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="ic_item_size">40dp</dimen>
-    <dimen name="ic_padding">4dp</dimen>
-    <dimen name="item_height">56dp</dimen>
+    <dimen name="size_item_icon">40dp</dimen>
+    <dimen name="padding_ic">4dp</dimen>
+    <dimen name="height_item">56dp</dimen>
 
-    <dimen name="showcase_narrow_size">56dp</dimen>
-    <dimen name="basket_narrow_size">56dp</dimen>
+    <dimen name="width_showcase_narrow">56dp</dimen>
+    <dimen name="width_basket_narrow">56dp</dimen>
 
-    <dimen name="icon_text_size">10sp</dimen>
+    <dimen name="textsize_item_name">14sp</dimen>
+    <dimen name="textsize_item_icon">10sp</dimen>
+    <dimen name="textsize_category">@dimen/textsize_item_name</dimen>
+    <dimen name="textsize_guide">16sp</dimen>
+    <dimen name="textsize_appbar">16sp</dimen>
+
 </resources>

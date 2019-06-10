@@ -2,11 +2,11 @@ package alektas.pocketbasket;
 
 import android.content.Context;
 
-import alektas.pocketbasket.viewmodel.ItemsViewModel;
 import androidx.annotation.NonNull;
-
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
+
+import alektas.pocketbasket.ui.ActivityViewModel;
 import dagger.Module;
 import dagger.Provides;
 
@@ -24,7 +24,7 @@ public class AppModule {
     }
 
     @Provides
-    ItemsViewModel viewModel(FragmentActivity activity) {
-        return ViewModelProviders.of(activity).get(ItemsViewModel.class);
+    ActivityViewModel viewModel(FragmentActivity activity) {
+        return ViewModelProviders.of(activity).get(ActivityViewModel.class);
     }
 }

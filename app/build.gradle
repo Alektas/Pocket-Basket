@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply from: "$rootDir/release.gradle"
 
 // Create a variable called keystorePropertiesFile, and initialize it to
 // keystore.properties file, in the rootProject folder.
@@ -26,8 +27,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
 
-        versionName "0.7.1"
-        versionCode 5
+        versionName "0.8.0"
+        versionCode 6
         project.ext.set("archivesBaseName", "PocketBasket-" + defaultConfig.versionName)
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -45,6 +46,9 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
+
+            buildConfigField 'String', 'AUTHORITY', '"alektas.pocketbasket.services.ItemsProvider"'
+            resValue 'string', 'search_authority', 'alektas.pocketbasket.services.ItemsProvider'
         }
         debug {
             aaptOptions.cruncherEnabled = false
@@ -54,6 +58,12 @@ android {
             ext.enableCrashlytics = false
             splits.abi.enable = false
             splits.density.enable = false
+
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+
+            buildConfigField 'String', 'AUTHORITY', '"alektas.pocketbasket.debug.ItemsProvider"'
+            resValue 'string', 'search_authority', 'alektas.pocketbasket.debug.ItemsProvider'
         }
     }
     flavorDimensions "mode"
@@ -62,7 +72,6 @@ android {
         // override those in the defaultConfig block.
         dev {
             dimension "mode"
-            versionNameSuffix "-dev"
         }
 
         free {
@@ -82,6 +91,29 @@ android {
         exclude 'META-INF/LICENSE-FIREBASE.txt'
         exclude 'META-INF/NOTICE'
     }
+
+    applicationVariants.all { variant ->
+        variant.getAssembleProvider().configure() {
+            it.doLast {
+                //If this is a 'release' build, reveal the compiled apk in finder/explorer
+                if (variant.buildType.name.contains('release')) {
+
+                    def path = null
+                    variant.outputs.each { output ->
+                        path = output.outputFile
+                    }
+
+                    exec {
+                        if (System.properties['os.name'].toLowerCase().contains('mac os x')) {
+                            ['open', '-R', path].execute()
+                        } else if (System.properties['os.name'].toLowerCase().contains('windows')) {
+                            ['explorer', '/select,', path].execute()
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 // Add plugin https://bitbucket.org/hvisser/android-apt
@@ -97,13 +129,16 @@ buildscript {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha4'
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.leanback:leanback:1.0.0'
     implementation 'androidx.annotation:annotation:1.0.2'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     implementation 'androidx.room:room-runtime:2.0.0'
     annotationProcessor 'androidx.room:room-compiler:2.0.0'
-    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha5'
+    implementation 'androidx.leanback:leanback:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+
     // Firebase
     implementation 'com.google.firebase:firebase-core:16.0.8'
     implementation 'com.google.firebase:firebase-ads:17.2.0'
@@ -112,10 +147,11 @@ dependencies {
 
     implementation 'com.google.dagger:dagger:2.16'
     annotationProcessor 'com.google.dagger:dagger-compiler:2.16'
+
+    // Testing
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
-    implementation 'com.google.android.material:material:1.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

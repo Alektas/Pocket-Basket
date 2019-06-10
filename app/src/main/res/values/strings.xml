@@ -12,7 +12,7 @@
     <string name="share_intro">Need goods:</string>
 
     <string name="about_app">About app</string>
-    <string name="about_msg">Pocket Basket is app for product list creation.</string>
+    <string name="about_msg">Pocket Basket is the app for the product list creation.</string>
     <string name="about_title" translatable="false">@string/app_name</string>
     <string name="about_developer">Developer: Alektas</string>
     <string name="about_email" translatable="false">alektas@inbox.ru</string>
@@ -24,37 +24,27 @@
     <string name="about_icons_by">Icons by:</string>
     <string name="about_version">Version: %s</string>
 
-    <string name="guide_accept_title">Do you want to go training?</string>
-    <string name="guide_accept_msg">Training can always be repeated by selecting \"Help\" in the menu</string>
+    <string name="guide">Hints</string>
+    <string name="guide_accept_title">Do you want to get hints?</string>
+    <string name="guide_accept_msg">Hints can be turned on/off by selecting \"Hints\" in the menu</string>
 
-    <string name="guide">Help</string>
-    <string name="guide_change_mode">Change mode by swipe</string>
-    <string name="guide_add_item">Add items by tap</string>
-    <string name="guide_check_item">Check item by tap on icon</string>
-    <string name="guide_move_item">Move item in basket by drag</string>
-    <string name="guide_remove_item">Remove item by swipe</string>
-    <string name="guide_del_mode">Select for deleting by long press</string>
-    <string name="guide_delete_items">Delete items or close panel</string>
-    <string name="guide_delete_items_sub">Items can be restored by \"Reset\" in the menu</string>
-    <string name="guide_floating_menu">Press button to show menu</string>
-    <string name="guide_check_all">Check all items</string>
-    <string name="guide_del_checked">Delete checked items</string>
-    <string name="guide_close_menu">Close menu</string>
-    <string name="guide_add_item_sub">or use search bar</string>
-    <string name="guide_move_item_sub">or by long press on item</string>
-    <string name="guide_remove_item_sub">or by tap on item in showcase</string>
-    <string name="guide_categ">This is categories</string>
-    <string name="guide_categ_sub">There you can filter items you needed</string>
-    <string name="guide_showcase">This is showcase</string>
-    <string name="guide_showcase_sub">From here you can take items to basket</string>
-    <string name="guide_basket">This is basket</string>
-    <string name="guide_basket_sub">There you keep items from showcase</string>
-    <string name="guide_change_mode_sub">Just swipe left</string>
+    <string name="guide_change_mode">Display mode can be changed by swipe</string>
+    <string name="guide_add_item">Items are added to the basket by tap</string>
+    <string name="guide_check_item">Products are marked by tap on the icon</string>
+    <string name="guide_move_item">Items in the basket are moved by the handler or a long press on the icon</string>
+    <string name="guide_remove_item">You can also remove an item from the basket with a swipe to the right</string>
+    <string name="guide_del_mode">You can go to the deletion mode by long pressing on the item</string>
+    <string name="guide_delete_items">You can delete selected items or close the panel. Non-user items can be restored by \"Reset\" in the menu.</string>
+    <string name="guide_floating_menu">Extra menu is called by long pressing on the button</string>
+    <string name="guide_check_all">Mark all items</string>
+    <string name="guide_del_checked">Remove marked items</string>
+    <string name="guide_close_menu">Close the menu</string>
 
     <string name="apache_license_link" translatable="false">https://www.apache.org/licenses/LICENSE-2.0.html</string>
     <string name="cc_license_link" translatable="false">http://creativecommons.org/licenses/by/3.0/</string>
     <string name="jeff_link" translatable="false">https://pixelbuddha.net/freebie/touch-gestures-icons</string>
     <string name="bom_link" translatable="false">https://www.iconfinder.com/korawan_m</string>
     <string name="google_material_link" translatable="false">https://material.io/tools/icons/</string>
+    <string name="del_toolbar_text">Selected for deletion: </string>
 
 </resources>

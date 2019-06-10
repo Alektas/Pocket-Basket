@@ -4,21 +4,21 @@ import android.os.AsyncTask;
 
 import java.util.List;
 
-import alektas.pocketbasket.data.Observer;
-import alektas.pocketbasket.db.dao.ItemsDao;
-import alektas.pocketbasket.db.entities.Item;
+import alektas.pocketbasket.data.ItemsUpdater;
+import alektas.pocketbasket.data.db.dao.ItemsDao;
+import alektas.pocketbasket.data.db.entities.Item;
 
 public class updateAllAsync extends AsyncTask<List<Item>, Void, Void> {
     private ItemsDao mDao;
-    private Observer mObserver;
+    private ItemsUpdater mUpdater;
 
     public updateAllAsync(ItemsDao dao) {
         mDao = dao;
     }
 
-    public updateAllAsync(ItemsDao dao, Observer observer) {
+    public updateAllAsync(ItemsDao dao, ItemsUpdater updater) {
         this(dao);
-        mObserver = observer;
+        mUpdater = updater;
     }
 
     @SafeVarargs
@@ -30,6 +30,9 @@ public class updateAllAsync extends AsyncTask<List<Item>, Void, Void> {
 
     @Override
     protected void onPostExecute(Void aVoid) {
-        if (mObserver != null) mObserver.update();
+        if (mUpdater != null) {
+            mUpdater.updateShowcase();
+            mUpdater.updateBasket();
+        }
     }
 }

@@ -4,13 +4,13 @@
     <string name="yes">Да</string>
     <string name="cancel">Закрыть</string>
     <string name="no">Нет</string>
-    <string name="del_user_items">Удалить пользовательские предметы</string>
-    <string name="search_hint">Добавить предмет</string>
+    <string name="del_user_items">Удалить пользовательские товары</string>
+    <string name="search_hint">Добавить товар</string>
     <string name="reset">Сброс</string>
     <string name="share">Поделиться</string>
     <string name="update">Обновить</string>
     <string name="share_intro">Нужны товары:</string>
-    <string name="guide">Помощь</string>
+    <string name="guide">Подсказки</string>
 
     <string name="about_app">О приложении</string>
     <string name="about_msg">Pocket Basket это приложение для составления списка продуктов.</string>
@@ -19,30 +19,21 @@
     <string name="about_icons_by">Иконки:</string>
     <string name="about_license">(лицензия)</string>
 
-    <string name="guide_accept_title">Хотите пройти обучение?</string>
-    <string name="guide_accept_msg">Обучение всегда можно пройти повторно выбрав \"Помощь\" в меню</string>
+    <string name="guide_accept_title">Хотите получать обучающие подсказки?</string>
+    <string name="guide_accept_msg">Включить/отключить подсказки можно выбрав \"Подсказки\" в меню</string>
 
-    <string name="guide_change_mode">Смените режим свайпом</string>
-    <string name="guide_add_item">Коснитесь, чтобы добавить в корзину</string>
-    <string name="guide_check_item">Коснитесь иконки, чтобы отметить предмет</string>
-    <string name="guide_move_item">Переместите предмет касанием</string>
-    <string name="guide_remove_item">Уберите предмет из корзины свайпом</string>
-    <string name="guide_del_mode">Перейдите в режим удаления долгим нажатием</string>
-    <string name="guide_delete_items">Удалите предметы или закройте панель</string>
-    <string name="guide_delete_items_sub">Предметы могут быть восстановлены с помощью пункта меню \"Сброс\"</string>
-    <string name="guide_floating_menu">Вызовите меню долгим нажатием</string>
-    <string name="guide_check_all">Отметить все</string>
-    <string name="guide_del_checked">Убрать отмеченные</string>
+    <string name="guide_change_mode">Режим отображения можно сменить свайпом</string>
+    <string name="guide_add_item">Товары в корзину добавляются касанием</string>
+    <string name="guide_check_item">Товары отмечаются касанием иконки</string>
+    <string name="guide_move_item">Товары в корзине перемещаются за ползунок или долгим нажатием по иконке</string>
+    <string name="guide_remove_item">Убрать товар из корзины можно также свайпом вправо</string>
+    <string name="guide_del_mode">Перейти в режим удаления можно долгим нажатием по товару</string>
+    <string name="guide_delete_items">Можно удалить выбранные товары или закрыть панель. Непользовательские предметы можно восстановить выбрав \"Сброс\" в меню</string>
+    <string name="guide_floating_menu">Дополнительное меню вызывается долгим нажатием по кнопке</string>
+    <string name="guide_check_all">Отметить все товары</string>
+    <string name="guide_del_checked">Убрать отмеченные товары</string>
     <string name="guide_close_menu">Закрыть меню</string>
-    <string name="guide_add_item_sub">или используйте строку поиска</string>
-    <string name="guide_move_item_sub">или долгим нажатием по предмету</string>
-    <string name="guide_remove_item_sub">или коснитесь его иконки в витрине слева</string>
-    <string name="guide_categ">Это категории</string>
-    <string name="guide_categ_sub">Здесь можно выбрать нужный тип товаров</string>
-    <string name="guide_showcase">Это витрина</string>
-    <string name="guide_showcase_sub">Здесь товары выбираются и отсюда кладутся в корзину</string>
-    <string name="guide_basket">Это корзина</string>
-    <string name="guide_basket_sub">Здесь хранятся выбранные из витрины товары</string>
-    <string name="guide_change_mode_sub">Просто проведите пальцем влево</string>
+    <string name="del_toolbar_text">Выбрано для удаления: </string>
+    =
 
 </resources>

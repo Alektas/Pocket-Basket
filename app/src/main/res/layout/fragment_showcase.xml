@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/showcase_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryLight"
+    tools:context=".ui.showcase.ShowcaseFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/showcase_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_above="@id/del_panel"
+        android:background="@color/colorPrimaryLight"
+        android:divider="@color/colorPrimaryLight"
+        android:animateLayoutChanges="false"
+        tools:listitem="@layout/item_showcase"/>
+
+    <LinearLayout
+        android:id="@+id/del_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <!-- Delete and Cancel buttons. Appear in Delete Mode -->
+        <LinearLayout
+            android:id="@+id/del_panel_content"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_del_panel"
+            android:gravity="center"
+            style="?android:attr/buttonBarStyle">
+
+            <ImageButton
+                android:id="@+id/btn_del"
+                android:layout_width="@dimen/size_del_panel_btn"
+                android:layout_height="@dimen/size_del_panel_btn"
+                android:src="@drawable/ic_delete_forever_white_24dp"
+                android:scaleType="centerCrop"
+                style="?android:attr/buttonBarButtonStyle"/>
+
+            <ImageButton
+                android:id="@+id/btn_close_panel"
+                android:layout_width="@dimen/size_del_panel_btn"
+                android:layout_height="@dimen/size_del_panel_btn"
+                android:src="@drawable/ic_close_white_24dp"
+                android:scaleType="centerCrop"
+                style="?android:attr/buttonBarButtonStyle"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

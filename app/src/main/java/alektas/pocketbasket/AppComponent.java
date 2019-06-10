@@ -2,7 +2,7 @@ package alektas.pocketbasket;
 
 import android.content.Context;
 
-import alektas.pocketbasket.view.MainActivity;
+import alektas.pocketbasket.ui.MainActivity;
 import dagger.Component;
 
 @Component(modules = {AppModule.class})

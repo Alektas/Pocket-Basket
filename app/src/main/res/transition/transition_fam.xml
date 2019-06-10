@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="250"
+    android:transitionOrdering="together">
+
+    <slide android:slideEdge="right">
+        <targets>
+            <target android:targetId="@id/fam_check_all"/>
+            <target android:targetId="@id/fam_del_all"/>
+        </targets>
+    </slide>
+
+</transitionSet>
