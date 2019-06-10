@@ -8,6 +8,7 @@ import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.databinding.ItemBasketBinding;
@@ -21,6 +22,7 @@ public abstract class BaseRecyclerAdapter
     private List<ItemModel> mItems;
 
     public BaseRecyclerAdapter() {
+        mItems = new ArrayList<>();
         setHasStableIds(true);
     }
 
@@ -77,9 +79,16 @@ public abstract class BaseRecyclerAdapter
     }
 
     public void setItems(List<ItemModel> newItems) {
-        ItemsDiffCallback diffCallback = new ItemsDiffCallback(mItems, newItems);
-        DiffUtil.DiffResult result = DiffUtil.calculateDiff(diffCallback);
-        mItems = newItems;
+        if (newItems.size() < 2) {
+            mItems.clear();
+            mItems.addAll(newItems);
+            notifyDataSetChanged();
+            return;
+        }
+        DiffUtil.DiffResult result =
+                DiffUtil.calculateDiff(new ItemsDiffCallback(mItems, newItems));
+        mItems.clear();
+        mItems.addAll(newItems);
         result.dispatchUpdatesTo(this);
     }
 
