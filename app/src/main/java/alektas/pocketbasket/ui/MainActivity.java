@@ -721,6 +721,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void changeShowcaseSize(int showcaseWidth) {
         ViewGroup.LayoutParams showcaseParams = mShowcaseContainer.getLayoutParams();
+        if (showcaseParams.width == showcaseWidth) return;
         showcaseParams.width = showcaseWidth;
         mShowcaseContainer.setLayoutParams(showcaseParams);
     }
@@ -733,6 +734,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void changeBasketSize(int basketWidth) {
         ViewGroup.LayoutParams basketParams = mBasketContainer.getLayoutParams();
+        if (basketParams.width == basketWidth) return;
         basketParams.width = basketWidth;
         mBasketContainer.setLayoutParams(basketParams);
     }
@@ -745,6 +747,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void changeCategoriesSize(int categWidth) {
         ViewGroup.LayoutParams categoriesParams = mCategoriesContainer.getLayoutParams();
+        if (categoriesParams.width == categWidth) return;
         categoriesParams.width = categWidth;
         mCategoriesContainer.setLayoutParams(categoriesParams);
     }
