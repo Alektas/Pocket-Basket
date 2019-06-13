@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements
     private float mMaxVelocity;
     private float protectedInterval;
     private float changeModeDistance;
+    private int changeModeStartDistance;
 
     private boolean isMenuShown;
     private boolean allowChangeMode = true;
@@ -359,6 +360,8 @@ public class MainActivity extends AppCompatActivity implements
 
         changeModeDistance = getResources().getDimension(R.dimen.change_mode_distance);
         protectedInterval = getResources().getDimension(R.dimen.protected_interval);
+        changeModeStartDistance =
+                (int) getResources().getDimension(R.dimen.change_mode_start_distance);
 
         mMaxVelocity = ViewConfiguration.get(this).getScaledMaximumFlingVelocity();
     }
@@ -633,37 +636,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Set basket or showcase mode in depends of the touch moving distance and velocity
-     *
-     * @param velocity touch moving velocity
-     */
-    private void setMode(int movX, float velocity) {
-        if (mViewModel.isShowcaseMode()) {
-            if (velocity < CHANGE_MODE_VELOCITY && movX < -changeModeDistance) {
-                setBasketMode();
-            } else {
-                if (movX < -protectedInterval)  {
-                    TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
-                }
-                changeLayoutSize(mCategWideWidth,
-                        0,
-                        mBasketNarrowWidth);
-            }
-        } else {
-            if (velocity > -CHANGE_MODE_VELOCITY && movX > changeModeDistance) {
-                setShowcaseMode();
-            } else {
-                if (movX > protectedInterval)  {
-                    TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
-                }
-                changeLayoutSize(mCategNarrowWidth,
-                        mShowcaseNarrowWidth,
-                        0);
-            }
-        }
-    }
-
-    /**
      * Set current mode to the Basket mode.
      * Mode state is observed, so this method also invoke {@link #applyBasketModeLayout()}
      * which actually resize views to consist the mode.
@@ -728,38 +700,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Set size of the layout parts in depends of touch moving distance
-     *
-     * @param movX touch moving distance
-     */
-    private void changeLayoutSizeByTouch(int movX) {
-        int showcaseWidth;
-        int categWidth;
-
-        if (mViewModel.isShowcaseMode()) {
-            showcaseWidth = calculateLayoutSize(
-                    mShowcaseWideWidth - mShowcaseNarrowWidth + movX/2,
-                    mShowcaseNarrowWidth,
-                    mShowcaseWideWidth);
-            categWidth = calculateLayoutSize(
-                    mCategWideWidth - mCategNarrowWidth + movX/2,
-                    mCategNarrowWidth,
-                    mCategWideWidth);
-        } else {
-            showcaseWidth = calculateLayoutSize(
-                    movX/2,
-                    mShowcaseNarrowWidth,
-                    mShowcaseWideWidth);
-            categWidth = calculateLayoutSize(
-                    movX/2,
-                    mCategNarrowWidth,
-                    mCategWideWidth);
-        }
-
-        changeLayoutSize(categWidth, showcaseWidth, 0);
-    }
-
-    /**
      * Change size of the layout parts: Categories, Showcase and Basket.
      * If one of the width equal '0' then the corresponding layout part fills in the free space.
      *
@@ -768,35 +708,45 @@ public class MainActivity extends AppCompatActivity implements
      * @param basketWidth width of the Basket in pixels
      */
     private void changeLayoutSize(int categWidth, int showcaseWidth, int basketWidth) {
-        ViewGroup.LayoutParams categoriesParams = mCategoriesContainer.getLayoutParams();
+        changeCategoriesSize(categWidth);
+        changeShowcaseSize(showcaseWidth);
+        changeBasketSize(basketWidth);
+    }
+
+    /**
+     * Change size of the Showcase layout.
+     * If width equal '0' then layout fills in the free space.
+     *
+     * @param showcaseWidth width of the Showcase in pixels
+     */
+    private void changeShowcaseSize(int showcaseWidth) {
         ViewGroup.LayoutParams showcaseParams = mShowcaseContainer.getLayoutParams();
-        ViewGroup.LayoutParams basketParams = mBasketContainer.getLayoutParams();
-
-        categoriesParams.width = categWidth;
         showcaseParams.width = showcaseWidth;
-        basketParams.width = basketWidth;
-
-        mCategoriesContainer.setLayoutParams(categoriesParams);
         mShowcaseContainer.setLayoutParams(showcaseParams);
+    }
+
+    /**
+     * Change size of the Basket layout.
+     * If width equal '0' then layout fills in the free space.
+     *
+     * @param basketWidth width of the Basket in pixels
+     */
+    private void changeBasketSize(int basketWidth) {
+        ViewGroup.LayoutParams basketParams = mBasketContainer.getLayoutParams();
+        basketParams.width = basketWidth;
         mBasketContainer.setLayoutParams(basketParams);
     }
 
     /**
-     * Calculate layout size according to touch gesture distance.
+     * Change size of the Categories layout.
+     * If width equal '0' then layout fills in the free space.
      *
-     * @param movX touch distance in pixels
-     * @param minSize minimum size of the layout
-     * @param maxSize maximum size of the layout
-     * @return value for size of layout between minSize and maxSize according to movX
+     * @param categWidth width of the Categories in pixels
      */
-    private int calculateLayoutSize(int movX, int minSize, int maxSize) {
-        if (movX <= 0) {
-            return minSize;
-        } else if (movX < maxSize - minSize) {
-            return minSize + movX;
-        } else {
-            return maxSize;
-        }
+    private void changeCategoriesSize(int categWidth) {
+        ViewGroup.LayoutParams categoriesParams = mCategoriesContainer.getLayoutParams();
+        categoriesParams.width = categWidth;
+        mCategoriesContainer.setLayoutParams(categoriesParams);
     }
 
     @SuppressLint("RestrictedApi")
@@ -1056,6 +1006,10 @@ public class MainActivity extends AppCompatActivity implements
         return super.dispatchTouchEvent(event);
     }
 
+    private boolean isModeChanging() {
+        return allowChangeMode && isChangeModeHandled;
+    }
+
     private void handleChangeModeByTouch(MotionEvent event) {
         if (mVelocityTracker == null) {
             mVelocityTracker = VelocityTracker.obtain();
@@ -1088,17 +1042,20 @@ public class MainActivity extends AppCompatActivity implements
 
                 // Allow or disallow changing mode
                 if (!isChangeModeHandled) {
-                    isChangeModeHandled = true;
                     if (Math.abs(movY) > Math.abs(movX)) {
+                        // Vertical direction is dominate so change mode is not allowed
+                        isChangeModeHandled = true;
                         allowChangeMode = false;
                         return;
-                    } else {
-                        allowChangeMode = true;
                     }
+                    if (Math.abs(movX) < changeModeStartDistance) {
+                        return; // gesture length is not enough to start change mode handling
+                    }
+                    isChangeModeHandled = true;
+                    allowChangeMode = true;
                 }
 
                 changeLayoutSizeByTouch(movX);
-
                 break;
             }
 
@@ -1110,8 +1067,48 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private boolean isModeChanging() {
-        return allowChangeMode && isChangeModeHandled;
+    /**
+     * Set size of the layout parts in depends of touch moving distance
+     *
+     * @param movX touch moving distance
+     */
+    private void changeLayoutSizeByTouch(int movX) {
+        int showcaseOffset;
+        int categOffset;
+        if (mViewModel.isShowcaseMode()) {
+            showcaseOffset = mShowcaseWideWidth - mShowcaseNarrowWidth + movX/2 + changeModeStartDistance;
+            categOffset = mCategWideWidth - mCategNarrowWidth + movX/2 + changeModeStartDistance;
+        } else {
+            showcaseOffset = movX/2 - changeModeStartDistance;
+            categOffset = movX/2 - changeModeStartDistance;
+        }
+
+        int showcaseWidth = calculateLayoutSize(showcaseOffset,
+                mShowcaseNarrowWidth,
+                mShowcaseWideWidth);
+        int categWidth = calculateLayoutSize(categOffset,
+                mCategNarrowWidth,
+                mCategWideWidth);
+
+        changeLayoutSize(categWidth, showcaseWidth, 0);
+    }
+
+    /**
+     * Calculate layout size according to touch gesture distance.
+     *
+     * @param movX touch distance in pixels
+     * @param minSize minimum size of the layout
+     * @param maxSize maximum size of the layout
+     * @return value for size of layout between minSize and maxSize according to movX
+     */
+    private int calculateLayoutSize(int movX, int minSize, int maxSize) {
+        if (movX <= 0) {
+            return minSize;
+        } else if (movX < maxSize - minSize) {
+            return minSize + movX;
+        } else {
+            return maxSize;
+        }
     }
 
     /**
@@ -1160,6 +1157,37 @@ public class MainActivity extends AppCompatActivity implements
             }
             default: {
                 return new DecelerateInterpolator(2.5f);
+            }
+        }
+    }
+
+    /**
+     * Set basket or showcase mode in depends of the touch moving distance and velocity
+     *
+     * @param velocity touch moving velocity
+     */
+    private void setMode(int movX, float velocity) {
+        if (mViewModel.isShowcaseMode()) {
+            if (velocity < CHANGE_MODE_VELOCITY && movX < -changeModeDistance) {
+                setBasketMode();
+            } else {
+                if (movX < -protectedInterval)  {
+                    TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
+                }
+                changeLayoutSize(mCategWideWidth,
+                        0,
+                        mBasketNarrowWidth);
+            }
+        } else {
+            if (velocity > -CHANGE_MODE_VELOCITY && movX > changeModeDistance) {
+                setShowcaseMode();
+            } else {
+                if (movX > protectedInterval)  {
+                    TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
+                }
+                changeLayoutSize(mCategNarrowWidth,
+                        mShowcaseNarrowWidth,
+                        0);
             }
         }
     }
