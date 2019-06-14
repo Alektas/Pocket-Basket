@@ -76,9 +76,14 @@ public class MainActivity extends AppCompatActivity implements
         ItemSizeProvider {
 
     private static final String TAG = "MainActivity";
-    private static final long CHANGE_MODE_TIME = 250;
-    private static final float CHANGE_MODE_VELOCITY = 150;
     private static final String SAVED_CATEGORY_KEY = "saved_category";
+    private static final long CHANGE_MODE_TIME = 250;
+    private static final float CHANGE_MODE_MIN_VELOCITY = 150;
+    /**
+     * Affect to interpolator selection for the mode change.
+     * The smaller the divider, the easier faster interpolator is selecting.
+     */
+    private static final float CHANGE_MODE_VELOCITY_DIVIDER = 1000;
 
     private int mCategNarrowWidth;
     private int mCategWideWidth;
@@ -1144,7 +1149,7 @@ public class MainActivity extends AppCompatActivity implements
      * @return appropriate decelerate interpolator
      */
     private Interpolator getInterpolator(float velocity) {
-        int factor = (int) (Math.abs(velocity)/1500);
+        int factor = (int) (Math.abs(velocity)/ CHANGE_MODE_VELOCITY_DIVIDER);
         switch (factor) {
             case 0: {
                 return new AccelerateDecelerateInterpolator();
@@ -1171,7 +1176,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void setMode(int movX, float velocity) {
         if (mViewModel.isShowcaseMode()) {
-            if (velocity < CHANGE_MODE_VELOCITY && movX < -changeModeDistance) {
+            if (velocity < CHANGE_MODE_MIN_VELOCITY && movX < -changeModeDistance) {
                 setBasketMode();
             } else {
                 if (movX < -protectedInterval)  {
@@ -1182,7 +1187,7 @@ public class MainActivity extends AppCompatActivity implements
                         mBasketNarrowWidth);
             }
         } else {
-            if (velocity > -CHANGE_MODE_VELOCITY && movX > changeModeDistance) {
+            if (velocity > -CHANGE_MODE_MIN_VELOCITY && movX > changeModeDistance) {
                 setShowcaseMode();
             } else {
                 if (movX > protectedInterval)  {
