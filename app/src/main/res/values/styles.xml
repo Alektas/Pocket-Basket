@@ -16,6 +16,7 @@
         <item name="android:editTextColor">@android:color/white</item>
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textColorHint">@color/lb_search_plate_hint_text_color</item>
+        <item name="android:textSize">@dimen/textsize_appbar</item>
     </style>
 
     <style name="CategButton">
@@ -40,6 +41,7 @@
         <item name="android:paddingBottom">16dp</item>
         <item name="android:layout_margin">32dp</item>
         <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textSize">@dimen/textsize_guide_hint</item>
         <item name="android:backgroundTint">@color/bg_guide_hint</item>
         <item name="android:onClick">onHintClick</item>
     </style>

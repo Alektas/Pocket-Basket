@@ -26,9 +26,12 @@
     <dimen name="textsize_item_icon">12sp</dimen>
     <dimen name="textsize_category">@dimen/textsize_item_name</dimen>
     <dimen name="textsize_guide">20sp</dimen>
+    <dimen name="textsize_guide_hint">16sp</dimen>
     <dimen name="textsize_appbar">20sp</dimen>
+    <dimen name="textsize_del_toolbar">18sp</dimen>
 
     <dimen name="change_mode_distance">56dp</dimen>
+    <dimen name="change_mode_start_distance">16dp</dimen>
     <dimen name="protected_interval">16dp</dimen>
 
     <dimen name="padding_8">8dp</dimen>
@@ -36,6 +39,6 @@
     <dimen name="padding_32">32dp</dimen>
     <dimen name="padding_rb">16dp</dimen>
     <dimen name="padding_ic">8dp</dimen>
-    <dimen name="textsize_del_toolbar">18sp</dimen>
+    <dimen name="margin_item_icon_8">8dp</dimen>
 
 </resources>
