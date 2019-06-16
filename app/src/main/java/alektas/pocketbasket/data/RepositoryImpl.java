@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.async.insertAllAsync;
-import alektas.pocketbasket.async.updateAllAsync;
 import alektas.pocketbasket.data.db.AppDatabase;
 import alektas.pocketbasket.data.db.dao.ItemsDao;
 import alektas.pocketbasket.data.db.entities.BasketMeta;
@@ -43,8 +41,8 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     private Observable<Integer> mDelItemsCountData;
 
     private RepositoryImpl(Context context) {
-        mItemsDao = AppDatabase.getInstance(context, this).getDao();
-        mShowcaseData = new SingleObservableValue<>(getItems(mTag));
+        mItemsDao = AppDatabase.getInstance(context).getDao();
+        mShowcaseData = new SingleObservableValue<>(getShowcaseItems(mTag));
         mBasketData = new SingleObservableValue<>(getBasketItems());
         mDelItemsCountData = new SingleObservableValue<>(0);
         showcaseModeState = new MultiObservableValue<>(true);
@@ -180,7 +178,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     // Delete all checked items from "Basket"
     @Override
     public void removeMarked() {
-        new deleteMarkedAsync(mItemsDao, this).execute();
+        new removeBasketMarkedAsync(mItemsDao, this).execute();
     }
 
 
@@ -201,23 +199,25 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     // Return default showcase items
     @Override
     public void resetShowcase() {
-        new resetAsync(mItemsDao, this).execute(ItemGenerator.getAll());
+        new resetAsync(mItemsDao, this).execute();
     }
 
     @Override
-    public void insertPredefinedItems() {
-        new insertAllAsync(mItemsDao, this).execute(convert(ItemGenerator.getAll()));
+    public void returnDeletedItems() {
+        new returnDeletedItemsAsync(mItemsDao, this).execute();
     }
 
     @Override
-    public void updateAll() {
-        new updateAllAsync(mItemsDao, this).execute(ItemGenerator.getAll());
+    public void updateNames() {
+        new updateDisplayedNamesAsync(mItemsDao, this).execute();
     }
 
     // Set value to Showcase Data to notify observers
     @Override
     public void updateShowcase() {
-        List<ShowcaseItemModel> items = getItems(mTag);
+        // Get items according to the selected category (tag)
+        List<ShowcaseItemModel> items = getShowcaseItems(mTag);
+        // In del mode set removal state to the selected for deletion items
         if (items != null && delModeState.getValue()) {
             for (ShowcaseItemModel delItem : mDelItems) {
                 int i = items.indexOf(delItem);
@@ -248,18 +248,18 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     }
 
     @Override
-    public ItemModel getItem(String name) {
+    public ItemModel getItemByName(String name) {
         try {
-            return new getItemAsync(mItemsDao).execute(name).get();
+            return new getItemByNameAsync(mItemsDao).execute(name).get();
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private List<ShowcaseItemModel> getItems(String tag) {
+    private List<ShowcaseItemModel> getShowcaseItems(String tag) {
         try {
-            return new getAllAsync(mItemsDao).execute(tag).get();
+            return new getShowcaseAsync(mItemsDao).execute(tag).get();
         }
         catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
@@ -281,23 +281,23 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         }
     }
 
-    private static class getItemAsync extends AsyncTask<String, Void, ItemModel> {
+    private static class getItemByNameAsync extends AsyncTask<String, Void, ItemModel> {
         ItemsDao mDao;
 
-        getItemAsync(ItemsDao dao) {
+        getItemByNameAsync(ItemsDao dao) {
             mDao = dao;
         }
 
         @Override
         protected ItemModel doInBackground(String... strings) {
-            return mDao.getItem(strings[0]);
+            return mDao.getItemByName(strings[0]);
         }
     }
 
-    private static class getAllAsync extends AsyncTask<String, Void, List<ShowcaseItemModel>> {
+    private static class getShowcaseAsync extends AsyncTask<String, Void, List<ShowcaseItemModel>> {
         private ItemsDao mDao;
 
-        getAllAsync(ItemsDao dao) { mDao = dao; }
+        getShowcaseAsync(ItemsDao dao) { mDao = dao; }
 
         @Override
         protected List<ShowcaseItemModel> doInBackground(String... tags) {
@@ -427,20 +427,20 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         }
     }
 
-    private static class deleteMarkedAsync extends AsyncTask<Void, Void, Void> {
+    private static class removeBasketMarkedAsync extends AsyncTask<Void, Void, Void> {
         private ItemsDao mDao;
         private ItemsUpdater mUpdater;
 
-        deleteMarkedAsync(ItemsDao dao) { mDao = dao; }
+        removeBasketMarkedAsync(ItemsDao dao) { mDao = dao; }
 
-        deleteMarkedAsync(ItemsDao dao, ItemsUpdater updater) {
+        removeBasketMarkedAsync(ItemsDao dao, ItemsUpdater updater) {
             this(dao);
             mUpdater = updater;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            mDao.deleteChecked();
+            mDao.removeCheckedBasket();
             return null;
         }
 
@@ -519,7 +519,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         @SafeVarargs
         @Override
         protected final Void doInBackground(List<Item>... items) {
-            mDao.delete(items[0]);
+            mDao.deleteItems(items[0]);
             return null;
         }
 
@@ -532,7 +532,7 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         }
     }
 
-    private static class resetAsync extends AsyncTask<List<Item>, Void, Void> {
+    private static class resetAsync extends AsyncTask<Void, Void, Void> {
         private ItemsDao mDao;
         private ItemsUpdater mUpdater;
 
@@ -543,10 +543,68 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
             mUpdater = updater;
         }
 
-        @SafeVarargs
         @Override
-        protected final Void doInBackground(List<Item>... items) {
-            mDao.fullReset(items[0]);
+        protected final Void doInBackground(Void... voids) {
+            mDao.fullReset();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mUpdater != null) {
+                mUpdater.updateShowcase();
+                mUpdater.updateBasket();
+            }
+        }
+    }
+
+    private static class returnDeletedItemsAsync extends AsyncTask<Void, Void, Void> {
+        private ItemsDao mDao;
+        private ItemsUpdater mUpdater;
+
+        returnDeletedItemsAsync(ItemsDao dao) {
+            mDao = dao;
+        }
+
+        returnDeletedItemsAsync(ItemsDao dao, ItemsUpdater updater) {
+            this(dao);
+            mUpdater = updater;
+        }
+
+        @Override
+        protected final Void doInBackground(Void... voids) {
+            mDao.returnDeletedItems();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mUpdater != null) mUpdater.updateShowcase();
+        }
+    }
+
+    private static class updateDisplayedNamesAsync extends AsyncTask<Void, Void, Void> {
+        private ItemsDao mDao;
+        private ItemsUpdater mUpdater;
+
+        updateDisplayedNamesAsync(ItemsDao dao) {
+            mDao = dao;
+        }
+
+        updateDisplayedNamesAsync(ItemsDao dao, ItemsUpdater updater) {
+            this(dao);
+            mUpdater = updater;
+        }
+
+        @Override
+        protected final Void doInBackground(Void... voids) {
+            List<Item> items = new ArrayList<>(mDao.getShowcaseItems());
+            for (Item item : items) {
+                if (item.getNameRes() == null) continue;
+                item.setName(ResourcesUtils.getString(item.getNameRes()));
+            }
+
+            mDao.update(items);
             return null;
         }
 

@@ -41,11 +41,13 @@ class ItemsDiffCallback extends DiffUtil.Callback {
         if (oldItem instanceof BasketItem) {
             BasketItem oldBasketItem = (BasketItem) oldItem;
             BasketItem newBasketItem = (BasketItem) newItem;
-            return oldBasketItem.isMarked() == newBasketItem.isMarked();
+            return oldBasketItem.getName().equals(newBasketItem.getName())
+                    && oldBasketItem.isMarked() == newBasketItem.isMarked();
         } else if (oldItem instanceof ShowcaseItem) {
             ShowcaseItem oldShowcaseItem = (ShowcaseItem) oldItem;
             ShowcaseItem newShowcaseItem = (ShowcaseItem) newItem;
-            return oldShowcaseItem.isRemoval() == newShowcaseItem.isRemoval()
+            return oldShowcaseItem.getName().equals(newShowcaseItem.getName())
+                    && oldShowcaseItem.isRemoval() == newShowcaseItem.isRemoval()
                     && oldShowcaseItem.isExistInBasket() == newShowcaseItem.isExistInBasket();
         }
         return false;

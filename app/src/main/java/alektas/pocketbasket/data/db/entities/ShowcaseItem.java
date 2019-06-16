@@ -1,7 +1,6 @@
 package alektas.pocketbasket.data.db.entities;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 
@@ -14,8 +13,8 @@ public class ShowcaseItem extends Item implements ShowcaseItemModel {
     @Ignore
     private boolean isRemoval;
 
-    public ShowcaseItem(@NonNull String name, String nameRes, String imgRes, @NonNull String tagRes) {
-        super(name, nameRes, imgRes, tagRes);
+    public ShowcaseItem(@NonNull String key, String name, String nameRes, String imgRes, @NonNull String tagRes) {
+        super(key, name, nameRes, imgRes, tagRes);
     }
 
     public int getExistInBasket() {
@@ -42,11 +41,4 @@ public class ShowcaseItem extends Item implements ShowcaseItemModel {
         isRemoval = removal;
     }
 
-    @Override
-    public boolean equals(@Nullable Object obj) {
-        if (obj == this) return true;
-        if (obj == null || obj.getClass() != getClass()) return false;
-        ShowcaseItem item = (ShowcaseItem) obj;
-        return item.getName().equals(getName());
-    }
 }

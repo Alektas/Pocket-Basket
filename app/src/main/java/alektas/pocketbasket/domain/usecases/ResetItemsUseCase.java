@@ -14,7 +14,7 @@ public class ResetItemsUseCase implements UseCase<Boolean, Void> {
         if (fullReset) {
             mRepository.resetShowcase();
         } else {
-            mRepository.insertPredefinedItems();
+            mRepository.returnDeletedItems();
         }
     }
 }

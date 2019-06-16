@@ -39,7 +39,7 @@ public class ItemsProvider extends ContentProvider {
         String query = uri.getLastPathSegment();
         MatrixCursor cursor = new MatrixCursor(ItemsContract.SEARCH_COLUMNS);
         List<Item> items = new ArrayList<>();
-        ItemsDao dao = AppDatabase.getInstance(getContext(), null).getDao();
+        ItemsDao dao = AppDatabase.getInstance(getContext()).getDao();
 
         if (SearchManager.SUGGEST_URI_PATH_QUERY.equals(query)) {
             // user hasn't entered anything
@@ -62,11 +62,10 @@ public class ItemsProvider extends ContentProvider {
         int i = 0;
         for (Item item : items) {
             // Cursor fields assigned in the ItemsContract.
-            // ID, visible text, image resource ID and data(key = name).
-            cursor.addRow(new Object[] {i,
-                    item.getName(),
-                    ResourcesUtils.getImgId(item.getImgRes()),
-                    item.getName()});
+            cursor.addRow(new Object[] {i,                      // ID
+                    item.getName(),                             // visible text
+                    ResourcesUtils.getImgId(item.getImgRes()),  // image resource ID
+                    item.getKey()});                           // data(key = name)
             i++;
         }
         return cursor;

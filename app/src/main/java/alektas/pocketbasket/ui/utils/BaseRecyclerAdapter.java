@@ -60,7 +60,7 @@ public abstract class BaseRecyclerAdapter
     @Override
     public long getItemId(int position) {
         ItemModel obj = mItems.get(position);
-        return obj.getName().hashCode();
+        return obj.getKey().hashCode();
     }
 
     @NonNull
