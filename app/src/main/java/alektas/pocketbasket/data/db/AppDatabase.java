@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import alektas.pocketbasket.BuildConfig;
 import alektas.pocketbasket.data.db.dao.ItemsDao;
 import alektas.pocketbasket.data.db.entities.BasketMeta;
 import alektas.pocketbasket.data.db.entities.Item;
@@ -32,11 +33,15 @@ public abstract class AppDatabase extends RoomDatabase {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
-                    copyAttachedDatabase(context.getApplicationContext(), DATABASE_NAME);
+                    if (BuildConfig.VERSION_CODE == 7 || BuildConfig.VERSION_CODE == 8) {
+                        deleteDatabase(context.getApplicationContext(), DATABASE_NAME);
+                    }
+                    setDatabaseIfNotExists(context.getApplicationContext(), DATABASE_NAME);
                     INSTANCE = Room.databaseBuilder(
                             context.getApplicationContext(),
                             AppDatabase.class, DATABASE_NAME)
                             .addMigrations(MIGRATION_1_9, MIGRATION_9_10)
+                            .fallbackToDestructiveMigrationFrom()
                             .build();
                 }
             }
@@ -45,7 +50,7 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     // Check if database not exists and copy prepopulated file from assets
-    private static void copyAttachedDatabase(Context context, String databaseName) {
+    private static void setDatabaseIfNotExists(Context context, String databaseName) {
         final File dbPath = context.getDatabasePath(databaseName);
 
         // If the database already exists, return
@@ -53,6 +58,19 @@ public abstract class AppDatabase extends RoomDatabase {
             return;
         }
 
+        loadDatabase(context, databaseName, dbPath);
+    }
+
+    private static void deleteDatabase(Context context, String databaseName) {
+        final File dbPath = context.getDatabasePath(databaseName);
+
+        // If the database already exists, delete it
+        if (dbPath.exists()) {
+            dbPath.delete();
+        }
+    }
+
+    private static void loadDatabase(Context context, String databaseName, File dbPath) {
         // Make sure we have a path to the file
         dbPath.getParentFile().mkdirs();
 
@@ -80,16 +98,12 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static final Migration MIGRATION_9_10 = new Migration(9, 10) {
         @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-
-        }
+        public void migrate(@NonNull SupportSQLiteDatabase database) { }
     };
 
     private static final Migration MIGRATION_1_9 = new Migration(1, 9) {
         @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-
-        }
+        public void migrate(@NonNull SupportSQLiteDatabase database) { }
     };
 
 }
