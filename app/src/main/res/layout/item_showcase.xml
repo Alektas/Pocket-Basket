@@ -57,7 +57,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textSize="@dimen/textsize_item_icon"
-                android:text="@{ResourcesUtils.getImgId(item.imgRes) == 0 ? ResourcesUtils.getDisplayName(item) : null}"/>
+                android:text="@{ResourcesUtils.getImgId(item.imgRes) == 0 ? item.name : null}"/>
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -70,7 +70,7 @@
             android:layout_centerVertical="true"
             android:textSize="@dimen/textsize_item_name"
             android:textColor="@color/text_item_showcase"
-            android:text="@{ResourcesUtils.getDisplayName(item)}"/>
+            android:text="@{item.name}"/>
 
     </RelativeLayout>
 </layout>

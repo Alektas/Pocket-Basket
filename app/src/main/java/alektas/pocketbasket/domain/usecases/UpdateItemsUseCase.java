@@ -11,6 +11,6 @@ public class UpdateItemsUseCase implements UseCase<Void, Void> {
 
     @Override
     public void execute(Void v, Callback<Void> callback) {
-        mRepository.updateAll();
+        mRepository.updateNames();
     }
 }

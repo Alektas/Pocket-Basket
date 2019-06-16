@@ -1,6 +1,8 @@
 package alektas.pocketbasket.domain.entities;
 
 public interface ItemModel {
+    String getKey();
+    void setKey(String key);
     String getName();
     void setName(String name);
     String getNameRes();

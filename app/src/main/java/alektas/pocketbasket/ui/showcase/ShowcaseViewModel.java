@@ -76,12 +76,12 @@ public class ShowcaseViewModel extends AndroidViewModel {
             mRepository.selectForDeleting(item);
             return;
         }
-        new SelectShowcaseItem(mRepository).execute(item.getName(), (isAdded) -> {
+        new SelectShowcaseItem(mRepository).execute(item.getKey(), (isAdded) -> {
             if (isAdded) {
                 mGuide.onUserEvent(GuideContract.GUIDE_ADD_ITEM_BY_TAP);
 
                 Bundle bundle = new Bundle();
-                bundle.putString(FirebaseAnalytics.Param.ITEM_ID, item.getName());
+                bundle.putString(FirebaseAnalytics.Param.ITEM_ID, item.getKey());
                 bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, item.getName());
                 bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, item.getTagRes());
                 App.getAnalytics().logEvent(FirebaseAnalytics.Event.ADD_TO_CART, bundle);

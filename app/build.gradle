@@ -112,6 +112,7 @@ android {
             }
         }
     }
+    sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/main/assets/'] } }
 }
 
 // Add plugin https://bitbucket.org/hvisser/android-apt

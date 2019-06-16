@@ -57,7 +57,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
 
     @Override
     public void onItemDismiss(int position) {
-        mModel.removeFromBasket(getItems().get(position).getName());
+        mModel.removeFromBasket(getItems().get(position).getKey());
     }
 
     @Override
