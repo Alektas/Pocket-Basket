@@ -13,7 +13,7 @@
     <string name="guide">Подсказки</string>
 
     <string name="about_app">О приложении</string>
-    <string name="about_msg">Pocket Basket это приложение для составления списка продуктов.</string>
+    <string name="about_msg">Pocket Basket это приложение для составления списка покупок.</string>
     <string name="about_version">"Версия: %s"</string>
     <string name="about_developer">Разработчик: Alektas</string>
     <string name="about_icons_by">Иконки:</string>

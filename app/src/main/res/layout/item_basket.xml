@@ -37,7 +37,7 @@
             android:layout_margin="@dimen/margin_item_icon_8"
             card_view:cardCornerRadius="@dimen/corners_item_icon"
             card_view:cardPreventCornerOverlap="true"
-            android:onClick="@{() -> model.markItem(item.name)}">
+            android:onClick="@{() -> model.markItem(item.key)}">
 
             <ImageView
                 android:id="@+id/item_image"
@@ -58,7 +58,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:textSize="@dimen/textsize_item_icon"
-                android:text="@{ResourcesUtils.getImgId(item.imgRes) == 0 ? ResourcesUtils.getDisplayName(item) : null}"/>
+                android:text="@{ResourcesUtils.getImgId(item.imgRes) == 0 ? item.name : null}"/>
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -71,7 +71,7 @@
             android:layout_centerVertical="true"
             android:textSize="@dimen/textsize_item_name"
             android:textColor="@color/text_item_basket"
-            android:text="@{ResourcesUtils.getDisplayName(item)}"/>
+            android:text="@{item.name}"/>
 
         <ImageView
             android:id="@+id/drag_handle"

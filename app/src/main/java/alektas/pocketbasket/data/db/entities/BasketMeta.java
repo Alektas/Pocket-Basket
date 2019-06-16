@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -13,33 +12,28 @@ import static androidx.room.ForeignKey.CASCADE;
 
 @Entity(tableName = "basket_meta",
         indices = {
-                @Index(value = "item_name", unique = true),
+                @Index(value = "item_key", unique = true),
                 @Index(value = "position")},
         foreignKeys = @ForeignKey(
                 entity = Item.class,
-                parentColumns = "name",
-                childColumns = "item_name",
+                parentColumns = "_key",
+                childColumns = "item_key",
                 onDelete = CASCADE,
                 onUpdate = CASCADE))
 public class BasketMeta {
     @PrimaryKey(autoGenerate = true)
     private int _id;
 
-    @ColumnInfo(name = "item_name")
+    @ColumnInfo(name = "item_key")
     @NonNull
-    private String itemName;
+    private String itemKey;
 
-    @NonNull
     private int position;
 
-    @NonNull
-    private int marked;
+    private int marked = 0;
 
-    public BasketMeta() {}
-
-    @Ignore
-    public BasketMeta(@NonNull String name) {
-        itemName = name;
+    public BasketMeta(@NonNull String itemKey) {
+        this.itemKey = itemKey;
     }
 
     public int get_id() {
@@ -50,12 +44,12 @@ public class BasketMeta {
         this._id = _id;
     }
 
-    public String getItemName() {
-        return itemName;
+    public String getItemKey() {
+        return itemKey;
     }
 
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
+    public void setItemKey(String itemKey) {
+        this.itemKey = itemKey;
     }
 
     public int getPosition() {
@@ -81,12 +75,12 @@ public class BasketMeta {
     }
 
     @NonNull
-    public String toString() { return ("[basket_meta: name=" + itemName + ": pos=" + position + " marked=" + marked + "]"); }
+    public String toString() { return ("[basket_meta: name=" + itemKey + ": pos=" + position + " marked=" + marked + "]"); }
 
     @Override
     public boolean equals(@Nullable Object obj) {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != getClass()) return false;
-        return ((BasketMeta) obj).getItemName().equals(this.itemName);
+        return ((BasketMeta) obj).getItemKey().equals(this.itemKey);
     }
 }

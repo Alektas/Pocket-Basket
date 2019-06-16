@@ -15,10 +15,10 @@ public class ChangeItemsPositions implements UseCase<List<ItemModel>, Void> {
 
     @Override
     public void execute(List<ItemModel> items, Callback<Void> callback) {
-        List<String> names = new ArrayList<>();
+        List<String> keys = new ArrayList<>();
         for (ItemModel item : items) {
-            names.add(item.getName());
+            keys.add(item.getKey());
         }
-        mRepository.updatePositions(names);
+        mRepository.updatePositions(keys);
     }
 }

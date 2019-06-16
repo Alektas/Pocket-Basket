@@ -123,11 +123,9 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     }
 
     /**
-     * Update information of all vanilla items (exclude user items).
-     * Information includes icons that were added in the new version and displayed names that
-     * were changed with localization.
+     * Update displayed item names that were changed with localization (exclude user items)
      */
-    public void updateAllItems() {
+    public void updateLocaleNames() {
         new UpdateItemsUseCase(mRepository).execute(null, null);
     }
 

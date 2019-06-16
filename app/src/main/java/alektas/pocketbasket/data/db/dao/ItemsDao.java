@@ -19,11 +19,11 @@ import alektas.pocketbasket.data.db.entities.ShowcaseItem;
 public abstract class ItemsDao {
     private static final String TAG = "ItemsDao";
 
-    @Query("SELECT name, name_res, img_res, tag_res, " +
+    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, deleted, " +
                 "(CASE WHEN EXISTS " +
-                    "(SELECT 1 FROM basket_meta WHERE items.name = basket_meta.item_name) " +
+                    "(SELECT 1 FROM basket_meta WHERE items._key = basket_meta.item_key) " +
                 "THEN 1 ELSE 0 END) AS in_basket " +
-            "FROM items ORDER BY CASE " +
+            "FROM items WHERE deleted = 0 ORDER BY CASE " +
             "WHEN tag_res = 'drink' THEN 1 " +
             "WHEN tag_res = 'fruit' THEN 2 " +
             "WHEN tag_res = 'vegetable' THEN 3 " +
@@ -38,49 +38,49 @@ public abstract class ItemsDao {
             "WHEN tag_res = 'household' THEN 12 " +
             "WHEN tag_res = 'other' THEN 13 " +
             "ELSE 14 " +
-            "END, name")
+            "END, displayed_name")
     public abstract List<ShowcaseItem> getShowcaseItems();
 
-    @Query("SELECT name, name_res, img_res, tag_res " +
-            "FROM items WHERE items.name = :name")
-    public abstract Item getItem(String name);
+    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, deleted " +
+            "FROM items WHERE displayed_name = :name AND deleted = 0")
+    public abstract Item getItemByName(String name);
 
-    @Query("SELECT name, name_res, img_res, tag_res, " +
+    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, deleted, " +
                 "(CASE WHEN EXISTS " +
-                    "(SELECT 1 FROM basket_meta WHERE items.name = basket_meta.item_name) " +
+                    "(SELECT 1 FROM basket_meta WHERE items._key = basket_meta.item_key) " +
                 "THEN 1 ELSE 0 END) AS in_basket " +
-            "FROM items WHERE items.tag_res = :tag ORDER BY name ASC")
+            "FROM items WHERE items.tag_res = :tag AND deleted = 0 ORDER BY displayed_name ASC")
     public abstract List<ShowcaseItem> getShowcaseItems(String tag);
 
-    @Query("SELECT * FROM items WHERE name LIKE :query")
+    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, deleted " +
+            "FROM items WHERE displayed_name LIKE :query AND deleted = 0")
     public abstract List<Item> search(String query);
 
-    @Query("SELECT name, name_res, img_res, tag_res, basket_meta.marked " +
+    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, basket_meta.marked, deleted " +
             "FROM items INNER JOIN basket_meta " +
-            "ON items.name = basket_meta.item_name " +
+            "ON items._key = basket_meta.item_key " +
             "GROUP BY basket_meta.position")
     public abstract List<BasketItem> getBasketItems();
 
-    @Query("SELECT * FROM basket_meta WHERE item_name = :name")
-    public abstract BasketMeta getItemMeta(String name);
+    @Query("SELECT _id, item_key, position, marked FROM basket_meta WHERE item_key = :key")
+    public abstract BasketMeta getItemMeta(String key);
 
-    @Query("SELECT name FROM items " +
+    @Query("SELECT _key FROM items " +
             "INNER JOIN basket_meta " +
-            "ON items.name = basket_meta.item_name " +
+            "ON items._key = basket_meta.item_key " +
             "GROUP BY basket_meta.position")
-    protected abstract List<String> getBasketItemNames();
+    protected abstract List<String> getBasketItemKeys();
 
 
     /* Mark an item queries */
 
     @Transaction
-    public void mark(String name) {
-        if (getItemMeta(name).isMarked()) mark(name, 0);
-        else mark(name, 1);
+    public void mark(String key) {
+        mark(key, getItemMeta(key).isMarked() ? 0 : 1);
     }
 
-    @Query("UPDATE basket_meta SET marked = :state WHERE item_name = :name")
-    protected abstract void mark(String name, int state);
+    @Query("UPDATE basket_meta SET marked = :state WHERE item_key = :key")
+    protected abstract void mark(String key, int state);
 
 
     /* Mark all items queries */
@@ -93,32 +93,32 @@ public abstract class ItemsDao {
     @Query("UPDATE basket_meta SET marked = :checked ")
     protected abstract void markAll(int checked);
 
-    @Query("SELECT item_name FROM basket_meta WHERE marked = 0 LIMIT 1")
+    @Query("SELECT item_key FROM basket_meta WHERE marked = 0 LIMIT 1")
     public abstract String findUnmarked();
 
 
     /* Update item positions queries */
 
     @Transaction
-    public void updatePositions(List<String> names) {
+    public void updatePositions(List<String> keys) {
         // start positions from 1
         int i = 1;
-        for (String name : names) {
-            setPosition(name, i);
+        for (String key : keys) {
+            setPosition(key, i);
             i++;
         }
     }
 
-    @Query("UPDATE basket_meta SET position = :position WHERE item_name = :name")
-    protected abstract void setPosition(String name, int position);
+    @Query("UPDATE basket_meta SET position = :position WHERE item_key = :key")
+    protected abstract void setPosition(String key, int position);
 
 
     /* Delete checked items queries */
 
     @Transaction
-    public void deleteChecked() {
+    public void removeCheckedBasket() {
         deleteCheckedBasket();
-        updatePositions(getBasketItemNames());
+        updatePositions(getBasketItemKeys());
     }
 
     @Query("DELETE FROM basket_meta WHERE marked = 1")
@@ -128,17 +128,17 @@ public abstract class ItemsDao {
     /* Remove basket item queries */
 
     @Transaction
-    public void removeBasketItem(String name) {
-        int position = getPosition(name);
-        removeFromBasket(name);
+    public void removeBasketItem(String key) {
+        int position = getPosition(key);
+        deleteBasketMeta(key);
         onItemDeleted(position);
     }
 
-    @Query("SELECT position FROM basket_meta WHERE item_name = :name")
-    protected abstract int getPosition(String name);
+    @Query("SELECT position FROM basket_meta WHERE item_key = :key")
+    protected abstract int getPosition(String key);
 
-    @Query("DELETE FROM basket_meta WHERE item_name = :name")
-    protected abstract void removeFromBasket(String name);
+    @Query("DELETE FROM basket_meta WHERE item_key = :key")
+    protected abstract void deleteBasketMeta(String key);
 
     @Query("UPDATE basket_meta SET position = (position - 1) " +
             "WHERE position > :position")
@@ -148,29 +148,45 @@ public abstract class ItemsDao {
     /* Reset showcase queries */
 
     @Transaction
-    public void fullReset(List<Item> items) {
-        deleteAll();
-        insertAll(items);
+    public void fullReset() {
+        deleteUserItems();
+        returnDeletedItems();
     }
 
-    @Query("DELETE FROM items")
-    protected abstract void deleteAll();
+    @Query("DELETE FROM items WHERE name_res = NULL")
+    protected abstract void deleteUserItems();
+
+    @Query("UPDATE items SET deleted = 0")
+    public abstract void returnDeletedItems();
+
+    @Transaction
+    public void deleteItems(List<Item> items) {
+        for (Item item : items) {
+            if (item.getNameRes() == null) {
+                delete(item);
+                continue;
+            }
+            item.setDeleted(1);
+            update(item);
+            removeBasketItem(item.getKey());
+        }
+    }
 
 
     /* Add new item to showcase and put item to basket queries */
     @Transaction
-    public void addNewItem(String name) {
-        Item item = new Item(name);
+    public void addNewItem(String key) {
+        Item item = new Item(key);
         insert(item);
-        BasketMeta basketMeta = new BasketMeta(name);
+        BasketMeta basketMeta = new BasketMeta(key);
         basketMeta.setPosition(getMaxPosition() + 1);
         putBasketMeta(basketMeta);
     }
 
     @Transaction
-    public void putItemToBasket(String name) {
-        if (getItemMeta(name) != null) return;
-        BasketMeta basketMeta = new BasketMeta(name);
+    public void putItemToBasket(String key) {
+        if (getItemMeta(key) != null) return;
+        BasketMeta basketMeta = new BasketMeta(key);
         basketMeta.setPosition(getMaxPosition() + 1);
         putBasketMeta(basketMeta);
     }
@@ -185,17 +201,15 @@ public abstract class ItemsDao {
     protected abstract void putBasketMeta(BasketMeta meta);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insert(Item item);
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    public abstract void insertAll(List<Item> items);
+    protected abstract void insert(Item item);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    public abstract void update(Item item);
+    protected abstract void update(Item item);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     public abstract void update(List<Item> items);
 
     @Delete
-    public abstract void delete(List<Item> item);
+    protected abstract void delete(Item item);
+
 }

@@ -10,12 +10,12 @@ public class SelectShowcaseItem implements UseCase<String, Boolean> {
     }
 
     @Override
-    public void execute(String name, Callback<Boolean> callback) {
-        if (mRepository.isItemInBasket(name)) {
-            mRepository.removeFromBasket(name);
+    public void execute(String key, Callback<Boolean> callback) {
+        if (mRepository.isItemInBasket(key)) {
+            mRepository.removeFromBasket(key);
             callback.onResponse(false);
         } else {
-            mRepository.putToBasket(name);
+            mRepository.putToBasket(key);
             callback.onResponse(true);
         }
     }

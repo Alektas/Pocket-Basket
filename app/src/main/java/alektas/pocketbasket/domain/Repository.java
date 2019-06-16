@@ -28,8 +28,8 @@ public interface Repository {
     void addNewItem(String name);
     void setFilter(String tag);
     void resetShowcase();
-    void insertPredefinedItems();
-    void updateAll();
+    void returnDeletedItems();
+    void updateNames();
     /**
      * Find item by name in all categories.
      * Case sensitive.
@@ -37,7 +37,7 @@ public interface Repository {
      * @param name key of the item
      * @return item domain model or null
      */
-    ItemModel getItem(String name);
+    ItemModel getItemByName(String name);
 
     /**
      * Contains current mode state.
