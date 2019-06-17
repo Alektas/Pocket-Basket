@@ -136,12 +136,20 @@ public class MainActivity extends AppCompatActivity implements
 
         init();
 
-        /* Update items in the database when locale is changed.
-         * It allow to display correct item names */
+        /* Update items in the database when other app version is launched or locale is changed.
+         * It allow to display correct correct item names */
         String curLang = ResourcesUtils.getCurrentLocale().getLanguage();
         String savedLang = mPrefs.getString(getString(R.string.LOCALE_KEY), "lang");
-        if (!savedLang.equals(curLang)) {
-            mPrefs.edit().putString(getString(R.string.LOCALE_KEY), curLang).apply();
+
+        int vc = ResourcesUtils.getVersionCode();
+        boolean isVersionChanged =
+                mPrefs.getInt(getString(R.string.VERSION_CODE_KEY), 1) != vc;
+
+        if (!savedLang.equals(curLang) || isVersionChanged) {
+            mPrefs.edit()
+                    .putString(getString(R.string.LOCALE_KEY), curLang)
+                    .putInt(getString(R.string.VERSION_CODE_KEY), vc)
+                    .apply();
             mViewModel.updateLocaleNames();
         }
 
