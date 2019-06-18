@@ -31,6 +31,8 @@ android {
         versionCode 10
         project.ext.set("archivesBaseName", "PocketBasket-" + defaultConfig.versionName)
 
+        resConfigs "en", "ru"
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
 
