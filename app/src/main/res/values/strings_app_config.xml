@@ -5,7 +5,7 @@
     <string name="PREFERENCES_FILE_KEY" translatable="false">alektas.pocketbasket</string>
     <string name="GUIDE_PREFERENCES_FILE_KEY" translatable="false">alektas.pocketbasket.guide</string>
     <string name="VERSION_CODE_KEY" translatable="false">versionCode</string>
-    <string name="LOCALE_KEY" translatable="false">locale</string>
+    <string name="LOCALE_KEY" translatable="false">user_locale</string>
     <string name="FIRST_START_KEY" translatable="false">isFirstStart</string>
     <string name="SHOW_HINTS_KEY" translatable="false">showHints</string>
 
