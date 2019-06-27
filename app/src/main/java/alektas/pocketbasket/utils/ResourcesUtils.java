@@ -71,4 +71,8 @@ public class ResourcesUtils {
         return Locale.getDefault();
     }
 
+    public static int getInDip(int dimenRes) {
+        return (int) (mResources.getDimension(dimenRes) / mResources.getDisplayMetrics().density);
+    }
+
 }
