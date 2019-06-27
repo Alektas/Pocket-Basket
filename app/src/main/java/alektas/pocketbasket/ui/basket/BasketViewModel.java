@@ -68,8 +68,8 @@ public class BasketViewModel extends AndroidViewModel {
         mGuide.onUserEvent(GuideContract.GUIDE_CHECK_ITEM);
     }
 
-    public void removeFromBasket(String name) {
-        new RemoveItemFromBasket(mRepository).execute(name, null);
+    public void removeFromBasket(String key) {
+        new RemoveItemFromBasket(mRepository).execute(key, null);
         ActivityViewModel.removeCountState.setState(ActivityViewModel.removeCountState.getState() + 1);
         mGuide.onUserEvent(GuideContract.GUIDE_SWIPE_REMOVE_ITEM);
     }

@@ -11,6 +11,12 @@
     <string name="update">Обновить</string>
     <string name="share_intro">Нужны товары:</string>
     <string name="guide">Подсказки</string>
+    <string name="del_toolbar_text">Выбрано для удаления: </string>
+
+    <string name="widget_empty">Пусто</string>
+    <string name="widget_basket_title">Корзина</string>
+    <string name="widget_loading_long">Загрузка…</string>
+    <string name="widget_item_removed">"Товар удален: "</string>
 
     <string name="about_app">О приложении</string>
     <string name="about_msg">Pocket Basket это приложение для составления списка покупок.</string>
@@ -33,7 +39,5 @@
     <string name="guide_check_all">Отметить все товары</string>
     <string name="guide_del_checked">Убрать отмеченные товары</string>
     <string name="guide_close_menu">Закрыть меню</string>
-    <string name="del_toolbar_text">Выбрано для удаления: </string>
-    =
 
 </resources>

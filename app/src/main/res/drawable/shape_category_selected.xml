@@ -5,8 +5,8 @@
     android:tint="@color/colorPrimaryLight">
     <corners
         android:radius="1dp"
-        android:topLeftRadius="24dp"
+        android:topLeftRadius="@dimen/corners_category"
         android:topRightRadius="0dp"
-        android:bottomLeftRadius="24dp"
+        android:bottomLeftRadius="@dimen/corners_category"
         android:bottomRightRadius="0dp" />
 </shape>
