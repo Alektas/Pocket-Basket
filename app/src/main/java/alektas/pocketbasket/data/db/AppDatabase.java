@@ -20,7 +20,7 @@ import alektas.pocketbasket.data.db.dao.ItemsDao;
 import alektas.pocketbasket.data.db.entities.BasketMeta;
 import alektas.pocketbasket.data.db.entities.Item;
 
-@Database(entities = {Item.class, BasketMeta.class}, version = 10)
+@Database(entities = {Item.class, BasketMeta.class}, version = 11)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String TAG = "AppDatabase";
     private static volatile AppDatabase INSTANCE;
@@ -36,7 +36,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(
                             context.getApplicationContext(),
                             AppDatabase.class, DATABASE_NAME)
-                            .addMigrations(MIGRATION_8_9, MIGRATION_9_10)
+                            .addMigrations(MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
                             .fallbackToDestructiveMigration()
                             .build();
                 }
@@ -91,6 +91,14 @@ public abstract class AppDatabase extends RoomDatabase {
             e.printStackTrace();
         }
     }
+
+    // App version upgrade: 0.8.2 -> 0.9.0
+    private static final Migration MIGRATION_10_11 = new Migration(10, 11) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // Just handle loading database from assets, so the migration is not necessary
+        }
+    };
 
     // App version upgrade: 0.8.1 -> 0.8.2
     private static final Migration MIGRATION_9_10 = new Migration(9, 10) {
