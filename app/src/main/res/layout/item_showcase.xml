@@ -28,7 +28,7 @@
             android:layout_gravity="center_vertical|start"
             android:layout_width="@dimen/size_item_icon"
             android:layout_height="@dimen/size_item_icon"
-            android:layout_margin="@dimen/margin_item_icon_8"
+            android:layout_margin="@dimen/margin_item_icon"
             card_view:cardCornerRadius="@dimen/corners_item_icon"
             card_view:cardPreventCornerOverlap="true">
 

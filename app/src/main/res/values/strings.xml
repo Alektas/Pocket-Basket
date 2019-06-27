@@ -10,6 +10,13 @@
     <string name="share">Share</string>
     <string name="update">Update</string>
     <string name="share_intro">Need goods:</string>
+    <string name="del_toolbar_text">Selected for deletion: </string>
+
+    <string name="widget_empty">Empty</string>
+    <string name="widget_basket_title">Basket</string>
+    <string name="widget_loading_short" translatable="false">...</string>
+    <string name="widget_loading_long">Loading…</string>
+    <string name="widget_item_removed">"Item removed: "</string>
 
     <string name="about_app">About app</string>
     <string name="about_msg">Pocket Basket is the app for the product list creation.</string>
@@ -45,6 +52,5 @@
     <string name="jeff_link" translatable="false">https://pixelbuddha.net/freebie/touch-gestures-icons</string>
     <string name="bom_link" translatable="false">https://www.iconfinder.com/korawan_m</string>
     <string name="google_material_link" translatable="false">https://material.io/tools/icons/</string>
-    <string name="del_toolbar_text">Selected for deletion: </string>
 
 </resources>

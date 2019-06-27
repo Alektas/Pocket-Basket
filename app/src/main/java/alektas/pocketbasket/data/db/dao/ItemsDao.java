@@ -130,6 +130,7 @@ public abstract class ItemsDao {
     @Transaction
     public void removeBasketItem(String key) {
         int position = getPosition(key);
+        if (position < 1) return; // no item in basket with this key
         deleteBasketMeta(key);
         onItemDeleted(position);
     }
@@ -143,6 +144,9 @@ public abstract class ItemsDao {
     @Query("UPDATE basket_meta SET position = (position - 1) " +
             "WHERE position > :position")
     protected abstract void onItemDeleted(int position);
+
+    @Query("DELETE FROM basket_meta")
+    public abstract void cleanBasket();
 
 
     /* Reset showcase queries */

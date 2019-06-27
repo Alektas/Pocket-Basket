@@ -68,6 +68,7 @@ import alektas.pocketbasket.ui.dialogs.GuideAcceptDialog;
 import alektas.pocketbasket.ui.dialogs.ResetDialog;
 import alektas.pocketbasket.ui.utils.SmoothDecelerateInterpolator;
 import alektas.pocketbasket.utils.ResourcesUtils;
+import alektas.pocketbasket.widget.BasketWidget;
 
 public class MainActivity extends AppCompatActivity implements
         ResetDialog.ResetDialogListener,
@@ -186,6 +187,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStop() {
         mPrefs.edit().putInt(SAVED_CATEGORY_KEY, getSelectedCategoryId()).apply();
+        BasketWidget.updateItems(this);
         super.onStop();
     }
 

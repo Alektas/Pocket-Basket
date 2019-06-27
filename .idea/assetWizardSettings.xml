@@ -99,7 +99,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="ffffff" />
+                                      <entry key="backgroundColor" value="edffd0" />
                                       <entry key="foregroundImage" value="D:\YandexDisk\Изображения\icons\vector\ic_basket-dev.svg" />
                                     </map>
                                   </option>
@@ -173,7 +173,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_info_outline_black_24dp.xml" />
+                                      <entry key="url" value="jar:file:/C:/Program%20Files/Android/Android%20Studio/plugins/android/lib/android.jar!/images/material_design_icons/action/ic_delete_black_24dp.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -183,13 +183,10 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="assetSourceType" value="FILE" />
                             <entry key="color" value="005005" />
-                            <entry key="height" value="91" />
-                            <entry key="outputName" value="ic_watermelon" />
+                            <entry key="outputName" value="ic_delete_black_24dp" />
                             <entry key="overrideSize" value="true" />
                             <entry key="sourceFile" value="D:\YandexDisk\Изображения\icons\Food Set 3\SVG\91\2427890 - food fresh fruit summer watermelon.svg" />
-                            <entry key="width" value="91" />
                           </map>
                         </option>
                       </PersistentState>
