@@ -470,7 +470,7 @@ public class MainActivity extends AppCompatActivity implements
 
         TextView counter = findViewById(R.id.toolbar_del_mode_counter);
         viewModel.deleteItemsCountData().observe(this, delCount -> {
-            counter.setText(delCount.toString());
+            counter.setText(String.valueOf(delCount));
         });
 
         viewModel.showcaseModeState().observe(this, isShowcase -> {
