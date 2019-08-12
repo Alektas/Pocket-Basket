@@ -3,18 +3,25 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorControlNormal">@color/colorAccent</item>
-        <item name="colorControlActivated">@color/colorAccent</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryLight</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorSecondary">@color/colorPrimaryDark</item>
+        <item name="colorSecondaryVariant">@color/colorPrimaryDark</item>
+        <item name="colorOnSecondary">@android:color/white</item>
+        <item name="colorSurface">@android:color/white</item>
+        <item name="colorOnSurface">@color/colorTextDark</item>
+        <item name="android:colorBackground">@color/bg_main</item>
+        <item name="colorOnBackground">@color/colorTextDark</item>
+        <item name="colorError">#F44336</item>
+        <item name="colorOnError">#FFFFFF</item>
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="colorControlActivated">@android:color/white</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
     </style>
 
     <style name="AppBar" parent="AppTheme">
-        <item name="colorAccent">@android:color/white</item>
-        <item name="colorControlNormal">@android:color/white</item>
-        <item name="colorControlActivated">@android:color/white</item>
         <item name="android:editTextColor">@android:color/white</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@color/colorTextDark</item>
         <item name="android:textColorHint">@color/lb_search_plate_hint_text_color</item>
         <item name="android:textSize">@dimen/textsize_appbar</item>
     </style>
@@ -30,6 +37,7 @@
         <item name="android:lines">1</item>
         <item name="android:ellipsize">marquee</item>
         <item name="android:marqueeRepeatLimit">0</item>
+        <item name="android:buttonTint">@android:color/white</item>
         <item name="android:background">@drawable/bg_categ</item>
         <item name="android:stateListAnimator">@animator/anim_category_selection</item>
         <item name="android:onClick">onFilterClick</item>

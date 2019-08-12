@@ -130,6 +130,7 @@
         android:layout_margin="@dimen/padding_16"
         android:longClickable="true"
         android:onClick="onFabClick"
+        android:tint="@android:color/white"
         app:srcCompat="@drawable/ic_edit_24dp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/separator"
