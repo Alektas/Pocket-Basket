@@ -19,21 +19,21 @@
     <string name="widget_item_removed">"Item removed: "</string>
 
     <string name="about_app">About app</string>
-    <string name="about_msg">Pocket Basket is the app for the product list creation.</string>
+    <string name="about_msg">Pocket Basket is a shopping list application.</string>
     <string name="about_title" translatable="false">@string/app_name</string>
-    <string name="about_developer">Developer: Alektas</string>
+    <string name="about_developer">Developer:</string>
     <string name="about_email" translatable="false">alektas@inbox.ru</string>
     <string name="about_license">(license)</string>
     <string name="about_google_material" translatable="false">- Google Material</string>
     <string name="about_bomsymbols" translatable="false">- BomSymbols</string>
     <string name="about_jeff_portaro" translatable="false">- Jeff Portaro</string>
-    <string name="about_alektas" translatable="false">- Alektas</string>
+    <string name="about_alektas">- Totilas A.A.</string>
     <string name="about_icons_by">Icons by:</string>
     <string name="about_version">Version: %s</string>
 
     <string name="guide">Hints</string>
     <string name="guide_accept_title">Do you want to get hints?</string>
-    <string name="guide_accept_msg">Hints can be turned on/off by selecting \"Hints\" in the menu</string>
+    <string name="guide_accept_msg">Hints can be turned on/off by selecting \u00ABHints\u00BB in the menu</string>
 
     <string name="guide_change_mode">Display mode can be changed by swipe</string>
     <string name="guide_add_item">Items are added to the basket by tap</string>
@@ -52,5 +52,8 @@
     <string name="jeff_link" translatable="false">https://pixelbuddha.net/freebie/touch-gestures-icons</string>
     <string name="bom_link" translatable="false">https://www.iconfinder.com/korawan_m</string>
     <string name="google_material_link" translatable="false">https://material.io/tools/icons/</string>
+    <string name="about_developer_name">\u00A9 2019 Totilas A.A.</string>
+    <string name="license_agreement_label">License agreement</string>
+    <string name="license_agreement_link" translatable="false">https://drive.google.com/open?id=1W5M8BZkOQFPkjiAAvoJiLRdD_95JoZGv</string>
 
 </resources>

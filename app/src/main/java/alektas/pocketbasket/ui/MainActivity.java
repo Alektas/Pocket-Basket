@@ -987,6 +987,11 @@ public class MainActivity extends AppCompatActivity implements
                 link = getString(R.string.google_material_link);
                 break;
             }
+
+            case R.id.license_link: {
+                link = getString(R.string.license_agreement_link);
+                break;
+            }
         }
 
         if (link == null) return;

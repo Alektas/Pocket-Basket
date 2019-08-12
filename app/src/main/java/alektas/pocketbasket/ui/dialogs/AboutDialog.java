@@ -42,23 +42,26 @@ public class AboutDialog extends DialogFragment {
     }
 
     private void initAboutMenuLinks() {
-        TextView tv = (TextView) mView.findViewById(R.id.jeff_link);
+        TextView tv = mView.findViewById(R.id.jeff_link);
         makeLinkable(tv, getString(R.string.jeff_link));
 
-        tv = (TextView) mView.findViewById(R.id.bom_link);
+        tv = mView.findViewById(R.id.bom_link);
         makeLinkable(tv, getString(R.string.bom_link));
 
-        tv = (TextView) mView.findViewById(R.id.google_link);
+        tv = mView.findViewById(R.id.google_link);
         makeLinkable(tv, getString(R.string.google_material_link));
 
-        tv = (TextView) mView.findViewById(R.id.apache2_link);
+        tv = mView.findViewById(R.id.apache2_link);
         makeLinkable(tv, getString(R.string.apache_license_link));
 
-        tv = (TextView) mView.findViewById(R.id.apache_link);
+        tv = mView.findViewById(R.id.apache_link);
         makeLinkable(tv, getString(R.string.apache_license_link));
 
-        tv = (TextView) mView.findViewById(R.id.cc_link);
+        tv = mView.findViewById(R.id.cc_link);
         makeLinkable(tv, getString(R.string.cc_license_link));
+
+        tv = mView.findViewById(R.id.license_link);
+        makeLinkable(tv, getString(R.string.license_agreement_link));
     }
 
     private void makeLinkable(TextView tv, String link) {
