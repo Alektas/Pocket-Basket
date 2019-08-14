@@ -14,8 +14,6 @@
         <item name="colorOnBackground">@color/colorTextDark</item>
         <item name="colorError">#F44336</item>
         <item name="colorOnError">#FFFFFF</item>
-        <item name="colorControlNormal">@android:color/white</item>
-        <item name="colorControlActivated">@android:color/white</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
     </style>
 
@@ -24,6 +22,8 @@
     </style>
 
     <style name="AppBar" parent="AppTheme">
+        <item name="colorControlNormal">@android:color/white</item>
+        <item name="colorControlActivated">@android:color/white</item>
         <item name="android:editTextColor">@android:color/white</item>
         <item name="android:textColor">@color/colorTextDark</item>
         <item name="android:textColorHint">@color/lb_search_plate_hint_text_color</item>
