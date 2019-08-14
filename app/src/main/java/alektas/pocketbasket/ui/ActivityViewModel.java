@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -333,10 +334,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
             guide.completeCase(GuideContract.GUIDE_DEL_MODE);
             guide.completeCase(GuideContract.GUIDE_DEL_SELECTED_ITEMS);
         }
-
-        // TODO: make analytic appropriate to the context guide
-        Bundle startGuide = new Bundle();
-        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_BEGIN, startGuide);
     }
 
     @Override
@@ -346,15 +343,16 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         removeByTapInBasketModeState.setState(false);
         markCountState.setState(0);
         removeCountState.setState(0);
-
-        // TODO: make analytic appropriate to the context guide
-        Bundle finGuide = new Bundle();
-        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_COMPLETE, finGuide);
     }
 
     @Override
     public void onGuideCaseStart(String caseKey) {
         mCurGuideCaseData.setValue(caseKey);
+
+        if (TextUtils.isEmpty(caseKey)) return;
+        Bundle bundle = new Bundle();
+        bundle.putString("guidecase_name", caseKey);
+        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_BEGIN, bundle);
     }
 
     @Override

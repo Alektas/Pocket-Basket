@@ -824,6 +824,9 @@ public class MainActivity extends AppCompatActivity implements
         mPrefs.edit().putBoolean(getString(R.string.SHOW_HINTS_KEY), true).apply();
         mGuidePrefs.edit().clear().apply();
         mViewModel.startGuide(mGuidePrefs);
+
+        Bundle startGuide = new Bundle();
+        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_BEGIN, startGuide);
     }
 
     @Override
@@ -831,6 +834,9 @@ public class MainActivity extends AppCompatActivity implements
         mPrefs.edit().putBoolean(getString(R.string.SHOW_HINTS_KEY), false).apply();
         mGuidePrefs.edit().clear().apply();
         mViewModel.stopGuide();
+
+        Bundle endGuide = new Bundle();
+        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_COMPLETE, endGuide);
     }
 
     @Override
@@ -1008,7 +1014,7 @@ public class MainActivity extends AppCompatActivity implements
         // Do not allow a mode change in the landscape orientation
         if (!isLandscape()) {
             handleChangeModeByTouch(event);
-            // When changing mode cancel all other actions to avoid fake clicks
+            // When changing mode is active cancel all other actions to avoid fake clicks
             // Also stop scrolling to avoid crashing
             if (isModeChanging()) {
                 mShowcase.stopScroll();
@@ -1063,6 +1069,7 @@ public class MainActivity extends AppCompatActivity implements
                         return;
                     }
                     if (Math.abs(movX) < changeModeStartDistance) {
+                        isChangeModeHandled = false;
                         return; // gesture length is not enough to start change mode handling
                     }
                     isChangeModeHandled = true;
@@ -1129,20 +1136,19 @@ public class MainActivity extends AppCompatActivity implements
      * Set appropriate mode (Basket or Showcase), cancel touch handling and clear the state
      */
     private void finishModeChange() {
-        if (allowChangeMode) {
+        if (isChangeModeHandled && allowChangeMode) {
             mVelocityTracker.computeCurrentVelocity(1000, mMaxVelocity);
             float velocity = mVelocityTracker.getXVelocity();
             Interpolator interpolator = getInterpolator(velocity);
             mChangeBounds.setInterpolator(interpolator);
             setMode(movX, velocity);
-        } else {
-            allowChangeMode = true;
         }
 
         if (mVelocityTracker != null) {
             mVelocityTracker.recycle();
             mVelocityTracker = null;
         }
+        allowChangeMode = true;
         isChangeModeHandled = false;
         initX = 0;
         movX = 0;

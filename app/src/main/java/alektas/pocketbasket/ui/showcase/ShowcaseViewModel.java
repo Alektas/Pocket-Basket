@@ -24,6 +24,7 @@ import alektas.pocketbasket.guide.domain.Guide;
 import alektas.pocketbasket.ui.ActivityViewModel;
 
 public class ShowcaseViewModel extends AndroidViewModel {
+    private static final String TAG = "ShowcaseViewModel";
     private Repository mRepository;
     private Guide mGuide;
     private MutableLiveData<List<ShowcaseItemModel>> mShowcaseData = new MutableLiveData<>();
@@ -85,12 +86,10 @@ public class ShowcaseViewModel extends AndroidViewModel {
                 bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, item.getName());
                 bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, item.getTagRes());
                 App.getAnalytics().logEvent(FirebaseAnalytics.Event.ADD_TO_CART, bundle);
-            } else {
-                if (showcaseModeState != null && !showcaseModeState.getValue()) {
-                    ActivityViewModel.removeByTapInBasketModeState.setState(true);
-                    ActivityViewModel.removeCountState
-                            .setState(ActivityViewModel.removeCountState.getState() + 1);
-                }
+            } else if (showcaseModeState != null && !showcaseModeState.getValue()) {
+                ActivityViewModel.removeByTapInBasketModeState.setState(true);
+                ActivityViewModel.removeCountState
+                        .setState(ActivityViewModel.removeCountState.getState() + 1);
             }
         });
     }
