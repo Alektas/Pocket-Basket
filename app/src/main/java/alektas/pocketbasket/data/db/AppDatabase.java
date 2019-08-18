@@ -1,6 +1,8 @@
 package alektas.pocketbasket.data.db;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -96,7 +98,16 @@ public abstract class AppDatabase extends RoomDatabase {
     private static final Migration MIGRATION_10_11 = new Migration(10, 11) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
-            // Just handle loading database from assets, so the migration is not necessary
+            // Add icon file name to each item
+            Cursor cursor = database.query("SELECT * FROM items");
+            while (cursor.moveToNext()) {
+                String iconName = cursor.getString(cursor.getColumnIndex("img_res"));
+                if (TextUtils.isEmpty(iconName)) {
+                    String name = cursor.getString(cursor.getColumnIndex("_key"));
+                    iconName = "ic_" + name;
+                    database.execSQL("UPDATE items SET img_res = " + iconName + " WHERE _key = " + name);
+                }
+            }
         }
     };
 
