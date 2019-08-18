@@ -10,8 +10,8 @@ public class PutItemToBasket implements UseCase<String, Boolean> {
     }
 
     @Override
-    public void execute(String name, Callback<Boolean> callback) {
-        mRepository.putToBasket(name);
+    public void execute(String key, Callback<Boolean> callback) {
+        mRepository.putToBasket(key);
         callback.onResponse(true);
     }
 }

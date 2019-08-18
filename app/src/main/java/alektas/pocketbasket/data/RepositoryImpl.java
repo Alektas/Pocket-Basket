@@ -18,6 +18,7 @@ import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.BasketItemModel;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
+import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.domain.utils.MultiObservableValue;
 import alektas.pocketbasket.domain.utils.Observable;
 import alektas.pocketbasket.domain.utils.SingleObservableValue;
@@ -120,12 +121,12 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     /* Basket methods */
 
     /**
-     * @param name key of the item
+     * @param key key of the item
      * @return contain item position in Basket and mark state
      */
-    private BasketMeta getItemMeta(String name) {
+    private BasketMeta getItemMeta(String key) {
         try {
-            return new getItemMetaAsync(mItemsDao).execute(name).get();
+            return new getItemMetaAsync(mItemsDao).execute(key).get();
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -142,25 +143,25 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     }
 
     @Override
-    public boolean isItemInBasket(String name) {
-        return getItemMeta(name) != null;
+    public boolean isItemInBasket(String key) {
+        return getItemMeta(key) != null;
     }
 
 
     @Override
-    public void putToBasket(@NonNull String name) {
-        new putToBasketAsync(mItemsDao, this).execute(name);
+    public void putToBasket(@NonNull String key) {
+        new putToBasketAsync(mItemsDao, this).execute(key);
     }
 
     @Override
-    public void updatePositions(List<String> names) {
-        new updatePositionsAsync(mItemsDao, this).execute(names);
+    public void updatePositions(List<String> keys) {
+        new updatePositionsAsync(mItemsDao, this).execute(keys);
     }
 
     // Change item state in "Basket"
     @Override
-    public void markItem(@NonNull String name) {
-        new markAsync(mItemsDao, this).execute(name);
+    public void markItem(@NonNull String key) {
+        new markAsync(mItemsDao, this).execute(key);
     }
 
     // Check all items in Basket (or uncheck if already all items are checked)
@@ -171,8 +172,17 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
     // Delete item from "Basket"
     @Override
-    public void removeFromBasket(@NonNull String name) {
-        new removeBasketItemAsync(mItemsDao, this).execute(name);
+    public void removeFromBasket(@NonNull String key) {
+        new removeBasketItemAsync(mItemsDao, this).execute(key);
+    }
+
+    @Override
+    public void removeFromBasket(String key, UseCase.Callback<Boolean> callback) {
+        if (callback == null) {
+            new removeBasketItemAsync(mItemsDao, this).execute(key);
+            return;
+        }
+        new removeBasketItemAsync(mItemsDao, this, callback).execute(key);
     }
 
     // Delete all checked items from "Basket"
@@ -181,6 +191,10 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         new removeBasketMarkedAsync(mItemsDao, this).execute();
     }
 
+    @Override
+    public void cleanBasket(UseCase.Callback<Boolean> callback) {
+        new cleanBasketAsync(mItemsDao, this, callback).execute();
+    }
 
     /* Showcase methods */
 
@@ -427,6 +441,40 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         }
     }
 
+    private static class cleanBasketAsync extends AsyncTask<Void, Void, Void> {
+        private ItemsDao mDao;
+        private ItemsUpdater mUpdater;
+        private UseCase.Callback<Boolean> mCallback;
+
+        cleanBasketAsync(ItemsDao dao) { mDao = dao; }
+
+        cleanBasketAsync(ItemsDao dao, ItemsUpdater updater) {
+            mDao = dao;
+            mUpdater = updater;
+        }
+
+        cleanBasketAsync(ItemsDao dao, ItemsUpdater updater, UseCase.Callback<Boolean> callback) {
+            mDao = dao;
+            mUpdater = updater;
+            mCallback = callback;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            mDao.cleanBasket();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mUpdater != null) {
+                mUpdater.updateBasket();
+                mUpdater.updateShowcase();
+            }
+            if (mCallback != null) mCallback.onResponse(true);
+        }
+    }
+
     private static class removeBasketMarkedAsync extends AsyncTask<Void, Void, Void> {
         private ItemsDao mDao;
         private ItemsUpdater mUpdater;
@@ -456,12 +504,18 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     private static class removeBasketItemAsync extends AsyncTask<String, Void, Void> {
         private ItemsDao mDao;
         private ItemsUpdater mUpdater;
+        private UseCase.Callback<Boolean> mCallback;
 
         removeBasketItemAsync(ItemsDao dao) { mDao = dao; }
 
         removeBasketItemAsync(ItemsDao dao, ItemsUpdater updater) {
             this(dao);
             mUpdater = updater;
+        }
+
+        removeBasketItemAsync(ItemsDao dao, ItemsUpdater updater, UseCase.Callback<Boolean> callback) {
+            this(dao, updater);
+            mCallback = callback;
         }
 
         @Override
@@ -475,6 +529,10 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
             if (mUpdater != null) {
                 mUpdater.updateShowcase();
                 mUpdater.updateBasket();
+            }
+            if (mCallback != null) {
+                mCallback.onResponse(true);
+                mCallback = null;
             }
         }
     }

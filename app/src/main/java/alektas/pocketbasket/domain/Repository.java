@@ -5,6 +5,7 @@ import java.util.List;
 import alektas.pocketbasket.domain.entities.BasketItemModel;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
+import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.domain.utils.Observable;
 
 public interface Repository {
@@ -13,13 +14,15 @@ public interface Repository {
      * Data contains only items stored in the basket.
      */
     Observable<List<BasketItemModel>> getBasketData();
-    boolean isItemInBasket(String name);
-    void putToBasket(String name);
-    void removeFromBasket(String name);
-    void updatePositions(List<String> names);
-    void markItem(String name);
+    boolean isItemInBasket(String key);
+    void putToBasket(String key);
+    void removeFromBasket(String key);
+    void removeFromBasket(String key, UseCase.Callback<Boolean> callback);
+    void updatePositions(List<String> keys);
+    void markItem(String key);
     void markAll();
     void removeMarked();
+    void cleanBasket(UseCase.Callback<Boolean> callback);
 
     /**
      * Data contains only items consisted to the selected category.

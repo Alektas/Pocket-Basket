@@ -15,7 +15,7 @@
         android:icon="@mipmap/ic_launcher"
         android:banner="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
+        android:theme="@style/AppTheme.Splash"
         android:supportsRtl="true"
         tools:ignore="GoogleAppIndexingWarning"
         android:allowBackup="true"
@@ -37,6 +37,18 @@
             android:authorities="${applicationId}.ItemsProvider"
             android:name=".services.ItemsProvider"
             android:exported="false"/>
+        <receiver android:name=".widget.BasketWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="alektas.pocketbasket.action.ACTION_UPDATE_ITEMS"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/widget_provider_info"/>
+        </receiver>
+        <service android:name=".widget.BasketWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="@string/ad_app_id"/>

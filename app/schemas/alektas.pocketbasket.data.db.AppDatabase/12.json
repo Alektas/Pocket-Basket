@@ -1,0 +1,164 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 12,
+    "identityHash": "62f0b1e6b82aa23f1cd2499fe74771a9",
+    "entities": [
+      {
+        "tableName": "items",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_key` TEXT NOT NULL, `displayed_name` TEXT NOT NULL, `name_res` TEXT, `img_res` TEXT, `tag_res` TEXT NOT NULL, `deleted` INTEGER NOT NULL, PRIMARY KEY(`_key`))",
+        "fields": [
+          {
+            "fieldPath": "mKey",
+            "columnName": "_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mName",
+            "columnName": "displayed_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mNameRes",
+            "columnName": "name_res",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mImgRes",
+            "columnName": "img_res",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "mTagRes",
+            "columnName": "tag_res",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deleted",
+            "columnName": "deleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_key"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_items__key",
+            "unique": true,
+            "columnNames": [
+              "_key"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_items__key` ON `${TABLE_NAME}` (`_key`)"
+          },
+          {
+            "name": "index_items_displayed_name",
+            "unique": true,
+            "columnNames": [
+              "displayed_name"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_items_displayed_name` ON `${TABLE_NAME}` (`displayed_name`)"
+          },
+          {
+            "name": "index_items_tag_res",
+            "unique": false,
+            "columnNames": [
+              "tag_res"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_items_tag_res` ON `${TABLE_NAME}` (`tag_res`)"
+          },
+          {
+            "name": "index_items_deleted",
+            "unique": false,
+            "columnNames": [
+              "deleted"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_items_deleted` ON `${TABLE_NAME}` (`deleted`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "basket_meta",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `item_key` TEXT NOT NULL, `position` INTEGER NOT NULL, `marked` INTEGER NOT NULL, FOREIGN KEY(`item_key`) REFERENCES `items`(`_key`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "_id",
+            "columnName": "_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "itemKey",
+            "columnName": "item_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "marked",
+            "columnName": "marked",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_basket_meta_item_key",
+            "unique": true,
+            "columnNames": [
+              "item_key"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_basket_meta_item_key` ON `${TABLE_NAME}` (`item_key`)"
+          },
+          {
+            "name": "index_basket_meta_position",
+            "unique": false,
+            "columnNames": [
+              "position"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_basket_meta_position` ON `${TABLE_NAME}` (`position`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "items",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "item_key"
+            ],
+            "referencedColumns": [
+              "_key"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '62f0b1e6b82aa23f1cd2499fe74771a9')"
+    ]
+  }
+}

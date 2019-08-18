@@ -68,6 +68,7 @@ import alektas.pocketbasket.ui.dialogs.GuideAcceptDialog;
 import alektas.pocketbasket.ui.dialogs.ResetDialog;
 import alektas.pocketbasket.ui.utils.SmoothDecelerateInterpolator;
 import alektas.pocketbasket.utils.ResourcesUtils;
+import alektas.pocketbasket.widget.BasketWidget;
 
 public class MainActivity extends AppCompatActivity implements
         ResetDialog.ResetDialogListener,
@@ -128,6 +129,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(R.style.AppTheme); // Remove splash screen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         App.getComponent().inject(this);
@@ -186,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStop() {
         mPrefs.edit().putInt(SAVED_CATEGORY_KEY, getSelectedCategoryId()).apply();
+        BasketWidget.updateItems(this);
         super.onStop();
     }
 
@@ -468,7 +471,7 @@ public class MainActivity extends AppCompatActivity implements
 
         TextView counter = findViewById(R.id.toolbar_del_mode_counter);
         viewModel.deleteItemsCountData().observe(this, delCount -> {
-            counter.setText(delCount.toString());
+            counter.setText(String.valueOf(delCount));
         });
 
         viewModel.showcaseModeState().observe(this, isShowcase -> {
@@ -821,6 +824,9 @@ public class MainActivity extends AppCompatActivity implements
         mPrefs.edit().putBoolean(getString(R.string.SHOW_HINTS_KEY), true).apply();
         mGuidePrefs.edit().clear().apply();
         mViewModel.startGuide(mGuidePrefs);
+
+        Bundle startGuide = new Bundle();
+        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_BEGIN, startGuide);
     }
 
     @Override
@@ -828,6 +834,9 @@ public class MainActivity extends AppCompatActivity implements
         mPrefs.edit().putBoolean(getString(R.string.SHOW_HINTS_KEY), false).apply();
         mGuidePrefs.edit().clear().apply();
         mViewModel.stopGuide();
+
+        Bundle endGuide = new Bundle();
+        App.getAnalytics().logEvent(FirebaseAnalytics.Event.TUTORIAL_COMPLETE, endGuide);
     }
 
     @Override
@@ -985,6 +994,11 @@ public class MainActivity extends AppCompatActivity implements
                 link = getString(R.string.google_material_link);
                 break;
             }
+
+            case R.id.license_link: {
+                link = getString(R.string.license_agreement_link);
+                break;
+            }
         }
 
         if (link == null) return;
@@ -1000,7 +1014,7 @@ public class MainActivity extends AppCompatActivity implements
         // Do not allow a mode change in the landscape orientation
         if (!isLandscape()) {
             handleChangeModeByTouch(event);
-            // When changing mode cancel all other actions to avoid fake clicks
+            // When changing mode is active cancel all other actions to avoid fake clicks
             // Also stop scrolling to avoid crashing
             if (isModeChanging()) {
                 mShowcase.stopScroll();
@@ -1055,6 +1069,7 @@ public class MainActivity extends AppCompatActivity implements
                         return;
                     }
                     if (Math.abs(movX) < changeModeStartDistance) {
+                        isChangeModeHandled = false;
                         return; // gesture length is not enough to start change mode handling
                     }
                     isChangeModeHandled = true;
@@ -1121,20 +1136,19 @@ public class MainActivity extends AppCompatActivity implements
      * Set appropriate mode (Basket or Showcase), cancel touch handling and clear the state
      */
     private void finishModeChange() {
-        if (allowChangeMode) {
+        if (isChangeModeHandled && allowChangeMode) {
             mVelocityTracker.computeCurrentVelocity(1000, mMaxVelocity);
             float velocity = mVelocityTracker.getXVelocity();
             Interpolator interpolator = getInterpolator(velocity);
             mChangeBounds.setInterpolator(interpolator);
             setMode(movX, velocity);
-        } else {
-            allowChangeMode = true;
         }
 
         if (mVelocityTracker != null) {
             mVelocityTracker.recycle();
             mVelocityTracker = null;
         }
+        allowChangeMode = true;
         isChangeModeHandled = false;
         initX = 0;
         movX = 0;

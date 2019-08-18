@@ -11,16 +11,22 @@
     <string name="update">Обновить</string>
     <string name="share_intro">Нужны товары:</string>
     <string name="guide">Подсказки</string>
+    <string name="del_toolbar_text">Выбрано для удаления: </string>
+
+    <string name="widget_empty">Пусто</string>
+    <string name="widget_basket_title">Корзина</string>
+    <string name="widget_loading_long">Загрузка…</string>
+    <string name="widget_item_removed">"Товар удален: "</string>
 
     <string name="about_app">О приложении</string>
     <string name="about_msg">Pocket Basket это приложение для составления списка покупок.</string>
     <string name="about_version">"Версия: %s"</string>
-    <string name="about_developer">Разработчик: Alektas</string>
+    <string name="about_developer">Разработчик:</string>
     <string name="about_icons_by">Иконки:</string>
     <string name="about_license">(лицензия)</string>
 
     <string name="guide_accept_title">Хотите получать обучающие подсказки?</string>
-    <string name="guide_accept_msg">Включить/отключить подсказки можно выбрав \"Подсказки\" в меню</string>
+    <string name="guide_accept_msg">Включить/отключить подсказки можно выбрав \u00ABПодсказки\u00BB в меню</string>
 
     <string name="guide_change_mode">Режим отображения можно сменить свайпом</string>
     <string name="guide_add_item">Товары в корзину добавляются касанием</string>
@@ -33,7 +39,8 @@
     <string name="guide_check_all">Отметить все товары</string>
     <string name="guide_del_checked">Убрать отмеченные товары</string>
     <string name="guide_close_menu">Закрыть меню</string>
-    <string name="del_toolbar_text">Выбрано для удаления: </string>
-    =
+    <string name="about_developer_name">\u00A9 2019 Тотилас А.А.</string>
+    <string name="license_agreement_label">Лицензионное соглашение</string>
+    <string name="about_alektas">- Тотилас А.А.</string>
 
 </resources>

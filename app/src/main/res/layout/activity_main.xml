@@ -6,7 +6,6 @@
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_main"
     android:focusableInTouchMode="true"
     tools:context=".ui.MainActivity">
 
@@ -130,6 +129,7 @@
         android:layout_margin="@dimen/padding_16"
         android:longClickable="true"
         android:onClick="onFabClick"
+        android:tint="@android:color/white"
         app:srcCompat="@drawable/ic_edit_24dp"
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@id/separator"

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_item"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/height_widget_item">
+
+    <ImageView
+        android:id="@+id/widget_item_icon"
+        android:layout_width="@dimen/height_widget_item"
+        android:layout_height="@dimen/height_widget_item"
+        android:layout_centerInParent="true"
+        android:padding="@dimen/padding_widget_ic"
+        android:src="@drawable/ic_launcher_foreground"/>
+
+    <TextView
+        android:id="@+id/widget_item_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textAlignment="center"
+        android:textSize="@dimen/textsize_item_icon"/>
+
+    <ImageButton
+        android:id="@+id/widget_btn_del"
+        android:layout_width="@dimen/size_widget_item_btn_del_narrow"
+        android:layout_height="@dimen/size_widget_item_btn_del_narrow"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:visibility="gone"
+        android:elevation="4dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="2dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="8dp"
+        android:adjustViewBounds="false"
+        android:scaleType="fitEnd"
+        android:background="@drawable/shape_widget_btn_del_narrow"
+        android:backgroundTint="@color/colorPrimary"
+        android:src="@drawable/ic_close_white_24dp"/>
+
+    <FrameLayout
+        android:id="@+id/widget_item_body"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_item_ripple"/>
+
+</RelativeLayout>

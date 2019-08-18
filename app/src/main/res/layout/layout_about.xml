@@ -29,12 +29,22 @@
             android:text="@string/about_developer" />
 
         <TextView
-            android:id="@+id/dev_mail_link"
+            android:id="@+id/developer_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/padding_32"
             android:layout_marginEnd="@dimen/padding_32"
             android:layout_below="@id/developer_text"
+            style="@style/TextAppearance.AppCompat.Medium"
+            android:text="@string/about_developer_name" />
+
+        <TextView
+            android:id="@+id/dev_mail_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_32"
+            android:layout_marginEnd="@dimen/padding_32"
+            android:layout_below="@id/developer_name"
             style="@style/TextAppearance.AppCompat.Medium"
             android:autoLink="email"
             android:text="@string/about_email" />
@@ -139,6 +149,20 @@
             android:focusable="true" />
 
         <TextView
+            android:id="@+id/license_link"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_16"
+            android:layout_marginStart="@dimen/padding_32"
+            android:layout_marginEnd="@dimen/padding_8"
+            android:layout_below="@id/google_link"
+            style="@style/TextAppearance.AppCompat.Medium"
+            android:clickable="true"
+            android:onClick="onLinkClick"
+            android:text="@string/license_agreement_label"
+            android:focusable="true" />
+
+        <TextView
             android:id="@+id/version_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -146,7 +170,7 @@
             android:layout_marginTop="@dimen/padding_16"
             android:layout_marginStart="@dimen/padding_32"
             android:layout_marginEnd="@dimen/padding_32"
-            android:layout_below="@id/google_link"
+            android:layout_below="@id/license_link"
             android:layout_alignParentEnd="true"
             style="@style/TextAppearance.AppCompat.Small" />
 

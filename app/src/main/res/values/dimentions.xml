@@ -8,6 +8,30 @@
     <dimen name="height_item">72dp</dimen>
     <dimen name="margin_end_basket_item_text">56dp</dimen>
 
+    <dimen name="width_widget_default">110dp</dimen>
+    <dimen name="width_widget_min">40dp</dimen>
+    <dimen name="height_widget_default">180dp</dimen>
+    <dimen name="height_widget_min">180dp</dimen>
+    <dimen name="height_widget_item">56dp</dimen>
+    <dimen name="size_widget_header_icon">32dp</dimen>
+    <dimen name="size_widget_item_icon">40dp</dimen>
+    <dimen name="size_widget_item_icon_small">32dp</dimen>
+    <dimen name="size_widget_item_btn_del_narrow">28dp</dimen>
+    <dimen name="textsize_widget_title">18sp</dimen>
+    <dimen name="textsize_widget_empty">16sp</dimen>
+    <dimen name="textsize_widget_item_name">@dimen/textsize_item_name</dimen>
+    <dimen name="textsize_widget_item_name_small">12sp</dimen>
+    <dimen name="textsize_widget_item_icon">@dimen/textsize_item_icon</dimen>
+    <dimen name="corners_widget_btn_del">8dp</dimen>
+    <dimen name="corners_widget_btn_del_narrow">40dp</dimen>
+    <dimen name="margin_widget_text">8dp</dimen>
+    <dimen name="margin_widget_icon">8dp</dimen>
+    <dimen name="margin_widget_item_icon">8dp</dimen>
+    <dimen name="margin_widget_item_icon_small">4dp</dimen>
+    <dimen name="margin_widget_item_text">8dp</dimen>
+    <dimen name="padding_widget_ic_small">4dp</dimen>
+    <dimen name="padding_widget_ic">8dp</dimen>
+
     <dimen name="size_guide_gesture_icon">96dp</dimen>
     <dimen name="size_guide_hint_icon">32dp</dimen>
     <dimen name="corners_guide_hint">8dp</dimen>
@@ -17,6 +41,7 @@
 
     <dimen name="height_ad_separator">10dp</dimen>
 
+    <dimen name="corners_category">24dp</dimen>
     <dimen name="width_categ_wide">145dp</dimen>
     <dimen name="width_categ_narrow">56dp</dimen>
     <dimen name="width_showcase_narrow">72dp</dimen>
@@ -39,6 +64,6 @@
     <dimen name="padding_32">32dp</dimen>
     <dimen name="padding_rb">16dp</dimen>
     <dimen name="padding_ic">8dp</dimen>
-    <dimen name="margin_item_icon_8">8dp</dimen>
+    <dimen name="margin_item_icon">8dp</dimen>
 
 </resources>
