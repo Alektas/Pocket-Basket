@@ -22,7 +22,7 @@ import alektas.pocketbasket.data.db.dao.ItemsDao;
 import alektas.pocketbasket.data.db.entities.BasketMeta;
 import alektas.pocketbasket.data.db.entities.Item;
 
-@Database(entities = {Item.class, BasketMeta.class}, version = 11)
+@Database(entities = {Item.class, BasketMeta.class}, version = 12)
 public abstract class AppDatabase extends RoomDatabase {
     private static final String TAG = "AppDatabase";
     private static volatile AppDatabase INSTANCE;
@@ -38,7 +38,7 @@ public abstract class AppDatabase extends RoomDatabase {
                     INSTANCE = Room.databaseBuilder(
                             context.getApplicationContext(),
                             AppDatabase.class, DATABASE_NAME)
-                            .addMigrations(MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
+                            .addMigrations(MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
                             .fallbackToDestructiveMigration()
                             .build();
                 }
@@ -94,8 +94,8 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     }
 
-    // App version upgrade: 0.8.2 -> 0.9.0
-    private static final Migration MIGRATION_10_11 = new Migration(10, 11) {
+    // App version upgrade: 0.8.2.2 -> 0.9.0
+    private static final Migration MIGRATION_11_12 = new Migration(11, 12) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             // Add icon file name to each item
@@ -105,9 +105,17 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (TextUtils.isEmpty(iconName)) {
                     String name = cursor.getString(cursor.getColumnIndex("_key"));
                     iconName = "ic_" + name;
-                    database.execSQL("UPDATE items SET img_res = " + iconName + " WHERE _key = " + name);
+                    database.execSQL("UPDATE items SET img_res = '" + iconName + "' WHERE _key = '" + name + "'");
                 }
             }
+        }
+    };
+
+    // App version upgrade: 0.8.2 -> 0.8.2.2
+    private static final Migration MIGRATION_10_11 = new Migration(10, 11) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            // Allow to download items from assets
         }
     };
 
