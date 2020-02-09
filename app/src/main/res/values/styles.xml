@@ -26,7 +26,7 @@
         <item name="colorControlActivated">@android:color/white</item>
         <item name="android:editTextColor">@android:color/white</item>
         <item name="android:textColor">@color/colorTextDark</item>
-        <item name="android:textColorHint">@color/lb_search_plate_hint_text_color</item>
+        <item name="android:textColorHint">@android:color/white</item>
         <item name="android:textSize">@dimen/textsize_appbar</item>
     </style>
 

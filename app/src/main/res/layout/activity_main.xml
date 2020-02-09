@@ -73,7 +73,7 @@
                 android:layout_margin="@dimen/padding_8"
                 android:layout_marginEnd="@dimen/padding_16"
                 android:src="@drawable/ic_close_white_24dp"
-                android:background="@drawable/lb_selectable_item_rounded_rect"
+                android:background="@android:color/transparent"
                 android:onClick="onCloseDelModeClick"/>
         </RelativeLayout>
 
