@@ -121,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements
     private View mDelAllBtn;
     private View mCheckAllBtn;
     private SearchView mSearchView;
-    private AdView mAdView;
     private TransitionSet mChangeModeTransition;
     private Transition mFamTransition;
     private Transition mChangeBounds;
@@ -171,18 +170,6 @@ public class MainActivity extends AppCompatActivity implements
             View root = findViewById(R.id.root_layout);
             root.requestFocus();
         }
-
-        if (mAdView != null) {
-            mAdView.resume();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        if (mAdView != null) {
-            mAdView.pause();
-        }
-        super.onPause();
     }
 
     @Override
@@ -190,14 +177,6 @@ public class MainActivity extends AppCompatActivity implements
         mPrefs.edit().putInt(SAVED_CATEGORY_KEY, getSelectedCategoryId()).apply();
         BasketWidget.updateItems(this);
         super.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
-        if (mAdView != null) {
-            mAdView.destroy();
-        }
-        super.onDestroy();
     }
 
     @SuppressLint("RestrictedApi")
@@ -296,7 +275,6 @@ public class MainActivity extends AppCompatActivity implements
         mGuidePrefs = getSharedPreferences(getString(R.string.GUIDE_PREFERENCES_FILE_KEY), MODE_PRIVATE);
         mPrefs = getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
 
-        initAd();
         initSearch();
         initTransitions();
         initFloatingActionMenu();
@@ -377,71 +355,6 @@ public class MainActivity extends AppCompatActivity implements
         mSearchView = findViewById(R.id.menu_search);
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         mSearchView.setIconified(false);
-    }
-
-    private void initAd() {
-        MobileAds.initialize(this, getString(R.string.ad_app_id));
-
-        mAdView = findViewById(R.id.adBanner);
-        mAdView.setAdListener(new AdListener() {
-            @Override
-            public void onAdLoaded() {
-                // Code to be executed when an ad finishes loading.
-                showAdBanner();
-            }
-
-            @Override
-            public void onAdFailedToLoad(int errorCode) {
-                // Code to be executed when an ad request fails.
-                String errorStr;
-                switch (errorCode) {
-                    case 0: errorStr = "INTERNAL_ERROR"; break;
-                    case 1: errorStr = "INVALID_REQUEST"; break;
-                    case 2: errorStr = "NETWORK_ERROR"; break;
-                    case 3: errorStr = "NO_FILL"; break;
-                    default: errorStr = "UNKNOWN";
-                }
-                Log.d(TAG, "onAdFailedToLoad: code = " + errorStr);
-                hideAdBanner();
-            }
-
-            @Override
-            public void onAdOpened() {
-                // Code to be executed when an ad opens an overlay that
-                // covers the screen.
-            }
-
-            @Override
-            public void onAdLeftApplication() {
-                // Code to be executed when the user has left the app.
-            }
-
-            @Override
-            public void onAdClosed() {
-                // Code to be executed when the user is about to return
-                // to the app after tapping on an ad.
-                updateAd();
-            }
-        });
-
-        updateAd();
-    }
-
-    /**
-     * Send new Ad request to the server
-     */
-    private void updateAd() {
-        AdRequest request;
-        if (BuildConfig.DEBUG) {
-            request = new AdRequest.Builder()
-                    .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
-                    .addTestDevice(getString(R.string.ad_test_device_id))
-                    .build();
-        } else {
-            request = new AdRequest.Builder().build();
-        }
-
-        mAdView.loadAd(request);
     }
 
     private void subscribeOnModel(ActivityViewModel viewModel,
@@ -790,20 +703,6 @@ public class MainActivity extends AppCompatActivity implements
         isMenuShown = false;
 
         mViewModel.onFloatingMenuHide();
-    }
-
-    private void showAdBanner() {
-        if (mAdView != null) {
-            mAdView.setVisibility(View.VISIBLE);
-            mAdView.resume();
-        }
-    }
-
-    private void hideAdBanner() {
-        if (mAdView != null) {
-            mAdView.pause();
-            mAdView.setVisibility(View.GONE);
-        }
     }
 
 
