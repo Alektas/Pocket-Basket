@@ -12,14 +12,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.transition.ChangeBounds;
-import android.transition.Explode;
-import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.transition.TransitionSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -38,24 +35,19 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
-import androidx.appcompat.widget.Toolbar;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
+import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;
 
 import alektas.pocketbasket.App;
-import alektas.pocketbasket.BuildConfig;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.guide.GuideContract;
@@ -111,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements
     private ActivityViewModel mViewModel;
     private VelocityTracker mVelocityTracker;
     private ShareActionProvider mShareActionProvider;
-    private ConstraintLayout mConstraintLayout;
+    private CoordinatorLayout mConstraintLayout;
     private View mBasketContainer;
     private View mShowcaseContainer;
     private View mCategoriesContainer;
@@ -132,8 +124,8 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         App.getComponent().inject(this);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        BottomAppBar bar = findViewById(R.id.appbar);
+        setSupportActionBar(bar);
 
         init();
 
@@ -203,7 +195,6 @@ public class MainActivity extends AppCompatActivity implements
             App.getAnalytics().logEvent(FirebaseAnalytics.Event.SHARE, bundle);
             return false;
         });
-
 
         return true;
     }
@@ -310,19 +301,10 @@ public class MainActivity extends AppCompatActivity implements
 
         mChangeBounds = new ChangeBounds();
 
-        Transition explode = new Explode();
-        explode.addTarget(R.id.fab);
-
-        Transition fade = new Fade();
-        explode.addTarget(R.id.fam_del_all);
-        explode.addTarget(R.id.fam_check_all);
-
         mChangeModeTransition = new TransitionSet();
         mChangeModeTransition.setDuration(CHANGE_MODE_TIME)
                 .setOrdering(TransitionSet.ORDERING_TOGETHER)
-                .addTransition(mChangeBounds)
-                .addTransition(fade)
-                .addTransition(explode);
+                .addTransition(mChangeBounds);
     }
 
     private void initDimensions() {
@@ -550,8 +532,6 @@ public class MainActivity extends AppCompatActivity implements
         changeLayoutSize(mCategWideWidth,
                 mShowcaseWideWidth,
                 0);
-
-        showFloatingButton();
     }
 
     /**
@@ -577,13 +557,6 @@ public class MainActivity extends AppCompatActivity implements
         changeLayoutSize(mCategNarrowWidth,
                 mShowcaseNarrowWidth,
                 0);
-
-        showFloatingButton();
-
-        if (isMenuShown) {
-            TransitionManager.beginDelayedTransition(mConstraintLayout, mFamTransition);
-            hideFloatingMenu();
-        }
     }
 
     /**
@@ -609,13 +582,6 @@ public class MainActivity extends AppCompatActivity implements
         changeLayoutSize(mCategWideWidth,
                 0,
                 mBasketNarrowWidth);
-
-        hideFloatingButton();
-
-        if (isMenuShown) {
-            TransitionManager.beginDelayedTransition(mConstraintLayout, mFamTransition);
-            hideFloatingMenu();
-        }
     }
 
     /**
@@ -669,16 +635,6 @@ public class MainActivity extends AppCompatActivity implements
         if (categoriesParams.width == categWidth) return;
         categoriesParams.width = categWidth;
         mCategoriesContainer.setLayoutParams(categoriesParams);
-    }
-
-    @SuppressLint("RestrictedApi")
-    private void showFloatingButton() {
-        mAddBtn.setVisibility(View.VISIBLE);
-    }
-
-    @SuppressLint("RestrictedApi")
-    private void hideFloatingButton() {
-        mAddBtn.setVisibility(View.GONE);
     }
 
     private void showFloatingMenu() {
