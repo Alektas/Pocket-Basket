@@ -26,10 +26,12 @@
 
         <SearchView
             android:id="@+id/menu_search"
-            android:layout_width="match_parent"
+            style="@style/SearchViewStyle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:iconifiedByDefault="false"
-            android:imeOptions="actionDone" />
+            android:imeOptions="actionDone"
+            android:paddingStart="@dimen/margin_start_search_view_query"
+            android:paddingEnd="@dimen/margin_end_search_view_query"/>
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -104,7 +106,7 @@
         app:layout_anchor="@id/fab"
         app:layout_anchorGravity="top|center_horizontal"
         app:srcCompat="@drawable/ic_check_all_white_24dp"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fam_del_all"
@@ -117,6 +119,6 @@
         app:layout_anchor="@id/fam_check_all"
         app:layout_anchorGravity="top|center_horizontal"
         app:srcCompat="@drawable/ic_delete_forever_white_24dp"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
