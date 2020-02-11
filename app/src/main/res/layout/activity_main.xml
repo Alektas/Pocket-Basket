@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:paddingStart="@dimen/margin_start_search_view_query"
-            android:paddingEnd="@dimen/margin_end_search_view_query"/>
+            android:paddingEnd="@dimen/margin_end_search_view_query" />
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -64,19 +64,33 @@
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="8dp"
+                android:layout_toStartOf="@id/toolbar_del_mode_btn_delete"
                 android:layout_toEndOf="@id/toolbar_del_mode_text"
+                android:text="@string/del_mode_counter_placeholder"
+                android:textAlignment="viewStart"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/textsize_del_toolbar" />
 
             <ImageButton
+                android:id="@+id/toolbar_del_mode_btn_delete"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="@dimen/size_appbar_icon"
+                android:layout_height="@dimen/size_appbar_icon"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/toolbar_del_mode_btn_close"
+                android:onClick="onDelModeBtnClick"
+                android:src="@drawable/ic_delete_forever_white_24dp" />
+
+            <ImageButton
                 android:id="@+id/toolbar_del_mode_btn_close"
-                android:layout_width="@dimen/size_categ_icon"
-                android:layout_height="@dimen/size_categ_icon"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="@dimen/size_appbar_icon"
+                android:layout_height="@dimen/size_appbar_icon"
                 android:layout_alignParentEnd="true"
-                android:layout_margin="@dimen/padding_8"
+                android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/padding_16"
-                android:background="@android:color/transparent"
-                android:onClick="onCloseDelModeClick"
+                android:layout_marginStart="@dimen/margin_between_appbar_icons"
+                android:onClick="onDelModeBtnClick"
                 android:src="@drawable/ic_close_white_24dp" />
         </RelativeLayout>
     </com.google.android.material.bottomappbar.BottomAppBar>
