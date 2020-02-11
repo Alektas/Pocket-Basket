@@ -15,6 +15,7 @@
         <item name="colorError">#F44336</item>
         <item name="colorOnError">#FFFFFF</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
         <item name="searchViewStyle">@style/SearchViewStyle</item>
     </style>
 
