@@ -376,6 +376,11 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         famShowingState.setState(false);
     }
 
+    public void onDeleteSelectedShowcaseItems() {
+        mRepository.deleteSelectedItems();
+        onCloseDelMode();
+    }
+
     public void onCloseDelMode() {
         mGuide.onUserEvent(GuideContract.GUIDE_DEL_SELECTED_ITEMS);
         new DelModeUseCase(mRepository).execute(false, null);

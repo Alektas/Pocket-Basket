@@ -742,8 +742,15 @@ public class MainActivity extends AppCompatActivity implements
         mViewModel.onHintClick();
     }
 
-    public void onCloseDelModeClick(View view) {
-        mViewModel.onCloseDelMode();
+    public void onDelModeBtnClick(View view) {
+        switch (view.getId()) {
+            case R.id.toolbar_del_mode_btn_delete:
+                mViewModel.onDeleteSelectedShowcaseItems();
+                break;
+            case R.id.toolbar_del_mode_btn_close:
+                mViewModel.onCloseDelMode();
+                break;
+        }
     }
 
     public void onFilterClick(View view) {

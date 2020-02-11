@@ -36,9 +36,6 @@
     <dimen name="size_guide_hint_icon">32dp</dimen>
     <dimen name="corners_guide_hint">8dp</dimen>
 
-    <dimen name="corners_del_panel">16dp</dimen>
-    <dimen name="stroke_del_panel">0dp</dimen>
-
     <dimen name="height_ad_separator">10dp</dimen>
 
     <dimen name="corners_category">24dp</dimen>
@@ -54,6 +51,9 @@
     <dimen name="textsize_guide_hint">16sp</dimen>
     <dimen name="textsize_appbar">20sp</dimen>
     <dimen name="textsize_del_toolbar">18sp</dimen>
+
+    <dimen name="size_appbar_icon">24dp</dimen>
+    <dimen name="margin_between_appbar_icons">24dp</dimen>
 
     <dimen name="corners_search_view_query">8dp</dimen>
     <dimen name="margin_end_search_view_query">32dp</dimen>
