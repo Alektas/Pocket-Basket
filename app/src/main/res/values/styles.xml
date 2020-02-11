@@ -15,6 +15,7 @@
         <item name="colorError">#F44336</item>
         <item name="colorOnError">#FFFFFF</item>
         <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="searchViewStyle">@style/SearchViewStyle</item>
     </style>
 
     <style name="AppTheme.Splash">
@@ -28,6 +29,14 @@
         <item name="android:textColor">@color/colorTextDark</item>
         <item name="android:textColorHint">@android:color/white</item>
         <item name="android:textSize">@dimen/textsize_appbar</item>
+    </style>
+
+    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="android:iconifiedByDefault">false</item>
+        <item name="android:queryHint">@string/search_hint</item>
+        <item name="android:queryBackground">@drawable/shape_search_view_query</item>
+        <item name="android:searchIcon">@null</item>
+        <item name="android:submitBackground">@null</item>
     </style>
 
     <style name="CategButton">

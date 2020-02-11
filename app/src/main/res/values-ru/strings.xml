@@ -5,7 +5,7 @@
     <string name="cancel">Закрыть</string>
     <string name="no">Нет</string>
     <string name="del_user_items">Удалить пользовательские товары</string>
-    <string name="search_hint">Добавить товар</string>
+    <string name="search_hint">Найти товар</string>
     <string name="reset">Сброс</string>
     <string name="share">Поделиться</string>
     <string name="update">Обновить</string>

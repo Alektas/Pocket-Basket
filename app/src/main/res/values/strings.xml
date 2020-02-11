@@ -5,7 +5,7 @@
     <string name="accept">Accept</string>
     <string name="no">No</string>
     <string name="del_user_items">Delete user items</string>
-    <string name="search_hint">Add item</string>
+    <string name="search_hint">Search item</string>
     <string name="reset">Reset</string>
     <string name="share">Share</string>
     <string name="update">Update</string>
