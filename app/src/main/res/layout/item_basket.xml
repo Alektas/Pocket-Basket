@@ -70,7 +70,7 @@
             android:layout_toEndOf="@id/item_icon_view"
             android:layout_centerVertical="true"
             android:textSize="@dimen/textsize_item_name"
-            android:textColor="@color/text_item_basket"
+            android:textColor="?colorOnBackground"
             android:text="@{item.name}"/>
 
         <ImageView
@@ -81,6 +81,7 @@
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
             android:onTouch="@{() -> dragListener.onStartDrag(holder)}"
+            android:tint="?colorSecondary"
             android:src="@drawable/ic_item_drag_handle_darkgreen_24dp"/>
 
     </RelativeLayout>
