@@ -4,15 +4,13 @@
     android:id="@+id/showcase_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryLight"
+    android:background="?colorPrimary"
     tools:context=".ui.showcase.ShowcaseFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/showcase_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorPrimaryLight"
-        android:divider="@color/colorPrimaryLight"
         android:animateLayoutChanges="false"
         tools:listitem="@layout/item_showcase"/>
 </FrameLayout>

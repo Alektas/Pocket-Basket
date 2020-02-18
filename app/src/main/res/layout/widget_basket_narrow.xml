@@ -11,7 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:backgroundTint="@color/colorPrimary"
         android:background="@drawable/shape_widget_header"
         android:clickable="true"
         android:focusable="true"

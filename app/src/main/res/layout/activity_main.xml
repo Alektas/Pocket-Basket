@@ -19,19 +19,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:backgroundTint="@color/colorPrimaryDark"
-        android:theme="@style/AppBar"
-        app:fabAlignmentMode="end"
-        app:popupTheme="@style/AppBar">
+        app:fabAlignmentMode="end">
 
         <SearchView
             android:id="@+id/menu_search"
-            style="@style/SearchViewStyle"
+            android:theme="@style/ThemeOverlay.SearchView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:paddingStart="@dimen/margin_start_search_view_query"
-            android:paddingEnd="@dimen/margin_end_search_view_query" />
+            android:paddingEnd="@dimen/margin_end_search_view_query"/>
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -39,10 +36,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:backgroundTint="@color/colorPrimaryDark"
-        android:theme="@style/AppBar"
-        android:visibility="invisible"
-        app:popupTheme="@style/AppBar">
+        android:visibility="invisible">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -55,7 +49,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginStart="16dp"
                 android:text="@string/del_toolbar_text"
-                android:textColor="@android:color/white"
+                android:textColor="?colorOnPrimary"
                 android:textSize="@dimen/textsize_del_toolbar" />
 
             <TextView
@@ -68,7 +62,7 @@
                 android:layout_toEndOf="@id/toolbar_del_mode_text"
                 android:text="@string/del_mode_counter_placeholder"
                 android:textAlignment="viewStart"
-                android:textColor="@android:color/white"
+                android:textColor="?colorOnPrimary"
                 android:textSize="@dimen/textsize_del_toolbar" />
 
             <ImageButton
@@ -79,7 +73,8 @@
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/toolbar_del_mode_btn_close"
                 android:onClick="onDelModeBtnClick"
-                android:src="@drawable/ic_delete_forever_white_24dp" />
+                android:src="@drawable/ic_delete_forever_white_24dp"
+                android:tint="?colorOnPrimary"/>
 
             <ImageButton
                 android:id="@+id/toolbar_del_mode_btn_close"
@@ -91,7 +86,8 @@
                 android:layout_marginEnd="@dimen/padding_16"
                 android:layout_marginStart="@dimen/margin_between_appbar_icons"
                 android:onClick="onDelModeBtnClick"
-                android:src="@drawable/ic_close_white_24dp" />
+                android:src="@drawable/ic_close_white_24dp"
+                android:tint="?colorOnPrimary"/>
         </RelativeLayout>
     </com.google.android.material.bottomappbar.BottomAppBar>
 
@@ -103,7 +99,7 @@
         android:layout_height="wrap_content"
         android:longClickable="true"
         android:onClick="onFabClick"
-        android:tint="@android:color/white"
+        android:tint="?colorOnSecondary"
         app:layout_anchor="@id/appbar"
         app:srcCompat="@drawable/ic_edit_24dp" />
 
