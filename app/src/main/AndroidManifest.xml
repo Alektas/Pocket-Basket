@@ -27,7 +27,7 @@
         </activity>
         <provider
             android:authorities="${applicationId}.ItemsProvider"
-            android:name=".services.ItemsProvider"
+            android:name=".ui.searching.ItemsProvider"
             android:exported="false"/>
         <receiver android:name=".widget.BasketWidget">
             <intent-filter>
