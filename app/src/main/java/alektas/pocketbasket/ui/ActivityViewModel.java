@@ -153,9 +153,9 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
      * then add it to the Basket
      */
     public void onSearch(String name) {
-        UseCase<String, Boolean> useCase = new AddItemUseCase(mRepository);
-        useCase.execute(name, isNewItemAdded -> {
-            if (isNewItemAdded) {
+        UseCase<String, Integer> useCase = new AddItemUseCase(mRepository);
+        useCase.execute(name, result -> {
+            if (result == AddItemUseCase.NEW_ITEM_ADDED) {
                 newItemAddedState.setState(true);
             }
         });
