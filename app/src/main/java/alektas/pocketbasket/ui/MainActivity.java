@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements
     private ActivityViewModel mViewModel;
     private VelocityTracker mVelocityTracker;
     private ShareActionProvider mShareActionProvider;
-    private CoordinatorLayout mConstraintLayout;
+    private CoordinatorLayout mRootLayout;
     private View mBasketContainer;
     private View mShowcaseContainer;
     private View mCategoriesContainer;
@@ -270,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements
         initTransitions();
         initFloatingActionMenu();
 
-        mConstraintLayout = findViewById(R.id.root_layout);
+        mRootLayout = findViewById(R.id.root_layout);
         mCategoriesContainer = findViewById(R.id.fragment_categories);
         mShowcaseContainer = findViewById(R.id.fragment_showcase);
         mShowcase = mShowcaseContainer.findViewById(R.id.showcase_list);
@@ -360,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements
 
         View delModeToolbar = findViewById(R.id.toolbar_del_mode);
         viewModel.deleteModeData().observe(this, delMode -> {
-            TransitionManager.beginDelayedTransition(mConstraintLayout, mDelToolbarTransition);
+            TransitionManager.beginDelayedTransition(mRootLayout, mDelToolbarTransition);
             delModeToolbar.setVisibility(delMode ? View.VISIBLE : View.GONE);
             if (delMode) mAddBtn.hide(); else mAddBtn.show();
         });
@@ -554,7 +554,7 @@ public class MainActivity extends AppCompatActivity implements
      * To actually change mode invoke {@link #setBasketMode() setBasketMode} instead.
      */
     private void applyBasketModeLayout() {
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
+        TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
         changeLayoutSize(mCategNarrowWidth,
                 mShowcaseNarrowWidth,
                 0);
@@ -579,7 +579,7 @@ public class MainActivity extends AppCompatActivity implements
      * To actually change mode invoke {@link #setShowcaseMode() setShowcaseMode} instead.
      */
     private void applyShowcaseModeLayout() {
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
+        TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
         changeLayoutSize(mCategWideWidth,
                 0,
                 mBasketNarrowWidth);
@@ -641,7 +641,7 @@ public class MainActivity extends AppCompatActivity implements
     private void showFloatingMenu() {
         mAddBtn.setImageResource(R.drawable.ic_close_white_24dp);
 
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mFamTransition);
+        TransitionManager.beginDelayedTransition(mRootLayout, mFamTransition);
         mCheckAllBtn.setVisibility(View.VISIBLE);
         mDelAllBtn.setVisibility(View.VISIBLE);
 
@@ -653,7 +653,7 @@ public class MainActivity extends AppCompatActivity implements
     private void hideFloatingMenu() {
         mAddBtn.setImageResource(R.drawable.ic_edit_24dp);
 
-        TransitionManager.beginDelayedTransition(mConstraintLayout, mFamTransition);
+        TransitionManager.beginDelayedTransition(mRootLayout, mFamTransition);
         mCheckAllBtn.setVisibility(View.INVISIBLE);
         mDelAllBtn.setVisibility(View.INVISIBLE);
 
@@ -1055,7 +1055,7 @@ public class MainActivity extends AppCompatActivity implements
                 setBasketMode();
             } else {
                 if (movX < -protectedInterval)  {
-                    TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
+                    TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
                 }
                 changeLayoutSize(mCategWideWidth,
                         0,
@@ -1066,7 +1066,7 @@ public class MainActivity extends AppCompatActivity implements
                 setShowcaseMode();
             } else {
                 if (movX > protectedInterval)  {
-                    TransitionManager.beginDelayedTransition(mConstraintLayout, mChangeModeTransition);
+                    TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
                 }
                 changeLayoutSize(mCategNarrowWidth,
                         mShowcaseNarrowWidth,
