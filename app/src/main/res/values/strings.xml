@@ -41,7 +41,7 @@
     <string name="guide_move_item">Items in the basket are moved by the handler or a long press on the icon</string>
     <string name="guide_remove_item">You can also remove an item from the basket with a swipe to the right</string>
     <string name="guide_del_mode">You can go to the deletion mode by long pressing on the item</string>
-    <string name="guide_delete_items">You can delete selected items or close the panel. Non-user items can be restored by \"Reset\" in the menu.</string>
+    <string name="guide_delete_items">You can delete selected items or cancel deletion. Non-user items can be restored by \"Reset\" in the menu.</string>
     <string name="guide_floating_menu">Extra menu is called by long pressing on the button</string>
     <string name="guide_check_all">Mark all items</string>
     <string name="guide_del_checked">Remove marked items</string>
@@ -56,5 +56,7 @@
     <string name="license_agreement_label">License agreement</string>
     <string name="license_agreement_link" translatable="false">https://drive.google.com/open?id=1W5M8BZkOQFPkjiAAvoJiLRdD_95JoZGv</string>
     <string name="del_mode_counter_placeholder" translatable="false">0</string>
+    <string name="descr_fam_del_marked_btn">Delete marked basket items</string>
+    <string name="descr_fam_mark_btn">Mark all basket items</string>
 
 </resources>

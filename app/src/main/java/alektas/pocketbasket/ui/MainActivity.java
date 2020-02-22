@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements
     private ActivityViewModel mViewModel;
     private VelocityTracker mVelocityTracker;
     private ShareActionProvider mShareActionProvider;
-    private CoordinatorLayout mRootLayout;
+    private ViewGroup mRootLayout;
     private View mBasketContainer;
     private View mShowcaseContainer;
     private View mCategoriesContainer;
@@ -493,7 +493,6 @@ public class MainActivity extends AppCompatActivity implements
                 .Builder(GuideContract.GUIDE_FLOATING_MENU_HELP)
                 .addViews(findViewById(R.id.guide_bg_full_img),
                         findViewById(R.id.guide_floating_menu_help_clicker),
-                        findViewById(R.id.guide_floating_menu_close_text),
                         findViewById(R.id.guide_floating_menu_check_all_text),
                         findViewById(R.id.guide_floating_menu_del_checked_text))
                 .build();

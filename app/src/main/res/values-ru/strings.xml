@@ -34,7 +34,7 @@
     <string name="guide_move_item">Товары в корзине перемещаются за ползунок или долгим нажатием по иконке</string>
     <string name="guide_remove_item">Убрать товар из корзины можно также свайпом вправо</string>
     <string name="guide_del_mode">Перейти в режим удаления можно долгим нажатием по товару</string>
-    <string name="guide_delete_items">Можно удалить выбранные товары или закрыть панель. Непользовательские предметы можно восстановить выбрав \"Сброс\" в меню</string>
+    <string name="guide_delete_items">Можно удалить выбранные товары или отменить удаление. Непользовательские предметы можно восстановить выбрав Сброс в меню</string>
     <string name="guide_floating_menu">Дополнительное меню вызывается долгим нажатием по кнопке</string>
     <string name="guide_check_all">Отметить все товары</string>
     <string name="guide_del_checked">Убрать отмеченные товары</string>
@@ -42,5 +42,7 @@
     <string name="about_developer_name">\u00A9 2019 Тотилас А.А.</string>
     <string name="license_agreement_label">Лицензионное соглашение</string>
     <string name="about_alektas">- Тотилас А.А.</string>
+    <string name="descr_fam_del_marked_btn">Удаление отмеченных товаров из корзины</string>
+    <string name="descr_fam_mark_btn">Отметка всех товаров в корзине</string>
 
 </resources>

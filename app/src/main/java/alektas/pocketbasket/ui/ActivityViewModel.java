@@ -108,6 +108,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
 
     /**
      * Show in the Showcase only items with specified tag
+     *
      * @param tag item type or category
      */
     public void setFilter(String tag) {
@@ -117,6 +118,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
 
     /**
      * Return default showcase items
+     *
      * @param fullReset if true delete all user items
      */
     public void resetShowcase(boolean fullReset) {
@@ -240,24 +242,21 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
                     }
                 })
                 .addCase(famCase)
-                .require(new Requirement(showcaseModeState, basketSizeState, markCountState) {
+                .require(new Requirement(basketSizeState, markCountState) {
                     @Override
                     public boolean check() {
-                        return !showcaseModeState.getState()
-                                && basketSizeState.getState() > 1
+                        return basketSizeState.getState() > 1
                                 && markCountState.getState() > 1;
-
                     }
                 })
                 .addCase(famHelpCase)
-                .require(new Requirement(showcaseModeState, famShowingState) {
+                .require(new Requirement(famShowingState) {
                     @Override
                     public boolean check() {
-                        return !showcaseModeState.getState() && famShowingState.getState();
+                        return famShowingState.getState();
                     }
                 })
                 .build();
-
     }
 
     public void onEventHappened(String eventKey) {
