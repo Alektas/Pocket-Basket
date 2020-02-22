@@ -80,15 +80,13 @@ public abstract class BaseRecyclerAdapter
 
     public void setItems(List<ItemModel> newItems) {
         if (newItems.size() < 2) {
-            mItems.clear();
-            mItems.addAll(newItems);
+            mItems = newItems;
             notifyDataSetChanged();
             return;
         }
         DiffUtil.DiffResult result =
                 DiffUtil.calculateDiff(new ItemsDiffCallback(mItems, newItems));
-        mItems.clear();
-        mItems.addAll(newItems);
+        mItems = newItems;
         result.dispatchUpdatesTo(this);
     }
 
