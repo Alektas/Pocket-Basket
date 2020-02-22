@@ -148,33 +148,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         return mRepository.getBasketData().getValue();
     }
 
-    /**
-     * Create a new item in the Showcase if it doesn't already exist,
-     * then add it to the Basket
-     */
-    public void onSearch(String name) {
-        UseCase<String, Boolean> useCase = new AddItemUseCase(mRepository);
-        useCase.execute(name, isNewItemAdded -> {
-            if (isNewItemAdded) {
-                newItemAddedState.setState(true);
-            }
-        });
-    }
-
-    /**
-     * Verify if all items in the Basket are checked.
-     */
-    public void markAllItems() {
-        new MarkAllBasketItems(mRepository).execute(null, null);
-    }
-
-    /**
-     * Delete all checked items in the Basket.
-     */
-    public void deleteMarked() {
-        new RemoveMarkedItems(mRepository).execute(null, null);
-    }
-
 
     /* Guide methods */
 
@@ -388,6 +361,29 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
 
     public void onFabClick() {
         mGuide.onUserEvent(GuideContract.GUIDE_FLOATING_MENU_HELP);
+    }
+
+    public void onFamCheckBtnClick() {
+        mGuide.onUserEvent(GuideContract.GUIDE_FLOATING_MENU_HELP);
+        new MarkAllBasketItems(mRepository).execute(null, null);
+    }
+
+    public void onFamDelBtnClick() {
+        mGuide.onUserEvent(GuideContract.GUIDE_FLOATING_MENU_HELP);
+        new RemoveMarkedItems(mRepository).execute(null, null);
+    }
+
+    /**
+     * Create a new item in the Showcase if it doesn't already exist,
+     * then add it to the Basket
+     */
+    public void onSearch(String name) {
+        UseCase<String, Boolean> useCase = new AddItemUseCase(mRepository);
+        useCase.execute(name, isNewItemAdded -> {
+            if (isNewItemAdded) {
+                newItemAddedState.setState(true);
+            }
+        });
     }
 
 }

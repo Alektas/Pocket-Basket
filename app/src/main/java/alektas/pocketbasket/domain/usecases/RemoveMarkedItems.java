@@ -2,6 +2,9 @@ package alektas.pocketbasket.domain.usecases;
 
 import alektas.pocketbasket.domain.Repository;
 
+/**
+ * Delete all marked items in the Basket.
+ */
 public class RemoveMarkedItems implements UseCase<Void, Void> {
     private Repository mRepository;
 

@@ -177,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
 
         // Show icons in toolbar menu
-        if(menu instanceof MenuBuilder){
+        if (menu instanceof MenuBuilder) {
             MenuBuilder m = (MenuBuilder) menu;
             m.setOptionalIconsVisible(true);
         }
@@ -362,7 +362,8 @@ public class MainActivity extends AppCompatActivity implements
         viewModel.deleteModeData().observe(this, delMode -> {
             TransitionManager.beginDelayedTransition(mRootLayout, mDelToolbarTransition);
             delModeToolbar.setVisibility(delMode ? View.VISIBLE : View.GONE);
-            if (delMode) mAddBtn.hide(); else mAddBtn.show();
+            if (delMode) mAddBtn.hide();
+            else mAddBtn.show();
         });
 
         TextView counter = findViewById(R.id.toolbar_del_mode_counter);
@@ -386,7 +387,9 @@ public class MainActivity extends AppCompatActivity implements
         mCheckAllBtn = findViewById(R.id.fam_check_all);
         mDelAllBtn = findViewById(R.id.fam_del_all);
         mAddBtn.setOnLongClickListener(view -> {
-            if (!isMenuShown) { showFloatingMenu(); }
+            if (!isMenuShown) {
+                showFloatingMenu();
+            }
             return true;
         });
     }
@@ -550,7 +553,7 @@ public class MainActivity extends AppCompatActivity implements
      * categories and showcase narrowed, basket expanded.
      * Warning! This method don't change global mode state and it should be
      * invoked only when the mode is not changed, but it's necessary to apply appropriate sizes.
-     *
+     * <p>
      * To actually change mode invoke {@link #setBasketMode() setBasketMode} instead.
      */
     private void applyBasketModeLayout() {
@@ -575,7 +578,7 @@ public class MainActivity extends AppCompatActivity implements
      * categories and showcase expanded, basket narrowed.
      * Warning! This method don't change global mode state and it should be
      * invoked only when the mode is not changed, but it's necessary to apply appropriate sizes.
-     *
+     * <p>
      * To actually change mode invoke {@link #setShowcaseMode() setShowcaseMode} instead.
      */
     private void applyShowcaseModeLayout() {
@@ -589,9 +592,9 @@ public class MainActivity extends AppCompatActivity implements
      * Change size of the layout parts: Categories, Showcase and Basket.
      * If one of the width equal '0' then the corresponding layout part fills in the free space.
      *
-     * @param categWidth width of the Categories in pixels
+     * @param categWidth    width of the Categories in pixels
      * @param showcaseWidth width of the Showcase in pixels
-     * @param basketWidth width of the Basket in pixels
+     * @param basketWidth   width of the Basket in pixels
      */
     private void changeLayoutSize(int categWidth, int showcaseWidth, int basketWidth) {
         changeCategoriesSize(categWidth);
@@ -714,28 +717,26 @@ public class MainActivity extends AppCompatActivity implements
     /* On click methods */
 
     public void onFabClick(View view) {
+        if (view.getId() != R.id.fab) return;
+
         mViewModel.onFabClick();
         if (isMenuShown) {
-            if (view.getId() == R.id.fab) {
-                hideFloatingMenu();
-            }
-            if (view.getId() == R.id.fam_del_all) {
-                mViewModel.deleteMarked();
-                hideFloatingMenu();
-            }
-            if (view.getId() == R.id.fam_check_all) {
-                mViewModel.markAllItems();
-            }
+            hideFloatingMenu();
+        } else {
+            toggleSearchView();
         }
-        else if (view.getId() == R.id.fab){
-            if (mSearchView.hasFocus()) {
-                if (!TextUtils.isEmpty(mSearchView.getQuery())) {
-                    onSearch(mSearchView.getQuery().toString());
-                }
-                cancelSearch();
-            } else {
-                mSearchView.setIconified(false);
-            }
+    }
+
+    public void onFamDelBtnClick(View view) {
+        if (view.getId() == R.id.fam_del_all) {
+            mViewModel.onFamDelBtnClick();
+            hideFloatingMenu();
+        }
+    }
+
+    public void onFamCheckBtnClick(View view) {
+        if (view.getId() == R.id.fam_check_all) {
+            mViewModel.onFamCheckBtnClick();
         }
     }
 
@@ -960,11 +961,11 @@ public class MainActivity extends AppCompatActivity implements
         int showcaseOffset;
         int categOffset;
         if (mViewModel.isShowcaseMode()) {
-            showcaseOffset = mShowcaseWideWidth - mShowcaseNarrowWidth + movX/2 + changeModeStartDistance;
-            categOffset = mCategWideWidth - mCategNarrowWidth + movX/2 + changeModeStartDistance;
+            showcaseOffset = mShowcaseWideWidth - mShowcaseNarrowWidth + movX / 2 + changeModeStartDistance;
+            categOffset = mCategWideWidth - mCategNarrowWidth + movX / 2 + changeModeStartDistance;
         } else {
-            showcaseOffset = movX/2 - changeModeStartDistance;
-            categOffset = movX/2 - changeModeStartDistance;
+            showcaseOffset = movX / 2 - changeModeStartDistance;
+            categOffset = movX / 2 - changeModeStartDistance;
         }
 
         int showcaseWidth = calculateLayoutSize(showcaseOffset,
@@ -980,7 +981,7 @@ public class MainActivity extends AppCompatActivity implements
     /**
      * Calculate layout size according to touch gesture distance.
      *
-     * @param movX touch distance in pixels
+     * @param movX    touch distance in pixels
      * @param minSize minimum size of the layout
      * @param maxSize maximum size of the layout
      * @return value for size of layout between minSize and maxSize according to movX
@@ -1024,7 +1025,7 @@ public class MainActivity extends AppCompatActivity implements
      * @return appropriate decelerate interpolator
      */
     private Interpolator getInterpolator(float velocity) {
-        int factor = (int) (Math.abs(velocity)/ CHANGE_MODE_VELOCITY_DIVIDER);
+        int factor = (int) (Math.abs(velocity) / CHANGE_MODE_VELOCITY_DIVIDER);
         switch (factor) {
             case 0: {
                 return new AccelerateDecelerateInterpolator();
@@ -1054,7 +1055,7 @@ public class MainActivity extends AppCompatActivity implements
             if (velocity < CHANGE_MODE_MIN_VELOCITY && movX < -changeModeDistance) {
                 setBasketMode();
             } else {
-                if (movX < -protectedInterval)  {
+                if (movX < -protectedInterval) {
                     TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
                 }
                 changeLayoutSize(mCategWideWidth,
@@ -1065,7 +1066,7 @@ public class MainActivity extends AppCompatActivity implements
             if (velocity > -CHANGE_MODE_MIN_VELOCITY && movX > changeModeDistance) {
                 setShowcaseMode();
             } else {
-                if (movX > protectedInterval)  {
+                if (movX > protectedInterval) {
                     TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
                 }
                 changeLayoutSize(mCategNarrowWidth,
@@ -1112,6 +1113,17 @@ public class MainActivity extends AppCompatActivity implements
         Bundle search = new Bundle();
         search.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.SEARCH, search);
+    }
+
+    private void toggleSearchView() {
+        if (mSearchView.hasFocus()) {
+            if (!TextUtils.isEmpty(mSearchView.getQuery())) {
+                onSearch(mSearchView.getQuery().toString());
+            }
+            cancelSearch();
+        } else {
+            mSearchView.setIconified(false); // give focus
+        }
     }
 
     /**
