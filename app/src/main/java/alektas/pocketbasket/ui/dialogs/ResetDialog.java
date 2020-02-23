@@ -41,7 +41,7 @@ public class ResetDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setTitle(R.string.reset_msg)
                 .setMultiChoiceItems(R.array.reset_choices, null,
                         (dialogInterface, i, b) -> isFullReset = b)

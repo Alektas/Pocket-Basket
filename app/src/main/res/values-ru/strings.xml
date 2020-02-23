@@ -39,7 +39,7 @@
     <string name="guide_check_all">Отметить все товары</string>
     <string name="guide_del_checked">Убрать отмеченные товары</string>
     <string name="guide_close_menu">Закрыть меню</string>
-    <string name="about_developer_name">\u00A9 2019 Тотилас А.А.</string>
+    <string name="about_developer_name">© 2020 Тотилас А.А.</string>
     <string name="license_agreement_label">Лицензионное соглашение</string>
     <string name="about_alektas">- Тотилас А.А.</string>
     <string name="descr_fam_del_marked_btn">Удаление отмеченных товаров из корзины</string>
