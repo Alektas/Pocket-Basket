@@ -154,17 +154,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        // Remove focus from search view and hide keyboard
-        if (TextUtils.isEmpty(mSearchView.getQuery()) || mSearchView.getQuery() == null) {
-            cancelSearch();
-            View root = findViewById(R.id.root_layout);
-            root.requestFocus();
-        }
-    }
-
-    @Override
     protected void onStop() {
         mPrefs.edit().putInt(SAVED_CATEGORY_KEY, getSelectedCategoryId()).apply();
         BasketWidget.updateItems(this);
@@ -326,6 +315,12 @@ public class MainActivity extends AppCompatActivity implements
         mSearchView = findViewById(R.id.menu_search);
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         mSearchView.setIconified(false);
+        // Remove focus from search view and hide keyboard
+        if (TextUtils.isEmpty(mSearchView.getQuery())) {
+            cancelSearch();
+            View root = findViewById(R.id.root_layout);
+            root.requestFocus();
+        }
     }
 
     private void subscribeOnModel(ActivityViewModel viewModel,
