@@ -351,8 +351,12 @@ public class MainActivity extends AppCompatActivity implements
         viewModel.deleteModeData().observe(this, delMode -> {
             TransitionManager.beginDelayedTransition(mRootLayout, mDelToolbarTransition);
             delModeToolbar.setVisibility(delMode ? View.VISIBLE : View.GONE);
-            if (delMode) mAddBtn.hide();
-            else mAddBtn.show();
+            if (delMode) {
+                mAddBtn.hide();
+                cancelSearch();
+            } else {
+                mAddBtn.show();
+            }
         });
 
         TextView counter = findViewById(R.id.toolbar_del_mode_counter);
