@@ -53,12 +53,12 @@
     <string name="bom_link" translatable="false">https://www.iconfinder.com/korawan_m</string>
     <string name="google_material_link" translatable="false">https://material.io/tools/icons/</string>
     <string name="about_developer_name">\u00A9 2020 Totilas A.A.</string>
-    <string name="license_agreement_label">License agreement</string>
-    <string name="license_agreement_link" translatable="false">https://drive.google.com/open?id=1W5M8BZkOQFPkjiAAvoJiLRdD_95JoZGv</string>
+    <string name="privacy_policy_link">https://drive.google.com/open?id=1XWuf-8qf-wK6Z9u_-zuvpheG8tAV0_ZW</string>
     <string name="del_mode_counter_placeholder" translatable="false">0</string>
     <string name="descr_fam_del_marked_btn">Delete marked basket items</string>
     <string name="descr_fam_mark_btn">Mark all basket items</string>
     <string name="msg_share_unsuccessful_basket_empty">Add items to basket to share list</string>
     <string name="share_unsuccessful_title">Unable to share list</string>
+    <string name="privacy_policy_label">Privacy Policy</string>
 
 </resources>

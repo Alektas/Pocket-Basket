@@ -846,8 +846,8 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             }
 
-            case R.id.license_link: {
-                link = getString(R.string.license_agreement_link);
+            case R.id.privacy_policy_link: {
+                link = getString(R.string.privacy_policy_link);
                 break;
             }
         }

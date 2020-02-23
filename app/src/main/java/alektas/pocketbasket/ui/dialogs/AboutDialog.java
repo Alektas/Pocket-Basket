@@ -60,8 +60,8 @@ public class AboutDialog extends DialogFragment {
         tv = mView.findViewById(R.id.cc_link);
         makeLinkable(tv, getString(R.string.cc_license_link));
 
-        tv = mView.findViewById(R.id.license_link);
-        makeLinkable(tv, getString(R.string.license_agreement_link));
+        tv = mView.findViewById(R.id.privacy_policy_link);
+        makeLinkable(tv, getString(R.string.privacy_policy_link));
     }
 
     private void makeLinkable(TextView tv, String link) {

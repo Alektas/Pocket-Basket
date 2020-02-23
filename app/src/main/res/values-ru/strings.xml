@@ -46,5 +46,7 @@
     <string name="descr_fam_mark_btn">Отметка всех товаров в корзине</string>
     <string name="msg_share_unsuccessful_basket_empty">Добавьте товары в корзину чтобы поделиться списком</string>
     <string name="share_unsuccessful_title">Невозможно поделиться списком</string>
+    <string name="privacy_policy_label">Политика Конфиденциальности</string>
+    <string name="privacy_policy_link">https://drive.google.com/open?id=1DnMzoN5IUr-xWzgo25lKvW6OiMh9MMox</string>
 
 </resources>
