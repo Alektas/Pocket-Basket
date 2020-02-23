@@ -44,5 +44,7 @@
     <string name="about_alektas">- Тотилас А.А.</string>
     <string name="descr_fam_del_marked_btn">Удаление отмеченных товаров из корзины</string>
     <string name="descr_fam_mark_btn">Отметка всех товаров в корзине</string>
+    <string name="msg_share_unsuccessful_basket_empty">Добавьте товары в корзину чтобы поделиться списком</string>
+    <string name="share_unsuccessful_title">Невозможно поделиться списком</string>
 
 </resources>

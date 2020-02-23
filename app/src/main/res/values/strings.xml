@@ -58,5 +58,7 @@
     <string name="del_mode_counter_placeholder" translatable="false">0</string>
     <string name="descr_fam_del_marked_btn">Delete marked basket items</string>
     <string name="descr_fam_mark_btn">Mark all basket items</string>
+    <string name="msg_share_unsuccessful_basket_empty">Add items to basket to share list</string>
+    <string name="share_unsuccessful_title">Unable to share list</string>
 
 </resources>

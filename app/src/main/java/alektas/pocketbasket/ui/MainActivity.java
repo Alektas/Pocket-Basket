@@ -35,7 +35,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -58,6 +57,7 @@ import alektas.pocketbasket.guide.ui.SequentialGuidePresenter;
 import alektas.pocketbasket.ui.dialogs.AboutDialog;
 import alektas.pocketbasket.ui.dialogs.GuideAcceptDialog;
 import alektas.pocketbasket.ui.dialogs.ResetDialog;
+import alektas.pocketbasket.ui.dialogs.ShareUnsuccessfulDialog;
 import alektas.pocketbasket.ui.utils.SmoothDecelerateInterpolator;
 import alektas.pocketbasket.utils.ResourcesUtils;
 import alektas.pocketbasket.widget.BasketWidget;
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (item.getItemId()) {
             case R.id.menu_share: {
-                updateShareIntent(mViewModel.getBasketItems());
+                onShareBasketItems(mViewModel.getBasketItems());
                 return true;
             }
 
@@ -1115,13 +1115,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Rewrite shared items (basket items) in the share intent.
-     * Update should be invoked every time when a new item added to the basket.
+     * Rewrite shared basket items in the share intent.
+     * If there are items, share selector is shown, else alert dialog is shown.
      *
-     * @param items shared items
+     * @param items shared basket items
      */
-    private void updateShareIntent(List<? extends ItemModel> items) {
-        if (mShareActionProvider != null && items != null) {
+    private void onShareBasketItems(List<? extends ItemModel> items) {
+        if (mShareActionProvider != null && items != null && !items.isEmpty()) {
 
             StringBuilder sb = new StringBuilder(getString(R.string.share_intro));
             for (ItemModel item : items) {
@@ -1133,6 +1133,9 @@ public class MainActivity extends AppCompatActivity implements
             shareIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
 
             mShareActionProvider.setShareIntent(shareIntent);
+        } else {
+            DialogFragment dialog = new ShareUnsuccessfulDialog();
+            dialog.show(getSupportFragmentManager(), "ShareUnsuccessfulDialog");
         }
     }
 
