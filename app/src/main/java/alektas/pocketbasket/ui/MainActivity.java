@@ -214,17 +214,6 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
             }
 
-            case R.id.menu_load_new_ver: {
-                loadNewVersion();
-
-                // Log analytic event
-                Bundle bundle = new Bundle();
-                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "check for the new app version");
-                App.getAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
-
-                return true;
-            }
-
             case R.id.menu_guide: {
                 showHintsAcceptDialog();
                 return true;
@@ -1123,15 +1112,6 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             mSearchView.setIconified(false); // give focus
         }
-    }
-
-    /**
-     * Open the link of the apk storage in the web browser
-     */
-    private void loadNewVersion() {
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse("https://drive.google.com/open?id=1HPHjTYmi7xlY6XO6w2QozXg8c_lyh2-9"));
-        startActivity(browserIntent);
     }
 
     /**

@@ -17,13 +17,7 @@
           android:icon="@drawable/ic_menu_reset_darkgreen_24dp"
           app:showAsAction="never"/>
 
-    <item android:id="@+id/menu_load_new_ver"
-          android:orderInCategory="30"
-          android:title="@string/update"
-          android:icon="@drawable/ic_menu_file_download_darkgreen_24dp"
-          app:showAsAction="never"/>
-
-    <item android:id="@+id/menu_guide"
+   <item android:id="@+id/menu_guide"
           android:orderInCategory="40"
           android:title="@string/guide"
           android:icon="@drawable/ic_menu_help_outline_darkgreen_24dp"
