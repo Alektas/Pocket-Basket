@@ -30,13 +30,17 @@ public class ShowcaseViewModel extends AndroidViewModel {
     private Guide mGuide;
     private MutableLiveData<List<ShowcaseItemModel>> mShowcaseData = new MutableLiveData<>();
     private MutableLiveData<Boolean> delModeState = new MutableLiveData<>();
+    private MutableLiveData<Boolean> showcaseModeData = new MutableLiveData<>();
     private boolean showcaseModeState = UiContract.IS_DEFAULT_MODE_SHOWCASE;
 
     public ShowcaseViewModel(@NonNull Application application) {
         super(application);
         mRepository = RepositoryImpl.getInstance(application);
         mRepository.getShowcaseData().observe(mShowcaseData::setValue);
-        mRepository.showcaseModeData().observe(state -> showcaseModeState = state);
+        mRepository.showcaseModeData().observe(state -> {
+            showcaseModeData.setValue(state);
+            showcaseModeState = state;
+        });
         mRepository.delModeData().observe((delMode) -> {
             delModeState.setValue(delMode);
             ActivityViewModel.delModeState.setState(delMode);
@@ -51,6 +55,10 @@ public class ShowcaseViewModel extends AndroidViewModel {
         mRepository.showcaseModeData().clearObservers();
         mRepository.delModeData().clearObservers();
         mRepository = null;
+    }
+
+    public MutableLiveData<Boolean> getShowcaseModeData() {
+        return showcaseModeData;
     }
 
     public LiveData<List<ShowcaseItemModel>> getShowcaseData() {

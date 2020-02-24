@@ -60,5 +60,6 @@
     <string name="msg_share_unsuccessful_basket_empty">Add items to basket to share list</string>
     <string name="share_unsuccessful_title">Unable to share list</string>
     <string name="privacy_policy_label">Privacy Policy</string>
+    <string name="ad_attribution" translatable="false">Ad</string>
 
 </resources>
