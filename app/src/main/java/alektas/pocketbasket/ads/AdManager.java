@@ -31,7 +31,7 @@ public class AdManager {
 
     public interface AdsLoadingListener {
         void onLoadFinished();
-        void onLoadFailed();
+        void onLoadFailed(int errorCode);
     }
 
     private AdManager(Context context, String appId, String adId, RequestConfiguration config) {
@@ -82,15 +82,14 @@ public class AdManager {
     /**
      * Receives a new portion of advertising from the network. The operation is asynchronous, so the
      * listener must be provided to notify of the completion / failure of the download via callbacks.
-     *  @param withWideMode should ads be in wide mode or not
      * @param listener gets loading callbacks
      */
-    public void fetchAds(boolean withWideMode, AdsLoadingListener listener) {
+    public void fetchAds(AdsLoadingListener listener) {
         mNativeAds.clear();
 
         mAdLoader = new AdLoader.Builder(mContext, mAdId)
                 .forUnifiedNativeAd(unifiedNativeAd -> {
-                    mNativeAds.add(new NativeAdWrapper(unifiedNativeAd, withWideMode));
+                    mNativeAds.add(new NativeAdWrapper(unifiedNativeAd, true));
                     if (!mAdLoader.isLoading()) {
                         if (listener != null) listener.onLoadFinished();
                     }
@@ -99,7 +98,7 @@ public class AdManager {
                     @Override
                     public void onAdFailedToLoad(int errorCode) {
                         Log.e("[Loading ads]", "Failed to load with code: " + errorCode);
-                        if (listener != null) listener.onLoadFailed();
+                        if (listener != null) listener.onLoadFailed(errorCode);
                     }
                 })
                 .withNativeAdOptions(new NativeAdOptions.Builder().build())

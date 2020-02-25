@@ -20,8 +20,10 @@ import alektas.pocketbasket.R;
 import alektas.pocketbasket.ads.AdManager;
 import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 import alektas.pocketbasket.ui.ItemSizeProvider;
+import alektas.pocketbasket.utils.NetworkMonitor;
 
 public class ShowcaseFragment extends Fragment {
+    private NetworkMonitor mNetworkMonitor;
     private AdManager mAdManager;
     private List<ShowcaseItemModel> mProducts = new ArrayList<>();
     private ShowcaseViewModel mViewModel;
@@ -78,14 +80,19 @@ public class ShowcaseFragment extends Fragment {
                 .withTestDevice(R.string.ad_test_device_id)
                 .build();
 
-        mAdManager.fetchAds(true, new AdManager.AdsLoadingListener() {
-            @Override
-            public void onLoadFinished() {
-                mShowcaseAdapter.setItems(mAdManager.combineWithLatestAds(mProducts));
-            }
+        mNetworkMonitor = new NetworkMonitor(requireContext());
+        mNetworkMonitor.setNetworkListener(isAvailable -> {
+            if (!isAvailable) return;
 
-            @Override
-            public void onLoadFailed() {  }
+            mAdManager.fetchAds(new AdManager.AdsLoadingListener() {
+                @Override
+                public void onLoadFinished() {
+                    mShowcaseAdapter.setItems(mAdManager.combineWithLatestAds(mProducts));
+                }
+
+                @Override
+                public void onLoadFailed(int errorCode) {  }
+            });
         });
 
         super.onActivityCreated(savedInstanceState);
@@ -98,4 +105,9 @@ public class ShowcaseFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onDestroyView() {
+        mNetworkMonitor.removeNetworkListener();
+        super.onDestroyView();
+    }
 }

@@ -53,8 +53,7 @@ class ItemsDiffCallback extends DiffUtil.Callback {
         } else if (oldItem instanceof NativeAdWrapper && newItem instanceof NativeAdWrapper) {
             NativeAdWrapper oldAd = (NativeAdWrapper) oldItem;
             NativeAdWrapper newAd = (NativeAdWrapper) newItem;
-            return oldAd.getAd().getHeadline().equals(newAd.getAd().getHeadline())
-                    && (oldAd.isWideMode() == newAd.isWideMode());
+            return oldAd.getAd().getHeadline().equals(newAd.getAd().getHeadline());
         }
         return false;
     }
