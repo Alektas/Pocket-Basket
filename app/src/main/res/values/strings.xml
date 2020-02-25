@@ -61,5 +61,8 @@
     <string name="share_unsuccessful_title">Unable to share list</string>
     <string name="privacy_policy_label">Privacy Policy</string>
     <string name="ad_attribution" translatable="false">Ad</string>
+    <string name="check_all">Check all</string>
+    <string name="del_checked">Delete checked</string>
+    <string name="guide_basket_menu">You can mark all products in the basket or delete marked ones in the toolbar below</string>
 
 </resources>

@@ -272,14 +272,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@drawable/ic_guide_tap_rot180" />
 
-    <!-- Guide: floating menu invoke -->
+    <!-- Guide:basket menu buttons -->
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/guide_show_floating_menu_body"
+        android:id="@+id/guide_basket_menu_body"
         style="@style/Widget.Hint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/guide_floating_menu"
+        android:text="@string/guide_basket_menu"
         app:cornerRadius="@dimen/corners_guide_hint"
         app:icon="@drawable/ic_menu_info_outline_darkgreen_24dp"
         app:iconSize="@dimen/size_guide_hint_icon"
@@ -289,49 +289,13 @@
         app:rippleColor="@color/colorPrimaryDark" />
 
     <ImageView
-        android:id="@+id/guide_show_floating_menu_img"
+        android:id="@+id/guide_basket_menu_img"
         android:layout_width="@dimen/size_guide_gesture_icon"
         android:layout_height="@dimen/size_guide_gesture_icon"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="32dp"
+        android:layout_marginEnd="32dp"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_guide_press_and_hold_rot180" />
-
-    <!-- Guide: floating menu help -->
-
-    <FrameLayout
-        android:id="@+id/guide_floating_menu_help_clicker"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clickable="true"
-        android:focusable="true"
-        android:onClick="onHintClick"
-        android:visibility="invisible" />
-
-    <TextView
-        android:id="@+id/guide_floating_menu_check_all_text"
-        style="@style/Widget.Guide.Text.Main.Light"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="80dp"
-        android:layout_marginBottom="105dp"
-        android:text="@string/guide_check_all"
-        android:textAlignment="viewEnd"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <TextView
-        android:id="@+id/guide_floating_menu_del_checked_text"
-        style="@style/Widget.Guide.Text.Main.Light"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="80dp"
-        android:layout_marginBottom="52dp"
-        android:text="@string/guide_del_checked"
-        android:textAlignment="viewEnd"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:srcCompat="@drawable/ic_guide_tap_rot180" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

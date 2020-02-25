@@ -48,5 +48,8 @@
     <string name="share_unsuccessful_title">Невозможно поделиться списком</string>
     <string name="privacy_policy_label">Политика Конфиденциальности</string>
     <string name="privacy_policy_link">https://drive.google.com/open?id=1DnMzoN5IUr-xWzgo25lKvW6OiMh9MMox</string>
+    <string name="check_all">Отметить все</string>
+    <string name="del_checked">Удалить отмеченные</string>
+    <string name="guide_basket_menu">Отметить все товары в корзине или удалить отмеченные можно в панели инструментов внизу</string>
 
 </resources>
