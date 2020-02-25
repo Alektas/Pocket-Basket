@@ -10,7 +10,7 @@
         android:id="@+id/basket_list"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:animateLayoutChanges="false"
+        android:scrollbars="vertical"
         tools:listitem="@layout/item_basket"/>
 
 </FrameLayout>
