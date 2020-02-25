@@ -9,4 +9,6 @@
 
     <color name="colorHintOnPrimary">#99F0F0F0</color>
     <color name="bg_guide_fullscreen">#DC212121</color>
+    <color name="colorAdBadge">#CE981A</color>
+    <color name="colorAdBadgeText">#FFFFFF</color>
 </resources>

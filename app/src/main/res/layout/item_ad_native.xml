@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginTop="@dimen/padding_8"
+    android:layout_marginBottom="@dimen/padding_8"
+    app:cardCornerRadius="@dimen/corners_ads">
+
+    <com.google.android.gms.ads.formats.UnifiedNativeAdView
+        android:id="@+id/ad_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:id="@+id/ad_view_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/size_ads_icon">
+
+            <ImageView
+                android:id="@+id/ad_item_icon"
+                android:layout_width="@dimen/size_ads_icon"
+                android:layout_height="@dimen/size_ads_icon"
+                android:layout_marginTop="8dp"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/ad_item_title_wide"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="4dp"
+                android:paddingTop="8dp"
+                android:layout_below="@id/ad_item_icon"
+                android:layout_centerHorizontal="true"
+                android:ellipsize="end"
+                android:maxLines="5"
+                android:text="Headline"
+                android:gravity="center"
+                android:textColor="?colorOnBackground"
+                android:textSize="@dimen/textsize_item_name" />
+
+            <TextView
+                android:id="@+id/ad_attribution"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="15dp"
+                android:minHeight="15dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/shape_ad_badge"
+                android:text="@string/ad_attribution"
+                android:gravity="center"
+                android:textColor="@color/colorAdBadgeText"
+                android:textSize="12sp" />
+        </RelativeLayout>
+    </com.google.android.gms.ads.formats.UnifiedNativeAdView>
+</androidx.cardview.widget.CardView>

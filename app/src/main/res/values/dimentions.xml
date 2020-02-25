@@ -69,4 +69,6 @@
     <dimen name="padding_rb">16dp</dimen>
     <dimen name="padding_ic">8dp</dimen>
     <dimen name="margin_item_icon">8dp</dimen>
+    <dimen name="corners_ads">4dp</dimen>
+    <dimen name="size_ads_icon">40dp</dimen>
 </resources>

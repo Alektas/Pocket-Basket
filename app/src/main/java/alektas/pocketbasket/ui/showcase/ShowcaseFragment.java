@@ -1,6 +1,5 @@
 package alektas.pocketbasket.ui.showcase;
 
-
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,15 +14,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import alektas.pocketbasket.R;
+import alektas.pocketbasket.ads.AdManager;
+import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 import alektas.pocketbasket.ui.ItemSizeProvider;
+import alektas.pocketbasket.utils.NetworkMonitor;
 
-/**
- * A simple {@link Fragment} subclass.
- */
 public class ShowcaseFragment extends Fragment {
-    private static final String TAG = "ShowcaseFragment";
+    private NetworkMonitor mNetworkMonitor;
+    private AdManager mAdManager;
+    private List<ShowcaseItemModel> mProducts = new ArrayList<>();
     private ShowcaseViewModel mViewModel;
     private ShowcaseRvAdapter mShowcaseAdapter;
     private ItemSizeProvider mItemSizeProvider;
@@ -70,14 +72,42 @@ public class ShowcaseFragment extends Fragment {
         return root;
     }
 
-    private void subscribeOnModel() {
-        mViewModel.getShowcaseData().observe(this, items -> {
-            mShowcaseAdapter.setItems(new ArrayList<>(items));
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        mAdManager = new AdManager.Builder(requireContext(), R.string.ad_app_id, R.string.ad_unit_id)
+                .withDebugAppId(R.string.ad_test_app_id)
+                .withDebugAdId(R.string.ad_test_unit_id)
+                .withTestDevice(R.string.ad_test_device_id)
+                .build();
+
+        mNetworkMonitor = new NetworkMonitor(requireContext());
+        mNetworkMonitor.setNetworkListener(isAvailable -> {
+            if (!isAvailable) return;
+
+            mAdManager.fetchAds(new AdManager.AdsLoadingListener() {
+                @Override
+                public void onLoadFinished() {
+                    mShowcaseAdapter.setItems(mAdManager.combineWithLatestAds(mProducts));
+                }
+
+                @Override
+                public void onLoadFailed(int errorCode) {  }
+            });
         });
 
-        mViewModel.delModeState().observe(this, isDelMode -> {
-            if (!isDelMode) mShowcaseAdapter.notifyDataSetChanged();
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    private void subscribeOnModel() {
+        mViewModel.getShowcaseData().observe(this, items -> {
+            mProducts = items;
+            mShowcaseAdapter.setItems(mAdManager.combineWithLatestAds(mProducts));
         });
     }
 
+    @Override
+    public void onDestroyView() {
+        mNetworkMonitor.removeNetworkListener();
+        super.onDestroyView();
+    }
 }

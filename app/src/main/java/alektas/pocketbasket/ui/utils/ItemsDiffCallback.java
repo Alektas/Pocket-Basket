@@ -4,15 +4,15 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import java.util.List;
 
+import alektas.pocketbasket.ads.NativeAdWrapper;
 import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.data.db.entities.ShowcaseItem;
-import alektas.pocketbasket.domain.entities.ItemModel;
 
 class ItemsDiffCallback extends DiffUtil.Callback {
-    private final List<ItemModel> mOldList;
-    private final List<ItemModel> mNewList;
+    private final List<Object> mOldList;
+    private final List<Object> mNewList;
 
-    ItemsDiffCallback(List<ItemModel> oldList, List<ItemModel> newList) {
+    ItemsDiffCallback(List<Object> oldList, List<Object> newList) {
         mOldList = oldList;
         mNewList = newList;
     }
@@ -36,19 +36,24 @@ class ItemsDiffCallback extends DiffUtil.Callback {
 
     @Override
     public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
-        ItemModel oldItem = mOldList.get(oldItemPosition);
-        ItemModel newItem = mNewList.get(newItemPosition);
+        Object oldItem = mOldList.get(oldItemPosition);
+        Object newItem = mNewList.get(newItemPosition);
         if (oldItem instanceof BasketItem) {
             BasketItem oldBasketItem = (BasketItem) oldItem;
+            // New item also is BasketItem, because the basket don't have ads
             BasketItem newBasketItem = (BasketItem) newItem;
             return oldBasketItem.getName().equals(newBasketItem.getName())
                     && oldBasketItem.isMarked() == newBasketItem.isMarked();
-        } else if (oldItem instanceof ShowcaseItem) {
+        } else if (oldItem instanceof ShowcaseItem && newItem instanceof ShowcaseItem) {
             ShowcaseItem oldShowcaseItem = (ShowcaseItem) oldItem;
             ShowcaseItem newShowcaseItem = (ShowcaseItem) newItem;
             return oldShowcaseItem.getName().equals(newShowcaseItem.getName())
                     && oldShowcaseItem.isRemoval() == newShowcaseItem.isRemoval()
                     && oldShowcaseItem.isExistInBasket() == newShowcaseItem.isExistInBasket();
+        } else if (oldItem instanceof NativeAdWrapper && newItem instanceof NativeAdWrapper) {
+            NativeAdWrapper oldAd = (NativeAdWrapper) oldItem;
+            NativeAdWrapper newAd = (NativeAdWrapper) newItem;
+            return oldAd.getAd().getHeadline().equals(newAd.getAd().getHeadline());
         }
         return false;
     }
