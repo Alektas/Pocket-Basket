@@ -96,11 +96,6 @@ public class ShowcaseFragment extends Fragment {
             mProducts = items;
             mShowcaseAdapter.setItems(mAdManager.combineWithLatestAds(mProducts));
         });
-
-        mViewModel.delModeState().observe(this, isDelMode -> {
-            // Update item views to remove deletion selection border
-            if (!isDelMode) mShowcaseAdapter.setItems(mShowcaseAdapter.getItems());
-        });
     }
 
 }
