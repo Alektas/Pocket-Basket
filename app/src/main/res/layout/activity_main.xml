@@ -24,7 +24,7 @@
         <SearchView
             android:id="@+id/menu_search"
             android:theme="@style/ThemeOverlay.SearchView"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
             android:paddingStart="@dimen/margin_start_search_view_query"
