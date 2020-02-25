@@ -21,7 +21,7 @@ import alektas.pocketbasket.BuildConfig;
 import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 
 public class AdManager {
-    private static final int MIN_OFFSET_OF_ADS = 5;
+    private static final int MIN_OFFSET_OF_ADS = 10;
     private static final int NUMBER_OF_ADS = 5;
     private List<NativeAdWrapper> mNativeAds = new ArrayList<>();
     private List<Integer> mLatestAdPositions = new ArrayList<>();
