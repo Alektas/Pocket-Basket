@@ -348,6 +348,7 @@ public class MainActivity extends AppCompatActivity implements
             delModeToolbar.setVisibility(delMode ? View.VISIBLE : View.GONE);
             if (delMode) {
                 mAddBtn.hide();
+                hideFloatingMenu();
                 cancelSearch();
             } else {
                 mAddBtn.show();
