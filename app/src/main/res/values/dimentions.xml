@@ -38,7 +38,7 @@
 
     <dimen name="height_ad_separator">10dp</dimen>
 
-    <dimen name="corners_category">24dp</dimen>
+    <dimen name="corners_category">8dp</dimen>
     <dimen name="width_categ_wide">145dp</dimen>
     <dimen name="width_categ_narrow">56dp</dimen>
     <dimen name="width_showcase_narrow">72dp</dimen>
