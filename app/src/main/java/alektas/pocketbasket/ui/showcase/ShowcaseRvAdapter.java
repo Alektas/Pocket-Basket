@@ -15,11 +15,10 @@ import com.google.android.gms.ads.formats.UnifiedNativeAdView;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.databinding.ItemShowcaseBinding;
-import alektas.pocketbasket.ui.UiContract;
 import alektas.pocketbasket.ui.utils.BaseRecyclerAdapter;
 import alektas.pocketbasket.ui.ItemSizeProvider;
-import alektas.pocketbasket.ui.utils.NativeAdViewHolder;
-import alektas.pocketbasket.ui.utils.NativeAdWrapper;
+import alektas.pocketbasket.ads.NativeAdViewHolder;
+import alektas.pocketbasket.ads.NativeAdWrapper;
 
 public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
     private static final int PRODUCT_VIEW_TYPE = 0;
@@ -27,7 +26,6 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
 
     private ShowcaseViewModel mModel;
     private ItemSizeProvider mSizeProvider;
-    private boolean isShowcaseMode = UiContract.IS_DEFAULT_MODE_SHOWCASE;
 
     public ShowcaseRvAdapter(@NonNull ShowcaseViewModel model) {
         super();
@@ -49,8 +47,6 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
             case AD_VIEW_TYPE:
                 View nativeLayoutView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.item_ad_native, parent, false);
-                nativeLayoutView.findViewById(R.id.ad_item_icon)
-                        .setVisibility(isShowcaseMode ? View.VISIBLE : View.GONE);
                 return new NativeAdViewHolder(nativeLayoutView);
             case PRODUCT_VIEW_TYPE:
             default:
@@ -71,7 +67,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
             case AD_VIEW_TYPE:
                 NativeAdViewHolder adHolder = (NativeAdViewHolder) viewHolder;
                 NativeAdWrapper adWrapper = (NativeAdWrapper) getItems().get(position);
-                displayUnifiedNativeAd(adHolder, adWrapper);
+                displayNativeAd(adHolder, adWrapper);
                 break;
             case PRODUCT_VIEW_TYPE:
             default:
@@ -88,13 +84,13 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
         return PRODUCT_VIEW_TYPE;
     }
 
-    private void displayUnifiedNativeAd(NativeAdViewHolder holder, NativeAdWrapper adWrapper) {
+    private void displayNativeAd(NativeAdViewHolder holder, NativeAdWrapper adWrapper) {
         UnifiedNativeAdView adView = holder.getAdView();
         ((TextView) adView.getHeadlineView()).setText(adWrapper.getAd().getHeadline());
 
         NativeAd.Image icon = adWrapper.getAd().getIcon();
         ImageView iconView = (ImageView) adView.getIconView();
-        if (adWrapper.isIconShown() && icon != null) {
+        if (adWrapper.isWideMode() && icon != null) {
             iconView.setImageDrawable(icon.getDrawable());
             iconView.setVisibility(View.VISIBLE);
         } else {
@@ -104,9 +100,4 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
         // Register ad and add it to the view
         adView.setNativeAd(adWrapper.getAd());
     }
-
-    public void setMode(Boolean isShowcaseMode) {
-        this.isShowcaseMode = isShowcaseMode;
-    }
-
 }

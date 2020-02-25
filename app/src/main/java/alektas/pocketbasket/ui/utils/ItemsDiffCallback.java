@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.DiffUtil;
 
 import java.util.List;
 
+import alektas.pocketbasket.ads.NativeAdWrapper;
 import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.data.db.entities.ShowcaseItem;
 
@@ -53,7 +54,7 @@ class ItemsDiffCallback extends DiffUtil.Callback {
             NativeAdWrapper oldAd = (NativeAdWrapper) oldItem;
             NativeAdWrapper newAd = (NativeAdWrapper) newItem;
             return oldAd.getAd().getHeadline().equals(newAd.getAd().getHeadline())
-                    && (oldAd.isIconShown() == newAd.isIconShown());
+                    && (oldAd.isWideMode() == newAd.isWideMode());
         }
         return false;
     }

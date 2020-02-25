@@ -1,4 +1,4 @@
-package alektas.pocketbasket.ui.utils;
+package alektas.pocketbasket.ads;
 
 import android.view.View;
 
