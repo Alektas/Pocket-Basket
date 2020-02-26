@@ -54,5 +54,6 @@
     <string name="remove_checked_items_success">Товары убраны из корзины</string>
     <string name="reset_showcase_success">Витрина успешно восстановлена</string>
     <string name="reset_showcase_fail">Не удалось восстановить витрину</string>
+    <string name="basket_placeholder_empty_cart">Корзина пуста</string>
 
 </resources>
