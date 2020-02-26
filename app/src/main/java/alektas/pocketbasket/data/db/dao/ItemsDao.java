@@ -162,7 +162,7 @@ public abstract class ItemsDao {
         returnDeletedItems();
     }
 
-    @Query("DELETE FROM items WHERE name_res = NULL")
+    @Query("DELETE FROM items WHERE name_res IS NULL")
     protected abstract void deleteUserItems();
 
     @Query("UPDATE items SET deleted = 0")
