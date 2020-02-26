@@ -424,23 +424,23 @@ public class MainActivity extends AppCompatActivity implements
                 .build();
 
         //  Guide: delete items from Showcase
-        Animator tapAnim3 = AnimatorInflater
-                .loadAnimator(this, R.animator.anim_guide_tap);
+        Animator pointAnim = AnimatorInflater
+                .loadAnimator(this, R.animator.anim_guide_point_down);
         View tapToDelImg = findViewById(R.id.guide_tap_delete_img);
         GuideCaseView deleteItemsCase = new GuideCaseView
                 .Builder(GuideContract.GUIDE_DEL_SELECTED_ITEMS)
                 .addViews(tapToDelImg, findViewById(R.id.guide_delete_items_body))
-                .setAnimation(tapAnim3, tapToDelImg)
+                .setAnimation(pointAnim, tapToDelImg)
                 .build();
 
         //  Guide: basket menu help
-        Animator tapAnim4 = AnimatorInflater
-                .loadAnimator(this, R.animator.anim_guide_tap);
+        Animator pointAnim2 = AnimatorInflater
+                .loadAnimator(this, R.animator.anim_guide_point_down);
         View tapBasketMenuButtons = findViewById(R.id.guide_basket_menu_img);
         GuideCaseView floatingMenuHelpCase = new GuideCaseView
                 .Builder(GuideContract.GUIDE_BASKET_MENU_HELP)
                 .addViews(tapBasketMenuButtons, findViewById(R.id.guide_basket_menu_body))
-                .setAnimation(tapAnim4, tapBasketMenuButtons)
+                .setAnimation(pointAnim2, tapBasketMenuButtons)
                 .build();
 
         GuidePresenter guidePresenter = new SequentialGuidePresenter(this);
