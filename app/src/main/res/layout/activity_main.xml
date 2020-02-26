@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root_layout"
     android:layout_width="match_parent"
@@ -18,17 +17,14 @@
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        app:fabAlignmentMode="end">
+        android:layout_gravity="bottom" >
 
         <SearchView
             android:id="@+id/menu_search"
             android:theme="@style/ThemeOverlay.SearchView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:imeOptions="actionDone"
-            android:paddingStart="@dimen/margin_start_search_view_query"
-            android:paddingEnd="@dimen/margin_end_search_view_query"/>
+            android:imeOptions="actionDone"/>
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.bottomappbar.BottomAppBar
@@ -90,45 +86,5 @@
                 android:tint="?colorOnPrimary"/>
         </RelativeLayout>
     </com.google.android.material.bottomappbar.BottomAppBar>
-
-    <!-- FAB -->
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:longClickable="true"
-        android:onClick="onFabClick"
-        android:tint="?colorOnSecondary"
-        app:layout_anchor="@id/appbar"
-        app:srcCompat="@drawable/ic_edit_24dp" />
-
-    <!-- Floating menu buttons -->
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fam_check_all"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="96dp"
-        android:onClick="onFamCheckBtnClick"
-        android:visibility="invisible"
-        app:fabSize="mini"
-        app:layout_anchor="@id/fab"
-        app:layout_anchorGravity="top|center_horizontal"
-        app:srcCompat="@drawable/ic_check_all_white_24dp"
-        tools:visibility="visible" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fam_del_all"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="150dp"
-        android:onClick="onFamDelBtnClick"
-        android:visibility="invisible"
-        app:fabSize="mini"
-        app:layout_anchor="@id/fam_check_all"
-        app:layout_anchorGravity="top|center_horizontal"
-        app:srcCompat="@drawable/ic_delete_forever_white_24dp"
-        tools:visibility="visible" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

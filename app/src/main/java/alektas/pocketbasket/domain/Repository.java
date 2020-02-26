@@ -21,7 +21,7 @@ public interface Repository {
     void updatePositions(List<String> keys);
     void markItem(String key);
     void markAll();
-    void removeMarked();
+    void removeMarked(UseCase.Callback<Boolean> callback);
     void cleanBasket(UseCase.Callback<Boolean> callback);
 
     /**

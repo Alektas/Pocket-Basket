@@ -28,6 +28,7 @@ import alektas.pocketbasket.domain.usecases.ResetItemsUseCase;
 import alektas.pocketbasket.domain.usecases.SelectCategoryUseCase;
 import alektas.pocketbasket.domain.usecases.UpdateItemsUseCase;
 import alektas.pocketbasket.domain.usecases.UseCase;
+import alektas.pocketbasket.domain.utils.Event;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.GuideObserver;
 import alektas.pocketbasket.guide.domain.AppState;
@@ -46,6 +47,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     private MutableLiveData<Boolean> showcaseModeData = new MutableLiveData<>();
     private MutableLiveData<Boolean> deleteModeData = new MutableLiveData<>();
     private MutableLiveData<Integer> deleteItemsCountData = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> deleteCheckedSuccessful = new MutableLiveData<>();
     private MutableLiveData<String> mCurGuideCaseData = new MutableLiveData<>();
     private MutableLiveData<String> mCompletedGuideCase = new MutableLiveData<>();
 
@@ -61,8 +63,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
             new AppState<>(GuideContract.STATE_BASKET_SIZE, 0);
     private AppState<Boolean> landscapeState =
             new AppState<>(GuideContract.STATE_LANDSCAPE, false);
-    private AppState<Boolean> famShowingState =
-            new AppState<>(GuideContract.STATE_FAM_SHOWING, false);
     private AppState<Boolean> showcaseModeState =
             new AppState<>(GuideContract.STATE_MODE, false);
     private AppState<Boolean> newItemAddedState =
@@ -182,10 +182,8 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
                 prefs.getBoolean(GuideContract.GUIDE_DEL_MODE, false));
         GuideCase delSelectedCase = new GuideCaseImpl(GuideContract.GUIDE_DEL_SELECTED_ITEMS,
                 prefs.getBoolean(GuideContract.GUIDE_DEL_SELECTED_ITEMS, false));
-        GuideCase famCase = new GuideCaseImpl(GuideContract.GUIDE_SHOW_FLOATING_MENU,
-                prefs.getBoolean(GuideContract.GUIDE_SHOW_FLOATING_MENU, false));
-        GuideCase famHelpCase = new GuideCaseImpl(GuideContract.GUIDE_FLOATING_MENU_HELP,
-                prefs.getBoolean(GuideContract.GUIDE_FLOATING_MENU_HELP, false));
+        GuideCase famHelpCase = new GuideCaseImpl(GuideContract.GUIDE_BASKET_MENU_HELP,
+                prefs.getBoolean(GuideContract.GUIDE_BASKET_MENU_HELP, false));
 
         return new ContextualGuide.Builder()
                 .addCase(addByTapCase)
@@ -241,19 +239,11 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
                         return delModeState.getState();
                     }
                 })
-                .addCase(famCase)
-                .require(new Requirement(basketSizeState, markCountState) {
-                    @Override
-                    public boolean check() {
-                        return basketSizeState.getState() > 1
-                                && markCountState.getState() > 1;
-                    }
-                })
                 .addCase(famHelpCase)
-                .require(new Requirement(famShowingState) {
+                .require(new Requirement(markCountState) {
                     @Override
                     public boolean check() {
-                        return famShowingState.getState();
+                        return markCountState.getState() > 1;
                     }
                 })
                 .build();
@@ -268,6 +258,11 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
      */
     public void onHintClick() {
         mGuide.onUserEvent(mGuide.currentCase());
+    }
+
+
+    public LiveData<Event<Boolean>> getDeleteCheckedSuccessful() {
+        return deleteCheckedSuccessful;
     }
 
     public LiveData<Boolean> deleteModeData() {
@@ -297,10 +292,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         }
         if (markCountState.getState() > 0) {
             guide.completeCase(GuideContract.GUIDE_CHECK_ITEM);
-        }
-        if (famShowingState.getState()) {
-            guide.completeCase(GuideContract.GUIDE_SHOW_FLOATING_MENU);
-            guide.completeCase(GuideContract.GUIDE_FLOATING_MENU_HELP);
         }
         if (delModeState.getState()) {
             guide.completeCase(GuideContract.GUIDE_DEL_MODE);
@@ -339,15 +330,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         landscapeState.setState(isLandscape);
     }
 
-    public void onFloatingMenuCalled() {
-        famShowingState.setState(true);
-        mGuide.onUserEvent(GuideContract.GUIDE_SHOW_FLOATING_MENU);
-    }
-
-    public void onFloatingMenuHide() {
-        famShowingState.setState(false);
-    }
-
     public void onDeleteSelectedShowcaseItems() {
         mRepository.deleteSelectedItems();
         onCloseDelMode();
@@ -358,18 +340,16 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         new DelModeUseCase(mRepository).execute(false, null);
     }
 
-    public void onFabClick() {
-        mGuide.onUserEvent(GuideContract.GUIDE_FLOATING_MENU_HELP);
-    }
-
-    public void onFamCheckBtnClick() {
-        mGuide.onUserEvent(GuideContract.GUIDE_FLOATING_MENU_HELP);
+    public void onCheckAllBtnClick() {
+        mGuide.onUserEvent(GuideContract.GUIDE_BASKET_MENU_HELP);
         new MarkAllBasketItems(mRepository).execute(null, null);
     }
 
-    public void onFamDelBtnClick() {
-        mGuide.onUserEvent(GuideContract.GUIDE_FLOATING_MENU_HELP);
-        new RemoveMarkedItems(mRepository).execute(null, null);
+    public void onDelCheckedBtnClick() {
+        mGuide.onUserEvent(GuideContract.GUIDE_BASKET_MENU_HELP);
+        new RemoveMarkedItems(mRepository).execute(null, response -> {
+            deleteCheckedSuccessful.setValue(new Event<>(response));
+        });
     }
 
     /**
