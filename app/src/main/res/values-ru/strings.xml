@@ -40,7 +40,6 @@
     <string name="guide_del_checked">Убрать отмеченные товары</string>
     <string name="guide_close_menu">Закрыть меню</string>
     <string name="about_developer_name">© 2020 Тотилас А.А.</string>
-    <string name="license_agreement_label">Лицензионное соглашение</string>
     <string name="about_alektas">- Тотилас А.А.</string>
     <string name="descr_fam_del_marked_btn">Удаление отмеченных товаров из корзины</string>
     <string name="descr_fam_mark_btn">Отметка всех товаров в корзине</string>
@@ -51,5 +50,7 @@
     <string name="check_all">Отметить все</string>
     <string name="del_checked">Удалить отмеченные</string>
     <string name="guide_basket_menu">Отметить все товары в корзине или удалить отмеченные можно в панели инструментов внизу</string>
+    <string name="remove_checked_items_fail">Отметьте товары в корзине, которые необходимо удалить</string>
+    <string name="remove_checked_items_success">Товары убраны из корзины</string>
 
 </resources>

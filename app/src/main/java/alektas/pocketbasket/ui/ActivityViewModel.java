@@ -28,6 +28,7 @@ import alektas.pocketbasket.domain.usecases.ResetItemsUseCase;
 import alektas.pocketbasket.domain.usecases.SelectCategoryUseCase;
 import alektas.pocketbasket.domain.usecases.UpdateItemsUseCase;
 import alektas.pocketbasket.domain.usecases.UseCase;
+import alektas.pocketbasket.domain.utils.Event;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.GuideObserver;
 import alektas.pocketbasket.guide.domain.AppState;
@@ -46,6 +47,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     private MutableLiveData<Boolean> showcaseModeData = new MutableLiveData<>();
     private MutableLiveData<Boolean> deleteModeData = new MutableLiveData<>();
     private MutableLiveData<Integer> deleteItemsCountData = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> deleteCheckedSuccessful = new MutableLiveData<>();
     private MutableLiveData<String> mCurGuideCaseData = new MutableLiveData<>();
     private MutableLiveData<String> mCompletedGuideCase = new MutableLiveData<>();
 
@@ -258,6 +260,11 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         mGuide.onUserEvent(mGuide.currentCase());
     }
 
+
+    public LiveData<Event<Boolean>> getDeleteCheckedSuccessful() {
+        return deleteCheckedSuccessful;
+    }
+
     public LiveData<Boolean> deleteModeData() {
         return deleteModeData;
     }
@@ -340,7 +347,9 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
 
     public void onDelCheckedBtnClick() {
         mGuide.onUserEvent(GuideContract.GUIDE_BASKET_MENU_HELP);
-        new RemoveMarkedItems(mRepository).execute(null, null);
+        new RemoveMarkedItems(mRepository).execute(null, response -> {
+            deleteCheckedSuccessful.setValue(new Event<>(response));
+        });
     }
 
     /**

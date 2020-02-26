@@ -41,6 +41,7 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;
@@ -339,6 +340,17 @@ public class MainActivity extends AppCompatActivity implements
             TransitionManager.beginDelayedTransition(mRootLayout, mDelToolbarTransition);
             delModeToolbar.setVisibility(delMode ? View.VISIBLE : View.GONE);
             if (delMode) cancelSearch();
+        });
+
+        viewModel.getDeleteCheckedSuccessful().observe(this, event -> {
+            Boolean isSuccess = event.getValue();
+            if (isSuccess == null) return;
+            String msg = isSuccess ?
+                    getString(R.string.remove_checked_items_success) :
+                    getString(R.string.remove_checked_items_fail);
+            Snackbar.make(mRootLayout, msg, Snackbar.LENGTH_SHORT)
+                    .setAnchorView(findViewById(R.id.appbar))
+                    .show();
         });
 
         TextView counter = findViewById(R.id.toolbar_del_mode_counter);

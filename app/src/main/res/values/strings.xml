@@ -63,6 +63,8 @@
     <string name="ad_attribution" translatable="false">Ad</string>
     <string name="check_all">Check all</string>
     <string name="del_checked">Delete checked</string>
-    <string name="guide_basket_menu">You can mark all products in the basket or delete marked ones in the toolbar below</string>
+    <string name="guide_basket_menu">You can mark all items in the basket or delete marked ones in the toolbar below</string>
+    <string name="remove_checked_items_success">Items removed from the basket</string>
+    <string name="remove_checked_items_fail">Mark the items in the basket that you want to remove</string>
 
 </resources>

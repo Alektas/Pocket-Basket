@@ -5,7 +5,7 @@ import alektas.pocketbasket.domain.Repository;
 /**
  * Delete all marked items in the Basket.
  */
-public class RemoveMarkedItems implements UseCase<Void, Void> {
+public class RemoveMarkedItems implements UseCase<Void, Boolean> {
     private Repository mRepository;
 
     public RemoveMarkedItems(Repository repository) {
@@ -13,7 +13,7 @@ public class RemoveMarkedItems implements UseCase<Void, Void> {
     }
 
     @Override
-    public void execute(Void v, Callback<Void> callback) {
-        mRepository.removeMarked();
+    public void execute(Void v, Callback<Boolean> callback) {
+        mRepository.removeMarked(callback);
     }
 }

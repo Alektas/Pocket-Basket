@@ -1,5 +1,6 @@
 <resources>
-    <style name="Theme.Main" parent="Theme.Base"/>
+
+    <style name="Theme.Main" parent="Theme.Base" />
 
     <style name="Theme.Base" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -17,9 +18,11 @@
         <item name="android:navigationBarColor">@color/colorPrimaryDark</item>
         <item name="bottomAppBarStyle">@style/Widget.AppBar</item>
         <item name="android:searchViewStyle">@style/Widget.SearchView</item>
+        <item name="snackbarStyle">@style/Widget.Snackbar</item>
+        <item name="snackbarTextViewStyle">@style/Widget.TextView.Snackbar</item>
     </style>
 
-    <style name="Theme.Main.Splash" parent="Theme.Base.Splash"/>
+    <style name="Theme.Main.Splash" parent="Theme.Base.Splash" />
 
     <style name="Theme.Base.Splash">
         <item name="android:colorBackground">@color/colorBackground</item>
@@ -47,6 +50,16 @@
         <item name="android:submitBackground">@null</item>
         <item name="android:voiceIcon">@drawable/ic_keyboard_voice_white_24dp</item>
         <item name="android:closeIcon">@drawable/ic_close_white_24dp</item>
+    </style>
+
+    <style name="Widget.Snackbar" parent="Widget.MaterialComponents.Snackbar">
+        <item name="backgroundTint">@android:color/white</item>
+    </style>
+
+    <style name="Widget.TextView.Snackbar" parent="Widget.MaterialComponents.Snackbar.TextView">
+        <item name="android:alpha">1.0</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Button</item>
     </style>
 
     <style name="Widget.CategoryButton" parent="Widget.AppCompat.CompoundButton.RadioButton">

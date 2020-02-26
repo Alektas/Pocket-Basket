@@ -187,8 +187,8 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
     // Delete all checked items from "Basket"
     @Override
-    public void removeMarked() {
-        new removeBasketMarkedAsync(mItemsDao, this).execute();
+    public void removeMarked(UseCase.Callback<Boolean> callback) {
+        new removeBasketMarkedAsync(mItemsDao, this, callback).execute();
     }
 
     @Override
@@ -475,9 +475,10 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         }
     }
 
-    private static class removeBasketMarkedAsync extends AsyncTask<Void, Void, Void> {
+    private static class removeBasketMarkedAsync extends AsyncTask<Void, Void, Boolean> {
         private ItemsDao mDao;
         private ItemsUpdater mUpdater;
+        private UseCase.Callback<Boolean> mCallback;
 
         removeBasketMarkedAsync(ItemsDao dao) { mDao = dao; }
 
@@ -486,17 +487,25 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
             mUpdater = updater;
         }
 
-        @Override
-        protected Void doInBackground(Void... voids) {
-            mDao.removeCheckedBasket();
-            return null;
+        removeBasketMarkedAsync(ItemsDao dao, ItemsUpdater updater, UseCase.Callback<Boolean> callback) {
+            this(dao, updater);
+            mCallback = callback;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
+        protected Boolean doInBackground(Void... voids) {
+            return mDao.removeCheckedBasket();
+        }
+
+        @Override
+        protected void onPostExecute(Boolean isSuccess) {
             if (mUpdater != null) {
                 mUpdater.updateShowcase();
                 mUpdater.updateBasket();
+            }
+            if (mCallback != null) {
+                mCallback.onResponse(isSuccess);
+                mCallback = null;
             }
         }
     }
