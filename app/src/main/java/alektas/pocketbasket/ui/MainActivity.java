@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements
     private TransitionSet mChangeModeTransition;
     private Transition mChangeBounds;
     private Transition mDelToolbarTransition;
+    private boolean isDelMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,6 +237,14 @@ public class MainActivity extends AppCompatActivity implements
         handleSearch(intent);
     }
 
+    @Override
+    public void onBackPressed() {
+        if (isDelMode) {
+            mViewModel.onCloseDelMode();
+            return;
+        }
+        super.onBackPressed();
+    }
 
     /* Init methods */
 
@@ -339,6 +348,7 @@ public class MainActivity extends AppCompatActivity implements
 
         View delModeToolbar = findViewById(R.id.toolbar_del_mode);
         viewModel.deleteModeData().observe(this, delMode -> {
+            isDelMode = delMode;
             TransitionManager.beginDelayedTransition(mRootLayout, mDelToolbarTransition);
             delModeToolbar.setVisibility(delMode ? View.VISIBLE : View.GONE);
             if (delMode) cancelSearch();
