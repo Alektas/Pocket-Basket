@@ -120,24 +120,24 @@ public class AdManager {
         if (ads.size() <= 0) return new ArrayList<>(products);
 
         int offset = Math.max((products.size() / ads.size() + 1), MIN_OFFSET_OF_ADS);
-        int adCount = (int) Math.ceil(products.size() / (float) offset);
+        int adCount = (int) Math.ceil(products.size() / (float) offset) + 1;
         int totalSize = products.size() + adCount;
-        Object[] array = new Object[totalSize];
+        List<Object> combined = new ArrayList<>(totalSize);
 
         int adPointer = 0;
         int productPointer = 0;
         int adIndex = 0;
         for (int i = 0; i < totalSize; i++) {
-            if (i == adIndex && adPointer < ads.size()) {
-                array[i] = ads.get(adPointer);
+            if (i == adIndex && adPointer < adCount) {
+                combined.add(ads.get(adPointer));
                 adPointer++;
                 adIndex += offset;
             } else if (productPointer < products.size()){
-                array[i] = products.get(productPointer);
+                combined.add(products.get(productPointer));
                 productPointer++;
             }
         }
 
-        return Arrays.asList(array);
+        return combined;
     }
 }
