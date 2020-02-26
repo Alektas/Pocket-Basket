@@ -36,6 +36,7 @@
         <item name="android:editTextColor">?colorOnPrimary</item>
         <item name="android:textColor">?colorOnBackground</item>
         <item name="android:textColorHint">@color/colorHintOnPrimary</item>
+        <item name="android:textAppearanceSearchResultTitle">@style/TextAppearance.MaterialComponents.Body1</item>
     </style>
 
     <style name="Widget.AppBar" parent="Widget.MaterialComponents.BottomAppBar.Colored">
