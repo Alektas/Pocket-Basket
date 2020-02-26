@@ -556,48 +556,23 @@ public class MainActivity extends AppCompatActivity implements
      * @param basketWidth   width of the Basket in pixels
      */
     private void changeLayoutSize(int categWidth, int showcaseWidth, int basketWidth) {
-        changeCategoriesSize(categWidth);
-        changeShowcaseSize(showcaseWidth);
-        changeBasketSize(basketWidth);
+        changeViewWidth(mCategoriesContainer, categWidth);
+        changeViewWidth(mShowcaseContainer, showcaseWidth);
+        changeViewWidth(mBasketContainer, basketWidth);
     }
 
     /**
-     * Change size of the Showcase layout.
-     * If width equal '0' then layout fills in the free space.
+     * Change size of the view.
+     * If width equal '0' then view fills in the free space.
      *
-     * @param showcaseWidth width of the Showcase in pixels
+     * @param view view which width need change
+     * @param width width of the view in pixels
      */
-    private void changeShowcaseSize(int showcaseWidth) {
-        ViewGroup.LayoutParams showcaseParams = mShowcaseContainer.getLayoutParams();
-        if (showcaseParams.width == showcaseWidth) return;
-        showcaseParams.width = showcaseWidth;
-        mShowcaseContainer.setLayoutParams(showcaseParams);
-    }
-
-    /**
-     * Change size of the Basket layout.
-     * If width equal '0' then layout fills in the free space.
-     *
-     * @param basketWidth width of the Basket in pixels
-     */
-    private void changeBasketSize(int basketWidth) {
-        ViewGroup.LayoutParams basketParams = mBasketContainer.getLayoutParams();
-        if (basketParams.width == basketWidth) return;
-        basketParams.width = basketWidth;
-        mBasketContainer.setLayoutParams(basketParams);
-    }
-
-    /**
-     * Change size of the Categories layout.
-     * If width equal '0' then layout fills in the free space.
-     *
-     * @param categWidth width of the Categories in pixels
-     */
-    private void changeCategoriesSize(int categWidth) {
-        ViewGroup.LayoutParams categoriesParams = mCategoriesContainer.getLayoutParams();
-        if (categoriesParams.width == categWidth) return;
-        categoriesParams.width = categWidth;
-        mCategoriesContainer.setLayoutParams(categoriesParams);
+    private void changeViewWidth(View view, int width) {
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        if (params.width == width) return;
+        params.width = width;
+        view.setLayoutParams(params);
     }
 
 
@@ -963,28 +938,44 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void setMode(int movX, float velocity) {
         if (mViewModel.isShowcaseMode()) {
-            if (velocity < CHANGE_MODE_MIN_VELOCITY && movX < -changeModeDistance) {
-                setBasketMode();
-            } else {
-                if (movX < -protectedInterval) {
-                    TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
-                }
-                changeLayoutSize(mCategWideWidth,
-                        0,
-                        mBasketNarrowWidth);
-            }
+            trySetBasketMode(movX, velocity);
         } else {
-            if (velocity > -CHANGE_MODE_MIN_VELOCITY && movX > changeModeDistance) {
-                setShowcaseMode();
-            } else {
-                if (movX > protectedInterval) {
-                    TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
-                }
-                changeLayoutSize(mCategNarrowWidth,
-                        mShowcaseNarrowWidth,
-                        0);
-            }
+            trySetShowcaseMode(movX, velocity);
         }
+    }
+
+    private void trySetBasketMode(int movX, float velocity) {
+        if (velocity < CHANGE_MODE_MIN_VELOCITY && movX < -changeModeDistance) {
+            setBasketMode();
+        } else {
+            recoverShowcaseMode(movX);
+        }
+    }
+
+    private void trySetShowcaseMode(int movX, float velocity) {
+        if (velocity > -CHANGE_MODE_MIN_VELOCITY && movX > changeModeDistance) {
+            setShowcaseMode();
+        } else {
+            recoverBasketMode(movX);
+        }
+    }
+
+    private void recoverShowcaseMode(int movX) {
+        if (movX < -protectedInterval) {
+            TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
+        }
+        changeLayoutSize(mCategWideWidth,
+                0,
+                mBasketNarrowWidth);
+    }
+
+    private void recoverBasketMode(int movX) {
+        if (movX > protectedInterval) {
+            TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
+        }
+        changeLayoutSize(mCategNarrowWidth,
+                mShowcaseNarrowWidth,
+                0);
     }
 
 
