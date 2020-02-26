@@ -212,13 +212,13 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
 
     // Return default showcase items
     @Override
-    public void resetShowcase() {
-        new resetAsync(mItemsDao, this).execute();
+    public void resetShowcase(UseCase.Callback<Boolean> callback) {
+        new resetAsync(mItemsDao, this, callback).execute();
     }
 
     @Override
-    public void returnDeletedItems() {
-        new returnDeletedItemsAsync(mItemsDao, this).execute();
+    public void returnDeletedItems(UseCase.Callback<Boolean> callback) {
+        new returnDeletedItemsAsync(mItemsDao, this, callback).execute();
     }
 
     @Override
@@ -602,12 +602,18 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     private static class resetAsync extends AsyncTask<Void, Void, Void> {
         private ItemsDao mDao;
         private ItemsUpdater mUpdater;
+        private UseCase.Callback<Boolean> mCallback;
 
         resetAsync(ItemsDao dao) { mDao = dao; }
 
         resetAsync(ItemsDao dao, ItemsUpdater updater) {
             this(dao);
             mUpdater = updater;
+        }
+
+        resetAsync(ItemsDao dao, ItemsUpdater updater, UseCase.Callback<Boolean> callback) {
+            this(dao, updater);
+            mCallback = callback;
         }
 
         @Override
@@ -622,12 +628,17 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
                 mUpdater.updateShowcase();
                 mUpdater.updateBasket();
             }
+            if (mCallback != null) {
+                mCallback.onResponse(true);
+                mCallback = null;
+            }
         }
     }
 
     private static class returnDeletedItemsAsync extends AsyncTask<Void, Void, Void> {
         private ItemsDao mDao;
         private ItemsUpdater mUpdater;
+        private UseCase.Callback<Boolean> mCallback;
 
         returnDeletedItemsAsync(ItemsDao dao) {
             mDao = dao;
@@ -636,6 +647,11 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         returnDeletedItemsAsync(ItemsDao dao, ItemsUpdater updater) {
             this(dao);
             mUpdater = updater;
+        }
+
+        returnDeletedItemsAsync(ItemsDao dao, ItemsUpdater updater, UseCase.Callback<Boolean> callback) {
+            this(dao, updater);
+            mCallback = callback;
         }
 
         @Override
@@ -647,6 +663,10 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         @Override
         protected void onPostExecute(Void aVoid) {
             if (mUpdater != null) mUpdater.updateShowcase();
+            if (mCallback != null) {
+                mCallback.onResponse(true);
+                mCallback = null;
+            }
         }
     }
 

@@ -47,7 +47,8 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     private MutableLiveData<Boolean> showcaseModeData = new MutableLiveData<>();
     private MutableLiveData<Boolean> deleteModeData = new MutableLiveData<>();
     private MutableLiveData<Integer> deleteItemsCountData = new MutableLiveData<>();
-    private MutableLiveData<Event<Boolean>> deleteCheckedSuccessful = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> deleteCheckedEvent = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> resetShowcaseEvent = new MutableLiveData<>();
     private MutableLiveData<String> mCurGuideCaseData = new MutableLiveData<>();
     private MutableLiveData<String> mCompletedGuideCase = new MutableLiveData<>();
 
@@ -122,7 +123,9 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
      * @param fullReset if true delete all user items
      */
     public void resetShowcase(boolean fullReset) {
-        new ResetItemsUseCase(mRepository).execute(fullReset, null);
+        new ResetItemsUseCase(mRepository).execute(fullReset, response -> {
+            resetShowcaseEvent.setValue(new Event<>(response));
+        });
     }
 
     /**
@@ -261,8 +264,12 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     }
 
 
-    public LiveData<Event<Boolean>> getDeleteCheckedSuccessful() {
-        return deleteCheckedSuccessful;
+    public LiveData<Event<Boolean>> getResetShowcaseEvent() {
+        return resetShowcaseEvent;
+    }
+
+    public LiveData<Event<Boolean>> getDeleteCheckedEvent() {
+        return deleteCheckedEvent;
     }
 
     public LiveData<Boolean> deleteModeData() {
@@ -348,7 +355,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     public void onDelCheckedBtnClick() {
         mGuide.onUserEvent(GuideContract.GUIDE_BASKET_MENU_HELP);
         new RemoveMarkedItems(mRepository).execute(null, response -> {
-            deleteCheckedSuccessful.setValue(new Event<>(response));
+            deleteCheckedEvent.setValue(new Event<>(response));
         });
     }
 

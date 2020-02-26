@@ -66,5 +66,7 @@
     <string name="guide_basket_menu">You can mark all items in the basket or delete marked ones in the toolbar below</string>
     <string name="remove_checked_items_success">Items removed from the basket</string>
     <string name="remove_checked_items_fail">Mark the items in the basket that you want to remove</string>
+    <string name="reset_showcase_success">Showcase recovered successfully</string>
+    <string name="reset_showcase_fail">Failed to restore the showcase</string>
 
 </resources>

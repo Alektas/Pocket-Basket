@@ -52,5 +52,7 @@
     <string name="guide_basket_menu">Отметить все товары в корзине или удалить отмеченные можно в панели инструментов внизу</string>
     <string name="remove_checked_items_fail">Отметьте товары в корзине, которые необходимо удалить</string>
     <string name="remove_checked_items_success">Товары убраны из корзины</string>
+    <string name="reset_showcase_success">Витрина успешно восстановлена</string>
+    <string name="reset_showcase_fail">Не удалось восстановить витрину</string>
 
 </resources>

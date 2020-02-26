@@ -30,8 +30,8 @@ public interface Repository {
     Observable<List<ShowcaseItemModel>> getShowcaseData();
     void addNewItem(String name);
     void setFilter(String tag);
-    void resetShowcase();
-    void returnDeletedItems();
+    void resetShowcase(UseCase.Callback<Boolean> callback);
+    void returnDeletedItems(UseCase.Callback<Boolean> callback);
     void updateNames();
     /**
      * Find item by name in all categories.

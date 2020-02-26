@@ -32,6 +32,7 @@ import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
@@ -49,6 +50,7 @@ import java.util.List;
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.utils.Event;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.ui.DisposableGuideCaseListener;
 import alektas.pocketbasket.guide.ui.GuideCaseView;
@@ -342,15 +344,16 @@ public class MainActivity extends AppCompatActivity implements
             if (delMode) cancelSearch();
         });
 
-        viewModel.getDeleteCheckedSuccessful().observe(this, event -> {
-            Boolean isSuccess = event.getValue();
-            if (isSuccess == null) return;
-            String msg = isSuccess ?
-                    getString(R.string.remove_checked_items_success) :
-                    getString(R.string.remove_checked_items_fail);
-            Snackbar.make(mRootLayout, msg, Snackbar.LENGTH_SHORT)
-                    .setAnchorView(findViewById(R.id.appbar))
-                    .show();
+        viewModel.getDeleteCheckedEvent().observe(this, event -> {
+            showEventSnackbar(event,
+                    R.string.remove_checked_items_success,
+                    R.string.remove_checked_items_fail);
+        });
+
+        viewModel.getResetShowcaseEvent().observe(this, event -> {
+            showEventSnackbar(event,
+                    R.string.reset_showcase_success,
+                    R.string.reset_showcase_fail);
         });
 
         TextView counter = findViewById(R.id.toolbar_del_mode_counter);
@@ -1057,6 +1060,17 @@ public class MainActivity extends AppCompatActivity implements
             DialogFragment dialog = new ShareUnsuccessfulDialog();
             dialog.show(getSupportFragmentManager(), "ShareUnsuccessfulDialog");
         }
+    }
+
+    private void showEventSnackbar(Event<Boolean> event, @StringRes int successMsg, @StringRes int failMsg) {
+        Boolean isSuccess = event.getValue();
+        if (isSuccess == null) return;
+        String msg = isSuccess ?
+                getString(successMsg) :
+                getString(failMsg);
+        Snackbar.make(mRootLayout, msg, Snackbar.LENGTH_SHORT)
+                .setAnchorView(findViewById(R.id.appbar))
+                .show();
     }
 
 }
