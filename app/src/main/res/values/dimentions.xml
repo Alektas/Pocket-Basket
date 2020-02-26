@@ -40,6 +40,9 @@
 
     <dimen name="size_appbar_buttons">48dp</dimen>
 
+    <dimen name="size_basket_placeholder_image">96dp</dimen>
+    <dimen name="textsize_basket_placeholder_text">16sp</dimen>
+
     <dimen name="corners_category">8dp</dimen>
     <dimen name="width_categ_wide">145dp</dimen>
     <dimen name="width_categ_narrow">56dp</dimen>

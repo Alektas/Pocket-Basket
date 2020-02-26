@@ -26,6 +26,7 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
     private BasketRvAdapter mBasketAdapter;
     private ItemTouchHelper mTouchHelper;
     private RecyclerView mBasket;
+    private ViewGroup mPlaceholder;
     private ItemSizeProvider mItemSizeProvider;
 
     public BasketFragment() {
@@ -60,6 +61,7 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_basket, container, false);
+        mPlaceholder = root.findViewById(R.id.basket_placeholder);
         mBasket = root.findViewById(R.id.basket_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
         mBasket.setLayoutManager(layoutManager);
@@ -75,6 +77,10 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
 
     private void subscribeOnModel() {
         mViewModel.getBasketData().observe(this, items -> {
+            mPlaceholder.setVisibility(items.isEmpty() ? View.VISIBLE : View.INVISIBLE);
+
+            // Fix crashes when a lot of updating comes at the same time
+            // (animation performed on the old items)
             RecyclerView.ItemAnimator animator = mBasket.getItemAnimator();
             if (animator == null) {
                 mBasketAdapter.setItems(new ArrayList<>(items));
