@@ -63,9 +63,9 @@
 
             <ImageButton
                 android:id="@+id/toolbar_del_mode_btn_delete"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="@dimen/size_appbar_icon"
-                android:layout_height="@dimen/size_appbar_icon"
+                android:background="?selectableItemBackground"
+                android:layout_width="@dimen/size_appbar_buttons"
+                android:layout_height="@dimen/size_appbar_buttons"
                 android:layout_centerVertical="true"
                 android:layout_toStartOf="@id/toolbar_del_mode_btn_close"
                 android:onClick="onDelModeBtnClick"
@@ -74,13 +74,12 @@
 
             <ImageButton
                 android:id="@+id/toolbar_del_mode_btn_close"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="@dimen/size_appbar_icon"
-                android:layout_height="@dimen/size_appbar_icon"
+                android:background="?selectableItemBackground"
+                android:layout_width="@dimen/size_appbar_buttons"
+                android:layout_height="@dimen/size_appbar_buttons"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="@dimen/padding_16"
-                android:layout_marginStart="@dimen/margin_between_appbar_icons"
                 android:onClick="onDelModeBtnClick"
                 android:src="@drawable/ic_close_white_24dp"
                 android:tint="?colorOnPrimary"/>

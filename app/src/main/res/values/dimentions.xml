@@ -3,7 +3,6 @@
     <dimen name="size_item_icon">56dp</dimen>
     <dimen name="corners_item_icon">8dp</dimen>
     <dimen name="size_categ_icon">40dp</dimen>
-    <dimen name="size_del_panel_btn">56dp</dimen>
 
     <dimen name="height_item">72dp</dimen>
     <dimen name="margin_end_basket_item_text">56dp</dimen>
@@ -36,7 +35,10 @@
     <dimen name="size_guide_hint_icon">32dp</dimen>
     <dimen name="corners_guide_hint">8dp</dimen>
 
-    <dimen name="height_ad_separator">10dp</dimen>
+    <dimen name="corners_ads">4dp</dimen>
+    <dimen name="size_ads_icon">40dp</dimen>
+
+    <dimen name="size_appbar_buttons">48dp</dimen>
 
     <dimen name="corners_category">8dp</dimen>
     <dimen name="width_categ_wide">145dp</dimen>
@@ -52,8 +54,6 @@
     <dimen name="textsize_appbar">20sp</dimen>
     <dimen name="textsize_del_toolbar">18sp</dimen>
 
-    <dimen name="size_appbar_icon">24dp</dimen>
-    <dimen name="margin_between_appbar_icons">24dp</dimen>
 
     <dimen name="corners_search_view_query">8dp</dimen>
     <dimen name="margin_end_search_view_query">32dp</dimen>
@@ -69,6 +69,5 @@
     <dimen name="padding_rb">16dp</dimen>
     <dimen name="padding_ic">8dp</dimen>
     <dimen name="margin_item_icon">8dp</dimen>
-    <dimen name="corners_ads">4dp</dimen>
-    <dimen name="size_ads_icon">40dp</dimen>
+
 </resources>
