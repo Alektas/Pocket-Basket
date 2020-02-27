@@ -130,23 +130,14 @@ public class AdManager {
     public List<Object> combine(List<ShowcaseItemModel> products, List<NativeAdWrapper> ads, int minAdsOffset) {
         if (ads.size() <= 0) return new ArrayList<>(products);
 
-        int offset = Math.max((products.size() / ads.size() + 1), minAdsOffset);
-        int adCount = (int) (Math.min(NUMBER_OF_ADS, (Math.ceil(products.size() / (float) offset) + 1)));
-        int totalSize = products.size() + adCount;
-        List<Object> combined = new ArrayList<>(totalSize);
+        List<Object> combined = new ArrayList<>(products);
 
-        int adPointer = 0;
-        int productPointer = 0;
+        int offset = Math.max((products.size() / ads.size() + 1), minAdsOffset);
         int adIndex = 0;
-        for (int i = 0; i < totalSize; i++) {
-            if (i == adIndex && adPointer < adCount) {
-                combined.add(ads.get(adPointer));
-                adPointer++;
-                adIndex += offset;
-            } else if (productPointer < products.size()) {
-                combined.add(products.get(productPointer));
-                productPointer++;
-            }
+        for (NativeAdWrapper ad : ads) {
+            if (adIndex >= combined.size()) break;
+            combined.add(adIndex, ad);
+            adIndex += offset;
         }
 
         return combined;

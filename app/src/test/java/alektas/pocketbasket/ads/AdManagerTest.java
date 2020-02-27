@@ -46,11 +46,11 @@ class AdManagerTest {
     }
 
     @Test
-    void combine_emptyProductList_isSingleAd() {
+    void combine_emptyProductList_isNonAd() {
         List<Object> combined = combine(0, 5, 8);
         int adCount = getAdCount(combined);
 
-        assertEquals(1, adCount);
+        assertEquals(0, adCount);
     }
 
     @Test
