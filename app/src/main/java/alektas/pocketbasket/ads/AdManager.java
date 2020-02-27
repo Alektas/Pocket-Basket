@@ -13,7 +13,6 @@ import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.formats.NativeAdOptions;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import alektas.pocketbasket.BuildConfig;
@@ -29,6 +28,7 @@ public class AdManager {
 
     public interface AdsLoadingListener {
         void onLoadFinished();
+
         void onLoadFailed(int errorCode);
     }
 
@@ -80,6 +80,7 @@ public class AdManager {
     /**
      * Receives a new portion of advertising from the network. The operation is asynchronous, so the
      * listener must be provided to notify of the completion / failure of the download via callbacks.
+     *
      * @param listener gets loading callbacks
      */
     public void fetchAds(AdsLoadingListener listener) {
@@ -113,13 +114,23 @@ public class AdManager {
      * @return combined list with products and ads
      */
     public List<Object> combineWithLatestAds(List<ShowcaseItemModel> products) {
-        return combine(products, mNativeAds);
+        return combine(products, mNativeAds, MIN_OFFSET_OF_ADS);
     }
 
-    private List<Object> combine(List<ShowcaseItemModel> products, List<NativeAdWrapper> ads) {
+    /**
+     * Combines products with ads into a common list, while the ads are
+     * distributed evenly.
+     *
+     * @param products     list of products in which the latest loaded ads should be inserted
+     * @param ads          list of ads which should be inserted into the products
+     * @param minAdsOffset minimal intervals between the ads. If the list of products is small,
+     *                     it allows to not overload the list with ads.
+     * @return combined list with products and ads
+     */
+    public List<Object> combine(List<ShowcaseItemModel> products, List<NativeAdWrapper> ads, int minAdsOffset) {
         if (ads.size() <= 0) return new ArrayList<>(products);
 
-        int offset = Math.max((products.size() / ads.size() + 1), MIN_OFFSET_OF_ADS);
+        int offset = Math.max((products.size() / ads.size() + 1), minAdsOffset);
         int adCount = (int) Math.ceil(products.size() / (float) offset) + 1;
         int totalSize = products.size() + adCount;
         List<Object> combined = new ArrayList<>(totalSize);
@@ -132,7 +143,7 @@ public class AdManager {
                 combined.add(ads.get(adPointer));
                 adPointer++;
                 adIndex += offset;
-            } else if (productPointer < products.size()){
+            } else if (productPointer < products.size()) {
                 combined.add(products.get(productPointer));
                 productPointer++;
             }
