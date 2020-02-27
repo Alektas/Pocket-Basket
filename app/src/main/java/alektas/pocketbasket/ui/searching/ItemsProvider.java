@@ -1,4 +1,4 @@
-package alektas.pocketbasket.services;
+package alektas.pocketbasket.ui.searching;
 
 import android.app.SearchManager;
 import android.content.ContentProvider;

@@ -2,7 +2,7 @@ package alektas.pocketbasket.domain.usecases;
 
 import alektas.pocketbasket.domain.Repository;
 
-public class ResetItemsUseCase implements UseCase<Boolean, Void> {
+public class ResetItemsUseCase implements UseCase<Boolean, Boolean> {
     private Repository mRepository;
 
     public ResetItemsUseCase(Repository repository) {
@@ -10,11 +10,11 @@ public class ResetItemsUseCase implements UseCase<Boolean, Void> {
     }
 
     @Override
-    public void execute(Boolean fullReset, Callback<Void> callback) {
+    public void execute(Boolean fullReset, Callback<Boolean> callback) {
         if (fullReset) {
-            mRepository.resetShowcase();
+            mRepository.resetShowcase(callback);
         } else {
-            mRepository.returnDeletedItems();
+            mRepository.returnDeletedItems(callback);
         }
     }
 }

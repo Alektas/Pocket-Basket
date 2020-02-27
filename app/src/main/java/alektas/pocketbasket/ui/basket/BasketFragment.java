@@ -25,7 +25,8 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
     private BasketViewModel mViewModel;
     private BasketRvAdapter mBasketAdapter;
     private ItemTouchHelper mTouchHelper;
-
+    private RecyclerView mBasket;
+    private ViewGroup mPlaceholder;
     private ItemSizeProvider mItemSizeProvider;
 
     public BasketFragment() {
@@ -60,22 +61,34 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_basket, container, false);
-        RecyclerView basket = root.findViewById(R.id.basket_list);
+        mPlaceholder = root.findViewById(R.id.basket_placeholder);
+        mBasket = root.findViewById(R.id.basket_list);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        basket.setLayoutManager(layoutManager);
-        basket.setHasFixedSize(true);
-        basket.setAdapter(mBasketAdapter);
+        mBasket.setLayoutManager(layoutManager);
+        mBasket.setHasFixedSize(true);
+        mBasket.setAdapter(mBasketAdapter);
 
         ItemTouchHelper.Callback callback = new ItemTouchCallback(getContext(), mBasketAdapter);
         mTouchHelper = new ItemTouchHelper(callback);
-        mTouchHelper.attachToRecyclerView(basket);
+        mTouchHelper.attachToRecyclerView(mBasket);
 
         return root;
     }
 
     private void subscribeOnModel() {
         mViewModel.getBasketData().observe(this, items -> {
-            mBasketAdapter.setItems(new ArrayList<>(items));
+            mPlaceholder.setVisibility(items.isEmpty() ? View.VISIBLE : View.INVISIBLE);
+
+            // Fix crashes when a lot of updating comes at the same time
+            // (animation performed on the old items)
+            RecyclerView.ItemAnimator animator = mBasket.getItemAnimator();
+            if (animator == null) {
+                mBasketAdapter.setItems(new ArrayList<>(items));
+            } else {
+                animator.isRunning(() -> {
+                    mBasketAdapter.setItems(new ArrayList<>(items));
+                });
+            }
         });
     }
 

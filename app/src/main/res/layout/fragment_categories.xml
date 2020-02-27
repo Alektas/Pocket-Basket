@@ -4,7 +4,7 @@
     android:id="@+id/categories_container"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="?colorPrimaryVariant"
     tools:context=".ui.categories.CategoriesFragment">
 
     <ScrollView
@@ -18,91 +18,90 @@
         <RadioGroup
             android:id="@+id/categories_radiogroup"
             android:layout_width="@dimen/width_categ_wide"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary">
+            android:layout_height="wrap_content">
 
             <RadioButton
                 android:id="@+id/all_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:checked="true"
                 android:text="@string/all"
                 android:tag="@string/all"
                 android:button="@drawable/ic_categ_all_inset"/>
             <RadioButton
                 android:id="@+id/drink_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/drink"
                 android:tag="@string/drink"
                 android:button="@drawable/ic_categ_drinks_inset"/>
             <RadioButton
                 android:id="@+id/fruits_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/fruit"
                 android:tag="@string/fruit"
                 android:button="@drawable/ic_categ_fruits_inset"/>
             <RadioButton
                 android:id="@+id/veg_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/vegetable"
                 android:tag="@string/vegetable"
                 android:button="@drawable/ic_categ_vegs_inset"/>
             <RadioButton
                 android:id="@+id/floury_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/floury"
                 android:tag="@string/floury"
                 android:button="@drawable/ic_categ_floury_inset"/>
             <RadioButton
                 android:id="@+id/milky_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/milky"
                 android:tag="@string/milky"
                 android:button="@drawable/ic_categ_milky_inset"/>
             <RadioButton
                 android:id="@+id/groats_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/groats"
                 android:tag="@string/groats"
                 android:button="@drawable/ic_categ_groats_inset"/>
             <RadioButton
                 android:id="@+id/sweets_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/sweets"
                 android:tag="@string/sweets"
                 android:button="@drawable/ic_categ_sweets_inset"/>
             <RadioButton
                 android:id="@+id/meat_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/meat"
                 android:tag="@string/meat"
                 android:button="@drawable/ic_categ_meat_inset"/>
             <RadioButton
                 android:id="@+id/seafood_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/seafood"
                 android:tag="@string/seafood"
                 android:button="@drawable/ic_categ_seafood_inset"/>
             <RadioButton
                 android:id="@+id/semis_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/semis"
                 android:tag="@string/semis"
                 android:button="@drawable/ic_categ_semis_inset"/>
             <RadioButton
                 android:id="@+id/sauce_n_oil_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/sauce_n_oil"
                 android:tag="@string/sauce_n_oil"
                 android:button="@drawable/ic_categ_oils_inset"/>
             <RadioButton
                 android:id="@+id/household_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/household"
                 android:tag="@string/household"
                 android:button="@drawable/ic_categ_household_inset"/>
             <RadioButton
                 android:id="@+id/other_rb"
-                style="@style/CategButton"
+                style="@style/Widget.CategoryButton"
                 android:text="@string/other"
                 android:tag="@string/other"
                 android:button="@drawable/ic_categ_other_inset"/>

@@ -21,7 +21,7 @@ public interface Repository {
     void updatePositions(List<String> keys);
     void markItem(String key);
     void markAll();
-    void removeMarked();
+    void removeMarked(UseCase.Callback<Boolean> callback);
     void cleanBasket(UseCase.Callback<Boolean> callback);
 
     /**
@@ -30,8 +30,8 @@ public interface Repository {
     Observable<List<ShowcaseItemModel>> getShowcaseData();
     void addNewItem(String name);
     void setFilter(String tag);
-    void resetShowcase();
-    void returnDeletedItems();
+    void resetShowcase(UseCase.Callback<Boolean> callback);
+    void returnDeletedItems(UseCase.Callback<Boolean> callback);
     void updateNames();
     /**
      * Find item by name in all categories.

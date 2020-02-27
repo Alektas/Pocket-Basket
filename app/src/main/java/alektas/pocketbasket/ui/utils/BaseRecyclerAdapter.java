@@ -19,7 +19,7 @@ import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 
 public abstract class BaseRecyclerAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<ItemModel> mItems;
+    private List<Object> mItems;
 
     public BaseRecyclerAdapter() {
         mItems = new ArrayList<>();
@@ -59,8 +59,11 @@ public abstract class BaseRecyclerAdapter
 
     @Override
     public long getItemId(int position) {
-        ItemModel obj = mItems.get(position);
-        return obj.getKey().hashCode();
+        Object obj = mItems.get(position);
+        if (obj instanceof ItemModel) {
+            return ((ItemModel) obj).getKey().hashCode();
+        }
+        return obj.hashCode();
     }
 
     @NonNull
@@ -69,16 +72,18 @@ public abstract class BaseRecyclerAdapter
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
-        ItemModel obj = mItems.get(position);
-        ItemHolder vh = (ItemHolder) viewHolder;
-        vh.bind(obj, viewHolder);
+        Object obj = mItems.get(position);
+        if (obj instanceof ItemModel) {
+            ItemHolder vh = (ItemHolder) viewHolder;
+            vh.bind((ItemModel) obj, viewHolder);
+        }
     }
 
-    public List<ItemModel> getItems() {
+    public List<Object> getItems() {
         return mItems;
     }
 
-    public void setItems(List<ItemModel> newItems) {
+    public void setItems(List<Object> newItems) {
         if (newItems.size() < 2) {
             mItems.clear();
             mItems.addAll(newItems);

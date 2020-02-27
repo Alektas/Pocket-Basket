@@ -5,10 +5,9 @@
     <string name="cancel">Закрыть</string>
     <string name="no">Нет</string>
     <string name="del_user_items">Удалить пользовательские товары</string>
-    <string name="search_hint">Добавить товар</string>
+    <string name="search_hint">Найти товар</string>
     <string name="reset">Сброс</string>
     <string name="share">Поделиться</string>
-    <string name="update">Обновить</string>
     <string name="share_intro">Нужны товары:</string>
     <string name="guide">Подсказки</string>
     <string name="del_toolbar_text">Выбрано для удаления: </string>
@@ -34,13 +33,20 @@
     <string name="guide_move_item">Товары в корзине перемещаются за ползунок или долгим нажатием по иконке</string>
     <string name="guide_remove_item">Убрать товар из корзины можно также свайпом вправо</string>
     <string name="guide_del_mode">Перейти в режим удаления можно долгим нажатием по товару</string>
-    <string name="guide_delete_items">Можно удалить выбранные товары или закрыть панель. Непользовательские предметы можно восстановить выбрав \"Сброс\" в меню</string>
-    <string name="guide_floating_menu">Дополнительное меню вызывается долгим нажатием по кнопке</string>
-    <string name="guide_check_all">Отметить все товары</string>
-    <string name="guide_del_checked">Убрать отмеченные товары</string>
-    <string name="guide_close_menu">Закрыть меню</string>
-    <string name="about_developer_name">\u00A9 2019 Тотилас А.А.</string>
-    <string name="license_agreement_label">Лицензионное соглашение</string>
+    <string name="guide_delete_items">Можно удалить выбранные товары или отменить удаление. Непользовательские предметы можно восстановить выбрав Сброс в меню</string>
+    <string name="about_developer_name">© 2020 Тотилас А.А.</string>
     <string name="about_alektas">- Тотилас А.А.</string>
+    <string name="msg_share_unsuccessful_basket_empty">Добавьте товары в корзину чтобы поделиться списком</string>
+    <string name="share_unsuccessful_title">Невозможно поделиться списком</string>
+    <string name="privacy_policy_label">Политика Конфиденциальности</string>
+    <string name="privacy_policy_link">https://drive.google.com/open?id=1DnMzoN5IUr-xWzgo25lKvW6OiMh9MMox</string>
+    <string name="check_all">Отметить все</string>
+    <string name="del_checked">Удалить отмеченные</string>
+    <string name="guide_basket_menu">Отметить все товары в корзине или удалить отмеченные можно в панели инструментов внизу</string>
+    <string name="remove_checked_items_fail">Отметьте товары в корзине, которые необходимо удалить</string>
+    <string name="remove_checked_items_success">Товары убраны из корзины</string>
+    <string name="reset_showcase_success">Витрина успешно восстановлена</string>
+    <string name="reset_showcase_fail">Не удалось восстановить витрину</string>
+    <string name="basket_placeholder_empty_cart">Корзина пуста</string>
 
 </resources>

@@ -28,6 +28,7 @@ import alektas.pocketbasket.domain.usecases.ResetItemsUseCase;
 import alektas.pocketbasket.domain.usecases.SelectCategoryUseCase;
 import alektas.pocketbasket.domain.usecases.UpdateItemsUseCase;
 import alektas.pocketbasket.domain.usecases.UseCase;
+import alektas.pocketbasket.domain.utils.Event;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.GuideObserver;
 import alektas.pocketbasket.guide.domain.AppState;
@@ -46,6 +47,8 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     private MutableLiveData<Boolean> showcaseModeData = new MutableLiveData<>();
     private MutableLiveData<Boolean> deleteModeData = new MutableLiveData<>();
     private MutableLiveData<Integer> deleteItemsCountData = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> deleteCheckedEvent = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> resetShowcaseEvent = new MutableLiveData<>();
     private MutableLiveData<String> mCurGuideCaseData = new MutableLiveData<>();
     private MutableLiveData<String> mCompletedGuideCase = new MutableLiveData<>();
 
@@ -61,8 +64,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
             new AppState<>(GuideContract.STATE_BASKET_SIZE, 0);
     private AppState<Boolean> landscapeState =
             new AppState<>(GuideContract.STATE_LANDSCAPE, false);
-    private AppState<Boolean> famShowingState =
-            new AppState<>(GuideContract.STATE_FAM_SHOWING, false);
     private AppState<Boolean> showcaseModeState =
             new AppState<>(GuideContract.STATE_MODE, false);
     private AppState<Boolean> newItemAddedState =
@@ -108,6 +109,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
 
     /**
      * Show in the Showcase only items with specified tag
+     *
      * @param tag item type or category
      */
     public void setFilter(String tag) {
@@ -117,10 +119,13 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
 
     /**
      * Return default showcase items
+     *
      * @param fullReset if true delete all user items
      */
     public void resetShowcase(boolean fullReset) {
-        new ResetItemsUseCase(mRepository).execute(fullReset, null);
+        new ResetItemsUseCase(mRepository).execute(fullReset, response -> {
+            resetShowcaseEvent.setValue(new Event<>(response));
+        });
     }
 
     /**
@@ -146,33 +151,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
 
     public List<? extends ItemModel> getBasketItems() {
         return mRepository.getBasketData().getValue();
-    }
-
-    /**
-     * Create a new item in the Showcase if it doesn't already exist,
-     * then add it to the Basket
-     */
-    public void onSearch(String name) {
-        UseCase<String, Boolean> useCase = new AddItemUseCase(mRepository);
-        useCase.execute(name, isNewItemAdded -> {
-            if (isNewItemAdded) {
-                newItemAddedState.setState(true);
-            }
-        });
-    }
-
-    /**
-     * Verify if all items in the Basket are checked.
-     */
-    public void markAllItems() {
-        new MarkAllBasketItems(mRepository).execute(null, null);
-    }
-
-    /**
-     * Delete all checked items in the Basket.
-     */
-    public void deleteMarked() {
-        new RemoveMarkedItems(mRepository).execute(null, null);
     }
 
 
@@ -207,10 +185,8 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
                 prefs.getBoolean(GuideContract.GUIDE_DEL_MODE, false));
         GuideCase delSelectedCase = new GuideCaseImpl(GuideContract.GUIDE_DEL_SELECTED_ITEMS,
                 prefs.getBoolean(GuideContract.GUIDE_DEL_SELECTED_ITEMS, false));
-        GuideCase famCase = new GuideCaseImpl(GuideContract.GUIDE_SHOW_FLOATING_MENU,
-                prefs.getBoolean(GuideContract.GUIDE_SHOW_FLOATING_MENU, false));
-        GuideCase famHelpCase = new GuideCaseImpl(GuideContract.GUIDE_FLOATING_MENU_HELP,
-                prefs.getBoolean(GuideContract.GUIDE_FLOATING_MENU_HELP, false));
+        GuideCase famHelpCase = new GuideCaseImpl(GuideContract.GUIDE_BASKET_MENU_HELP,
+                prefs.getBoolean(GuideContract.GUIDE_BASKET_MENU_HELP, false));
 
         return new ContextualGuide.Builder()
                 .addCase(addByTapCase)
@@ -266,25 +242,14 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
                         return delModeState.getState();
                     }
                 })
-                .addCase(famCase)
-                .require(new Requirement(showcaseModeState, basketSizeState, markCountState) {
-                    @Override
-                    public boolean check() {
-                        return !showcaseModeState.getState()
-                                && basketSizeState.getState() > 1
-                                && markCountState.getState() > 1;
-
-                    }
-                })
                 .addCase(famHelpCase)
-                .require(new Requirement(showcaseModeState, famShowingState) {
+                .require(new Requirement(markCountState) {
                     @Override
                     public boolean check() {
-                        return !showcaseModeState.getState() && famShowingState.getState();
+                        return markCountState.getState() > 1;
                     }
                 })
                 .build();
-
     }
 
     public void onEventHappened(String eventKey) {
@@ -296,6 +261,15 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
      */
     public void onHintClick() {
         mGuide.onUserEvent(mGuide.currentCase());
+    }
+
+
+    public LiveData<Event<Boolean>> getResetShowcaseEvent() {
+        return resetShowcaseEvent;
+    }
+
+    public LiveData<Event<Boolean>> getDeleteCheckedEvent() {
+        return deleteCheckedEvent;
     }
 
     public LiveData<Boolean> deleteModeData() {
@@ -325,10 +299,6 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         }
         if (markCountState.getState() > 0) {
             guide.completeCase(GuideContract.GUIDE_CHECK_ITEM);
-        }
-        if (famShowingState.getState()) {
-            guide.completeCase(GuideContract.GUIDE_SHOW_FLOATING_MENU);
-            guide.completeCase(GuideContract.GUIDE_FLOATING_MENU_HELP);
         }
         if (delModeState.getState()) {
             guide.completeCase(GuideContract.GUIDE_DEL_MODE);
@@ -367,13 +337,9 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         landscapeState.setState(isLandscape);
     }
 
-    public void onFloatingMenuCalled() {
-        famShowingState.setState(true);
-        mGuide.onUserEvent(GuideContract.GUIDE_SHOW_FLOATING_MENU);
-    }
-
-    public void onFloatingMenuHide() {
-        famShowingState.setState(false);
+    public void onDeleteSelectedShowcaseItems() {
+        mRepository.deleteSelectedItems();
+        onCloseDelMode();
     }
 
     public void onCloseDelMode() {
@@ -381,8 +347,29 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
         new DelModeUseCase(mRepository).execute(false, null);
     }
 
-    public void onFabClick() {
-        mGuide.onUserEvent(GuideContract.GUIDE_FLOATING_MENU_HELP);
+    public void onCheckAllBtnClick() {
+        mGuide.onUserEvent(GuideContract.GUIDE_BASKET_MENU_HELP);
+        new MarkAllBasketItems(mRepository).execute(null, null);
+    }
+
+    public void onDelCheckedBtnClick() {
+        mGuide.onUserEvent(GuideContract.GUIDE_BASKET_MENU_HELP);
+        new RemoveMarkedItems(mRepository).execute(null, response -> {
+            deleteCheckedEvent.setValue(new Event<>(response));
+        });
+    }
+
+    /**
+     * Create a new item in the Showcase if it doesn't already exist,
+     * then add it to the Basket
+     */
+    public void onSearch(String name) {
+        UseCase<String, Integer> useCase = new AddItemUseCase(mRepository);
+        useCase.execute(name, result -> {
+            if (result == AddItemUseCase.NEW_ITEM_ADDED) {
+                newItemAddedState.setState(true);
+            }
+        });
     }
 
 }

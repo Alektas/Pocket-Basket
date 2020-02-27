@@ -149,7 +149,7 @@
             android:focusable="true" />
 
         <TextView
-            android:id="@+id/license_link"
+            android:id="@+id/privacy_policy_link"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/padding_16"
@@ -159,7 +159,7 @@
             style="@style/TextAppearance.AppCompat.Medium"
             android:clickable="true"
             android:onClick="onLinkClick"
-            android:text="@string/license_agreement_label"
+            android:text="@string/privacy_policy_label"
             android:focusable="true" />
 
         <TextView
@@ -170,7 +170,7 @@
             android:layout_marginTop="@dimen/padding_16"
             android:layout_marginStart="@dimen/padding_32"
             android:layout_marginEnd="@dimen/padding_32"
-            android:layout_below="@id/license_link"
+            android:layout_below="@id/privacy_policy_link"
             android:layout_alignParentEnd="true"
             style="@style/TextAppearance.AppCompat.Small" />
 

@@ -71,6 +71,9 @@ public abstract class ItemsDao {
             "GROUP BY basket_meta.position")
     protected abstract List<String> getBasketItemKeys();
 
+    @Query("SELECT _id, item_key, position, marked FROM basket_meta WHERE marked = 1 LIMIT 1")
+    protected abstract BasketMeta anyMarkedItem();
+
 
     /* Mark an item queries */
 
@@ -116,9 +119,11 @@ public abstract class ItemsDao {
     /* Delete checked items queries */
 
     @Transaction
-    public void removeCheckedBasket() {
+    public boolean removeCheckedBasket() {
+        if (anyMarkedItem() == null) return false;
         deleteCheckedBasket();
         updatePositions(getBasketItemKeys());
+        return true;
     }
 
     @Query("DELETE FROM basket_meta WHERE marked = 1")
@@ -157,7 +162,7 @@ public abstract class ItemsDao {
         returnDeletedItems();
     }
 
-    @Query("DELETE FROM items WHERE name_res = NULL")
+    @Query("DELETE FROM items WHERE name_res IS NULL")
     protected abstract void deleteUserItems();
 
     @Query("UPDATE items SET deleted = 0")

@@ -13,8 +13,10 @@ import java.util.Collections;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.databinding.ItemBasketBinding;
+import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.ui.ItemSizeProvider;
 import alektas.pocketbasket.ui.utils.BaseRecyclerAdapter;
+import alektas.pocketbasket.ui.utils.ItemsConverter;
 
 public class BasketRvAdapter extends BaseRecyclerAdapter
         implements ItemTouchAdapter {
@@ -57,7 +59,10 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
 
     @Override
     public void onItemDismiss(int position) {
-        mModel.removeFromBasket(getItems().get(position).getKey());
+        Object o = getItems().get(position);
+        if (o instanceof ItemModel) {
+            mModel.removeFromBasket(((ItemModel) o).getKey());
+        }
     }
 
     @Override
@@ -69,6 +74,6 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
 
     @Override
     public void onItemMoveEnd(RecyclerView.ViewHolder viewHolder) {
-        mModel.updatePositions(getItems());
+        mModel.updatePositions(ItemsConverter.convert(getItems()));
     }
 }

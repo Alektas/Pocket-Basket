@@ -22,9 +22,9 @@ public class AboutDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 
-        LayoutInflater inflater = getActivity().getLayoutInflater();
+        LayoutInflater inflater = requireActivity().getLayoutInflater();
         mView = inflater.inflate(R.layout.layout_about, null);
 
         initAboutMenuLinks();
@@ -35,7 +35,7 @@ public class AboutDialog extends DialogFragment {
 
         builder.setTitle(R.string.about_title)
                 .setView(mView)
-                .setNeutralButton(R.string.cancel, (dialog, id) -> {
+                .setNegativeButton(R.string.cancel, (dialog, id) -> {
                     // User cancelled the dialog
                 });
         return builder.create();
@@ -60,8 +60,8 @@ public class AboutDialog extends DialogFragment {
         tv = mView.findViewById(R.id.cc_link);
         makeLinkable(tv, getString(R.string.cc_license_link));
 
-        tv = mView.findViewById(R.id.license_link);
-        makeLinkable(tv, getString(R.string.license_agreement_link));
+        tv = mView.findViewById(R.id.privacy_policy_link);
+        makeLinkable(tv, getString(R.string.privacy_policy_link));
     }
 
     private void makeLinkable(TextView tv, String link) {

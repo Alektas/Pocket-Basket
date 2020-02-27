@@ -36,7 +36,7 @@
         android:adjustViewBounds="false"
         android:scaleType="fitEnd"
         android:background="@drawable/shape_widget_btn_del_narrow"
-        android:backgroundTint="@color/colorPrimary"
+        android:tint="@color/colorOnPrimary"
         android:src="@drawable/ic_close_white_24dp"/>
 
     <FrameLayout
