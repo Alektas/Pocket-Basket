@@ -131,7 +131,7 @@ public class AdManager {
         if (ads.size() <= 0) return new ArrayList<>(products);
 
         int offset = Math.max((products.size() / ads.size() + 1), minAdsOffset);
-        int adCount = (int) Math.ceil(products.size() / (float) offset) + 1;
+        int adCount = (int) (Math.min(NUMBER_OF_ADS, (Math.ceil(products.size() / (float) offset) + 1)));
         int totalSize = products.size() + adCount;
         List<Object> combined = new ArrayList<>(totalSize);
 
