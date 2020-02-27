@@ -8,7 +8,6 @@
     <string name="search_hint">Найти товар</string>
     <string name="reset">Сброс</string>
     <string name="share">Поделиться</string>
-    <string name="update">Обновить</string>
     <string name="share_intro">Нужны товары:</string>
     <string name="guide">Подсказки</string>
     <string name="del_toolbar_text">Выбрано для удаления: </string>
@@ -35,14 +34,8 @@
     <string name="guide_remove_item">Убрать товар из корзины можно также свайпом вправо</string>
     <string name="guide_del_mode">Перейти в режим удаления можно долгим нажатием по товару</string>
     <string name="guide_delete_items">Можно удалить выбранные товары или отменить удаление. Непользовательские предметы можно восстановить выбрав Сброс в меню</string>
-    <string name="guide_floating_menu">Дополнительное меню вызывается долгим нажатием по кнопке</string>
-    <string name="guide_check_all">Отметить все товары</string>
-    <string name="guide_del_checked">Убрать отмеченные товары</string>
-    <string name="guide_close_menu">Закрыть меню</string>
     <string name="about_developer_name">© 2020 Тотилас А.А.</string>
     <string name="about_alektas">- Тотилас А.А.</string>
-    <string name="descr_fam_del_marked_btn">Удаление отмеченных товаров из корзины</string>
-    <string name="descr_fam_mark_btn">Отметка всех товаров в корзине</string>
     <string name="msg_share_unsuccessful_basket_empty">Добавьте товары в корзину чтобы поделиться списком</string>
     <string name="share_unsuccessful_title">Невозможно поделиться списком</string>
     <string name="privacy_policy_label">Политика Конфиденциальности</string>

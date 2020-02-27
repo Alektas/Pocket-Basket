@@ -63,19 +63,6 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.80" />
 
-    <!-- Guide: bg -->
-
-    <ImageView
-        android:id="@+id/guide_bg_full_img"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@color/bg_guide_fullscreen" />
-
     <!-- Guide: change mode -->
 
     <com.google.android.material.button.MaterialButton
@@ -130,7 +117,7 @@
         app:layout_constraintStart_toStartOf="@id/fragment_showcase"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.25"
-        app:srcCompat="@drawable/ic_guide_tap" />
+        app:srcCompat="@drawable/ic_guide_tap_up" />
 
     <!-- Guide: mark item in Basket -->
 
@@ -159,7 +146,7 @@
         app:layout_constraintStart_toStartOf="@id/fragment_basket"
         app:layout_constraintTop_toTopOf="@id/fragment_basket"
         app:layout_constraintVertical_bias="0.05"
-        app:srcCompat="@drawable/ic_guide_tap" />
+        app:srcCompat="@drawable/ic_guide_tap_up" />
 
     <!-- Guide: move item in Basket -->
 
@@ -188,7 +175,7 @@
         app:layout_constraintStart_toStartOf="@id/fragment_basket"
         app:layout_constraintTop_toTopOf="@id/fragment_basket"
         app:layout_constraintVertical_bias="0"
-        app:srcCompat="@drawable/ic_guide_scroll_vertical_mir_cut" />
+        app:srcCompat="@drawable/ic_guide_scroll_vertical" />
 
     <!-- Guide: remove item from Basket -->
 
@@ -270,7 +257,7 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_guide_tap_rot180" />
+        app:srcCompat="@drawable/ic_guide_tap_down" />
 
     <!-- Guide:basket menu buttons -->
 
@@ -296,6 +283,6 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_guide_tap_rot180" />
+        app:srcCompat="@drawable/ic_guide_tap_down" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

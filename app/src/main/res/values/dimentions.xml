@@ -27,7 +27,6 @@
     <dimen name="margin_widget_icon">8dp</dimen>
     <dimen name="margin_widget_item_icon">8dp</dimen>
     <dimen name="margin_widget_item_icon_small">4dp</dimen>
-    <dimen name="margin_widget_item_text">8dp</dimen>
     <dimen name="padding_widget_ic_small">4dp</dimen>
     <dimen name="padding_widget_ic">8dp</dimen>
 
@@ -52,15 +51,11 @@
     <dimen name="textsize_item_name">14sp</dimen>
     <dimen name="textsize_item_icon">12sp</dimen>
     <dimen name="textsize_category">@dimen/textsize_item_name</dimen>
-    <dimen name="textsize_guide">20sp</dimen>
     <dimen name="textsize_guide_hint">16sp</dimen>
-    <dimen name="textsize_appbar">20sp</dimen>
     <dimen name="textsize_del_toolbar">18sp</dimen>
 
 
     <dimen name="corners_search_view_query">8dp</dimen>
-    <dimen name="margin_end_search_view_query">32dp</dimen>
-    <dimen name="margin_start_search_view_query">16dp</dimen>
 
     <dimen name="change_mode_distance">56dp</dimen>
     <dimen name="change_mode_start_distance">16dp</dimen>
