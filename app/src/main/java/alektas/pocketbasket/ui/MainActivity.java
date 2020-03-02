@@ -15,7 +15,6 @@ import android.transition.ChangeBounds;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
-import android.transition.TransitionSet;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,8 +26,6 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -39,13 +36,17 @@ import androidx.appcompat.widget.ShareActionProvider;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
@@ -56,11 +57,14 @@ import alektas.pocketbasket.guide.ui.DisposableGuideCaseListener;
 import alektas.pocketbasket.guide.ui.GuideCaseView;
 import alektas.pocketbasket.guide.ui.GuidePresenter;
 import alektas.pocketbasket.guide.ui.SequentialGuidePresenter;
+import alektas.pocketbasket.ui.categories.CategoriesAdapter;
+import alektas.pocketbasket.ui.categories.Category;
 import alektas.pocketbasket.ui.dialogs.AboutDialog;
 import alektas.pocketbasket.ui.dialogs.GuideAcceptDialog;
 import alektas.pocketbasket.ui.dialogs.ResetDialog;
 import alektas.pocketbasket.ui.dialogs.ShareUnsuccessfulDialog;
 import alektas.pocketbasket.ui.utils.SmoothDecelerateInterpolator;
+import alektas.pocketbasket.ui.utils.SnapScrollListener;
 import alektas.pocketbasket.utils.ResourcesUtils;
 import alektas.pocketbasket.widget.BasketWidget;
 
@@ -80,8 +84,6 @@ public class MainActivity extends AppCompatActivity implements
      */
     private static final float CHANGE_MODE_VELOCITY_DIVIDER = 1000;
 
-    private int mCategNarrowWidth;
-    private int mCategWideWidth;
     private int mShowcaseWideWidth;
     private int mShowcaseNarrowWidth;
     private int mBasketNarrowWidth;
@@ -105,14 +107,13 @@ public class MainActivity extends AppCompatActivity implements
     private VelocityTracker mVelocityTracker;
     private ShareActionProvider mShareActionProvider;
     private ViewGroup mRootLayout;
+    private View mCategoriesContainer;
     private View mBasketContainer;
     private View mShowcaseContainer;
-    private View mCategoriesContainer;
     private RecyclerView mShowcase;
     private RecyclerView mBasket;
     private SearchView mSearchView;
-    private TransitionSet mChangeModeTransition;
-    private Transition mChangeBounds;
+    private Transition mChangeModeTransition;
     private Transition mDelToolbarTransition;
     private boolean isDelMode;
 
@@ -254,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements
 
         initSearch();
         initTransitions();
+        initCategories();
 
         mRootLayout = findViewById(R.id.root_layout);
         mCategoriesContainer = findViewById(R.id.fragment_categories);
@@ -269,8 +271,7 @@ public class MainActivity extends AppCompatActivity implements
 
         subscribeOnModel(mViewModel, mGuidePrefs, guidePresenter);
 
-        RadioGroup rg = mCategoriesContainer.findViewById(R.id.categories_radiogroup);
-        initCategorySelection(mPrefs, rg);
+        initCategorySelection(mPrefs);
 
         if (isLandscape()) {
             applyLandscapeLayout();
@@ -281,12 +282,8 @@ public class MainActivity extends AppCompatActivity implements
         mDelToolbarTransition = TransitionInflater.from(this)
                 .inflateTransition(R.transition.transition_del_toolbar);
 
-        mChangeBounds = new ChangeBounds();
-
-        mChangeModeTransition = new TransitionSet();
-        mChangeModeTransition.setDuration(CHANGE_MODE_TIME)
-                .setOrdering(TransitionSet.ORDERING_TOGETHER)
-                .addTransition(mChangeBounds);
+        mChangeModeTransition = new ChangeBounds()
+                .setDuration(CHANGE_MODE_TIME);
     }
 
     private void initDimensions() {
@@ -295,21 +292,14 @@ public class MainActivity extends AppCompatActivity implements
         int screenWidth = displaymetrics.widthPixels;
         int screenHeight = displaymetrics.heightPixels;
         int minDisplaySize = Math.min(screenHeight, screenWidth);
-        mCategNarrowWidth = (int) getResources().getDimension(R.dimen.width_categ_narrow);
         mShowcaseNarrowWidth = (int) getResources().getDimension(R.dimen.width_showcase_narrow);
         mBasketNarrowWidth = (int) getResources().getDimension(R.dimen.width_basket_narrow);
-        mCategWideWidth = (int) getResources().getDimension(R.dimen.width_categ_wide);
-        mShowcaseWideWidth = minDisplaySize - mCategWideWidth - mBasketNarrowWidth;
-        if (isLandscape()) {
-            mBasketWideWidth = screenWidth - mCategWideWidth - mShowcaseWideWidth;
-        } else {
-            mBasketWideWidth = screenWidth - mCategNarrowWidth - mShowcaseNarrowWidth;
-        }
+        mShowcaseWideWidth = minDisplaySize - mBasketNarrowWidth;
+        mBasketWideWidth = isLandscape() ? screenWidth - mShowcaseWideWidth : screenWidth - mShowcaseNarrowWidth;
 
         changeModeDistance = getResources().getDimension(R.dimen.change_mode_distance);
         protectedInterval = getResources().getDimension(R.dimen.protected_interval);
-        changeModeStartDistance =
-                (int) getResources().getDimension(R.dimen.change_mode_start_distance);
+        changeModeStartDistance = (int) getResources().getDimension(R.dimen.change_mode_start_distance);
 
         mMaxVelocity = ViewConfiguration.get(this).getScaledMaximumFlingVelocity();
     }
@@ -325,6 +315,53 @@ public class MainActivity extends AppCompatActivity implements
             View root = findViewById(R.id.root_layout);
             root.requestFocus();
         }
+    }
+
+    private void initCategories() {
+        RecyclerView categoriesRv = findViewById(R.id.categories_spinner);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        categoriesRv.setLayoutManager(layoutManager);
+
+        LinearSnapHelper snapper = new LinearSnapHelper();
+        snapper.attachToRecyclerView(categoriesRv);
+
+        List<Category> categories = Arrays.asList(
+                new Category(0, getString(R.string.all), R.string.all, R.drawable.ic_categ_all),
+                new Category(1, getString(R.string.drink), R.string.drink, R.drawable.ic_categ_drinks),
+                new Category(2, getString(R.string.fruit), R.string.fruit, R.drawable.ic_categ_fruits),
+                new Category(3, getString(R.string.vegetable), R.string.vegetable, R.drawable.ic_categ_vegs),
+                new Category(4, getString(R.string.floury), R.string.floury, R.drawable.ic_categ_floury),
+                new Category(5, getString(R.string.milky), R.string.milky, R.drawable.ic_categ_milky),
+                new Category(6, getString(R.string.groats), R.string.groats, R.drawable.ic_categ_groats),
+                new Category(7, getString(R.string.sweets), R.string.sweets, R.drawable.ic_categ_sweets),
+                new Category(8, getString(R.string.meat), R.string.meat, R.drawable.ic_categ_meat),
+                new Category(9, getString(R.string.seafood), R.string.seafood, R.drawable.ic_categ_seafood),
+                new Category(10, getString(R.string.semis), R.string.semis, R.drawable.ic_categ_semis),
+                new Category(11, getString(R.string.sauce_n_oil), R.string.sauce_n_oil, R.drawable.ic_categ_oils),
+                new Category(12, getString(R.string.household), R.string.household, R.drawable.ic_categ_household),
+                new Category(13, getString(R.string.other), R.string.other, R.drawable.ic_categ_other)
+        );
+        CategoriesAdapter adapter = new CategoriesAdapter(categories, position -> {
+            View targetView = layoutManager.findViewByPosition(position);
+            if (targetView == null) return;
+            int[] distances = snapper.calculateDistanceToFinalSnap(layoutManager, targetView);
+            int distance = Objects.requireNonNull(distances)[0];
+            if (distance == 0) return;
+            categoriesRv.smoothScrollBy(distance, 0);
+        });
+        categoriesRv.setAdapter(adapter);
+
+        SnapScrollListener snapListener = new SnapScrollListener(snapper, categories.size()) {
+            @Override
+            public void onSnapChanged(int snapPosition) {
+                int nameRes = categories.get(snapPosition).getNameRes();
+                setFilter(nameRes);
+            }
+        };
+        categoriesRv.addOnScrollListener(snapListener);
+
+        int initPosition = Integer.MAX_VALUE / 2;
+        layoutManager.scrollToPosition(initPosition);
     }
 
     private void subscribeOnModel(ActivityViewModel viewModel,
@@ -482,17 +519,17 @@ public class MainActivity extends AppCompatActivity implements
         return guidePresenter;
     }
 
-    private void initCategorySelection(SharedPreferences prefs, RadioGroup rg) {
+    private void initCategorySelection(SharedPreferences prefs) {
         int catId = prefs.getInt(SAVED_CATEGORY_KEY, 0);
         if (catId == 0) return;
-        rg.check(catId);
-        onFilterClick(rg.findViewById(catId));
+//        setFilter(catId);
     }
 
     private int getSelectedCategoryId() {
-        if (mCategoriesContainer == null) return 0;
-        RadioGroup rg = mCategoriesContainer.findViewById(R.id.categories_radiogroup);
-        return rg.getCheckedRadioButtonId();
+        return 0;
+    }
+
+    private void setCategory(int id) {
     }
 
 
@@ -502,9 +539,7 @@ public class MainActivity extends AppCompatActivity implements
      * Set Landscape Mode: categories, showcase and basket expanded
      */
     private void applyLandscapeLayout() {
-        changeLayoutSize(mCategWideWidth,
-                mShowcaseWideWidth,
-                0);
+        changeLayoutSize(mShowcaseWideWidth, 0);
     }
 
     /**
@@ -527,9 +562,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void applyBasketModeLayout() {
         TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
-        changeLayoutSize(mCategNarrowWidth,
-                mShowcaseNarrowWidth,
-                0);
+        changeLayoutSize(mShowcaseNarrowWidth, 0);
     }
 
     /**
@@ -552,21 +585,17 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void applyShowcaseModeLayout() {
         TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
-        changeLayoutSize(mCategWideWidth,
-                0,
-                mBasketNarrowWidth);
+        changeLayoutSize(0, mBasketNarrowWidth);
     }
 
     /**
-     * Change size of the layout parts: Categories, Showcase and Basket.
+     * Change size of the layout parts: Showcase and Basket.
      * If one of the width equal '0' then the corresponding layout part fills in the free space.
      *
-     * @param categWidth    width of the Categories in pixels
      * @param showcaseWidth width of the Showcase in pixels
      * @param basketWidth   width of the Basket in pixels
      */
-    private void changeLayoutSize(int categWidth, int showcaseWidth, int basketWidth) {
-        changeViewWidth(mCategoriesContainer, categWidth);
+    private void changeLayoutSize(int showcaseWidth, int basketWidth) {
         changeViewWidth(mShowcaseContainer, showcaseWidth);
         changeViewWidth(mBasketContainer, basketWidth);
     }
@@ -575,7 +604,7 @@ public class MainActivity extends AppCompatActivity implements
      * Change size of the view.
      * If width equal '0' then view fills in the free space.
      *
-     * @param view view which width need change
+     * @param view  view which width need change
      * @param width width of the view in pixels
      */
     private void changeViewWidth(View view, int width) {
@@ -654,70 +683,6 @@ public class MainActivity extends AppCompatActivity implements
     public void onFilterClick(View view) {
         if (view == null) {
             setFilter(R.string.all);
-            return;
-        }
-
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
-
-        // Check which radio button was clicked
-        switch (view.getId()) {
-            case R.id.all_rb:
-                if (checked)
-                    setFilter(R.string.all);
-                break;
-            case R.id.drink_rb:
-                if (checked)
-                    setFilter(R.string.drink);
-                break;
-            case R.id.fruits_rb:
-                if (checked)
-                    setFilter(R.string.fruit);
-                break;
-            case R.id.veg_rb:
-                if (checked)
-                    setFilter(R.string.vegetable);
-                break;
-            case R.id.groats_rb:
-                if (checked)
-                    setFilter(R.string.groats);
-                break;
-            case R.id.milky_rb:
-                if (checked)
-                    setFilter(R.string.milky);
-                break;
-            case R.id.floury_rb:
-                if (checked)
-                    setFilter(R.string.floury);
-                break;
-            case R.id.sweets_rb:
-                if (checked)
-                    setFilter(R.string.sweets);
-                break;
-            case R.id.meat_rb:
-                if (checked)
-                    setFilter(R.string.meat);
-                break;
-            case R.id.seafood_rb:
-                if (checked)
-                    setFilter(R.string.seafood);
-                break;
-            case R.id.semis_rb:
-                if (checked)
-                    setFilter(R.string.semis);
-                break;
-            case R.id.sauce_n_oil_rb:
-                if (checked)
-                    setFilter(R.string.sauce_n_oil);
-                break;
-            case R.id.household_rb:
-                if (checked)
-                    setFilter(R.string.household);
-                break;
-            case R.id.other_rb:
-                if (checked)
-                    setFilter(R.string.other);
-                break;
         }
     }
 
@@ -803,8 +768,8 @@ public class MainActivity extends AppCompatActivity implements
 
                 /* Disable the change mode from the basket in the basket mode
                  * because direction of the swipe is match to direction of the item delete swipe */
-                if (!mViewModel.isShowcaseMode()
-                        && initX > (mCategNarrowWidth + mShowcaseNarrowWidth)) {
+                if (!mViewModel.isShowcaseMode() && initX > (mShowcaseNarrowWidth)
+                        || isInteractionWithSystemBars(initY)) {
                     allowChangeMode = false;
                     isChangeModeHandled = true;
                 }
@@ -848,6 +813,10 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    private boolean isInteractionWithSystemBars(int touchDownY) {
+        return touchDownY > mCategoriesContainer.getY();
+    }
+
     /**
      * Set size of the layout parts in depends of touch moving distance
      *
@@ -855,23 +824,17 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void changeLayoutSizeByTouch(int movX) {
         int showcaseOffset;
-        int categOffset;
         if (mViewModel.isShowcaseMode()) {
-            showcaseOffset = mShowcaseWideWidth - mShowcaseNarrowWidth + movX / 2 + changeModeStartDistance;
-            categOffset = mCategWideWidth - mCategNarrowWidth + movX / 2 + changeModeStartDistance;
+            showcaseOffset = mShowcaseWideWidth - mShowcaseNarrowWidth + movX + changeModeStartDistance;
         } else {
-            showcaseOffset = movX / 2 - changeModeStartDistance;
-            categOffset = movX / 2 - changeModeStartDistance;
+            showcaseOffset = movX - changeModeStartDistance;
         }
 
         int showcaseWidth = calculateLayoutSize(showcaseOffset,
                 mShowcaseNarrowWidth,
                 mShowcaseWideWidth);
-        int categWidth = calculateLayoutSize(categOffset,
-                mCategNarrowWidth,
-                mCategWideWidth);
 
-        changeLayoutSize(categWidth, showcaseWidth, 0);
+        changeLayoutSize(showcaseWidth, 0);
     }
 
     /**
@@ -900,7 +863,7 @@ public class MainActivity extends AppCompatActivity implements
             mVelocityTracker.computeCurrentVelocity(1000, mMaxVelocity);
             float velocity = mVelocityTracker.getXVelocity();
             Interpolator interpolator = getInterpolator(velocity);
-            mChangeBounds.setInterpolator(interpolator);
+            mChangeModeTransition.setInterpolator(interpolator);
             setMode(movX, velocity);
         }
 
@@ -974,18 +937,14 @@ public class MainActivity extends AppCompatActivity implements
         if (movX < -protectedInterval) {
             TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
         }
-        changeLayoutSize(mCategWideWidth,
-                0,
-                mBasketNarrowWidth);
+        changeLayoutSize(0, mBasketNarrowWidth);
     }
 
     private void recoverBasketMode(int movX) {
         if (movX > protectedInterval) {
             TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
         }
-        changeLayoutSize(mCategNarrowWidth,
-                mShowcaseNarrowWidth,
-                0);
+        changeLayoutSize(mShowcaseNarrowWidth, 0);
     }
 
 
@@ -1025,17 +984,6 @@ public class MainActivity extends AppCompatActivity implements
         Bundle search = new Bundle();
         search.putString(FirebaseAnalytics.Param.SEARCH_TERM, query);
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.SEARCH, search);
-    }
-
-    private void toggleSearchView() {
-        if (mSearchView.hasFocus()) {
-            if (!TextUtils.isEmpty(mSearchView.getQuery())) {
-                onSearch(mSearchView.getQuery().toString());
-            }
-            cancelSearch();
-        } else {
-            mSearchView.setIconified(false); // give focus
-        }
     }
 
     /**

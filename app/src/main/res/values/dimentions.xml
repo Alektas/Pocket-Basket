@@ -43,8 +43,8 @@
     <dimen name="textsize_basket_placeholder_text">16sp</dimen>
 
     <dimen name="corners_category">8dp</dimen>
-    <dimen name="width_categ_wide">145dp</dimen>
-    <dimen name="width_categ_narrow">56dp</dimen>
+    <dimen name="padding_categories_content">180dp</dimen>
+
     <dimen name="width_showcase_narrow">72dp</dimen>
     <dimen name="width_basket_narrow">72dp</dimen>
 
@@ -53,7 +53,6 @@
     <dimen name="textsize_category">@dimen/textsize_item_name</dimen>
     <dimen name="textsize_guide_hint">16sp</dimen>
     <dimen name="textsize_del_toolbar">18sp</dimen>
-
 
     <dimen name="corners_search_view_query">8dp</dimen>
 

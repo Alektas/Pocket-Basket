@@ -3,4 +3,21 @@
     <string-array name="reset_choices">
         <item>@string/del_user_items</item>
     </string-array>
+
+    <string-array name="categoies_names">
+        <item>All</item>
+        <item>Drinks</item>
+        <item>Fruits</item>
+        <item>Veggies</item>
+        <item>Floury</item>
+        <item>Milky</item>
+        <item>Groats</item>
+        <item>Sweets</item>
+        <item>Meat</item>
+        <item>Seafood</item>
+        <item>Semis</item>
+        <item>Sauces</item>
+        <item>Household</item>
+        <item>Other</item>
+    </string-array>
 </resources>
