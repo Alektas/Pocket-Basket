@@ -195,21 +195,24 @@ public abstract class ItemsDao {
     public void addNewItem(String key) {
         Item item = new Item(key);
         insert(item);
-        BasketMeta basketMeta = new BasketMeta(key);
-        basketMeta.setPosition(getMaxPosition() + 1);
-        putBasketMeta(basketMeta);
+        createBasketMeta(key);
     }
 
     @Transaction
     public void putItemToBasket(String key) {
         if (getItemMeta(key) != null) return;
-        BasketMeta basketMeta = new BasketMeta(key);
-        basketMeta.setPosition(getMaxPosition() + 1);
-        putBasketMeta(basketMeta);
+        createBasketMeta(key);
     }
 
-    @Query("SELECT MAX(position) FROM basket_meta")
-    public abstract int getMaxPosition();
+    @Transaction
+    protected void createBasketMeta(String key) {
+        BasketMeta basketMeta = new BasketMeta(key);
+        basketMeta.setPosition(0);
+        putBasketMeta(basketMeta);
+
+        List<String> keys = getBasketItemKeys();
+        updatePositions(keys);
+    }
 
 
     /* Default Insert, Update, Delete queries */
