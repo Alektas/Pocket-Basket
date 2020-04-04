@@ -59,7 +59,7 @@ public abstract class ItemsDao {
     @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, basket_meta.marked, deleted " +
             "FROM items INNER JOIN basket_meta " +
             "ON items._key = basket_meta.item_key " +
-            "GROUP BY basket_meta.position")
+            "ORDER BY basket_meta.position")
     public abstract List<BasketItem> getBasketItems();
 
     @Query("SELECT _id, item_key, position, marked FROM basket_meta WHERE item_key = :key")
@@ -68,7 +68,7 @@ public abstract class ItemsDao {
     @Query("SELECT _key FROM items " +
             "INNER JOIN basket_meta " +
             "ON items._key = basket_meta.item_key " +
-            "GROUP BY basket_meta.position")
+            "ORDER BY basket_meta.position")
     protected abstract List<String> getBasketItemKeys();
 
     @Query("SELECT _id, item_key, position, marked FROM basket_meta WHERE marked = 1 LIMIT 1")
@@ -79,7 +79,15 @@ public abstract class ItemsDao {
 
     @Transaction
     public void mark(String key) {
-        mark(key, getItemMeta(key).isMarked() ? 0 : 1);
+        int state = getItemMeta(key).isMarked() ? 0 : 1;
+        mark(key, state);
+
+        // Move marked item to the end of the basket list
+        if (state != 0) {
+            List<String> keys = getBasketItemKeys();
+            if (keys.remove(key)) keys.add(key);
+            updatePositions(keys);
+        }
     }
 
     @Query("UPDATE basket_meta SET marked = :state WHERE item_key = :key")
