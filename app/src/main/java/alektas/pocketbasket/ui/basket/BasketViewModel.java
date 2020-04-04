@@ -17,6 +17,7 @@ import alektas.pocketbasket.domain.usecases.ChangeItemsPositions;
 import alektas.pocketbasket.domain.usecases.MarkBasketItem;
 import alektas.pocketbasket.domain.usecases.RemoveItemFromBasket;
 import alektas.pocketbasket.domain.usecases.UseCase;
+import alektas.pocketbasket.domain.utils.Event;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.domain.ContextualGuide;
 import alektas.pocketbasket.guide.domain.Guide;
@@ -26,6 +27,7 @@ public class BasketViewModel extends AndroidViewModel {
     private Repository mRepository;
     private Guide mGuide;
     private MutableLiveData<List<BasketItemModel>> mBasketData = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> scrollToTopEvent = new MutableLiveData<>();
 
     public BasketViewModel(@NonNull Application application) {
         super(application);
@@ -46,6 +48,10 @@ public class BasketViewModel extends AndroidViewModel {
 
     public LiveData<List<BasketItemModel>> getBasketData() {
         return mBasketData;
+    }
+
+    public LiveData<Event<Boolean>> getScrollToTopEvent() {
+        return scrollToTopEvent;
     }
 
     /**

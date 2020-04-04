@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,6 +29,7 @@ public class ShowcaseFragment extends Fragment {
     private ShowcaseViewModel mViewModel;
     private ShowcaseRvAdapter mShowcaseAdapter;
     private ItemSizeProvider mItemSizeProvider;
+    private RecyclerView mShowcase;
 
     public ShowcaseFragment() {
         // Required empty public constructor
@@ -50,30 +51,25 @@ public class ShowcaseFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        mViewModel = ViewModelProviders.of(this).get(ShowcaseViewModel.class);
-        mShowcaseAdapter = new ShowcaseRvAdapter(mViewModel, mItemSizeProvider);
-        subscribeOnModel();
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_showcase, container, false);
 
-        RecyclerView showcase = root.findViewById(R.id.showcase_list);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        showcase.setLayoutManager(layoutManager);
-        showcase.setHasFixedSize(true);
-        showcase.setAdapter(mShowcaseAdapter);
+        mShowcase = root.findViewById(R.id.showcase_list);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(requireContext());
+        mShowcase.setLayoutManager(layoutManager);
+        mShowcase.setHasFixedSize(true);
 
         return root;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        mViewModel = new ViewModelProvider(this).get(ShowcaseViewModel.class);
+        mShowcaseAdapter = new ShowcaseRvAdapter(mViewModel, mItemSizeProvider);
+        mShowcase.setAdapter(mShowcaseAdapter);
+        subscribeOnModel();
+
         mAdManager = new AdManager.Builder(requireContext(), R.string.ad_app_id, R.string.ad_unit_id)
                 .withDebugAppId(R.string.ad_test_app_id)
                 .withDebugAdId(R.string.ad_test_unit_id)
@@ -99,7 +95,7 @@ public class ShowcaseFragment extends Fragment {
     }
 
     private void subscribeOnModel() {
-        mViewModel.getShowcaseData().observe(this, items -> {
+        mViewModel.getShowcaseData().observe(getViewLifecycleOwner(), items -> {
             mProducts = items;
             mShowcaseAdapter.setItems(mAdManager.combineWithLatestAds(mProducts));
         });

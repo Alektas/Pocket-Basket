@@ -57,10 +57,6 @@ public class ShowcaseViewModel extends AndroidViewModel {
         mRepository = null;
     }
 
-    public MutableLiveData<Boolean> getShowcaseModeData() {
-        return showcaseModeData;
-    }
-
     public LiveData<List<ShowcaseItemModel>> getShowcaseData() {
         return mShowcaseData;
     }
@@ -102,10 +98,6 @@ public class ShowcaseViewModel extends AndroidViewModel {
     public boolean isDelMode() {
         if (delModeState.getValue() == null) return false;
         return delModeState.getValue();
-    }
-
-    public LiveData<Boolean> delModeState() {
-        return delModeState;
     }
 
     /**
