@@ -83,3 +83,5 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+/app/release/output.json
+/.idea/inspectionProfiles/Project_Default.xml
