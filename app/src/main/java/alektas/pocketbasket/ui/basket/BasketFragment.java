@@ -89,6 +89,10 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
                     mBasketAdapter.setItems(new ArrayList<>(items));
                 });
             }
+
+            // If added a new item to the basket then scroll to the beginning of the list
+            if (items.size() > oldItemsCount) mBasket.smoothScrollToPosition(0);
+            oldItemsCount = items.size();
         });
     }
 
