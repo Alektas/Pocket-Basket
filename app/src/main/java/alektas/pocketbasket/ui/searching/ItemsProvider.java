@@ -78,7 +78,7 @@ public class ItemsProvider extends ContentProvider {
 
         @Override
         protected List<Item> doInBackground(String... query) {
-            return mDao.search(query[0]+"%");
+            return mDao.search("%" + query[0] + "%");
         }
     }
 
