@@ -3,9 +3,16 @@
     <objectAnimator
         android:propertyName="scaleY"
         android:duration="200"
+        android:valueType="floatType"
         android:valueTo="1.0"/>
     <objectAnimator
         android:propertyName="scaleX"
         android:duration="200"
+        android:valueType="floatType"
+        android:valueTo="1.0"/>
+    <objectAnimator
+        android:propertyName="alpha"
+        android:duration="200"
+        android:valueType="floatType"
         android:valueTo="1.0"/>
 </set>
