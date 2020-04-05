@@ -14,8 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import alektas.pocketbasket.R;
+import alektas.pocketbasket.domain.entities.BasketItemModel;
 import alektas.pocketbasket.ui.ItemSizeProvider;
 
 /**
@@ -26,12 +28,13 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
     private BasketRvAdapter mBasketAdapter;
     private ItemTouchHelper mTouchHelper;
     private RecyclerView mBasket;
+    private LinearLayoutManager mLayoutManager;
     private ViewGroup mPlaceholder;
     private ItemSizeProvider mItemSizeProvider;
     /**
      * Cache of the last known basket items count
      */
-    private int oldItemsCount = 0;
+    private int previousItemsCount = 0;
 
     public BasketFragment() {
         // Required empty public constructor
@@ -58,8 +61,8 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
         View root = inflater.inflate(R.layout.fragment_basket, container, false);
         mPlaceholder = root.findViewById(R.id.basket_placeholder);
         mBasket = root.findViewById(R.id.basket_list);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
-        mBasket.setLayoutManager(layoutManager);
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mBasket.setLayoutManager(mLayoutManager);
         mBasket.setHasFixedSize(true);
 
         return root;
@@ -88,17 +91,27 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
             // (animation performed on the old items)
             RecyclerView.ItemAnimator animator = mBasket.getItemAnimator();
             if (animator == null) {
-                mBasketAdapter.setItems(new ArrayList<>(items));
-            } else {
-                animator.isRunning(() -> {
-                    mBasketAdapter.setItems(new ArrayList<>(items));
-                });
+                setItems(items);
+                return;
             }
-
-            // If added a new item to the basket then scroll to the beginning of the list
-            if (items.size() > oldItemsCount) mBasket.smoothScrollToPosition(0);
-            oldItemsCount = items.size();
+            animator.isRunning(() -> setItems(items));
         });
+    }
+
+    private void setItems(List<BasketItemModel> items) {
+        mBasketAdapter.setItems(new ArrayList<>(items), () -> scrollToTop(items.size()));
+    }
+
+    private void scrollToTop(int newSize) {
+        // Need to scroll only if we were on the top of the list before
+        if (mLayoutManager.findFirstVisibleItemPosition() > 0) {
+            previousItemsCount = newSize;
+            return;
+        }
+
+        // If added a new item to the basket then scroll to the beginning of the list
+        if (newSize > previousItemsCount) mBasket.smoothScrollToPosition(0);
+        previousItemsCount = newSize;
     }
 
     @Override
