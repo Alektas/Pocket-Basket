@@ -19,6 +19,7 @@ public interface Repository {
     void removeFromBasket(String key);
     void removeFromBasket(String key, UseCase.Callback<Boolean> callback);
     void updatePositions(List<String> keys);
+    void updatePosition(String key, int position);
     void markItem(String key);
     void markAll();
     void removeMarked(UseCase.Callback<Boolean> callback);

@@ -15,6 +15,7 @@ import alektas.pocketbasket.domain.entities.BasketItemModel;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.usecases.ChangeItemsPositions;
 import alektas.pocketbasket.domain.usecases.MarkBasketItem;
+import alektas.pocketbasket.domain.usecases.MoveItemToTopUseCase;
 import alektas.pocketbasket.domain.usecases.RemoveItemFromBasket;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.domain.utils.Event;
@@ -78,6 +79,10 @@ public class BasketViewModel extends AndroidViewModel {
         new RemoveItemFromBasket(mRepository).execute(key, null);
         ActivityViewModel.removeCountState.setState(ActivityViewModel.removeCountState.getState() + 1);
         mGuide.onUserEvent(GuideContract.GUIDE_SWIPE_REMOVE_ITEM);
+    }
+
+    public void onItemDoubleClick(String key) {
+        new MoveItemToTopUseCase(mRepository).execute(key, null);
     }
 
 }

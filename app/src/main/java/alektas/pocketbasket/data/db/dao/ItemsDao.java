@@ -120,6 +120,16 @@ public abstract class ItemsDao {
         }
     }
 
+    @Transaction
+    public void updatePosition(String key, int position) {
+        List<String> keys = getBasketItemKeys();
+        int i = keys.indexOf(key);
+        if (i < 0 || i == position) return;
+        keys.remove(i);
+        keys.add(position, key);
+        updatePositions(keys);
+    }
+
     @Query("UPDATE basket_meta SET position = :position WHERE item_key = :key")
     protected abstract void setPosition(String key, int position);
 

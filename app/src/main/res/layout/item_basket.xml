@@ -29,7 +29,8 @@
         android:layout_height="@dimen/height_item"
         android:background="@drawable/bg_item_ripple"
         android:clickable="true"
-        android:focusable="true">
+        android:focusable="true"
+        android:onDoubleClick="@{() -> model.onItemDoubleClick(item.key)}">
 
         <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/item_icon_view"
