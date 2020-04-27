@@ -1,8 +1,9 @@
 package alektas.pocketbasket.domain.usecases;
 
 import alektas.pocketbasket.domain.Repository;
+import io.reactivex.Completable;
 
-public class ResetItemsUseCase implements UseCase<Boolean, Boolean> {
+public class ResetItemsUseCase implements UseCase<Boolean, Completable> {
     private Repository mRepository;
 
     public ResetItemsUseCase(Repository repository) {
@@ -10,11 +11,11 @@ public class ResetItemsUseCase implements UseCase<Boolean, Boolean> {
     }
 
     @Override
-    public void execute(Boolean fullReset, Callback<Boolean> callback) {
+    public Completable execute(Boolean fullReset) {
         if (fullReset) {
-            mRepository.resetShowcase(callback);
+            return mRepository.resetShowcase();
         } else {
-            mRepository.returnDeletedItems(callback);
+            return mRepository.restoreShowcase();
         }
     }
 }

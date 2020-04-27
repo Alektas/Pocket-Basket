@@ -17,6 +17,7 @@ import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.domain.usecases.CleanBasketUseCase;
 import alektas.pocketbasket.domain.usecases.RemoveItemFromBasket;
 import alektas.pocketbasket.ui.MainActivity;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class BasketWidget extends AppWidgetProvider {
     public static final String ACTION_UPDATE_ITEMS = "alektas.pocketbasket.action.ACTION_UPDATE_ITEMS";
@@ -50,7 +51,8 @@ public class BasketWidget extends AppWidgetProvider {
                 break;
             case ACTION_CLEAN_BASKET:
                 new CleanBasketUseCase(RepositoryImpl.getInstance(context))
-                        .execute(null, successfully -> notifyWidgets(context));
+                        .execute(null)
+                        .subscribe(() -> notifyWidgets(context));
                 break;
             case ACTION_ITEM_TOUCH:
                 handleClick(context, intent.getExtras());
@@ -69,7 +71,9 @@ public class BasketWidget extends AppWidgetProvider {
         switch (action) {
             case ACTION_ITEM_DEL:
                 new RemoveItemFromBasket(RepositoryImpl.getInstance(context), true)
-                        .execute(itemName, successfully -> {
+                        .execute(itemName)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(() -> {
                             notifyWidgets(context);
                             String prefix = context.getResources().getString(R.string.widget_item_removed);
                             Toast.makeText(context, prefix + itemName, Toast.LENGTH_SHORT).show();
@@ -153,7 +157,7 @@ public class BasketWidget extends AppWidgetProvider {
         touchIntent.setAction(action);
         touchIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
         touchIntent.setData(Uri.parse(touchIntent.toUri(Intent.URI_INTENT_SCHEME)));
-        return PendingIntent.getBroadcast( context, 0, touchIntent,
+        return PendingIntent.getBroadcast(context, 0, touchIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }

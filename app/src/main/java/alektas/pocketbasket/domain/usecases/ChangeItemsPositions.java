@@ -14,12 +14,14 @@ public class ChangeItemsPositions implements UseCase<List<ItemModel>, Void> {
     }
 
     @Override
-    public void execute(List<ItemModel> items, Callback<Void> callback) {
-        if (items == null || items.isEmpty()) return;
+    public Void execute(List<ItemModel> items) {
+        if (items == null || items.isEmpty()) return null;
         List<String> keys = new ArrayList<>();
         for (ItemModel item : items) {
             keys.add(item.getKey());
         }
-        mRepository.updatePositions(keys);
+        mRepository.updateBasketPositions(keys);
+        return null;
     }
+
 }

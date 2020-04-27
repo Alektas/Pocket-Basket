@@ -23,11 +23,10 @@ import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.usecases.AddItemUseCase;
 import alektas.pocketbasket.domain.usecases.DelModeUseCase;
 import alektas.pocketbasket.domain.usecases.MarkAllBasketItems;
-import alektas.pocketbasket.domain.usecases.RemoveMarkedItems;
+import alektas.pocketbasket.domain.usecases.RemoveCheckedBasketItems;
 import alektas.pocketbasket.domain.usecases.ResetItemsUseCase;
 import alektas.pocketbasket.domain.usecases.SelectCategoryUseCase;
 import alektas.pocketbasket.domain.usecases.UpdateItemsUseCase;
-import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.domain.utils.Event;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.GuideObserver;
@@ -38,13 +37,16 @@ import alektas.pocketbasket.guide.domain.GuideCase;
 import alektas.pocketbasket.guide.domain.GuideCaseImpl;
 import alektas.pocketbasket.guide.domain.Requirement;
 import alektas.pocketbasket.utils.ResourcesUtils;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class ActivityViewModel extends AndroidViewModel implements GuideObserver {
     private static final String TAG = "ActivityViewModel";
     private Guide mGuide;
     private Repository mRepository;
+    private CompositeDisposable mDisposable = new CompositeDisposable();
 
-    private MutableLiveData<Boolean> showcaseModeData = new MutableLiveData<>();
+    private MutableLiveData<Boolean> viewModeData = new MutableLiveData<>();
     private MutableLiveData<Boolean> deleteModeData = new MutableLiveData<>();
     private MutableLiveData<Integer> deleteItemsCountData = new MutableLiveData<>();
     private MutableLiveData<Event<Boolean>> deleteCheckedEvent = new MutableLiveData<>();
@@ -72,17 +74,27 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     public ActivityViewModel(@NonNull Application application) {
         super(application);
         mRepository = RepositoryImpl.getInstance(application);
-        mRepository.showcaseModeData().observe(showcaseMode -> {
-            showcaseModeData.setValue(showcaseMode);
-            showcaseModeState.setState(showcaseMode);
-            if (showcaseMode) {
-                removeByTapInBasketModeState.setState(false);
-                removeCountState.setState(0);
-                markCountState.setState(0);
-            }
-        });
-        mRepository.delModeData().observe(deleteModeData::setValue);
-        mRepository.getDelItemsCountData().observe(deleteItemsCountData::setValue);
+        mDisposable.addAll(
+                mRepository.observeViewMode()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(isShowcaseMode -> {
+                            viewModeData.setValue(isShowcaseMode);
+                            showcaseModeState.setState(isShowcaseMode);
+                            if (isShowcaseMode) {
+                                removeByTapInBasketModeState.setState(false);
+                                removeCountState.setState(0);
+                                markCountState.setState(0);
+                            }
+                        }),
+
+                mRepository.observeDelMode()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(isDelMode -> deleteModeData.setValue(isDelMode)),
+
+                mRepository.getDelItemsCountData()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(delItemsCount -> deleteItemsCountData.setValue(delItemsCount))
+        );
 
         SharedPreferences guidePrefs = application.getSharedPreferences(
                 ResourcesUtils.getString(R.string.GUIDE_PREFERENCES_FILE_KEY),
@@ -101,8 +113,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     @Override
     protected void onCleared() {
         super.onCleared();
-        mRepository.showcaseModeData().clearObservers();
-        mRepository.delModeData().clearObservers();
+        mDisposable.clear();
         mRepository = null;
         mGuide.removeObserver(this);
     }
@@ -113,8 +124,7 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
      * @param tag item type or category
      */
     public void setFilter(String tag) {
-        UseCase<String, Void> useCase = new SelectCategoryUseCase(mRepository);
-        useCase.execute(tag, null);
+        new SelectCategoryUseCase(mRepository).execute(tag);
     }
 
     /**
@@ -123,34 +133,40 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
      * @param fullReset if true delete all user items
      */
     public void resetShowcase(boolean fullReset) {
-        new ResetItemsUseCase(mRepository).execute(fullReset, response -> {
-            resetShowcaseEvent.setValue(new Event<>(response));
-        });
+        mDisposable.add(
+                new ResetItemsUseCase(mRepository)
+                        .execute(fullReset)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                () -> resetShowcaseEvent.setValue(new Event<>(true)),
+                                error -> resetShowcaseEvent.setValue(new Event<>(false))
+                        )
+        );
     }
 
     /**
      * Update displayed item names that were changed with localization (exclude user items)
      */
     public void updateLocaleNames() {
-        new UpdateItemsUseCase(mRepository).execute(null, null);
+        new UpdateItemsUseCase(mRepository).execute(null);
     }
 
     public LiveData<Boolean> showcaseModeState() {
-        return showcaseModeData;
+        return viewModeData;
     }
 
     public boolean isShowcaseMode() {
-        if (showcaseModeData.getValue() == null) return true;
-        return showcaseModeData.getValue();
+        if (viewModeData.getValue() == null) return true;
+        return viewModeData.getValue();
     }
 
     public void setShowcaseMode(boolean showcaseMode) {
-        mRepository.setShowcaseMode(showcaseMode);
+        mRepository.setViewMode(showcaseMode);
         mGuide.onUserEvent(GuideContract.GUIDE_CHANGE_MODE);
     }
 
     public List<? extends ItemModel> getBasketItems() {
-        return mRepository.getBasketData().getValue();
+        return mRepository.getBasketData().blockingFirst();
     }
 
 
@@ -344,19 +360,25 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
 
     public void onCloseDelMode() {
         mGuide.onUserEvent(GuideContract.GUIDE_DEL_SELECTED_ITEMS);
-        new DelModeUseCase(mRepository).execute(false, null);
+        new DelModeUseCase(mRepository).execute(false);
     }
 
     public void onCheckAllBtnClick() {
         mGuide.onUserEvent(GuideContract.GUIDE_BASKET_MENU_HELP);
-        new MarkAllBasketItems(mRepository).execute(null, null);
+        new MarkAllBasketItems(mRepository).execute(null);
     }
 
     public void onDelCheckedBtnClick() {
         mGuide.onUserEvent(GuideContract.GUIDE_BASKET_MENU_HELP);
-        new RemoveMarkedItems(mRepository).execute(null, response -> {
-            deleteCheckedEvent.setValue(new Event<>(response));
-        });
+        mDisposable.add(
+                new RemoveCheckedBasketItems(mRepository)
+                        .execute(null)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(
+                                () -> deleteCheckedEvent.setValue(new Event<>(true)),
+                                error -> deleteCheckedEvent.setValue(new Event<>(false))
+                        )
+        );
     }
 
     /**
@@ -364,12 +386,17 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
      * then add it to the Basket
      */
     public void onSearch(String name) {
-        UseCase<String, Integer> useCase = new AddItemUseCase(mRepository);
-        useCase.execute(name, result -> {
-            if (result == AddItemUseCase.NEW_ITEM_ADDED) {
-                newItemAddedState.setState(true);
-            }
-        });
+        mDisposable.add(
+                new AddItemUseCase(mRepository)
+                        .execute(name)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(resultCode -> {
+                                    if (resultCode == AddItemUseCase.NEW_ITEM_ADDED) {
+                                        newItemAddedState.setState(true);
+                                    }
+                                }
+                        )
+        );
     }
 
 }

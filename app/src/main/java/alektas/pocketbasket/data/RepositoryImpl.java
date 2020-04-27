@@ -1,55 +1,58 @@
 package alektas.pocketbasket.data;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.AsyncTask;
-import android.util.Pair;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.Map;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.data.db.AppDatabase;
 import alektas.pocketbasket.data.db.dao.ItemsDao;
-import alektas.pocketbasket.data.db.entities.BasketMeta;
+import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.data.db.entities.Item;
+import alektas.pocketbasket.data.db.entities.ShowcaseItem;
 import alektas.pocketbasket.domain.Repository;
-import alektas.pocketbasket.domain.entities.BasketItemModel;
-import alektas.pocketbasket.domain.entities.ItemModel;
-import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
-import alektas.pocketbasket.domain.usecases.UseCase;
-import alektas.pocketbasket.domain.utils.MultiObservableValue;
-import alektas.pocketbasket.domain.utils.Observable;
-import alektas.pocketbasket.domain.utils.SingleObservableValue;
+import alektas.pocketbasket.domain.entities.CompletionException;
 import alektas.pocketbasket.utils.ResourcesUtils;
+import io.reactivex.Completable;
+import io.reactivex.Maybe;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Action;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
 
-public class RepositoryImpl implements Repository, ItemsUpdater {
+public class RepositoryImpl implements Repository {
     private static final String TAG = "RepositoryImpl";
     private static Repository INSTANCE;
-    private String mTag = ResourcesUtils.getResIdName(R.string.all);
     private ItemsDao mItemsDao;
 
-    private Observable<List<ShowcaseItemModel>> mShowcaseData;
-    private Observable<List<BasketItemModel>> mBasketData;
-    private Observable<Boolean> showcaseModeState;
-    private Observable<Boolean> delModeState;
+    private CompositeDisposable mShowcaseDisposable;
+    private BehaviorSubject<List<ShowcaseItem>> mShowcaseData;
+    private BehaviorSubject<Boolean> viewModeState;
+    private BehaviorSubject<Boolean> delModeState;
 
     /**
      * Items selected by the user for removal from the Showcase
      */
-    private List<ShowcaseItemModel> mDelItems;
-    private Observable<Integer> mDelItemsCountData;
+    private Map<String, ShowcaseItem> mDelItems;
+    private BehaviorSubject<Integer> mDelItemsCountData;
 
     private RepositoryImpl(Context context) {
         mItemsDao = AppDatabase.getInstance(context).getDao();
-        mShowcaseData = new SingleObservableValue<>(getShowcaseItems(mTag));
-        mBasketData = new SingleObservableValue<>(getBasketItems());
-        mDelItemsCountData = new SingleObservableValue<>(0);
-        showcaseModeState = new MultiObservableValue<>(true);
-        delModeState = new MultiObservableValue<>(false);
-        mDelItems = new ArrayList<>();
+        mShowcaseData = BehaviorSubject.create();
+        mDelItemsCountData = BehaviorSubject.create();
+        viewModeState = BehaviorSubject.create();
+        delModeState = BehaviorSubject.create();
+        mDelItems = new HashMap<>();
+        mShowcaseDisposable = new CompositeDisposable();
     }
 
     public static Repository getInstance(Context context) {
@@ -64,17 +67,29 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     }
 
     @Override
-    public Observable<Boolean> showcaseModeData() {
-        return showcaseModeState;
+    public Observable<List<ShowcaseItem>> getShowcaseData() {
+        return mShowcaseData;
     }
 
     @Override
-    public void setShowcaseMode(boolean showcaseMode) {
-        showcaseModeState.setValue(showcaseMode);
+    public Observable<List<BasketItem>> getBasketData() {
+        return mItemsDao.getBasketItems()
+                .subscribeOn(Schedulers.io());
     }
 
     @Override
-    public Observable<Boolean> delModeData() {
+    public Maybe<Item> getItemByName(String name) {
+        return mItemsDao.getItemByName(name)
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Observable<Boolean> observeViewMode() {
+        return viewModeState;
+    }
+
+    @Override
+    public Observable<Boolean> observeDelMode() {
         return delModeState;
     }
 
@@ -84,664 +99,191 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     }
 
     @Override
-    public void setDelMode(boolean delMode) {
-        delModeState.setValue(delMode);
-        if (!delMode) {
-            mDelItems.clear();
-            updateShowcase();
+    public void setViewMode(boolean isShowcaseMode) {
+        viewModeState.onNext(isShowcaseMode);
+    }
+
+    @Override
+    public void setDelMode(boolean isDelMode) {
+        mDelItems.clear();
+        delModeState.onNext(isDelMode);
+        if (!isDelMode) {
+            mShowcaseData.onNext(mapDeletingSelections(mShowcaseData.getValue(), mDelItems));
         }
     }
 
     @Override
-    public void selectForDeleting(ShowcaseItemModel item) {
+    public void toggleDeletingSelection(ShowcaseItem item) {
+        Log.d(TAG, "toggle selection");
         if (item.isRemoval()) {
-            mDelItems.remove(item);
+            mDelItems.remove(item.getKey());
         } else {
-            mDelItems.add(item);
+            mDelItems.put(item.getKey(), item);
         }
-        mDelItemsCountData.setValue(mDelItems.size());
-
-        updateShowcase();
+        mDelItemsCountData.onNext(mDelItems.size());
+        updateDeletingSelections();
     }
 
     @Override
     public void deleteSelectedItems() {
-        new deleteAllAsync(mItemsDao, this).execute(convert(mDelItems));
-    }
-
-    // TODO: make without converting
-    private List<Item> convert(@NonNull List<? extends ItemModel> models) {
-        List<Item> list = new ArrayList<>();
-        for (ItemModel model : models) {
-            list.add((Item) model);
-        }
-        return list;
+        launch(() -> mItemsDao.deleteItems(mDelItems.values()));
     }
 
 
     /* Basket methods */
 
-    /**
-     * @param key key of the item
-     * @return contain item position in Basket and mark state
-     */
-    private BasketMeta getItemMeta(String key) {
-        try {
-            return new getItemMetaAsync(mItemsDao).execute(key).get();
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    private List<BasketItemModel> getBasketItems() {
-        try {
-            return new getBasketItemsAsync(mItemsDao).execute().get();
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
+    @Override
+    public Single<Boolean> isItemInBasket(String key) {
+        return mItemsDao.getItemBasketMeta(key)
+                .subscribeOn(Schedulers.io())
+                .flatMapSingle(meta -> Single.just(true))
+                .onErrorReturn(error -> false);
     }
 
     @Override
-    public boolean isItemInBasket(String key) {
-        return getItemMeta(key) != null;
-    }
-
-
-    @Override
-    public void putToBasket(@NonNull String key) {
-        new putToBasketAsync(mItemsDao, this).execute(key);
+    public Completable putToBasket(@NonNull String key) {
+        return async(() -> mItemsDao.putToBasket(key));
     }
 
     @Override
-    public void updatePositions(List<String> keys) {
-        new updatePositionsAsync(mItemsDao, this).execute(keys);
+    public void updateBasketPositions(List<String> keys) {
+        launch(() -> mItemsDao.updateBasketPositions(keys));
     }
 
     @Override
-    public void updatePosition(String key, int position) {
-        new updatePositionAsync(mItemsDao, this).execute(new Pair<>(key, position));
-    }
-
-    // Change item state in "Basket"
-    @Override
-    public void markItem(@NonNull String key) {
-        new markAsync(mItemsDao, this).execute(key);
-    }
-
-    // Check all items in Basket (or uncheck if already all items are checked)
-    @Override
-    public void markAll() {
-        new markAllAsync(mItemsDao, this).execute();
-    }
-
-    // Delete item from "Basket"
-    @Override
-    public void removeFromBasket(@NonNull String key) {
-        new removeBasketItemAsync(mItemsDao, this).execute(key);
+    public void updateBasketItemPosition(String key, int position) {
+        launch(() -> mItemsDao.updateBasketItemPosition(key, position));
     }
 
     @Override
-    public void removeFromBasket(String key, UseCase.Callback<Boolean> callback) {
-        if (callback == null) {
-            new removeBasketItemAsync(mItemsDao, this).execute(key);
-            return;
-        }
-        new removeBasketItemAsync(mItemsDao, this, callback).execute(key);
-    }
-
-    // Delete all checked items from "Basket"
-    @Override
-    public void removeMarked(UseCase.Callback<Boolean> callback) {
-        new removeBasketMarkedAsync(mItemsDao, this, callback).execute();
+    public void toggleBasketItemCheck(@NonNull String key) {
+        launch(() -> mItemsDao.toggleBasketItemCheck(key));
     }
 
     @Override
-    public void cleanBasket(UseCase.Callback<Boolean> callback) {
-        new cleanBasketAsync(mItemsDao, this, callback).execute();
+    public void toggleBasketCheck() {
+        launch(() -> mItemsDao.toggleBasketCheck());
     }
+
+    @Override
+    public Completable removeFromBasket(@NonNull String key) {
+        return async(() -> mItemsDao.removeBasketItem(key));
+    }
+
+    @SuppressLint("CheckResult")
+    @Override
+    public Completable removeCheckedBasketItems() {
+        return Completable
+                .create(emitter -> {
+                    if (mItemsDao.removeCheckedBasketItems()) {
+                        emitter.onComplete();
+                    } else {
+                        emitter.onError(new CompletionException());
+                    }
+                })
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Completable cleanBasket() {
+        return mItemsDao.cleanBasket()
+                .subscribeOn(Schedulers.io());
+    }
+
 
     /* Showcase methods */
 
     @Override
     public void addNewItem(String name) {
-        new addNewItem(mItemsDao, this).execute(name);
+        launch(() -> mItemsDao.addNewItem(name));
     }
 
-    // Show in Showcase only items with specified tag
+    @SuppressLint("CheckResult")
     @Override
-    public void setFilter(String tag) {
-        mTag = tag;
-        updateShowcase();
-    }
+    public void setCategory(String tag) {
+        if (tag == null) return;
 
-    // Return default showcase items
-    @Override
-    public void resetShowcase(UseCase.Callback<Boolean> callback) {
-        new resetAsync(mItemsDao, this, callback).execute();
-    }
-
-    @Override
-    public void returnDeletedItems(UseCase.Callback<Boolean> callback) {
-        new returnDeletedItemsAsync(mItemsDao, this, callback).execute();
-    }
-
-    @Override
-    public void updateNames() {
-        new updateDisplayedNamesAsync(mItemsDao, this).execute();
-    }
-
-    // Set value to Showcase Data to notify observers
-    @Override
-    public void updateShowcase() {
-        // Get items according to the selected category (tag)
-        List<ShowcaseItemModel> items = getShowcaseItems(mTag);
-        // In del mode set removal state to the selected for deletion items
-        if (items != null && delModeState.getValue()) {
-            for (ShowcaseItemModel delItem : mDelItems) {
-                int i = items.indexOf(delItem);
-                if (i >= 0) items.get(i).setRemoval(true);
-            }
+        mShowcaseDisposable.clear();
+        if (tag.equals(ResourcesUtils.getResIdName(R.string.all))) {
+            mShowcaseDisposable.add(mItemsDao.getShowcaseItems()
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(this::updateShowcase));
+            return;
         }
-
-        mShowcaseData.setValue(items);
-    }
-
-    // Set value to the Basket Data to notify observers
-    @Override
-    public void updateBasket() {
-        mBasketData.setValue(getBasketItems());
-    }
-
-
-    /* Data getters */
-
-    @Override
-    public Observable<List<ShowcaseItemModel>> getShowcaseData() {
-        return mShowcaseData;
+        mShowcaseDisposable.add(mItemsDao.getShowcaseItems(tag)
+                .subscribeOn(Schedulers.io())
+                .subscribe(this::updateShowcase));
     }
 
     @Override
-    public Observable<List<BasketItemModel>> getBasketData() {
-        return mBasketData;
+    public Completable resetShowcase() {
+        return async(() -> mItemsDao.resetShowcase());
     }
 
     @Override
-    public ItemModel getItemByName(String name) {
-        try {
-            return new getItemByNameAsync(mItemsDao).execute(name).get();
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public Completable restoreShowcase() {
+        return async(() -> mItemsDao.restoreShowcase());
     }
 
-    private List<ShowcaseItemModel> getShowcaseItems(String tag) {
-        try {
-            return new getShowcaseAsync(mItemsDao).execute(tag).get();
-        }
-        catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        return null;
+    @SuppressLint("CheckResult")
+    @Override
+    public void updateDisplayedNames() {
+        mItemsDao.getAllItems()
+                .subscribeOn(Schedulers.io())
+                .subscribe(items -> {
+                    for (Item item : items) {
+                        if (item.getNameRes() == null) continue;
+                        item.setName(ResourcesUtils.getString(item.getNameRes()));
+                    }
+                    mItemsDao.update(items);
+                });
     }
 
-
-    /* AsyncTasks */
-
-    private static class getBasketItemsAsync extends AsyncTask<Void, Void, List<BasketItemModel>> {
-        private ItemsDao mDao;
-
-        getBasketItemsAsync(ItemsDao dao) { mDao = dao; }
-
-        @Override
-        protected List<BasketItemModel> doInBackground(Void... voids) {
-            return new ArrayList<>(mDao.getBasketItems());
-        }
+    @SuppressLint("CheckResult")
+    private void launch(Action action) {
+        Completable.complete()
+                .observeOn(Schedulers.io())
+                .subscribe(action);
     }
 
-    private static class getItemByNameAsync extends AsyncTask<String, Void, ItemModel> {
-        ItemsDao mDao;
-
-        getItemByNameAsync(ItemsDao dao) {
-            mDao = dao;
-        }
-
-        @Override
-        protected ItemModel doInBackground(String... strings) {
-            return mDao.getItemByName(strings[0]);
-        }
+    @SuppressLint("CheckResult")
+    private Completable async(Action action) {
+        Completable c = Completable.fromAction(action).subscribeOn(Schedulers.io()).cache();
+        c.subscribe(
+                () -> {/* empty */},
+                error -> Log.e(TAG, "Error happened in async operation", error));
+        return c;
     }
 
-    private static class getShowcaseAsync extends AsyncTask<String, Void, List<ShowcaseItemModel>> {
-        private ItemsDao mDao;
-
-        getShowcaseAsync(ItemsDao dao) { mDao = dao; }
-
-        @Override
-        protected List<ShowcaseItemModel> doInBackground(String... tags) {
-            if (tags.length == 0
-                    || tags[0] == null
-                    || tags[0].equals(ResourcesUtils.getResIdName(R.string.all))) {
-                return new ArrayList<>(mDao.getShowcaseItems());
-            }
-            else {
-                return new ArrayList<>(mDao.getShowcaseItems(tags[0]));
-            }
+    private void updateShowcase(List<ShowcaseItem> items) {
+        if (delModeState.hasValue() && delModeState.getValue()) {
+            updateDeletingSelections(items);
+            return;
         }
+        mShowcaseData.onNext(items);
     }
 
-    private static class updatePositionsAsync extends AsyncTask<List<String>, Void, Void> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-
-        updatePositionsAsync(ItemsDao dao) {
-            mDao = dao;
-        }
-
-        updatePositionsAsync(ItemsDao dao, ItemsUpdater updater) {
-            mDao = dao;
-            mUpdater = updater;
-        }
-
-        @SafeVarargs
-        @Override
-        protected final Void doInBackground(List<String>... names) {
-            mDao.updatePositions(names[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) {
-                mUpdater.updateBasket();
-            }
-        }
+    private void updateDeletingSelections() {
+        List<ShowcaseItem> items = mShowcaseData.getValue();
+        if (items == null) return;
+        updateDeletingSelections(items);
     }
 
-    private static class updatePositionAsync extends AsyncTask<Pair<String, Integer>, Void, Void> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-
-        updatePositionAsync(ItemsDao dao) {
-            mDao = dao;
-        }
-
-        updatePositionAsync(ItemsDao dao, ItemsUpdater updater) {
-            mDao = dao;
-            mUpdater = updater;
-        }
-
-        @SafeVarargs
-        @Override
-        protected final Void doInBackground(Pair<String, Integer>... request) {
-            mDao.updatePosition(request[0].first, request[0].second);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) {
-                mUpdater.updateBasket();
-            }
-        }
+    private void updateDeletingSelections(List<ShowcaseItem> items) {
+        mShowcaseData.onNext(mapDeletingSelections(items, mDelItems));
     }
 
-    private static class getItemMetaAsync extends AsyncTask<String, Void, BasketMeta> {
-        private ItemsDao mDao;
-
-        getItemMetaAsync(ItemsDao dao) { mDao = dao; }
-
-        @Override
-        protected BasketMeta doInBackground(String... meta) {
-            return mDao.getItemMeta(meta[0]);
+    private List<ShowcaseItem> mapDeletingSelections(
+            List<ShowcaseItem> items,
+            Map<String, ShowcaseItem> selectedItems
+    ) {
+        List<ShowcaseItem> updatedItems = new ArrayList<>(items.size());
+        for (int i = 0; i < items.size(); i++) {
+            ShowcaseItem item = items.get(i).copy();
+            item.setRemoval(selectedItems.containsKey(item.getKey()));
+            updatedItems.add(item);
         }
+        return updatedItems;
     }
 
-    private static class putToBasketAsync extends AsyncTask<String, Void, Void> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-
-        putToBasketAsync(ItemsDao dao) { mDao = dao; }
-
-        putToBasketAsync(ItemsDao dao, ItemsUpdater updater) {
-            this(dao);
-            mUpdater = updater;
-        }
-
-        @Override
-        protected final Void doInBackground(String... names) {
-            mDao.putItemToBasket(names[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) {
-                mUpdater.updateShowcase();
-                mUpdater.updateBasket();
-            }
-        }
-    }
-
-    private static class markAsync extends AsyncTask<String, Void, Void> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-
-        markAsync(ItemsDao dao) { mDao = dao; }
-
-        markAsync(ItemsDao dao, ItemsUpdater updater) {
-            this(dao);
-            mUpdater = updater;
-        }
-
-        @Override
-        protected final Void doInBackground(String... state) {
-            mDao.mark(state[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) {
-                mUpdater.updateBasket();
-            }
-        }
-    }
-
-    private static class markAllAsync extends AsyncTask<Void, Void, Void> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-
-        markAllAsync(ItemsDao dao) { mDao = dao; }
-
-        markAllAsync(ItemsDao dao, ItemsUpdater updater) {
-            mDao = dao;
-            mUpdater = updater;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            mDao.markAll();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) {
-                mUpdater.updateBasket();
-            }
-        }
-    }
-
-    private static class cleanBasketAsync extends AsyncTask<Void, Void, Void> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-        private UseCase.Callback<Boolean> mCallback;
-
-        cleanBasketAsync(ItemsDao dao) { mDao = dao; }
-
-        cleanBasketAsync(ItemsDao dao, ItemsUpdater updater) {
-            mDao = dao;
-            mUpdater = updater;
-        }
-
-        cleanBasketAsync(ItemsDao dao, ItemsUpdater updater, UseCase.Callback<Boolean> callback) {
-            mDao = dao;
-            mUpdater = updater;
-            mCallback = callback;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            mDao.cleanBasket();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) {
-                mUpdater.updateBasket();
-                mUpdater.updateShowcase();
-            }
-            if (mCallback != null) mCallback.onResponse(true);
-        }
-    }
-
-    private static class removeBasketMarkedAsync extends AsyncTask<Void, Void, Boolean> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-        private UseCase.Callback<Boolean> mCallback;
-
-        removeBasketMarkedAsync(ItemsDao dao) { mDao = dao; }
-
-        removeBasketMarkedAsync(ItemsDao dao, ItemsUpdater updater) {
-            this(dao);
-            mUpdater = updater;
-        }
-
-        removeBasketMarkedAsync(ItemsDao dao, ItemsUpdater updater, UseCase.Callback<Boolean> callback) {
-            this(dao, updater);
-            mCallback = callback;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... voids) {
-            return mDao.removeCheckedBasket();
-        }
-
-        @Override
-        protected void onPostExecute(Boolean isSuccess) {
-            if (mUpdater != null) {
-                mUpdater.updateShowcase();
-                mUpdater.updateBasket();
-            }
-            if (mCallback != null) {
-                mCallback.onResponse(isSuccess);
-                mCallback = null;
-            }
-        }
-    }
-
-    private static class removeBasketItemAsync extends AsyncTask<String, Void, Void> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-        private UseCase.Callback<Boolean> mCallback;
-
-        removeBasketItemAsync(ItemsDao dao) { mDao = dao; }
-
-        removeBasketItemAsync(ItemsDao dao, ItemsUpdater updater) {
-            this(dao);
-            mUpdater = updater;
-        }
-
-        removeBasketItemAsync(ItemsDao dao, ItemsUpdater updater, UseCase.Callback<Boolean> callback) {
-            this(dao, updater);
-            mCallback = callback;
-        }
-
-        @Override
-        protected final Void doInBackground(String... name) {
-            mDao.removeBasketItem(name[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) {
-                mUpdater.updateShowcase();
-                mUpdater.updateBasket();
-            }
-            if (mCallback != null) {
-                mCallback.onResponse(true);
-                mCallback = null;
-            }
-        }
-    }
-
-    private static class addNewItem extends AsyncTask<String, Void, Void> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-
-        addNewItem(ItemsDao dao) { mDao = dao; }
-
-        addNewItem(ItemsDao dao, ItemsUpdater updater) {
-            this(dao);
-            mUpdater = updater;
-        }
-
-        @Override
-        protected final Void doInBackground(String... name) {
-            mDao.addNewItem(name[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) {
-                mUpdater.updateShowcase();
-                mUpdater.updateBasket();
-            }
-        }
-    }
-
-    private static class deleteAllAsync extends AsyncTask<List<Item>, Void, Void> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-
-        deleteAllAsync(ItemsDao dao) { mDao = dao; }
-
-        deleteAllAsync(ItemsDao dao, ItemsUpdater updater) {
-            this(dao);
-            mUpdater = updater;
-        }
-
-        @SafeVarargs
-        @Override
-        protected final Void doInBackground(List<Item>... items) {
-            mDao.deleteItems(items[0]);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) {
-                mUpdater.updateShowcase();
-                mUpdater.updateBasket();
-            }
-        }
-    }
-
-    private static class resetAsync extends AsyncTask<Void, Void, Void> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-        private UseCase.Callback<Boolean> mCallback;
-
-        resetAsync(ItemsDao dao) { mDao = dao; }
-
-        resetAsync(ItemsDao dao, ItemsUpdater updater) {
-            this(dao);
-            mUpdater = updater;
-        }
-
-        resetAsync(ItemsDao dao, ItemsUpdater updater, UseCase.Callback<Boolean> callback) {
-            this(dao, updater);
-            mCallback = callback;
-        }
-
-        @Override
-        protected final Void doInBackground(Void... voids) {
-            mDao.fullReset();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) {
-                mUpdater.updateShowcase();
-                mUpdater.updateBasket();
-            }
-            if (mCallback != null) {
-                mCallback.onResponse(true);
-                mCallback = null;
-            }
-        }
-    }
-
-    private static class returnDeletedItemsAsync extends AsyncTask<Void, Void, Void> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-        private UseCase.Callback<Boolean> mCallback;
-
-        returnDeletedItemsAsync(ItemsDao dao) {
-            mDao = dao;
-        }
-
-        returnDeletedItemsAsync(ItemsDao dao, ItemsUpdater updater) {
-            this(dao);
-            mUpdater = updater;
-        }
-
-        returnDeletedItemsAsync(ItemsDao dao, ItemsUpdater updater, UseCase.Callback<Boolean> callback) {
-            this(dao, updater);
-            mCallback = callback;
-        }
-
-        @Override
-        protected final Void doInBackground(Void... voids) {
-            mDao.returnDeletedItems();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) mUpdater.updateShowcase();
-            if (mCallback != null) {
-                mCallback.onResponse(true);
-                mCallback = null;
-            }
-        }
-    }
-
-    private static class updateDisplayedNamesAsync extends AsyncTask<Void, Void, Void> {
-        private ItemsDao mDao;
-        private ItemsUpdater mUpdater;
-
-        updateDisplayedNamesAsync(ItemsDao dao) {
-            mDao = dao;
-        }
-
-        updateDisplayedNamesAsync(ItemsDao dao, ItemsUpdater updater) {
-            this(dao);
-            mUpdater = updater;
-        }
-
-        @Override
-        protected final Void doInBackground(Void... voids) {
-            List<Item> items = new ArrayList<>(mDao.getShowcaseItems());
-            for (Item item : items) {
-                if (item.getNameRes() == null) continue;
-                item.setName(ResourcesUtils.getString(item.getNameRes()));
-            }
-
-            mDao.update(items);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) {
-                mUpdater.updateShowcase();
-                mUpdater.updateBasket();
-            }
-        }
-    }
 }
-
-
-
-
-
-
-

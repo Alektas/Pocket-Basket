@@ -17,6 +17,7 @@ import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.transition.TransitionSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;

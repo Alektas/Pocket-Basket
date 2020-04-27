@@ -6,19 +6,18 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import alektas.pocketbasket.data.db.AppDatabase;
 import alektas.pocketbasket.data.db.dao.ItemsDao;
 import alektas.pocketbasket.data.db.entities.Item;
 import alektas.pocketbasket.utils.ResourcesUtils;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class ItemsProvider extends ContentProvider {
     private static final String TAG = "ItemsProvider";
@@ -38,7 +37,6 @@ public class ItemsProvider extends ContentProvider {
 
         String query = uri.getLastPathSegment();
         MatrixCursor cursor = new MatrixCursor(ItemsContract.SEARCH_COLUMNS);
-        List<Item> items = new ArrayList<>();
         ItemsDao dao = AppDatabase.getInstance(getContext()).getDao();
 
         if (SearchManager.SUGGEST_URI_PATH_QUERY.equals(query)) {
@@ -48,11 +46,9 @@ public class ItemsProvider extends ContentProvider {
         } else {
             // query contains the users search
             // return a cursor with appropriate data
-            try {
-                items = new searchAsync(dao).execute(query).get();
-            } catch (ExecutionException | InterruptedException e) {
-                e.printStackTrace();
-            }
+            List<Item> items = dao.search("%" + query + "%")
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .blockingGet(new ArrayList<>());
 
             return fillCursor(cursor, items);
         }
@@ -62,24 +58,13 @@ public class ItemsProvider extends ContentProvider {
         int i = 0;
         for (Item item : items) {
             // Cursor fields assigned in the ItemsContract.
-            cursor.addRow(new Object[] {i,                      // ID
+            cursor.addRow(new Object[]{i,                      // ID
                     item.getName(),                             // visible text
                     ResourcesUtils.getImgId(item.getImgRes()),  // image resource ID
                     item.getKey()});                           // data(key = name)
             i++;
         }
         return cursor;
-    }
-
-    private static class searchAsync extends AsyncTask<String, Void, List<Item>> {
-        private ItemsDao mDao;
-
-        searchAsync(ItemsDao dao) { mDao = dao; }
-
-        @Override
-        protected List<Item> doInBackground(String... query) {
-            return mDao.search("%" + query[0] + "%");
-        }
     }
 
     @Nullable
@@ -103,4 +88,5 @@ public class ItemsProvider extends ContentProvider {
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
         return 0;
     }
+
 }

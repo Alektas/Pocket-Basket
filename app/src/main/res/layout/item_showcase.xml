@@ -2,12 +2,11 @@
 <layout>
 
     <data>
-
         <import type="alektas.pocketbasket.utils.ResourcesUtils" />
 
         <variable
             name="item"
-            type="alektas.pocketbasket.domain.entities.ShowcaseItemModel" />
+            type="alektas.pocketbasket.data.db.entities.ShowcaseItem" />
 
         <variable
             name="model"

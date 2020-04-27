@@ -8,7 +8,7 @@
 
         <variable
             name="item"
-            type="alektas.pocketbasket.domain.entities.BasketItemModel" />
+            type="alektas.pocketbasket.data.db.entities.BasketItem" />
 
         <variable
             name="model"

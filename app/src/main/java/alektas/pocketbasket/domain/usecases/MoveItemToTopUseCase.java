@@ -10,9 +10,9 @@ public class MoveItemToTopUseCase implements UseCase<String, Void> {
     }
 
     @Override
-    public void execute(String itemKey, Callback<Void> callback) {
-        if (itemKey == null) return;
-
-        mRepository.updatePosition(itemKey, 0);
+    public Void execute(String itemKey) {
+        if (itemKey != null) mRepository.updateBasketItemPosition(itemKey, 0);
+        return null;
     }
+
 }

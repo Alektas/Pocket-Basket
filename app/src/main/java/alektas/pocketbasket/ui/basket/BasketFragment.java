@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.domain.entities.BasketItemModel;
+import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.ui.ItemSizeProvider;
 
 /**
@@ -98,7 +98,7 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
         });
     }
 
-    private void setItems(List<BasketItemModel> items) {
+    private void setItems(List<BasketItem> items) {
         mBasketAdapter.setItems(new ArrayList<>(items), () -> scrollToTop(items.size()));
     }
 

@@ -13,7 +13,9 @@ public class MarkAllBasketItems implements UseCase<Void, Void> {
     }
 
     @Override
-    public void execute(Void v, Callback<Void> callback) {
-        mRepository.markAll();
+    public Void execute(Void v) {
+        mRepository.toggleBasketCheck();
+        return null;
     }
+
 }

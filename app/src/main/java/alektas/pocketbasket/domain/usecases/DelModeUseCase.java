@@ -10,7 +10,9 @@ public class DelModeUseCase implements UseCase<Boolean, Void> {
     }
 
     @Override
-    public void execute(Boolean delMode, Callback<Void> callback) {
+    public Void execute(Boolean delMode) {
         mRepository.setDelMode(delMode);
+        return null;
     }
+
 }

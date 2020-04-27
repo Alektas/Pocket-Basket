@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.BuildConfig;
-import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
+import alektas.pocketbasket.data.db.entities.ShowcaseItem;
 
 public class AdManager {
     private static final int MIN_OFFSET_OF_ADS = 8;
@@ -113,7 +113,7 @@ public class AdManager {
      * @param products list of products in which the latest loaded ads should be inserted
      * @return combined list with products and ads
      */
-    public List<Object> combineWithLatestAds(List<ShowcaseItemModel> products) {
+    public List<Object> combineWithLatestAds(List<ShowcaseItem> products) {
         return combine(products, mNativeAds, MIN_OFFSET_OF_ADS);
     }
 
@@ -127,7 +127,7 @@ public class AdManager {
      *                     it allows to not overload the list with ads.
      * @return combined list with products and ads
      */
-    public List<Object> combine(List<ShowcaseItemModel> products, List<NativeAdWrapper> ads, int minAdsOffset) {
+    public List<Object> combine(List<ShowcaseItem> products, List<NativeAdWrapper> ads, int minAdsOffset) {
         if (ads.size() <= 0) return new ArrayList<>(products);
 
         List<Object> combined = new ArrayList<>(products);

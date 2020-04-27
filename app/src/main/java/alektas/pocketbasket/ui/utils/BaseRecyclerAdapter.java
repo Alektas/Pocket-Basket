@@ -11,11 +11,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import alektas.pocketbasket.data.db.entities.BasketItem;
+import alektas.pocketbasket.data.db.entities.ShowcaseItem;
 import alektas.pocketbasket.databinding.ItemBasketBinding;
 import alektas.pocketbasket.databinding.ItemShowcaseBinding;
-import alektas.pocketbasket.domain.entities.BasketItemModel;
 import alektas.pocketbasket.domain.entities.ItemModel;
-import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 
 public abstract class BaseRecyclerAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -41,10 +41,10 @@ public abstract class BaseRecyclerAdapter
 
         void bind(alektas.pocketbasket.domain.entities.ItemModel item, RecyclerView.ViewHolder holder) {
             if (mBinding instanceof ItemShowcaseBinding) {
-                ((ItemShowcaseBinding) mBinding).setItem((ShowcaseItemModel) item);
+                ((ItemShowcaseBinding) mBinding).setItem((ShowcaseItem) item);
             }
             if (mBinding instanceof ItemBasketBinding) {
-                ((ItemBasketBinding) mBinding).setItem((BasketItemModel) item);
+                ((ItemBasketBinding) mBinding).setItem((BasketItem) item);
                 ((ItemBasketBinding) mBinding).setHolder(holder);
             }
             mBinding.executePendingBindings();

@@ -8,7 +8,7 @@ import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
 
 public class ShowcaseItem extends Item implements ShowcaseItemModel {
     @ColumnInfo(name = "in_basket")
-    private int existInBasket;
+    private boolean existInBasket;
 
     @Ignore
     private boolean isRemoval;
@@ -17,18 +17,12 @@ public class ShowcaseItem extends Item implements ShowcaseItemModel {
         super(key, name, nameRes, imgRes, tagRes);
     }
 
-    public int getExistInBasket() {
+    public boolean getExistInBasket() {
         return existInBasket;
     }
-    public boolean isExistInBasket() {
-        return existInBasket != 0;
-    }
 
-    public void setExistInBasket(int existInBasket) {
-        this.existInBasket = existInBasket;
-    }
     public void setExistInBasket(boolean existInBasket) {
-        this.existInBasket = existInBasket ? 1 : 0;
+        this.existInBasket = existInBasket;
     }
 
     @Override
@@ -39,6 +33,19 @@ public class ShowcaseItem extends Item implements ShowcaseItemModel {
     @Override
     public void setRemoval(boolean removal) {
         isRemoval = removal;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return super.toString() + "[ existInBasket = " + existInBasket + "; isRemoval = " + isRemoval + " ]";
+    }
+
+    public ShowcaseItem copy() {
+        ShowcaseItem item = new ShowcaseItem(getKey(), getName(), getNameRes(), getImgRes(), getTagRes());
+        item.setExistInBasket(existInBasket);
+        item.setRemoval(isRemoval);
+        return item;
     }
 
 }

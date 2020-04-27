@@ -10,7 +10,8 @@ public class SelectCategoryUseCase implements UseCase<String, Void> {
     }
 
     @Override
-    public void execute(String s, Callback<Void> callback) {
-        mRepository.setFilter(s);
+    public Void execute(String s) {
+        mRepository.setCategory(s);
+        return null;
     }
 }

@@ -13,8 +13,10 @@ import java.util.List;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.data.RepositoryImpl;
-import alektas.pocketbasket.domain.entities.BasketItemModel;
+import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.utils.ResourcesUtils;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class BasketWidgetService extends RemoteViewsService {
     @Override
@@ -45,16 +47,20 @@ class BasketWidgetFactory implements RemoteViewsService.RemoteViewsFactory {
     }
 
     private void updateItems() {
+        CompositeDisposable d = new CompositeDisposable();
         widgetItems.clear();
-        List<BasketItemModel> items =
-                RepositoryImpl.getInstance(mContext).getBasketData().getValue();
-        for (BasketItemModel item : items) {
-            WidgetBasketItem widgetItem = new WidgetBasketItem(item.getName(), item.getImgRes());
-            if (item.getName().equals(BasketWidget.REMOVAL_ITEM)){
-                widgetItem.setRemoval(true);
-            }
-            widgetItems.add(widgetItem);
-        }
+        d.add(RepositoryImpl.getInstance(mContext).getBasketData()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(items -> {
+                    for (BasketItem item : items) {
+                        WidgetBasketItem widgetItem = new WidgetBasketItem(item.getName(), item.getImgRes());
+                        if (item.getName().equals(BasketWidget.REMOVAL_ITEM)) {
+                            widgetItem.setRemoval(true);
+                        }
+                        widgetItems.add(widgetItem);
+                    }
+                    d.clear();
+                }));
     }
 
     @Override
@@ -170,5 +176,6 @@ class BasketWidgetFactory implements RemoteViewsService.RemoteViewsFactory {
     public boolean hasStableIds() {
         return true;
     }
+
 }
 

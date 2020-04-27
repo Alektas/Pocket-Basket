@@ -28,17 +28,17 @@ class ChangeItemsPositionsTest {
     @Test
     @DisplayName("null -> not invoke updating positions")
     void execute_nullRequest_notInvokeUpdatingPositions() {
-        changePositionUseCase.execute(null, null);
+        changePositionUseCase.execute(null);
 
-        verify(mRepository, never()).updatePositions(anyList());
+        verify(mRepository, never()).updateBasketPositions(anyList());
     }
 
     @Test
     @DisplayName("empty list -> not invoke updating positions")
     void execute_emptyRequest_notInvokeUpdatingPositions() {
-        changePositionUseCase.execute(Collections.emptyList(), null);
+        changePositionUseCase.execute(Collections.emptyList());
 
-        verify(mRepository, never()).updatePositions(anyList());
+        verify(mRepository, never()).updateBasketPositions(anyList());
     }
 
     @Test
@@ -46,9 +46,9 @@ class ChangeItemsPositionsTest {
     void execute_singleItem_invokeUpdatingPosition() {
         ItemModel item1 = mock(ItemModel.class);
         when(item1.getKey()).thenReturn("Key1");
-        changePositionUseCase.execute(Collections.singletonList(item1), null);
+        changePositionUseCase.execute(Collections.singletonList(item1));
 
-        verify(mRepository).updatePositions(Collections.singletonList("Key1"));
+        verify(mRepository).updateBasketPositions(Collections.singletonList("Key1"));
     }
 
     @Test
@@ -58,8 +58,8 @@ class ChangeItemsPositionsTest {
         when(item1.getKey()).thenReturn("Key1");
         ItemModel item2 = mock(ItemModel.class);
         when(item2.getKey()).thenReturn("Key2");
-        changePositionUseCase.execute(Arrays.asList(item1, item2), null);
+        changePositionUseCase.execute(Arrays.asList(item1, item2));
 
-        verify(mRepository).updatePositions(Arrays.asList("Key1", "Key2"));
+        verify(mRepository).updateBasketPositions(Arrays.asList("Key1", "Key2"));
     }
 }

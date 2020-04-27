@@ -18,14 +18,14 @@ import java.util.List;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.ads.AdManager;
-import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
+import alektas.pocketbasket.data.db.entities.ShowcaseItem;
 import alektas.pocketbasket.ui.ItemSizeProvider;
 import alektas.pocketbasket.utils.NetworkMonitor;
 
 public class ShowcaseFragment extends Fragment {
     private NetworkMonitor mNetworkMonitor;
     private AdManager mAdManager;
-    private List<ShowcaseItemModel> mProducts = new ArrayList<>();
+    private List<ShowcaseItem> mProducts = new ArrayList<>();
     private ShowcaseViewModel mViewModel;
     private ShowcaseRvAdapter mShowcaseAdapter;
     private ItemSizeProvider mItemSizeProvider;

@@ -49,7 +49,7 @@ class ItemsDiffCallback extends DiffUtil.Callback {
             ShowcaseItem newShowcaseItem = (ShowcaseItem) newItem;
             return oldShowcaseItem.getName().equals(newShowcaseItem.getName())
                     && oldShowcaseItem.isRemoval() == newShowcaseItem.isRemoval()
-                    && oldShowcaseItem.isExistInBasket() == newShowcaseItem.isExistInBasket();
+                    && oldShowcaseItem.getExistInBasket() == newShowcaseItem.getExistInBasket();
         } else if (oldItem instanceof NativeAdWrapper && newItem instanceof NativeAdWrapper) {
             NativeAdWrapper oldAd = (NativeAdWrapper) oldItem;
             NativeAdWrapper newAd = (NativeAdWrapper) newItem;

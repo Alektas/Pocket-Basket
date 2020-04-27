@@ -1,9 +1,9 @@
 package alektas.pocketbasket.domain.usecases;
 
 import alektas.pocketbasket.domain.Repository;
-import alektas.pocketbasket.domain.entities.ItemModel;
+import io.reactivex.Completable;
 
-public class RemoveItemFromBasket implements UseCase<String, Boolean> {
+public class RemoveItemFromBasket implements UseCase<String, Completable> {
     private Repository mRepository;
     private boolean byName;
 
@@ -17,12 +17,11 @@ public class RemoveItemFromBasket implements UseCase<String, Boolean> {
     }
 
     @Override
-    public void execute(String s, Callback<Boolean> callback) {
+    public Completable execute(String s) {
         if (byName) {
-            ItemModel item = mRepository.getItemByName(s);
-            if (item == null) return;
-            s = item.getKey();
+            return mRepository.getItemByName(s)
+                    .flatMapCompletable(item -> mRepository.removeFromBasket(item.getKey()));
         }
-        mRepository.removeFromBasket(s, callback);
+        return mRepository.removeFromBasket(s);
     }
 }
