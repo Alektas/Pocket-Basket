@@ -4,9 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Ignore;
 
-import alektas.pocketbasket.domain.entities.ShowcaseItemModel;
-
-public class ShowcaseItem extends Item implements ShowcaseItemModel {
+public class ShowcaseItem extends Item {
     @ColumnInfo(name = "in_basket")
     private boolean existInBasket;
 
@@ -25,12 +23,10 @@ public class ShowcaseItem extends Item implements ShowcaseItemModel {
         this.existInBasket = existInBasket;
     }
 
-    @Override
     public boolean isRemoval() {
         return isRemoval;
     }
 
-    @Override
     public void setRemoval(boolean removal) {
         isRemoval = removal;
     }

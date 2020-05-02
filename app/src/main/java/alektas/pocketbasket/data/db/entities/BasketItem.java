@@ -3,9 +3,7 @@ package alektas.pocketbasket.data.db.entities;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 
-import alektas.pocketbasket.domain.entities.BasketItemModel;
-
-public class BasketItem extends Item implements BasketItemModel {
+public class BasketItem extends Item {
     @ColumnInfo(name = "marked")
     private boolean isMarked;
 
@@ -13,12 +11,10 @@ public class BasketItem extends Item implements BasketItemModel {
         super(key, name, nameRes, imgRes, tagRes);
     }
 
-    @Override
     public boolean isMarked() {
         return isMarked;
     }
 
-    @Override
     public void setMarked(boolean marked) {
         isMarked = marked;
     }
