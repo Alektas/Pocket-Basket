@@ -27,7 +27,6 @@ import alektas.pocketbasket.domain.usecases.RemoveCheckedBasketItems;
 import alektas.pocketbasket.domain.usecases.ResetItemsUseCase;
 import alektas.pocketbasket.domain.usecases.SelectCategoryUseCase;
 import alektas.pocketbasket.domain.usecases.UpdateItemsUseCase;
-import alektas.pocketbasket.domain.utils.Event;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.GuideObserver;
 import alektas.pocketbasket.guide.domain.AppState;
@@ -36,6 +35,7 @@ import alektas.pocketbasket.guide.domain.Guide;
 import alektas.pocketbasket.guide.domain.GuideCase;
 import alektas.pocketbasket.guide.domain.GuideCaseImpl;
 import alektas.pocketbasket.guide.domain.Requirement;
+import alektas.pocketbasket.ui.utils.LiveEvent;
 import alektas.pocketbasket.utils.ResourcesUtils;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -49,10 +49,10 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     private MutableLiveData<Boolean> viewModeData = new MutableLiveData<>();
     private MutableLiveData<Boolean> deleteModeData = new MutableLiveData<>();
     private MutableLiveData<Integer> deleteItemsCountData = new MutableLiveData<>();
-    private MutableLiveData<Event<Boolean>> deleteCheckedEvent = new MutableLiveData<>();
-    private MutableLiveData<Event<Boolean>> resetShowcaseEvent = new MutableLiveData<>();
     private MutableLiveData<String> mCurGuideCaseData = new MutableLiveData<>();
     private MutableLiveData<String> mCompletedGuideCase = new MutableLiveData<>();
+    private LiveEvent<Boolean> deleteCheckedEvent = new LiveEvent<>();
+    private LiveEvent<Boolean> resetShowcaseEvent = new LiveEvent<>();
 
     public static AppState<Boolean> removeByTapInBasketModeState =
             new AppState<>(GuideContract.STATE_REMOVE_BY_TAP, false);
@@ -138,8 +138,8 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
                         .execute(fullReset)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
-                                () -> resetShowcaseEvent.setValue(new Event<>(true)),
-                                error -> resetShowcaseEvent.setValue(new Event<>(false))
+                                () -> resetShowcaseEvent.setValue(true),
+                                error -> resetShowcaseEvent.setValue(false)
                         )
         );
     }
@@ -280,11 +280,11 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     }
 
 
-    public LiveData<Event<Boolean>> getResetShowcaseEvent() {
+    public LiveEvent<Boolean> getResetShowcaseEvent() {
         return resetShowcaseEvent;
     }
 
-    public LiveData<Event<Boolean>> getDeleteCheckedEvent() {
+    public LiveEvent<Boolean> getDeleteCheckedEvent() {
         return deleteCheckedEvent;
     }
 
@@ -375,8 +375,8 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
                         .execute(null)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(
-                                () -> deleteCheckedEvent.setValue(new Event<>(true)),
-                                error -> deleteCheckedEvent.setValue(new Event<>(false))
+                                () -> deleteCheckedEvent.setValue(true),
+                                error -> deleteCheckedEvent.setValue(false)
                         )
         );
     }

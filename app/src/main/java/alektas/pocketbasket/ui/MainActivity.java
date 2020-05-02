@@ -51,7 +51,6 @@ import java.util.List;
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.domain.entities.ItemModel;
-import alektas.pocketbasket.domain.utils.Event;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.ui.DisposableGuideCaseListener;
 import alektas.pocketbasket.guide.ui.GuideCaseView;
@@ -363,14 +362,14 @@ public class MainActivity extends AppCompatActivity implements
             if (delMode) cancelSearch();
         });
 
-        viewModel.getDeleteCheckedEvent().observe(this, event -> {
-            showEventSnackbar(event,
+        viewModel.getDeleteCheckedEvent().observe(this, isSuccess -> {
+            showEventSnackbar(isSuccess,
                     R.string.remove_checked_items_success,
                     R.string.remove_checked_items_fail);
         });
 
-        viewModel.getResetShowcaseEvent().observe(this, event -> {
-            showEventSnackbar(event,
+        viewModel.getResetShowcaseEvent().observe(this, isSuccess -> {
+            showEventSnackbar(isSuccess,
                     R.string.reset_showcase_success,
                     R.string.reset_showcase_fail);
         });
@@ -1079,12 +1078,9 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void showEventSnackbar(Event<Boolean> event, @StringRes int successMsg, @StringRes int failMsg) {
-        Boolean isSuccess = event.getValue();
-        if (isSuccess == null) return;
-        String msg = isSuccess ?
-                getString(successMsg) :
-                getString(failMsg);
+    private void showEventSnackbar(Boolean isSuccess, @StringRes int successMsg, @StringRes int failMsg) {
+        Log.d("MainActivity", "show snack: " + isSuccess);
+        String msg = getString(isSuccess ? successMsg : failMsg);
         Snackbar.make(mRootLayout, msg, Snackbar.LENGTH_SHORT)
                 .setAnchorView(findViewById(R.id.appbar))
                 .show();
