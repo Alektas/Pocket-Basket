@@ -47,20 +47,15 @@ class BasketWidgetFactory implements RemoteViewsService.RemoteViewsFactory {
     }
 
     private void updateItems() {
-        CompositeDisposable d = new CompositeDisposable();
         widgetItems.clear();
-        d.add(RepositoryImpl.getInstance(mContext).getBasketData()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(items -> {
-                    for (BasketItem item : items) {
-                        WidgetBasketItem widgetItem = new WidgetBasketItem(item.getName(), item.getImgRes());
-                        if (item.getName().equals(BasketWidget.REMOVAL_ITEM)) {
-                            widgetItem.setRemoval(true);
-                        }
-                        widgetItems.add(widgetItem);
-                    }
-                    d.clear();
-                }));
+        List<BasketItem> items = mRepository.getBasketData().blockingFirst(new ArrayList<>());
+        for (BasketItem item : items) {
+            WidgetBasketItem widgetItem = new WidgetBasketItem(item.getName(), item.getImgRes());
+            if (item.getName().equals(BasketWidget.REMOVAL_ITEM)) {
+                widgetItem.setRemoval(true);
+            }
+            widgetItems.add(widgetItem);
+        }
     }
 
     @Override
