@@ -12,11 +12,15 @@ import android.text.TextUtils;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.data.RepositoryImpl;
-import alektas.pocketbasket.domain.usecases.CleanBasketUseCase;
-import alektas.pocketbasket.domain.usecases.RemoveItemFromBasket;
+import alektas.pocketbasket.di.UseCasesModule;
+import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.ui.MainActivity;
+import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class BasketWidget extends AppWidgetProvider {
@@ -30,6 +34,16 @@ public class BasketWidget extends AppWidgetProvider {
     public static final int NARROW_MAX_WIDTH = 96;
     public static final int MIDDLE_MAX_WIDTH = 150;
     public static String REMOVAL_ITEM = "";
+    @Inject
+    @Named(UseCasesModule.CLEAN_BASKET_USE_CASE)
+    UseCase<Void, Completable> cleanBasketUseCase;
+    @Inject
+    @Named(UseCasesModule.REMOVE_BY_NAME_USE_CASE)
+    UseCase<String, Completable> removeByNameUseCase;
+
+    public BasketWidget() {
+        App.getComponent().inject(this);
+    }
 
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
@@ -50,7 +64,7 @@ public class BasketWidget extends AppWidgetProvider {
                 notifyWidgets(context);
                 break;
             case ACTION_CLEAN_BASKET:
-                new CleanBasketUseCase(RepositoryImpl.getInstance(context))
+                cleanBasketUseCase
                         .execute(null)
                         .subscribe(() -> notifyWidgets(context));
                 break;
@@ -67,10 +81,10 @@ public class BasketWidget extends AppWidgetProvider {
         if (bundle == null) return;
         String itemName = bundle.getString(EXTRA_ITEM_NAME);
         String action = bundle.getString(EXTRA_ACTION);
-        if (TextUtils.isEmpty(action) && TextUtils.isEmpty(itemName)) return;
+        if (action == null || TextUtils.isEmpty(action) || TextUtils.isEmpty(itemName)) return;
         switch (action) {
             case ACTION_ITEM_DEL:
-                new RemoveItemFromBasket(RepositoryImpl.getInstance(context), true)
+                removeByNameUseCase
                         .execute(itemName)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(() -> {

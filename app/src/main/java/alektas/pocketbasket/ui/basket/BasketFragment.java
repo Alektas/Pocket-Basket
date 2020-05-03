@@ -16,6 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.ui.ItemSizeProvider;
@@ -24,6 +27,8 @@ import alektas.pocketbasket.ui.ItemSizeProvider;
  * A simple {@link Fragment} subclass.
  */
 public class BasketFragment extends Fragment implements OnStartDragListener {
+    @Inject
+    ViewModelProvider.Factory mViewModelFactory;
     private BasketViewModel mViewModel;
     private BasketRvAdapter mBasketAdapter;
     private ItemTouchHelper mTouchHelper;
@@ -56,6 +61,12 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        App.getComponent().inject(this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_basket, container, false);
@@ -72,7 +83,7 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel = new ViewModelProvider(this).get(BasketViewModel.class);
+        mViewModel = new ViewModelProvider(this, mViewModelFactory).get(BasketViewModel.class);
         mBasketAdapter = new BasketRvAdapter(getContext(), mViewModel,this, mItemSizeProvider);
         mBasket.setAdapter(mBasketAdapter);
 

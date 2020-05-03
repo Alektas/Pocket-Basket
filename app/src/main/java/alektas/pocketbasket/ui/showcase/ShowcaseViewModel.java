@@ -1,45 +1,58 @@
 package alektas.pocketbasket.ui.showcase;
 
-import android.app.Application;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import alektas.pocketbasket.App;
-import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.data.db.entities.ShowcaseItem;
 import alektas.pocketbasket.domain.Repository;
-import alektas.pocketbasket.domain.usecases.DelModeUseCase;
 import alektas.pocketbasket.domain.usecases.SelectShowcaseItem;
+import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.GuideContract;
-import alektas.pocketbasket.guide.domain.ContextualGuide;
 import alektas.pocketbasket.guide.domain.Guide;
 import alektas.pocketbasket.ui.ActivityViewModel;
 import alektas.pocketbasket.ui.UiContract;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
-public class ShowcaseViewModel extends AndroidViewModel {
+import static alektas.pocketbasket.di.UseCasesModule.DEL_MODE_USE_CASE;
+import static alektas.pocketbasket.di.UseCasesModule.SELECT_SHOWCASE_ITEM_USE_CASE;
+
+public class ShowcaseViewModel extends ViewModel {
     private static final String TAG = "ShowcaseViewModel";
     private Repository mRepository;
     private Guide mGuide;
+    private UseCase<String, Single<Integer>> mSelectItemUseCase;
+    private UseCase<Boolean, Void> mDelModeUseCase;
     private CompositeDisposable mDisposable = new CompositeDisposable();
     private MutableLiveData<List<ShowcaseItem>> mShowcaseData = new MutableLiveData<>();
     private MutableLiveData<Boolean> delModeState = new MutableLiveData<>();
     private MutableLiveData<Boolean> showcaseModeData = new MutableLiveData<>();
     private boolean isShowcaseMode = UiContract.IS_DEFAULT_MODE_SHOWCASE;
 
-    public ShowcaseViewModel(@NonNull Application application) {
-        super(application);
-        mRepository = RepositoryImpl.getInstance(application);
-        mGuide = ContextualGuide.getInstance();
+    @Inject
+    public ShowcaseViewModel(
+            Repository repository,
+            Guide guide,
+            @Named(SELECT_SHOWCASE_ITEM_USE_CASE) UseCase<String, Single<Integer>> selectItemUseCase,
+            @Named(DEL_MODE_USE_CASE) UseCase<Boolean, Void> delModeUseCase
+    ) {
+        mSelectItemUseCase = selectItemUseCase;
+        mDelModeUseCase = delModeUseCase;
+
+        mRepository = repository;
+        mGuide = guide;
         mDisposable.addAll(
                 mRepository.getShowcaseData()
                         .observeOn(AndroidSchedulers.mainThread())
@@ -87,7 +100,7 @@ public class ShowcaseViewModel extends AndroidViewModel {
             mRepository.toggleDeletingSelection(item);
             return;
         }
-        mDisposable.add(new SelectShowcaseItem(mRepository)
+        mDisposable.add(mSelectItemUseCase
                 .execute(item.getKey())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(resultCode -> {
@@ -125,7 +138,7 @@ public class ShowcaseViewModel extends AndroidViewModel {
      */
     private void enableDelMode() {
         mGuide.onUserEvent(GuideContract.GUIDE_DEL_MODE);
-        new DelModeUseCase(mRepository).execute(true);
+        mDelModeUseCase.execute(true);
     }
 
 }

@@ -1,7 +1,6 @@
 package alektas.pocketbasket.data;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -11,8 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.data.db.AppDatabase;
 import alektas.pocketbasket.data.db.dao.ItemsDao;
 import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.data.db.entities.Item;
@@ -31,7 +31,6 @@ import io.reactivex.subjects.BehaviorSubject;
 
 public class RepositoryImpl implements Repository {
     private static final String TAG = "RepositoryImpl";
-    private static Repository INSTANCE;
     private ItemsDao mItemsDao;
 
     private CompositeDisposable mShowcaseDisposable;
@@ -45,25 +44,15 @@ public class RepositoryImpl implements Repository {
     private Map<String, ShowcaseItem> mDelItems;
     private BehaviorSubject<Integer> mDelItemsCountData;
 
-    private RepositoryImpl(Context context) {
-        mItemsDao = AppDatabase.getInstance(context).getDao();
+    @Inject
+    public RepositoryImpl(ItemsDao itemsDao) {
+        mItemsDao = itemsDao;
         mShowcaseData = BehaviorSubject.create();
         mDelItemsCountData = BehaviorSubject.create();
         viewModeState = BehaviorSubject.create();
         delModeState = BehaviorSubject.create();
         mDelItems = new HashMap<>();
         mShowcaseDisposable = new CompositeDisposable();
-    }
-
-    public static Repository getInstance(Context context) {
-        if (INSTANCE == null) {
-            synchronized (RepositoryImpl.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new RepositoryImpl(context);
-                }
-            }
-        }
-        return INSTANCE;
     }
 
     @Override

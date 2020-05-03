@@ -13,19 +13,20 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import alektas.pocketbasket.data.db.AppDatabase;
+import javax.inject.Inject;
+
+import alektas.pocketbasket.App;
 import alektas.pocketbasket.data.db.dao.ItemsDao;
 import alektas.pocketbasket.data.db.entities.Item;
 import alektas.pocketbasket.utils.ResourcesUtils;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 
 public class ItemsProvider extends ContentProvider {
     private static final String TAG = "ItemsProvider";
+    @Inject
+    ItemsDao mItemsDao;
 
     @Override
-    public boolean onCreate() {
-        return false;
-    }
+    public boolean onCreate() { return true; }
 
     @Nullable
     @Override
@@ -37,7 +38,6 @@ public class ItemsProvider extends ContentProvider {
 
         String query = uri.getLastPathSegment();
         MatrixCursor cursor = new MatrixCursor(ItemsContract.SEARCH_COLUMNS);
-        ItemsDao dao = AppDatabase.getInstance(getContext()).getDao();
 
         if (SearchManager.SUGGEST_URI_PATH_QUERY.equals(query)) {
             // user hasn't entered anything
@@ -46,8 +46,10 @@ public class ItemsProvider extends ContentProvider {
         } else {
             // query contains the users search
             // return a cursor with appropriate data
-            List<Item> items = dao.search("%" + query + "%")
-                    .observeOn(AndroidSchedulers.mainThread())
+            if (mItemsDao == null) {
+                App.getComponent().inject(this);
+            }
+            List<Item> items = mItemsDao.search("%" + query + "%")
                     .blockingGet(new ArrayList<>());
 
             return fillCursor(cursor, items);

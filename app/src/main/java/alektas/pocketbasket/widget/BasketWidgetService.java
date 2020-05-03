@@ -11,27 +11,37 @@ import android.widget.RemoteViewsService;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.data.RepositoryImpl;
 import alektas.pocketbasket.data.db.entities.BasketItem;
+import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.utils.ResourcesUtils;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
 
 public class BasketWidgetService extends RemoteViewsService {
+    @Inject
+    Repository mRepository;
+
+    public BasketWidgetService() {
+        App.getComponent().inject(this);
+    }
+
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
-        return new BasketWidgetFactory(getApplicationContext(), intent);
+        return new BasketWidgetFactory(getApplicationContext(), mRepository, intent);
     }
 }
 
 class BasketWidgetFactory implements RemoteViewsService.RemoteViewsFactory {
     private Context mContext;
+    private Repository mRepository;
     private List<WidgetBasketItem> widgetItems;
     private int widgetId;
 
-    BasketWidgetFactory(Context context, Intent intent) {
+    BasketWidgetFactory(Context context, Repository repository, Intent intent) {
         mContext = context;
+        mRepository = repository;
         widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
                 AppWidgetManager.INVALID_APPWIDGET_ID);
     }
@@ -108,12 +118,8 @@ class BasketWidgetFactory implements RemoteViewsService.RemoteViewsFactory {
         int iconRes = ResourcesUtils.getImgId(item.getIconName());
         if (BasketWidget.REMOVAL_ITEM.equals(item.getName())) {
             itemView.setViewVisibility(R.id.widget_btn_del, View.VISIBLE);
-//            itemView.setViewVisibility(iconRes == 0 ? R.id.widget_item_icon : R.id.widget_item_text,
-//                    View.GONE);
         } else {
             itemView.setViewVisibility(R.id.widget_btn_del, View.GONE);
-//            itemView.setViewVisibility(R.id.widget_item_icon, View.VISIBLE);
-//            itemView.setViewVisibility(R.id.widget_item_text, View.VISIBLE);
         }
         if (iconRes == 0) iconRes = R.drawable.ic_launcher_foreground;
         itemView.setImageViewResource(R.id.widget_item_icon, iconRes);

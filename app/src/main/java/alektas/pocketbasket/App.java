@@ -4,6 +4,10 @@ import android.app.Application;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import alektas.pocketbasket.di.AppComponent;
+import alektas.pocketbasket.di.AppModule;
+import alektas.pocketbasket.di.DaggerAppComponent;
+
 public class App extends Application {
     private static AppComponent sAppComponent;
     private static FirebaseAnalytics sAnalytics;

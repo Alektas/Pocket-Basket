@@ -16,6 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.ads.AdManager;
 import alektas.pocketbasket.data.db.entities.ShowcaseItem;
@@ -23,13 +26,17 @@ import alektas.pocketbasket.ui.ItemSizeProvider;
 import alektas.pocketbasket.utils.NetworkMonitor;
 
 public class ShowcaseFragment extends Fragment {
-    private NetworkMonitor mNetworkMonitor;
-    private AdManager mAdManager;
-    private List<ShowcaseItem> mProducts = new ArrayList<>();
+    @Inject
+    NetworkMonitor mNetworkMonitor;
+    @Inject
+    AdManager mAdManager;
+    @Inject
+    ViewModelProvider.Factory mViewModelFactory;
     private ShowcaseViewModel mViewModel;
     private ShowcaseRvAdapter mShowcaseAdapter;
     private ItemSizeProvider mItemSizeProvider;
     private RecyclerView mShowcase;
+    private List<ShowcaseItem> mProducts = new ArrayList<>();
 
     public ShowcaseFragment() {
         // Required empty public constructor
@@ -51,6 +58,12 @@ public class ShowcaseFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        App.getComponent().inject(this);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_showcase, container, false);
@@ -65,18 +78,11 @@ public class ShowcaseFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        mViewModel = new ViewModelProvider(this).get(ShowcaseViewModel.class);
+        mViewModel = new ViewModelProvider(this, mViewModelFactory).get(ShowcaseViewModel.class);
         mShowcaseAdapter = new ShowcaseRvAdapter(mViewModel, mItemSizeProvider);
         mShowcase.setAdapter(mShowcaseAdapter);
         subscribeOnModel();
 
-        mAdManager = new AdManager.Builder(requireContext(), R.string.ad_app_id, R.string.ad_unit_id)
-                .withDebugAppId(R.string.ad_test_app_id)
-                .withDebugAdId(R.string.ad_test_unit_id)
-                .withTestDevice(R.string.ad_test_device_id)
-                .build();
-
-        mNetworkMonitor = new NetworkMonitor(requireContext());
         mNetworkMonitor.setNetworkListener(isAvailable -> {
             if (!isAvailable) return;
 

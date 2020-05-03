@@ -39,6 +39,7 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,6 +48,9 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
@@ -63,6 +67,9 @@ import alektas.pocketbasket.ui.dialogs.ShareUnsuccessfulDialog;
 import alektas.pocketbasket.ui.utils.SmoothDecelerateInterpolator;
 import alektas.pocketbasket.utils.ResourcesUtils;
 import alektas.pocketbasket.widget.BasketWidget;
+
+import static alektas.pocketbasket.di.StorageModule.APP_PREFERENCES_NAME;
+import static alektas.pocketbasket.di.StorageModule.GUIDE_PREFERENCES_NAME;
 
 public class MainActivity extends AppCompatActivity implements
         ResetDialog.ResetDialogListener,
@@ -99,9 +106,15 @@ public class MainActivity extends AppCompatActivity implements
     private boolean allowChangeMode = true;
     private boolean isChangeModeHandled = false;
 
-    private SharedPreferences mGuidePrefs;
-    private SharedPreferences mPrefs;
+    @Inject
+    @Named(GUIDE_PREFERENCES_NAME)
+    SharedPreferences mGuidePrefs;
+    @Inject
+    @Named(APP_PREFERENCES_NAME)
+    SharedPreferences mPrefs;
 
+    @Inject
+    ViewModelProvider.Factory mViewModelFactory;
     private ActivityViewModel mViewModel;
     private VelocityTracker mVelocityTracker;
     private ShareActionProvider mShareActionProvider;
@@ -251,9 +264,6 @@ public class MainActivity extends AppCompatActivity implements
     /* Init methods */
 
     private void init() {
-        mGuidePrefs = getSharedPreferences(getString(R.string.GUIDE_PREFERENCES_FILE_KEY), MODE_PRIVATE);
-        mPrefs = getSharedPreferences(getString(R.string.PREFERENCES_FILE_KEY), MODE_PRIVATE);
-
         initSearch();
         initTransitions();
 
@@ -266,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements
         mBasket = mBasketContainer.findViewById(R.id.basket_list);
         initDimensions();
 
-        mViewModel = ViewModelProviders.of(this).get(ActivityViewModel.class);
+        mViewModel = new ViewModelProvider(this, mViewModelFactory).get(ActivityViewModel.class);
         mViewModel.setOrientationState(isLandscape());
         GuidePresenter guidePresenter = buildGuide();
 
