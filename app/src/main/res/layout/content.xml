@@ -13,12 +13,14 @@
         android:name="alektas.pocketbasket.ui.categories.CategoriesFragment"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintWidth_min="@dimen/width_categ_narrow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/fragment_showcase"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintHorizontal_chainStyle="packed"
         tools:layout="@layout/fragment_categories" />
 
     <fragment
@@ -26,12 +28,12 @@
         android:name="alektas.pocketbasket.ui.showcase.ShowcaseFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/fragment_basket"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@id/fragment_categories"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
         tools:layout="@layout/fragment_showcase" />
 
     <fragment
@@ -39,12 +41,13 @@
         android:name="alektas.pocketbasket.ui.basket.BasketFragment"
         android:layout_width="@dimen/width_basket_narrow"
         android:layout_height="0dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintWidth_min="@dimen/width_basket_narrow"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toEndOf="@id/fragment_showcase"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed"
         tools:layout="@layout/fragment_basket" />
 
     <!-- Guidelines -->
