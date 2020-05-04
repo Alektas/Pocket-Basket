@@ -30,7 +30,7 @@ class AddItemTest {
                 .test()
                 .assertValue(AddItem.ERROR_INVALID_NAME);
 
-        verify(mRepository, never()).addNewItem(anyString());
+        verify(mRepository, never()).createItem(anyString());
         verify(mRepository, never()).putToBasket(anyString());
     }
 
@@ -41,7 +41,7 @@ class AddItemTest {
                 .test()
                 .assertValue(AddItem.ERROR_INVALID_NAME);
 
-        verify(mRepository, never()).addNewItem(anyString());
+        verify(mRepository, never()).createItem(anyString());
         verify(mRepository, never()).putToBasket(anyString());
     }
 
@@ -54,7 +54,7 @@ class AddItemTest {
                 .test()
                 .assertValue(AddItem.NEW_ITEM_ADDED);
 
-        verify(mRepository).addNewItem("a");
+        verify(mRepository).createItem("a");
         verify(mRepository, never()).putToBasket(anyString());
     }
 
@@ -70,7 +70,7 @@ class AddItemTest {
                 .assertValue(AddItem.EXISTING_ITEM_ADDED);
 
         verify(mRepository).putToBasket("Key");
-        verify(mRepository, never()).addNewItem(anyString());
+        verify(mRepository, never()).createItem(anyString());
     }
 
     @Test
@@ -85,6 +85,6 @@ class AddItemTest {
                 .assertValue(AddItem.EXISTING_ITEM_ADDED);
 
         verify(mRepository).putToBasket("Key");
-        verify(mRepository, never()).addNewItem(anyString());
+        verify(mRepository, never()).createItem(anyString());
     }
 }

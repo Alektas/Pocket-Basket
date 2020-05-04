@@ -36,7 +36,7 @@ public interface Repository {
      * Data contains only items consisted to the selected category.
      */
     Observable<List<ShowcaseItem>> getShowcaseData();
-    void addNewItem(String name);
+    void createItem(String name);
     /**
      * Show in Showcase only items with specified tag
      * @param tag name of the category
@@ -78,6 +78,6 @@ public interface Repository {
     /**
      * Delete from the Showcase all items selected by user for the deleting.
      */
-    Completable deleteSelectedItems();
+    Completable deleteSelectedShowcaseItems();
 
 }

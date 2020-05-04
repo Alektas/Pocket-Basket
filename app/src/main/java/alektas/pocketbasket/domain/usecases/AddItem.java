@@ -42,7 +42,7 @@ public class AddItem implements UseCase<String, Single<Integer>> {
                 })
                 .onErrorReturn(error -> {
                     if (error instanceof NoSuchElementException) {
-                        mRepository.addNewItem(name);
+                        mRepository.createItem(name);
                         return NEW_ITEM_ADDED;
                     }
                     return ERROR_UNKNOWN;

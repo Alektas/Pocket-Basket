@@ -10,7 +10,9 @@ import javax.inject.Singleton;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.data.db.AppDatabase;
+import alektas.pocketbasket.data.db.dao.BasketDao;
 import alektas.pocketbasket.data.db.dao.ItemsDao;
+import alektas.pocketbasket.data.db.dao.ShowcaseDao;
 import dagger.Module;
 import dagger.Provides;
 
@@ -44,6 +46,18 @@ public class StorageModule {
     @Singleton
     ItemsDao providesItemsDao(AppDatabase database) {
         return database.getItemsDao();
+    }
+
+    @Provides
+    @Singleton
+    ShowcaseDao providesShowcaseDao(AppDatabase database) {
+        return database.getShowcaseDao();
+    }
+
+    @Provides
+    @Singleton
+    BasketDao providesBasketDao(AppDatabase database) {
+        return database.getBasketDao();
     }
 
     @Provides

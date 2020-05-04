@@ -15,7 +15,7 @@ public class DeleteSelectedShowcaseItems implements UseCase<Void, Completable> {
 
     @Override
     public Completable execute(Void request) {
-        return mRepository.deleteSelectedItems();
+        return mRepository.deleteSelectedShowcaseItems();
     }
 
 }

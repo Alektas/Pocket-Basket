@@ -13,7 +13,9 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import alektas.pocketbasket.R;
+import alektas.pocketbasket.data.db.dao.BasketDao;
 import alektas.pocketbasket.data.db.dao.ItemsDao;
+import alektas.pocketbasket.data.db.dao.ShowcaseDao;
 import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.data.db.entities.Item;
 import alektas.pocketbasket.data.db.entities.ShowcaseItem;
@@ -32,6 +34,8 @@ import io.reactivex.subjects.BehaviorSubject;
 public class RepositoryImpl implements Repository {
     private static final String TAG = "RepositoryImpl";
     private ItemsDao mItemsDao;
+    private ShowcaseDao mShowcaseDao;
+    private BasketDao mBasketDao;
 
     private CompositeDisposable mShowcaseDisposable;
     private BehaviorSubject<List<ShowcaseItem>> mShowcaseData;
@@ -45,8 +49,10 @@ public class RepositoryImpl implements Repository {
     private BehaviorSubject<Integer> mDelItemsCountData;
 
     @Inject
-    public RepositoryImpl(ItemsDao itemsDao) {
+    public RepositoryImpl(ItemsDao itemsDao, ShowcaseDao showcaseDao, BasketDao basketDao) {
         mItemsDao = itemsDao;
+        mShowcaseDao = showcaseDao;
+        mBasketDao = basketDao;
         mShowcaseData = BehaviorSubject.create();
         mDelItemsCountData = BehaviorSubject.create();
         viewModeState = BehaviorSubject.create();
@@ -62,7 +68,7 @@ public class RepositoryImpl implements Repository {
 
     @Override
     public Observable<List<BasketItem>> getBasketData() {
-        return mItemsDao.getBasketItems()
+        return mBasketDao.getItems()
                 .subscribeOn(Schedulers.io());
     }
 
@@ -101,6 +107,107 @@ public class RepositoryImpl implements Repository {
         }
     }
 
+
+    /* Basket methods */
+
+    @Override
+    public Single<Boolean> isItemInBasket(String key) {
+        return mBasketDao.getItemMeta(key)
+                .subscribeOn(Schedulers.io())
+                .flatMapSingle(meta -> Single.just(true))
+                .onErrorReturn(error -> false);
+    }
+
+    @Override
+    public Completable putToBasket(@NonNull String key) {
+        return async(() -> mBasketDao.putToBasket(key));
+    }
+
+    @Override
+    public void updateBasketPositions(List<String> keys) {
+        launch(() -> mBasketDao.updatePositionsInOrderOf(keys));
+    }
+
+    @Override
+    public void updateBasketItemPosition(String key, int position) {
+        launch(() -> mBasketDao.updateItemPosition(key, position));
+    }
+
+    @Override
+    public void toggleBasketItemCheck(@NonNull String key) {
+        launch(() -> mBasketDao.toggleItemCheck(key));
+    }
+
+    @Override
+    public void toggleBasketCheck() {
+        launch(() -> mBasketDao.toggleBasketCheck());
+    }
+
+    @Override
+    public Completable removeFromBasket(@NonNull String key) {
+        return async(() -> mBasketDao.removeItem(key));
+    }
+
+    @SuppressLint("CheckResult")
+    @Override
+    public Completable removeCheckedBasketItems() {
+        return Completable
+                .create(emitter -> {
+                    if (mBasketDao.removeCheckedItems()) {
+                        emitter.onComplete();
+                    } else {
+                        emitter.onError(new CompletionException());
+                    }
+                })
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Completable cleanBasket() {
+        return mBasketDao.cleanBasket()
+                .subscribeOn(Schedulers.io());
+    }
+
+
+    /* Showcase methods */
+
+    @SuppressLint("CheckResult")
+    @Override
+    public void setCategory(String tag) {
+        if (tag == null) return;
+
+        mShowcaseDisposable.clear();
+        if (tag.equals(ResourcesUtils.getResIdName(R.string.all))) {
+            mShowcaseDisposable.add(mShowcaseDao.getShowcaseItems()
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(this::updateShowcase));
+            return;
+        }
+        mShowcaseDisposable.add(mShowcaseDao.getShowcaseItems(tag)
+                .subscribeOn(Schedulers.io())
+                .subscribe(this::updateShowcase));
+    }
+
+    @Override
+    public Completable resetShowcase() {
+        return async(() -> mShowcaseDao.resetShowcase());
+    }
+
+    @Override
+    public Completable restoreShowcase() {
+        return async(() -> mShowcaseDao.restoreShowcase());
+    }
+
+    private void updateShowcase(List<ShowcaseItem> items) {
+        if (delModeState.hasValue() && delModeState.getValue()) {
+            updateDeletingSelections(items);
+            return;
+        }
+        mShowcaseData.onNext(items);
+    }
+
+    /* Showcase items deleting */
+
     @Override
     public void toggleDeletingSelection(ShowcaseItem item) {
         if (item.isRemoval()) {
@@ -113,104 +220,45 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public Completable deleteSelectedItems() {
-        return async(() -> mItemsDao.deleteItems(mDelItems.values()));
+    public Completable deleteSelectedShowcaseItems() {
+        return async(() -> {
+            mShowcaseDao.deleteItems(mDelItems.values());
+            mBasketDao.removeItems(mDelItems.keySet());
+        });
     }
 
-
-    /* Basket methods */
-
-    @Override
-    public Single<Boolean> isItemInBasket(String key) {
-        return mItemsDao.getItemBasketMeta(key)
-                .subscribeOn(Schedulers.io())
-                .flatMapSingle(meta -> Single.just(true))
-                .onErrorReturn(error -> false);
+    private void updateDeletingSelections() {
+        List<ShowcaseItem> items = mShowcaseData.getValue();
+        if (items == null) return;
+        updateDeletingSelections(items);
     }
 
-    @Override
-    public Completable putToBasket(@NonNull String key) {
-        return async(() -> mItemsDao.putToBasket(key));
+    private void updateDeletingSelections(List<ShowcaseItem> items) {
+        mShowcaseData.onNext(mapDeletingSelections(items, mDelItems));
     }
 
-    @Override
-    public void updateBasketPositions(List<String> keys) {
-        launch(() -> mItemsDao.updateBasketPositions(keys));
-    }
-
-    @Override
-    public void updateBasketItemPosition(String key, int position) {
-        launch(() -> mItemsDao.updateBasketItemPosition(key, position));
-    }
-
-    @Override
-    public void toggleBasketItemCheck(@NonNull String key) {
-        launch(() -> mItemsDao.toggleBasketItemCheck(key));
-    }
-
-    @Override
-    public void toggleBasketCheck() {
-        launch(() -> mItemsDao.toggleBasketCheck());
-    }
-
-    @Override
-    public Completable removeFromBasket(@NonNull String key) {
-        return async(() -> mItemsDao.removeBasketItem(key));
-    }
-
-    @SuppressLint("CheckResult")
-    @Override
-    public Completable removeCheckedBasketItems() {
-        return Completable
-                .create(emitter -> {
-                    if (mItemsDao.removeCheckedBasketItems()) {
-                        emitter.onComplete();
-                    } else {
-                        emitter.onError(new CompletionException());
-                    }
-                })
-                .subscribeOn(Schedulers.io());
-    }
-
-    @Override
-    public Completable cleanBasket() {
-        return mItemsDao.cleanBasket()
-                .subscribeOn(Schedulers.io());
-    }
-
-
-    /* Showcase methods */
-
-    @Override
-    public void addNewItem(String name) {
-        launch(() -> mItemsDao.addNewItem(name));
-    }
-
-    @SuppressLint("CheckResult")
-    @Override
-    public void setCategory(String tag) {
-        if (tag == null) return;
-
-        mShowcaseDisposable.clear();
-        if (tag.equals(ResourcesUtils.getResIdName(R.string.all))) {
-            mShowcaseDisposable.add(mItemsDao.getShowcaseItems()
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(this::updateShowcase));
-            return;
+    private List<ShowcaseItem> mapDeletingSelections(
+            List<ShowcaseItem> items,
+            Map<String, ShowcaseItem> selectedItems
+    ) {
+        List<ShowcaseItem> updatedItems = new ArrayList<>(items.size());
+        for (int i = 0; i < items.size(); i++) {
+            ShowcaseItem item = items.get(i).copy();
+            item.setRemoval(selectedItems.containsKey(item.getKey()));
+            updatedItems.add(item);
         }
-        mShowcaseDisposable.add(mItemsDao.getShowcaseItems(tag)
-                .subscribeOn(Schedulers.io())
-                .subscribe(this::updateShowcase));
+        return updatedItems;
     }
 
-    @Override
-    public Completable resetShowcase() {
-        return async(() -> mItemsDao.resetShowcase());
-    }
+
+    /* Common methods */
 
     @Override
-    public Completable restoreShowcase() {
-        return async(() -> mItemsDao.restoreShowcase());
+    public void createItem(String name) {
+        launch(() -> {
+            mItemsDao.createItem(name);
+            mBasketDao.putToBasket(name);
+        });
     }
 
     @SuppressLint("CheckResult")
@@ -241,37 +289,6 @@ public class RepositoryImpl implements Repository {
                 () -> {/* empty */},
                 error -> Log.e(TAG, "Error happened in async operation", error));
         return c;
-    }
-
-    private void updateShowcase(List<ShowcaseItem> items) {
-        if (delModeState.hasValue() && delModeState.getValue()) {
-            updateDeletingSelections(items);
-            return;
-        }
-        mShowcaseData.onNext(items);
-    }
-
-    private void updateDeletingSelections() {
-        List<ShowcaseItem> items = mShowcaseData.getValue();
-        if (items == null) return;
-        updateDeletingSelections(items);
-    }
-
-    private void updateDeletingSelections(List<ShowcaseItem> items) {
-        mShowcaseData.onNext(mapDeletingSelections(items, mDelItems));
-    }
-
-    private List<ShowcaseItem> mapDeletingSelections(
-            List<ShowcaseItem> items,
-            Map<String, ShowcaseItem> selectedItems
-    ) {
-        List<ShowcaseItem> updatedItems = new ArrayList<>(items.size());
-        for (int i = 0; i < items.size(); i++) {
-            ShowcaseItem item = items.get(i).copy();
-            item.setRemoval(selectedItems.containsKey(item.getKey()));
-            updatedItems.add(item);
-        }
-        return updatedItems;
     }
 
 }
