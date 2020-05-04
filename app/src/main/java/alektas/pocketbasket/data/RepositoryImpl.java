@@ -103,7 +103,6 @@ public class RepositoryImpl implements Repository {
 
     @Override
     public void toggleDeletingSelection(ShowcaseItem item) {
-        Log.d(TAG, "toggle selection");
         if (item.isRemoval()) {
             mDelItems.remove(item.getKey());
         } else {
@@ -114,8 +113,8 @@ public class RepositoryImpl implements Repository {
     }
 
     @Override
-    public void deleteSelectedItems() {
-        launch(() -> mItemsDao.deleteItems(mDelItems.values()));
+    public Completable deleteSelectedItems() {
+        return async(() -> mItemsDao.deleteItems(mDelItems.values()));
     }
 
 

@@ -40,7 +40,6 @@ import androidx.appcompat.widget.ShareActionProvider;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
@@ -206,11 +205,11 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (item.getItemId()) {
             case R.id.menu_check_all:
-                mViewModel.onCheckAllBtnClick();
+                mViewModel.onCheckBasket();
                 return true;
 
             case R.id.menu_del_checked:
-                mViewModel.onDelCheckedBtnClick();
+                mViewModel.onDelCheckedBasketItems();
                 return true;
 
             case R.id.menu_share:
@@ -372,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements
             if (delMode) cancelSearch();
         });
 
-        viewModel.getDeleteCheckedEvent().observe(this, isSuccess -> {
+        viewModel.getRemoveCheckedBasketItemsEvent().observe(this, isSuccess -> {
             showEventSnackbar(isSuccess,
                     R.string.remove_checked_items_success,
                     R.string.remove_checked_items_fail);

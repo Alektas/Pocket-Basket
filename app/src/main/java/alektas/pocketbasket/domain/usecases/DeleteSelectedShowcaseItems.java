@@ -3,8 +3,9 @@ package alektas.pocketbasket.domain.usecases;
 import javax.inject.Inject;
 
 import alektas.pocketbasket.domain.Repository;
+import io.reactivex.Completable;
 
-public class DeleteSelectedShowcaseItems implements UseCase<Void, Void> {
+public class DeleteSelectedShowcaseItems implements UseCase<Void, Completable> {
     private Repository mRepository;
 
     @Inject
@@ -13,9 +14,8 @@ public class DeleteSelectedShowcaseItems implements UseCase<Void, Void> {
     }
 
     @Override
-    public Void execute(Void request) {
-        mRepository.deleteSelectedItems();
-        return null;
+    public Completable execute(Void request) {
+        return mRepository.deleteSelectedItems();
     }
 
 }

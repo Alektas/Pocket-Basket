@@ -120,7 +120,7 @@ public abstract class UseCasesModule {
 
     @Binds
     @Named(DELETE_SELECTED_SHOWCASE_ITEMS)
-    abstract UseCase<Void, Void> deleteSelectedShowcase(DeleteSelectedShowcaseItems useCase);
+    abstract UseCase<Void, Completable> deleteSelectedShowcase(DeleteSelectedShowcaseItems useCase);
 
     @Binds
     @Named(GET_BASKET)

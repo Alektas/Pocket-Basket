@@ -3,6 +3,7 @@ package alektas.pocketbasket.ui;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -36,6 +37,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 
 import static alektas.pocketbasket.di.StorageModule.APP_PREFERENCES_NAME;
 import static alektas.pocketbasket.di.StorageModule.GUIDE_PREFERENCES_NAME;
@@ -63,7 +65,7 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
     private UseCase<Boolean, Completable> mResetItemsUseCase;
     private UseCase<String, Void> mSelectCategoryUseCase;
     private UseCase<Void, Void> mUpdateItemsUseCase;
-    private UseCase<Void, Void> mDeleteSelectedShowcaseItemsUseCase;
+    private UseCase<Void, Completable> mDeleteSelectedShowcaseItemsUseCase;
     private UseCase<Void, Observable<List<BasketItem>>> mGetBasketItemsUseCase;
     private UseCase<Boolean, Void> mSetViewModeUseCase;
 
@@ -110,7 +112,7 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
             @Named(GET_SELECTED_SHOWCASE_ITEM_COUNT) UseCase<Void, Observable<Integer>> delItemsCountUseCase,
             @Named(GET_BASKET) UseCase<Void, Observable<List<BasketItem>>> getBasketItemsUseCase,
             @Named(SET_VIEW_MODE) UseCase<Boolean, Void> setViewModeUseCase,
-            @Named(DELETE_SELECTED_SHOWCASE_ITEMS) UseCase<Void, Void> deleteSelectedShowcaseItemsUseCase
+            @Named(DELETE_SELECTED_SHOWCASE_ITEMS) UseCase<Void, Completable> deleteSelectedShowcaseItemsUseCase
     ) {
         mAddItemUseCase = addItemUseCase;
         mDelModeUseCase = delModeUseCase;
@@ -326,7 +328,7 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
         return resetShowcaseEvent;
     }
 
-    public LiveEvent<Boolean> getDeleteCheckedEvent() {
+    public LiveEvent<Boolean> getRemoveCheckedBasketItemsEvent() {
         return deleteCheckedEvent;
     }
 
@@ -396,8 +398,14 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
     }
 
     public void onDeleteSelectedShowcaseItems() {
-        mDeleteSelectedShowcaseItemsUseCase.execute(null);
-        onCloseDelMode();
+        Disposable d = mDeleteSelectedShowcaseItemsUseCase
+                .execute(null)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        this::onCloseDelMode,
+                        e -> Log.e(TAG, "Failed to delete showcase items", e)
+                );
+        mDisposable.add(d);
     }
 
     public void onCloseDelMode() {
@@ -405,12 +413,12 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
         mDelModeUseCase.execute(false);
     }
 
-    public void onCheckAllBtnClick() {
+    public void onCheckBasket() {
         mGuide.onUserEvent(GuideContract.GUIDE_BASKET_MENU_HELP);
         mToggleBasketCheck.execute(null);
     }
 
-    public void onDelCheckedBtnClick() {
+    public void onDelCheckedBasketItems() {
         mGuide.onUserEvent(GuideContract.GUIDE_BASKET_MENU_HELP);
         mDisposable.add(
                 mRemoveMarkedBasketItemsUseCase

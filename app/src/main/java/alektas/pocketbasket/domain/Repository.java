@@ -78,6 +78,6 @@ public interface Repository {
     /**
      * Delete from the Showcase all items selected by user for the deleting.
      */
-    void deleteSelectedItems();
+    Completable deleteSelectedItems();
 
 }
