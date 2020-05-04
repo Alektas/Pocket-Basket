@@ -3,13 +3,16 @@ package alektas.pocketbasket.domain.usecases;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.ItemModel;
 
-public class ChangeItemsPositions implements UseCase<List<ItemModel>, Void> {
+public class ChangeBasketPositions implements UseCase<List<ItemModel>, Void> {
     private Repository mRepository;
 
-    public ChangeItemsPositions(Repository repository) {
+    @Inject
+    public ChangeBasketPositions(Repository repository) {
         mRepository = repository;
     }
 

@@ -1,21 +1,20 @@
 package alektas.pocketbasket.domain.usecases;
 
+import javax.inject.Inject;
+
 import alektas.pocketbasket.domain.Repository;
 
-/**
- * Mark all items in the basket, or uncheck all if they are already marked.
- */
-public class MarkAllBasketItems implements UseCase<Void, Void> {
+public class UpdateItems implements UseCase<Void, Void> {
     private Repository mRepository;
 
-    public MarkAllBasketItems(Repository repository) {
+    @Inject
+    public UpdateItems(Repository repository) {
         mRepository = repository;
     }
 
     @Override
     public Void execute(Void v) {
-        mRepository.toggleBasketCheck();
+        mRepository.updateDisplayedNames();
         return null;
     }
-
 }

@@ -1,5 +1,7 @@
 package alektas.pocketbasket.domain.usecases;
 
+import javax.inject.Inject;
+
 import alektas.pocketbasket.domain.Repository;
 import io.reactivex.Completable;
 
@@ -9,6 +11,7 @@ import io.reactivex.Completable;
 public class RemoveCheckedBasketItems implements UseCase<Void, Completable> {
     private Repository mRepository;
 
+    @Inject
     public RemoveCheckedBasketItems(Repository repository) {
         mRepository = repository;
     }

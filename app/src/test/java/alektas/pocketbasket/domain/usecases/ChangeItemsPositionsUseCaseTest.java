@@ -15,14 +15,14 @@ import alektas.pocketbasket.domain.entities.ItemModel;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Use case of item position updating")
-class ChangeItemsPositionsTest {
+class ChangeItemsPositionsUseCaseTest {
     private Repository mRepository;
     private UseCase<List<ItemModel>, Void> changePositionUseCase;
 
     @BeforeEach
     void setUp() {
         mRepository = mock(RepositoryImpl.class);
-        changePositionUseCase = new ChangeItemsPositions(mRepository);
+        changePositionUseCase = new ChangeBasketPositions(mRepository);
     }
 
     @Test

@@ -1,11 +1,14 @@
 package alektas.pocketbasket.domain.usecases;
 
+import javax.inject.Inject;
+
 import alektas.pocketbasket.domain.Repository;
 
-public class MoveItemToTopUseCase implements UseCase<String, Void> {
+public class MoveBasketItemToTop implements UseCase<String, Void> {
     private Repository mRepository;
 
-    public MoveItemToTopUseCase(Repository repository) {
+    @Inject
+    public MoveBasketItemToTop(Repository repository) {
         mRepository = repository;
     }
 

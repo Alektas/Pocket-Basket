@@ -10,23 +10,23 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import alektas.pocketbasket.data.db.entities.BasketItem;
-import alektas.pocketbasket.domain.Repository;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.domain.Guide;
 import alektas.pocketbasket.ui.ActivityViewModel;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
-import static alektas.pocketbasket.di.UseCasesModule.CHANGE_ITEM_POSITIONS_USE_CASE;
-import static alektas.pocketbasket.di.UseCasesModule.MARK_BASKET_ITEM_USE_CASE;
-import static alektas.pocketbasket.di.UseCasesModule.MOVE_ITEM_TO_TOP_USE_CASE;
-import static alektas.pocketbasket.di.UseCasesModule.REMOVE_BY_KEY_USE_CASE;
+import static alektas.pocketbasket.di.UseCasesModule.CHANGE_BASKET_POSITIONS;
+import static alektas.pocketbasket.di.UseCasesModule.GET_BASKET;
+import static alektas.pocketbasket.di.UseCasesModule.TOGGLE_BASKET_ITEM_CHECK;
+import static alektas.pocketbasket.di.UseCasesModule.MOVE_BASKET_ITEM_TO_TOP;
+import static alektas.pocketbasket.di.UseCasesModule.REMOVE_BASKET_ITEM_BY_KEY;
 
 public class BasketViewModel extends ViewModel {
-    private Repository mRepository;
     private Guide mGuide;
     private UseCase<List<ItemModel>, Void> mChangePositionsUseCase;
     private UseCase<String, Void> mMarkBasketItemUseCase;
@@ -37,21 +37,20 @@ public class BasketViewModel extends ViewModel {
 
     @Inject
     public BasketViewModel(
-            Repository repository,
             Guide guide,
-            @Named(CHANGE_ITEM_POSITIONS_USE_CASE) UseCase<List<ItemModel>, Void> changePositionsUseCase,
-            @Named(MARK_BASKET_ITEM_USE_CASE) UseCase<String, Void> markBasketItemUseCase,
-            @Named(REMOVE_BY_KEY_USE_CASE) UseCase<String, Completable> removeBasketItemUseCase,
-            @Named(MOVE_ITEM_TO_TOP_USE_CASE) UseCase<String, Void> moveItemToTopUseCase
+            @Named(CHANGE_BASKET_POSITIONS) UseCase<List<ItemModel>, Void> changePositionsUseCase,
+            @Named(TOGGLE_BASKET_ITEM_CHECK) UseCase<String, Void> markBasketItemUseCase,
+            @Named(REMOVE_BASKET_ITEM_BY_KEY) UseCase<String, Completable> removeBasketItemUseCase,
+            @Named(MOVE_BASKET_ITEM_TO_TOP) UseCase<String, Void> moveItemToTopUseCase,
+            @Named(GET_BASKET) UseCase<Void, Observable<List<BasketItem>>> getBasketUseCase
     ) {
         mChangePositionsUseCase = changePositionsUseCase;
         mMarkBasketItemUseCase = markBasketItemUseCase;
         mRemoveBasketItemUseCase = removeBasketItemUseCase;
         mMoveItemToTopUseCase = moveItemToTopUseCase;
 
-        mRepository = repository;
         mDisposable.add(
-                mRepository.getBasketData()
+                getBasketUseCase.execute(null)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(basketItems -> {
                             mBasketData.setValue(basketItems);
@@ -65,7 +64,6 @@ public class BasketViewModel extends ViewModel {
     protected void onCleared() {
         super.onCleared();
         mDisposable.clear();
-        mRepository = null;
     }
 
     public LiveData<List<BasketItem>> getBasketData() {

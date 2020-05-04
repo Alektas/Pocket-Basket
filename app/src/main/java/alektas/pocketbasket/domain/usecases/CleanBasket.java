@@ -1,12 +1,15 @@
 package alektas.pocketbasket.domain.usecases;
 
+import javax.inject.Inject;
+
 import alektas.pocketbasket.domain.Repository;
 import io.reactivex.Completable;
 
-public class CleanBasketUseCase implements UseCase<Void, Completable> {
+public class CleanBasket implements UseCase<Void, Completable> {
     private Repository mRepository;
 
-    public CleanBasketUseCase(Repository repository) {
+    @Inject
+    public CleanBasket(Repository repository) {
         mRepository = repository;
     }
 

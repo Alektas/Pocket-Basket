@@ -35,10 +35,10 @@ public class BasketWidget extends AppWidgetProvider {
     public static final int MIDDLE_MAX_WIDTH = 150;
     public static String REMOVAL_ITEM = "";
     @Inject
-    @Named(UseCasesModule.CLEAN_BASKET_USE_CASE)
+    @Named(UseCasesModule.CLEAN_BASKET)
     UseCase<Void, Completable> cleanBasketUseCase;
     @Inject
-    @Named(UseCasesModule.REMOVE_BY_NAME_USE_CASE)
+    @Named(UseCasesModule.REMOVE_BASKET_ITEM_BY_NAME)
     UseCase<String, Completable> removeByNameUseCase;
 
     public BasketWidget() {

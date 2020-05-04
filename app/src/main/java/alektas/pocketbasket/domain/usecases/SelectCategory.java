@@ -1,11 +1,14 @@
 package alektas.pocketbasket.domain.usecases;
 
+import javax.inject.Inject;
+
 import alektas.pocketbasket.domain.Repository;
 
-public class SelectCategoryUseCase implements UseCase<String, Void> {
+public class SelectCategory implements UseCase<String, Void> {
     private Repository mRepository;
 
-    public SelectCategoryUseCase(Repository repository) {
+    @Inject
+    public SelectCategory(Repository repository) {
         mRepository = repository;
     }
 

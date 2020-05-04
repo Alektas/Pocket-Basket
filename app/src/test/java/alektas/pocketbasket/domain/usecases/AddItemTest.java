@@ -13,14 +13,14 @@ import io.reactivex.Single;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Use case add basket items")
-class AddItemUseCaseTest {
+class AddItemTest {
     private UseCase<String, Single<Integer>> addItemUseCase;
     private Repository mRepository;
 
     @BeforeEach
     void setUpEach() {
         mRepository = mock(RepositoryImpl.class);
-        addItemUseCase = new AddItemUseCase(mRepository);
+        addItemUseCase = new AddItem(mRepository);
     }
 
     @Test
@@ -28,7 +28,7 @@ class AddItemUseCaseTest {
     void execute_nullRequest_callbackInvalidCode() {
         addItemUseCase.execute(null)
                 .test()
-                .assertValue(AddItemUseCase.ERROR_INVALID_NAME);
+                .assertValue(AddItem.ERROR_INVALID_NAME);
 
         verify(mRepository, never()).addNewItem(anyString());
         verify(mRepository, never()).putToBasket(anyString());
@@ -39,7 +39,7 @@ class AddItemUseCaseTest {
     void execute_emptyRequest_callbackInvalidCode() {
         addItemUseCase.execute("")
                 .test()
-                .assertValue(AddItemUseCase.ERROR_INVALID_NAME);
+                .assertValue(AddItem.ERROR_INVALID_NAME);
 
         verify(mRepository, never()).addNewItem(anyString());
         verify(mRepository, never()).putToBasket(anyString());
@@ -52,7 +52,7 @@ class AddItemUseCaseTest {
 
         addItemUseCase.execute("a")
                 .test()
-                .assertValue(AddItemUseCase.NEW_ITEM_ADDED);
+                .assertValue(AddItem.NEW_ITEM_ADDED);
 
         verify(mRepository).addNewItem("a");
         verify(mRepository, never()).putToBasket(anyString());
@@ -67,7 +67,7 @@ class AddItemUseCaseTest {
 
         addItemUseCase.execute("Item")
                 .test()
-                .assertValue(AddItemUseCase.EXISTING_ITEM_ADDED);
+                .assertValue(AddItem.EXISTING_ITEM_ADDED);
 
         verify(mRepository).putToBasket("Key");
         verify(mRepository, never()).addNewItem(anyString());
@@ -82,7 +82,7 @@ class AddItemUseCaseTest {
 
         addItemUseCase.execute("item")
                 .test()
-                .assertValue(AddItemUseCase.EXISTING_ITEM_ADDED);
+                .assertValue(AddItem.EXISTING_ITEM_ADDED);
 
         verify(mRepository).putToBasket("Key");
         verify(mRepository, never()).addNewItem(anyString());

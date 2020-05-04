@@ -17,9 +17,9 @@ import javax.inject.Named;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.domain.entities.ItemModel;
-import alektas.pocketbasket.domain.usecases.AddItemUseCase;
+import alektas.pocketbasket.domain.usecases.AddItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.GuideObserver;
@@ -32,31 +32,40 @@ import alektas.pocketbasket.guide.domain.Requirement;
 import alektas.pocketbasket.ui.utils.LiveEvent;
 import alektas.pocketbasket.utils.ResourcesUtils;
 import io.reactivex.Completable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
 import static alektas.pocketbasket.di.StorageModule.APP_PREFERENCES_NAME;
 import static alektas.pocketbasket.di.StorageModule.GUIDE_PREFERENCES_NAME;
-import static alektas.pocketbasket.di.UseCasesModule.ADD_ITEM_USE_CASE;
-import static alektas.pocketbasket.di.UseCasesModule.DEL_MODE_USE_CASE;
-import static alektas.pocketbasket.di.UseCasesModule.MARK_ALL_BASKET_USE_CASE;
-import static alektas.pocketbasket.di.UseCasesModule.REMOVE_MARKED_BASKET_ITEMS_USE_CASE;
-import static alektas.pocketbasket.di.UseCasesModule.RESET_ITEMS_USE_CASE;
-import static alektas.pocketbasket.di.UseCasesModule.SELECT_CATEGORY_USE_CASE;
-import static alektas.pocketbasket.di.UseCasesModule.UPDATE_ITEMS_USE_CASE;
+import static alektas.pocketbasket.di.UseCasesModule.ADD_ITEM;
+import static alektas.pocketbasket.di.UseCasesModule.DELETE_SELECTED_SHOWCASE_ITEMS;
+import static alektas.pocketbasket.di.UseCasesModule.SET_DEL_MODE;
+import static alektas.pocketbasket.di.UseCasesModule.GET_BASKET;
+import static alektas.pocketbasket.di.UseCasesModule.GET_SELECTED_SHOWCASE_ITEM_COUNT;
+import static alektas.pocketbasket.di.UseCasesModule.GET_DEL_MODE;
+import static alektas.pocketbasket.di.UseCasesModule.GET_VIEW_MODE;
+import static alektas.pocketbasket.di.UseCasesModule.TOGGLE_BASKET_CHECK;
+import static alektas.pocketbasket.di.UseCasesModule.REMOVE_CHECKED_BASKET_ITEMS;
+import static alektas.pocketbasket.di.UseCasesModule.RESET_SHOWCASE;
+import static alektas.pocketbasket.di.UseCasesModule.SELECT_CATEGORY;
+import static alektas.pocketbasket.di.UseCasesModule.SET_VIEW_MODE;
+import static alektas.pocketbasket.di.UseCasesModule.UPDATE_ITEMS;
 
 public class ActivityViewModel extends ViewModel implements GuideObserver {
     private static final String TAG = "ActivityViewModel";
     private Guide mGuide;
-    private Repository mRepository;
     private UseCase<String, Single<Integer>> mAddItemUseCase;
     private UseCase<Boolean, Void> mDelModeUseCase;
-    private UseCase<Void, Void> mMarkBasketUseCase;
+    private UseCase<Void, Void> mToggleBasketCheck;
     private UseCase<Void, Completable> mRemoveMarkedBasketItemsUseCase;
     private UseCase<Boolean, Completable> mResetItemsUseCase;
     private UseCase<String, Void> mSelectCategoryUseCase;
     private UseCase<Void, Void> mUpdateItemsUseCase;
+    private UseCase<Void, Void> mDeleteSelectedShowcaseItemsUseCase;
+    private UseCase<Void, Observable<List<BasketItem>>> mGetBasketItemsUseCase;
+    private UseCase<Boolean, Void> mSetViewModeUseCase;
 
     private CompositeDisposable mDisposable = new CompositeDisposable();
 
@@ -87,28 +96,35 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
 
     @Inject
     ActivityViewModel(
-            Repository repository,
             @Named(APP_PREFERENCES_NAME) SharedPreferences appPrefs,
             @Named(GUIDE_PREFERENCES_NAME) SharedPreferences guidePrefs,
-            @Named(ADD_ITEM_USE_CASE) UseCase<String, Single<Integer>> addItemUseCase,
-            @Named(DEL_MODE_USE_CASE) UseCase<Boolean, Void> delModeUseCase,
-            @Named(MARK_ALL_BASKET_USE_CASE) UseCase<Void, Void> markBasketUseCase,
-            @Named(REMOVE_MARKED_BASKET_ITEMS_USE_CASE) UseCase<Void, Completable> removeMarkedBasketItemsUseCase,
-            @Named(RESET_ITEMS_USE_CASE) UseCase<Boolean, Completable> resetItemsUseCase,
-            @Named(SELECT_CATEGORY_USE_CASE) UseCase<String, Void> selectCategoryUseCase,
-            @Named(UPDATE_ITEMS_USE_CASE) UseCase<Void, Void> updateItemsUseCase
+            @Named(ADD_ITEM) UseCase<String, Single<Integer>> addItemUseCase,
+            @Named(SET_DEL_MODE) UseCase<Boolean, Void> delModeUseCase,
+            @Named(TOGGLE_BASKET_CHECK) UseCase<Void, Void> toggleBasketCheck,
+            @Named(REMOVE_CHECKED_BASKET_ITEMS) UseCase<Void, Completable> removeMarkedBasketItemsUseCase,
+            @Named(RESET_SHOWCASE) UseCase<Boolean, Completable> resetItemsUseCase,
+            @Named(SELECT_CATEGORY) UseCase<String, Void> selectCategoryUseCase,
+            @Named(UPDATE_ITEMS) UseCase<Void, Void> updateItemsUseCase,
+            @Named(GET_VIEW_MODE) UseCase<Void, Observable<Boolean>> getViewModeUseCase,
+            @Named(GET_DEL_MODE) UseCase<Void, Observable<Boolean>> getDelModeUseCase,
+            @Named(GET_SELECTED_SHOWCASE_ITEM_COUNT) UseCase<Void, Observable<Integer>> delItemsCountUseCase,
+            @Named(GET_BASKET) UseCase<Void, Observable<List<BasketItem>>> getBasketItemsUseCase,
+            @Named(SET_VIEW_MODE) UseCase<Boolean, Void> setViewModeUseCase,
+            @Named(DELETE_SELECTED_SHOWCASE_ITEMS) UseCase<Void, Void> deleteSelectedShowcaseItemsUseCase
     ) {
         mAddItemUseCase = addItemUseCase;
         mDelModeUseCase = delModeUseCase;
-        mMarkBasketUseCase = markBasketUseCase;
+        mToggleBasketCheck = toggleBasketCheck;
         mRemoveMarkedBasketItemsUseCase = removeMarkedBasketItemsUseCase;
         mResetItemsUseCase = resetItemsUseCase;
         mSelectCategoryUseCase = selectCategoryUseCase;
         mUpdateItemsUseCase = updateItemsUseCase;
+        mGetBasketItemsUseCase = getBasketItemsUseCase;
+        mSetViewModeUseCase = setViewModeUseCase;
+        mDeleteSelectedShowcaseItemsUseCase = deleteSelectedShowcaseItemsUseCase;
 
-        mRepository = repository;
         mDisposable.addAll(
-                mRepository.observeViewMode()
+                getViewModeUseCase.execute(null)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(isShowcaseMode -> {
                             viewModeData.setValue(isShowcaseMode);
@@ -120,11 +136,11 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
                             }
                         }),
 
-                mRepository.observeDelMode()
+                getDelModeUseCase.execute(null)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(isDelMode -> deleteModeData.setValue(isDelMode)),
 
-                mRepository.getDelItemsCountData()
+                delItemsCountUseCase.execute(null)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(delItemsCount -> deleteItemsCountData.setValue(delItemsCount))
         );
@@ -141,7 +157,6 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
     protected void onCleared() {
         super.onCleared();
         mDisposable.clear();
-        mRepository = null;
         mGuide.removeObserver(this);
     }
 
@@ -188,12 +203,12 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
     }
 
     public void setShowcaseMode(boolean showcaseMode) {
-        mRepository.setViewMode(showcaseMode);
+        mSetViewModeUseCase.execute(showcaseMode);
         mGuide.onUserEvent(GuideContract.GUIDE_CHANGE_MODE);
     }
 
     public List<? extends ItemModel> getBasketItems() {
-        return mRepository.getBasketData().blockingFirst();
+        return mGetBasketItemsUseCase.execute(null).blockingFirst();
     }
 
 
@@ -381,7 +396,7 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
     }
 
     public void onDeleteSelectedShowcaseItems() {
-        mRepository.deleteSelectedItems();
+        mDeleteSelectedShowcaseItemsUseCase.execute(null);
         onCloseDelMode();
     }
 
@@ -392,7 +407,7 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
 
     public void onCheckAllBtnClick() {
         mGuide.onUserEvent(GuideContract.GUIDE_BASKET_MENU_HELP);
-        mMarkBasketUseCase.execute(null);
+        mToggleBasketCheck.execute(null);
     }
 
     public void onDelCheckedBtnClick() {
@@ -418,7 +433,7 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
                         .execute(name)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(resultCode -> {
-                                    if (resultCode == AddItemUseCase.NEW_ITEM_ADDED) {
+                                    if (resultCode == AddItem.NEW_ITEM_ADDED) {
                                         newItemAddedState.setState(true);
                                     }
                                 }

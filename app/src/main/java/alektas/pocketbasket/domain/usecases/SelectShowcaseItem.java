@@ -1,5 +1,7 @@
 package alektas.pocketbasket.domain.usecases;
 
+import javax.inject.Inject;
+
 import alektas.pocketbasket.domain.Repository;
 import io.reactivex.Single;
 
@@ -8,6 +10,7 @@ public class SelectShowcaseItem implements UseCase<String, Single<Integer>> {
     public static final int ITEM_REMOVED_FROM_BASKET = 0;
     public static final int ITEM_ADDED_TO_BASKET = 1;
 
+    @Inject
     public SelectShowcaseItem(Repository repository) {
         mRepository = repository;
     }

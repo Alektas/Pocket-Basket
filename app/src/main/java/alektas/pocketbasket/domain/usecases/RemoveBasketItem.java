@@ -1,17 +1,16 @@
 package alektas.pocketbasket.domain.usecases;
 
+import javax.inject.Inject;
+
 import alektas.pocketbasket.domain.Repository;
 import io.reactivex.Completable;
 
-public class RemoveItemFromBasket implements UseCase<String, Completable> {
+public class RemoveBasketItem implements UseCase<String, Completable> {
     private Repository mRepository;
     private boolean byName;
 
-    public RemoveItemFromBasket(Repository repository) {
-        mRepository = repository;
-    }
-
-    public RemoveItemFromBasket(Repository repository, boolean byName) {
+    @Inject
+    public RemoveBasketItem(Repository repository, boolean byName) {
         mRepository = repository;
         this.byName = byName;
     }

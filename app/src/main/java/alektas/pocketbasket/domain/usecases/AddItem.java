@@ -2,6 +2,8 @@ package alektas.pocketbasket.domain.usecases;
 
 import java.util.NoSuchElementException;
 
+import javax.inject.Inject;
+
 import alektas.pocketbasket.domain.Repository;
 import io.reactivex.Single;
 
@@ -14,7 +16,7 @@ import io.reactivex.Single;
  * INPUT: item displayed name regardless of the register<br>
  * RESULT: result codes
  */
-public class AddItemUseCase implements UseCase<String, Single<Integer>> {
+public class AddItem implements UseCase<String, Single<Integer>> {
     public static final int NEW_ITEM_ADDED = 0;
     public static final int EXISTING_ITEM_ADDED = 1;
     public static final int ERROR_INVALID_NAME = 601;
@@ -22,7 +24,8 @@ public class AddItemUseCase implements UseCase<String, Single<Integer>> {
 
     private Repository mRepository;
 
-    public AddItemUseCase(Repository repository) {
+    @Inject
+    public AddItem(Repository repository) {
         mRepository = repository;
     }
 
