@@ -61,5 +61,6 @@
     <string name="reset_showcase_success">Showcase recovered successfully</string>
     <string name="reset_showcase_fail">Failed to restore the showcase</string>
     <string name="basket_placeholder_empty_cart">Basket is empty</string>
+    <string name="delete">Delete</string>
 
 </resources>

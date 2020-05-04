@@ -48,5 +48,6 @@
     <string name="reset_showcase_success">Витрина успешно восстановлена</string>
     <string name="reset_showcase_fail">Не удалось восстановить витрину</string>
     <string name="basket_placeholder_empty_cart">Корзина пуста</string>
+    <string name="delete">Удалить</string>
 
 </resources>
