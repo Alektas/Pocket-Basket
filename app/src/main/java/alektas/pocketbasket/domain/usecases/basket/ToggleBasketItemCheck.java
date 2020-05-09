@@ -1,14 +1,15 @@
-package alektas.pocketbasket.domain.usecases;
+package alektas.pocketbasket.domain.usecases.basket;
 
 import javax.inject.Inject;
 
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.BasketRepository;
+import alektas.pocketbasket.domain.usecases.UseCase;
 
 public class ToggleBasketItemCheck implements UseCase<String, Void> {
-    private Repository mRepository;
+    private BasketRepository mRepository;
 
     @Inject
-    public ToggleBasketItemCheck(Repository repository) {
+    public ToggleBasketItemCheck(BasketRepository repository) {
         mRepository = repository;
     }
 

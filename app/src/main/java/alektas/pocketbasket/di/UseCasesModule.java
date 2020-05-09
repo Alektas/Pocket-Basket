@@ -6,29 +6,30 @@ import javax.inject.Named;
 
 import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.data.db.entities.ShowcaseItem;
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.BasketRepository;
+import alektas.pocketbasket.domain.ShowcaseRepository;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.usecases.AddItem;
-import alektas.pocketbasket.domain.usecases.ChangeBasketPositions;
-import alektas.pocketbasket.domain.usecases.CleanBasket;
-import alektas.pocketbasket.domain.usecases.DeleteSelectedShowcaseItems;
-import alektas.pocketbasket.domain.usecases.GetBasket;
-import alektas.pocketbasket.domain.usecases.GetDelMode;
-import alektas.pocketbasket.domain.usecases.GetSelectedShowcaseItemCount;
-import alektas.pocketbasket.domain.usecases.GetShowcase;
+import alektas.pocketbasket.domain.usecases.basket.ChangeBasketPositions;
+import alektas.pocketbasket.domain.usecases.basket.CleanBasket;
+import alektas.pocketbasket.domain.usecases.showcase.DeleteSelectedShowcaseItems;
+import alektas.pocketbasket.domain.usecases.basket.GetBasket;
+import alektas.pocketbasket.domain.usecases.showcase.GetDelMode;
+import alektas.pocketbasket.domain.usecases.showcase.GetSelectedShowcaseItemCount;
+import alektas.pocketbasket.domain.usecases.showcase.GetShowcase;
 import alektas.pocketbasket.domain.usecases.GetViewMode;
-import alektas.pocketbasket.domain.usecases.MoveBasketItemToTop;
-import alektas.pocketbasket.domain.usecases.ResetShowcase;
-import alektas.pocketbasket.domain.usecases.SetDelMode;
-import alektas.pocketbasket.domain.usecases.ToggleBasketCheck;
-import alektas.pocketbasket.domain.usecases.ToggleBasketItemCheck;
-import alektas.pocketbasket.domain.usecases.RemoveCheckedBasketItems;
-import alektas.pocketbasket.domain.usecases.RemoveBasketItem;
-import alektas.pocketbasket.domain.usecases.SelectCategory;
-import alektas.pocketbasket.domain.usecases.SelectShowcaseItem;
+import alektas.pocketbasket.domain.usecases.basket.MoveBasketItemToTop;
+import alektas.pocketbasket.domain.usecases.showcase.ResetShowcase;
+import alektas.pocketbasket.domain.usecases.showcase.SetDelMode;
+import alektas.pocketbasket.domain.usecases.basket.ToggleBasketCheck;
+import alektas.pocketbasket.domain.usecases.basket.ToggleBasketItemCheck;
+import alektas.pocketbasket.domain.usecases.basket.RemoveCheckedBasketItems;
+import alektas.pocketbasket.domain.usecases.basket.RemoveBasketItem;
+import alektas.pocketbasket.domain.usecases.showcase.SelectCategory;
+import alektas.pocketbasket.domain.usecases.showcase.SelectShowcaseItem;
 import alektas.pocketbasket.domain.usecases.SetViewMode;
-import alektas.pocketbasket.domain.usecases.ToggleShowcaseItemSelection;
-import alektas.pocketbasket.domain.usecases.UpdateItems;
+import alektas.pocketbasket.domain.usecases.showcase.ToggleShowcaseItemSelection;
+import alektas.pocketbasket.domain.usecases.showcase.UpdateItems;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import dagger.Binds;
 import dagger.Module;
@@ -68,14 +69,20 @@ public abstract class UseCasesModule {
 
     @Provides
     @Named(REMOVE_BASKET_ITEM_BY_NAME)
-    static UseCase<String, Completable> removeFromBasketByName(Repository repo) {
-        return new RemoveBasketItem(repo, true);
+    static UseCase<String, Completable> removeFromBasketByName(
+            BasketRepository basketRepository,
+            ShowcaseRepository showcaseRepository
+    ) {
+        return new RemoveBasketItem(basketRepository, showcaseRepository, true);
     }
 
     @Provides
     @Named(REMOVE_BASKET_ITEM_BY_KEY)
-    static UseCase<String, Completable> removeFromBasketByKey(Repository repo) {
-        return new RemoveBasketItem(repo, false);
+    static UseCase<String, Completable> removeFromBasketByKey(
+            BasketRepository basketRepository,
+            ShowcaseRepository showcaseRepository
+    ) {
+        return new RemoveBasketItem(basketRepository, showcaseRepository, false);
     }
 
     @Binds

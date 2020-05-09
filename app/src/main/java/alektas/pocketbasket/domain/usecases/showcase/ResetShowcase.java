@@ -1,15 +1,16 @@
-package alektas.pocketbasket.domain.usecases;
+package alektas.pocketbasket.domain.usecases.showcase;
 
 import javax.inject.Inject;
 
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.ShowcaseRepository;
+import alektas.pocketbasket.domain.usecases.UseCase;
 import io.reactivex.Completable;
 
 public class ResetShowcase implements UseCase<Boolean, Completable> {
-    private Repository mRepository;
+    private ShowcaseRepository mRepository;
 
     @Inject
-    public ResetShowcase(Repository repository) {
+    public ResetShowcase(ShowcaseRepository repository) {
         mRepository = repository;
     }
 

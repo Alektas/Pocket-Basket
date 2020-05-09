@@ -1,17 +1,18 @@
-package alektas.pocketbasket.domain.usecases;
+package alektas.pocketbasket.domain.usecases.showcase;
 
 import javax.inject.Inject;
 
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.BasketRepository;
+import alektas.pocketbasket.domain.usecases.UseCase;
 import io.reactivex.Single;
 
 public class SelectShowcaseItem implements UseCase<String, Single<Integer>> {
-    private Repository mRepository;
+    private BasketRepository mRepository;
     public static final int ITEM_REMOVED_FROM_BASKET = 0;
     public static final int ITEM_ADDED_TO_BASKET = 1;
 
     @Inject
-    public SelectShowcaseItem(Repository repository) {
+    public SelectShowcaseItem(BasketRepository repository) {
         mRepository = repository;
     }
 

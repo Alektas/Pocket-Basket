@@ -4,9 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import alektas.pocketbasket.data.RepositoryImpl;
+import alektas.pocketbasket.data.BasketRepositoryImpl;
+import alektas.pocketbasket.data.ShowcaseRepositoryImpl;
 import alektas.pocketbasket.data.db.entities.Item;
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.BasketRepository;
+import alektas.pocketbasket.domain.ShowcaseRepository;
 import io.reactivex.Maybe;
 import io.reactivex.Single;
 
@@ -15,12 +17,14 @@ import static org.mockito.Mockito.*;
 @DisplayName("Use case add basket items")
 class AddItemTest {
     private UseCase<String, Single<Integer>> addItemUseCase;
-    private Repository mRepository;
+    private ShowcaseRepository mShowcaseRepository;
+    private BasketRepository mBasketRepository;
 
     @BeforeEach
     void setUpEach() {
-        mRepository = mock(RepositoryImpl.class);
-        addItemUseCase = new AddItem(mRepository);
+        mShowcaseRepository = mock(ShowcaseRepositoryImpl.class);
+        mBasketRepository = mock(BasketRepositoryImpl.class);
+        addItemUseCase = new AddItem(mShowcaseRepository, mBasketRepository);
     }
 
     @Test
@@ -30,8 +34,8 @@ class AddItemTest {
                 .test()
                 .assertValue(AddItem.ERROR_INVALID_NAME);
 
-        verify(mRepository, never()).createItem(anyString());
-        verify(mRepository, never()).putToBasket(anyString());
+        verify(mShowcaseRepository, never()).createItem(anyString());
+        verify(mBasketRepository, never()).putToBasket(anyString());
     }
 
     @Test
@@ -41,21 +45,21 @@ class AddItemTest {
                 .test()
                 .assertValue(AddItem.ERROR_INVALID_NAME);
 
-        verify(mRepository, never()).createItem(anyString());
-        verify(mRepository, never()).putToBasket(anyString());
+        verify(mShowcaseRepository, never()).createItem(anyString());
+        verify(mBasketRepository, never()).putToBasket(anyString());
     }
 
     @Test
     @DisplayName("new item one char name -> invoke adding new item, not putting existing")
     void execute_oneCharNewItemRequest_newItemAdded() {
-        when(mRepository.getItemByName(anyString())).thenReturn(Maybe.empty());
+        when(mShowcaseRepository.getItemByName(anyString())).thenReturn(Maybe.empty());
 
         addItemUseCase.execute("a")
                 .test()
                 .assertValue(AddItem.NEW_ITEM_ADDED);
 
-        verify(mRepository).createItem("a");
-        verify(mRepository, never()).putToBasket(anyString());
+        verify(mShowcaseRepository).createItem("a");
+        verify(mBasketRepository, never()).putToBasket(anyString());
     }
 
     @Test
@@ -63,14 +67,14 @@ class AddItemTest {
     void execute_existingItemRequest_existingItemAdded() {
         Item item = mock(Item.class);
         when(item.getKey()).thenReturn("Key");
-        when(mRepository.getItemByName("Item")).thenReturn(Maybe.just(item));
+        when(mShowcaseRepository.getItemByName("Item")).thenReturn(Maybe.just(item));
 
         addItemUseCase.execute("Item")
                 .test()
                 .assertValue(AddItem.EXISTING_ITEM_ADDED);
 
-        verify(mRepository).putToBasket("Key");
-        verify(mRepository, never()).createItem(anyString());
+        verify(mBasketRepository).putToBasket("Key");
+        verify(mShowcaseRepository, never()).createItem(anyString());
     }
 
     @Test
@@ -78,13 +82,13 @@ class AddItemTest {
     void execute_existingItemLowerCaseRequest_existingItemAdded() {
         Item item = mock(Item.class);
         when(item.getKey()).thenReturn("Key");
-        when(mRepository.getItemByName("Item")).thenReturn(Maybe.just(item));
+        when(mShowcaseRepository.getItemByName("Item")).thenReturn(Maybe.just(item));
 
         addItemUseCase.execute("item")
                 .test()
                 .assertValue(AddItem.EXISTING_ITEM_ADDED);
 
-        verify(mRepository).putToBasket("Key");
-        verify(mRepository, never()).createItem(anyString());
+        verify(mBasketRepository).putToBasket("Key");
+        verify(mShowcaseRepository, never()).createItem(anyString());
     }
 }

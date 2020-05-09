@@ -1,18 +1,19 @@
-package alektas.pocketbasket.domain.usecases;
+package alektas.pocketbasket.domain.usecases.basket;
 
 import javax.inject.Inject;
 
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.BasketRepository;
+import alektas.pocketbasket.domain.usecases.UseCase;
 import io.reactivex.Completable;
 
 /**
  * Delete all marked items in the Basket.
  */
 public class RemoveCheckedBasketItems implements UseCase<Void, Completable> {
-    private Repository mRepository;
+    private BasketRepository mRepository;
 
     @Inject
-    public RemoveCheckedBasketItems(Repository repository) {
+    public RemoveCheckedBasketItems(BasketRepository repository) {
         mRepository = repository;
     }
 

@@ -1,14 +1,15 @@
-package alektas.pocketbasket.domain.usecases;
+package alektas.pocketbasket.domain.usecases.showcase;
 
 import javax.inject.Inject;
 
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.ShowcaseRepository;
+import alektas.pocketbasket.domain.usecases.UseCase;
 
 public class UpdateItems implements UseCase<Void, Void> {
-    private Repository mRepository;
+    private ShowcaseRepository mRepository;
 
     @Inject
-    public UpdateItems(Repository repository) {
+    public UpdateItems(ShowcaseRepository repository) {
         mRepository = repository;
     }
 

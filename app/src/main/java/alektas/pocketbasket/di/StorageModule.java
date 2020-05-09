@@ -11,7 +11,6 @@ import javax.inject.Singleton;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.data.db.AppDatabase;
 import alektas.pocketbasket.data.db.dao.BasketDao;
-import alektas.pocketbasket.data.db.dao.ItemsDao;
 import alektas.pocketbasket.data.db.dao.ShowcaseDao;
 import dagger.Module;
 import dagger.Provides;
@@ -40,12 +39,6 @@ public class StorageModule {
                 context.getString(R.string.GUIDE_PREFERENCES_FILE_KEY),
                 Context.MODE_PRIVATE
         );
-    }
-
-    @Provides
-    @Singleton
-    ItemsDao providesItemsDao(AppDatabase database) {
-        return database.getItemsDao();
     }
 
     @Provides

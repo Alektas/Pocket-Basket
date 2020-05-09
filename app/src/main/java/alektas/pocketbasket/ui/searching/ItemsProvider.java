@@ -16,14 +16,14 @@ import java.util.List;
 import javax.inject.Inject;
 
 import alektas.pocketbasket.App;
-import alektas.pocketbasket.data.db.dao.ItemsDao;
+import alektas.pocketbasket.data.db.dao.ShowcaseDao;
 import alektas.pocketbasket.data.db.entities.Item;
 import alektas.pocketbasket.utils.ResourcesUtils;
 
 public class ItemsProvider extends ContentProvider {
     private static final String TAG = "ItemsProvider";
     @Inject
-    ItemsDao mItemsDao;
+    ShowcaseDao mShowcaseDao;
 
     @Override
     public boolean onCreate() { return true; }
@@ -46,10 +46,10 @@ public class ItemsProvider extends ContentProvider {
         } else {
             // query contains the users search
             // return a cursor with appropriate data
-            if (mItemsDao == null) {
+            if (mShowcaseDao == null) {
                 App.getComponent().inject(this);
             }
-            List<Item> items = mItemsDao.search("%" + query + "%")
+            List<Item> items = mShowcaseDao.search("%" + query + "%")
                     .blockingGet(new ArrayList<>());
 
             return fillCursor(cursor, items);

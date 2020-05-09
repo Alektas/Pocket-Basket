@@ -1,15 +1,16 @@
-package alektas.pocketbasket.domain.usecases;
+package alektas.pocketbasket.domain.usecases.showcase;
 
 import javax.inject.Inject;
 
 import alektas.pocketbasket.data.db.entities.ShowcaseItem;
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.ShowcaseRepository;
+import alektas.pocketbasket.domain.usecases.UseCase;
 
 public class ToggleShowcaseItemSelection implements UseCase<ShowcaseItem, Void> {
-    private Repository mRepository;
+    private ShowcaseRepository mRepository;
 
     @Inject
-    public ToggleShowcaseItemSelection(Repository repository) {
+    public ToggleShowcaseItemSelection(ShowcaseRepository repository) {
         mRepository = repository;
     }
 

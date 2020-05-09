@@ -16,12 +16,12 @@ import javax.inject.Inject;
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.data.db.entities.BasketItem;
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.BasketRepository;
 import alektas.pocketbasket.utils.ResourcesUtils;
 
 public class BasketWidgetService extends RemoteViewsService {
     @Inject
-    Repository mRepository;
+    BasketRepository mRepository;
 
     public BasketWidgetService() {
         App.getComponent().inject(this);
@@ -35,11 +35,11 @@ public class BasketWidgetService extends RemoteViewsService {
 
 class BasketWidgetFactory implements RemoteViewsService.RemoteViewsFactory {
     private Context mContext;
-    private Repository mRepository;
+    private BasketRepository mRepository;
     private List<WidgetBasketItem> widgetItems;
     private int widgetId;
 
-    BasketWidgetFactory(Context context, Repository repository, Intent intent) {
+    BasketWidgetFactory(Context context, BasketRepository repository, Intent intent) {
         mContext = context;
         mRepository = repository;
         widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,

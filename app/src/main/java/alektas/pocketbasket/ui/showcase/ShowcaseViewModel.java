@@ -15,7 +15,7 @@ import javax.inject.Named;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.data.db.entities.ShowcaseItem;
-import alektas.pocketbasket.domain.usecases.SelectShowcaseItem;
+import alektas.pocketbasket.domain.usecases.showcase.SelectShowcaseItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.domain.Guide;

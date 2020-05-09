@@ -2,6 +2,7 @@ package alektas.pocketbasket.data.db.dao;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
+import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import alektas.pocketbasket.data.db.entities.Item;
 import alektas.pocketbasket.data.db.entities.ShowcaseItem;
+import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 @Dao
@@ -48,20 +50,22 @@ public abstract class ShowcaseDao {
             "END, displayed_name")
     public abstract Observable<List<ShowcaseItem>> getShowcaseItems();
 
+    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, deleted FROM items")
+    public abstract Maybe<List<Item>> getAllItems();
 
-    /* Reset showcase queries */
+    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, deleted " +
+            "FROM items WHERE displayed_name = :name AND deleted = 0")
+    public abstract Maybe<Item> getItemByName(String name);
+
+    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, deleted " +
+            "FROM items WHERE displayed_name LIKE :query AND deleted = 0")
+    public abstract Maybe<List<Item>> search(String query);
 
     @Transaction
-    public void resetShowcase() {
-        deleteUserItems();
-        restoreShowcase();
+    public void createItem(String key) {
+        Item item = new Item(key);
+        insert(item);
     }
-
-    @Query("DELETE FROM items WHERE name_res IS NULL")
-    protected abstract void deleteUserItems();
-
-    @Query("UPDATE items SET deleted = 0")
-    public abstract void restoreShowcase();
 
     @Transaction
     public void deleteItems(Collection<ShowcaseItem> items) {
@@ -75,13 +79,28 @@ public abstract class ShowcaseDao {
         }
     }
 
+    @Transaction
+    public void resetShowcase() {
+        deleteUserItems();
+        restoreShowcase();
+    }
 
-    /* Default Insert, Update, Delete methods */
+    @Query("DELETE FROM items WHERE name_res IS NULL")
+    protected abstract void deleteUserItems();
+
+    @Query("UPDATE items SET deleted = 0")
+    public abstract void restoreShowcase();
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
     protected abstract void update(Item item);
 
     @Delete
     protected abstract void delete(Item item);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    protected abstract void insert(Item item);
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    public abstract void update(List<Item> items);
 
 }

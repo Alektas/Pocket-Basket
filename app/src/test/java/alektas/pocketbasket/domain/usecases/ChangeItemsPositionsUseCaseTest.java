@@ -8,20 +8,21 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import alektas.pocketbasket.data.RepositoryImpl;
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.data.BasketRepositoryImpl;
+import alektas.pocketbasket.domain.BasketRepository;
 import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.usecases.basket.ChangeBasketPositions;
 
 import static org.mockito.Mockito.*;
 
 @DisplayName("Use case of item position updating")
 class ChangeItemsPositionsUseCaseTest {
-    private Repository mRepository;
+    private BasketRepository mRepository;
     private UseCase<List<ItemModel>, Void> changePositionUseCase;
 
     @BeforeEach
     void setUp() {
-        mRepository = mock(RepositoryImpl.class);
+        mRepository = mock(BasketRepositoryImpl.class);
         changePositionUseCase = new ChangeBasketPositions(mRepository);
     }
 

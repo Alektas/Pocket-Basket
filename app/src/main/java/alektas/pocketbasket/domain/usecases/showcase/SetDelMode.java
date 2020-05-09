@@ -1,14 +1,15 @@
-package alektas.pocketbasket.domain.usecases;
+package alektas.pocketbasket.domain.usecases.showcase;
 
 import javax.inject.Inject;
 
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.ShowcaseRepository;
+import alektas.pocketbasket.domain.usecases.UseCase;
 
 public class SetDelMode implements UseCase<Boolean, Void> {
-    private Repository mRepository;
+    private ShowcaseRepository mRepository;
 
     @Inject
-    public SetDelMode(Repository repository) {
+    public SetDelMode(ShowcaseRepository repository) {
         mRepository = repository;
     }
 

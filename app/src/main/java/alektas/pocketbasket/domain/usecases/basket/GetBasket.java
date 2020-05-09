@@ -1,18 +1,19 @@
-package alektas.pocketbasket.domain.usecases;
+package alektas.pocketbasket.domain.usecases.basket;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
 import alektas.pocketbasket.data.db.entities.BasketItem;
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.BasketRepository;
+import alektas.pocketbasket.domain.usecases.UseCase;
 import io.reactivex.Observable;
 
 public class GetBasket implements UseCase<Void, Observable<List<BasketItem>>> {
-    private Repository mRepository;
+    private BasketRepository mRepository;
 
     @Inject
-    public GetBasket(Repository repository) {
+    public GetBasket(BasketRepository repository) {
         mRepository = repository;
     }
 

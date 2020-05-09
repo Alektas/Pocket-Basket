@@ -2,13 +2,13 @@ package alektas.pocketbasket.domain.usecases;
 
 import javax.inject.Inject;
 
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.AppRepository;
 
 public class SetViewMode implements UseCase<Boolean, Void> {
-    private Repository mRepository;
+    private AppRepository mRepository;
 
     @Inject
-    public SetViewMode(Repository repository) {
+    public SetViewMode(AppRepository repository) {
         mRepository = repository;
     }
 

@@ -2,14 +2,14 @@ package alektas.pocketbasket.domain.usecases;
 
 import javax.inject.Inject;
 
-import alektas.pocketbasket.domain.Repository;
+import alektas.pocketbasket.domain.AppRepository;
 import io.reactivex.Observable;
 
 public class GetViewMode implements UseCase<Void, Observable<Boolean>> {
-    private Repository mRepository;
+    private AppRepository mRepository;
 
     @Inject
-    public GetViewMode(Repository repository) {
+    public GetViewMode(AppRepository repository) {
         mRepository = repository;
     }
 
