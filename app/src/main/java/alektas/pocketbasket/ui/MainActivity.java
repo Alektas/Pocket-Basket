@@ -111,8 +111,7 @@ public class MainActivity extends AppCompatActivity implements
     AppPreferences mPrefs;
 
     @Inject
-    ViewModelProvider.Factory mViewModelFactory;
-    private ActivityViewModel mViewModel;
+    ActivityViewModel mViewModel;
     private VelocityTracker mVelocityTracker;
     private ShareActionProvider mShareActionProvider;
     private ViewGroup mRootLayout;
@@ -269,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements
         mBasket = mBasketContainer.findViewById(R.id.basket_list);
         initDimensions();
 
-        mViewModel = new ViewModelProvider(this, mViewModelFactory).get(ActivityViewModel.class);
         mViewModel.setOrientationState(isLandscape());
         GuidePresenter guidePresenter = buildGuide();
 

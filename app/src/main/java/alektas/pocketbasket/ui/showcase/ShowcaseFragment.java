@@ -31,8 +31,7 @@ public class ShowcaseFragment extends Fragment {
     @Inject
     AdManager mAdManager;
     @Inject
-    ViewModelProvider.Factory mViewModelFactory;
-    private ShowcaseViewModel mViewModel;
+    ShowcaseViewModel mViewModel;
     private ShowcaseRvAdapter mShowcaseAdapter;
     private ItemSizeProvider mItemSizeProvider;
     private RecyclerView mShowcase;
@@ -73,7 +72,6 @@ public class ShowcaseFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        mViewModel = new ViewModelProvider(this, mViewModelFactory).get(ShowcaseViewModel.class);
         mShowcaseAdapter = new ShowcaseRvAdapter(mViewModel, mItemSizeProvider);
         mShowcase.setAdapter(mShowcaseAdapter);
         subscribeOnModel();

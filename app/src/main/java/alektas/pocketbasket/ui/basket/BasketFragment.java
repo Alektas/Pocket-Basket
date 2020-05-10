@@ -29,8 +29,7 @@ import alektas.pocketbasket.ui.ItemSizeProvider;
  */
 public class BasketFragment extends Fragment implements OnStartDragListener {
     @Inject
-    ViewModelProvider.Factory mViewModelFactory;
-    private BasketViewModel mViewModel;
+    BasketViewModel mViewModel;
     private BasketRvAdapter mBasketAdapter;
     private ItemTouchHelper mTouchHelper;
     private RecyclerView mBasket;
@@ -79,7 +78,6 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        mViewModel = new ViewModelProvider(this, mViewModelFactory).get(BasketViewModel.class);
         mBasketAdapter = new BasketRvAdapter(getContext(), mViewModel,this, mItemSizeProvider);
         mBasket.setAdapter(mBasketAdapter);
 
