@@ -77,7 +77,7 @@ public class AppPreferences {
     }
 
     public int getSelectedCategoryId() {
-        return mAppPrefs.getInt(getString(R.string.SELECTED_CATEGORY_KEY), 0);
+        return mAppPrefs.getInt(getString(R.string.SELECTED_CATEGORY_KEY), PrefDefaults.SELECTED_CATEGORY_ID);
     }
 
 }

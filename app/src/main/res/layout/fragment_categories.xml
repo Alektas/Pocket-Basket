@@ -23,7 +23,6 @@
             <RadioButton
                 android:id="@+id/all_rb"
                 style="@style/Widget.CategoryButton"
-                android:checked="true"
                 android:text="@string/all"
                 android:tag="@string/all"
                 android:button="@drawable/ic_categ_all_inset"/>

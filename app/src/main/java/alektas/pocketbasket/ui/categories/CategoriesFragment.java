@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
@@ -15,7 +16,6 @@ import javax.inject.Inject;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.utils.ResourcesUtils;
 
 public class CategoriesFragment extends Fragment {
     @Inject
@@ -42,15 +42,17 @@ public class CategoriesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mCategories = view.findViewById(R.id.categories_radiogroup);
-        mCategories.setOnCheckedChangeListener((group, checkedId) -> onCategorySelect(checkedId));
+        mCategories.setOnCheckedChangeListener((group, checkedId) -> {
+            mViewModel.onCategorySelect(checkedId);
+        });
 
         observeModel();
     }
 
     private void observeModel() {
-        mViewModel.getInitCategory().observe(getViewLifecycleOwner(), categoryId -> {
-            if (categoryId == -1) return;
-            mCategories.check(categoryId);
+        mViewModel.getInitCategory().observe(getViewLifecycleOwner(), buttonId -> {
+            RadioButton button = mCategories.findViewById(buttonId);
+            button.setChecked(true);
         });
     }
 
@@ -58,57 +60,6 @@ public class CategoriesFragment extends Fragment {
     public void onStop() {
         mViewModel.saveCategory(mCategories.getCheckedRadioButtonId());
         super.onStop();
-    }
-
-    private void onCategorySelect(int buttonId) {
-        switch (buttonId) {
-            case R.id.all_rb:
-                setCategory(R.string.all);
-                break;
-            case R.id.drink_rb:
-                setCategory(R.string.drink);
-                break;
-            case R.id.fruits_rb:
-                setCategory(R.string.fruit);
-                break;
-            case R.id.veg_rb:
-                setCategory(R.string.vegetable);
-                break;
-            case R.id.groats_rb:
-                setCategory(R.string.groats);
-                break;
-            case R.id.milky_rb:
-                setCategory(R.string.milky);
-                break;
-            case R.id.floury_rb:
-                setCategory(R.string.floury);
-                break;
-            case R.id.sweets_rb:
-                setCategory(R.string.sweets);
-                break;
-            case R.id.meat_rb:
-                setCategory(R.string.meat);
-                break;
-            case R.id.seafood_rb:
-                setCategory(R.string.seafood);
-                break;
-            case R.id.semis_rb:
-                setCategory(R.string.semis);
-                break;
-            case R.id.sauce_n_oil_rb:
-                setCategory(R.string.sauce_n_oil);
-                break;
-            case R.id.household_rb:
-                setCategory(R.string.household);
-                break;
-            case R.id.other_rb:
-                setCategory(R.string.other);
-                break;
-        }
-    }
-
-    private void setCategory(int keyRes) {
-        mViewModel.setCategory(ResourcesUtils.getResIdName(keyRes));
     }
 
 }

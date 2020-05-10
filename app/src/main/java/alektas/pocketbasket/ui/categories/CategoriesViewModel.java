@@ -14,20 +14,24 @@ import static alektas.pocketbasket.di.UseCasesModule.SELECT_CATEGORY;
 public class CategoriesViewModel extends ViewModel {
     private UseCase<String, Void> mSelectCategory;
     private AppPreferences mPrefs;
+    private CategoryMapper mMapper;
     private LiveEvent<Integer> mInitCategory;
 
     @Inject
     public CategoriesViewModel(
             AppPreferences prefs,
+            CategoryMapper mapper,
             @Named(SELECT_CATEGORY) UseCase<String, Void> selectCategory
     ) {
         mPrefs = prefs;
+        mMapper = mapper;
         mSelectCategory = selectCategory;
         mInitCategory = new LiveEvent<>();
         mInitCategory.setValue(prefs.getSelectedCategoryId());
     }
 
-    public void setCategory(String categoryKey) {
+    public void onCategorySelect(int buttonId) {
+        String categoryKey = mMapper.convertToCategoryKey(buttonId);
         mSelectCategory.execute(categoryKey);
     }
 
@@ -38,4 +42,5 @@ public class CategoriesViewModel extends ViewModel {
     public LiveEvent<Integer> getInitCategory() {
         return mInitCategory;
     }
+
 }
