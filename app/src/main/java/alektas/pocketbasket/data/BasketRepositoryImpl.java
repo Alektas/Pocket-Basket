@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import alektas.pocketbasket.data.db.dao.BasketDao;
 import alektas.pocketbasket.data.db.entities.BasketItem;
@@ -20,6 +21,7 @@ import io.reactivex.Single;
 import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 
+@Singleton
 public class BasketRepositoryImpl implements BasketRepository {
     private static final String TAG = "BasketRepositoryImpl";
     private BasketDao mBasketDao;

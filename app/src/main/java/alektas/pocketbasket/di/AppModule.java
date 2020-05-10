@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import javax.inject.Singleton;
 
+import alektas.pocketbasket.data.AppPreferences;
 import alektas.pocketbasket.data.AppRepositoryImpl;
 import alektas.pocketbasket.data.BasketRepositoryImpl;
 import alektas.pocketbasket.data.ShowcaseRepositoryImpl;
@@ -32,8 +33,8 @@ public class AppModule {
 
     @Provides
     @Singleton
-    AppRepository providesRepository() {
-        return new AppRepositoryImpl();
+    AppRepository providesRepository(AppPreferences prefs) {
+        return new AppRepositoryImpl(prefs);
     }
 
     @Provides

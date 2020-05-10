@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.data.db.dao.ShowcaseDao;
@@ -25,6 +26,7 @@ import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
+@Singleton
 public class ShowcaseRepositoryImpl implements ShowcaseRepository {
     private static final String TAG = "RepositoryImpl";
     private ShowcaseDao mShowcaseDao;
