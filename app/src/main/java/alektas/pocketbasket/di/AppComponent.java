@@ -18,6 +18,7 @@ import dagger.Component;
         UseCasesModule.class, ViewModelModule.class
 })
 public interface AppComponent {
+
     Context context();
 
     void inject(MainActivity activity);
@@ -31,4 +32,5 @@ public interface AppComponent {
     void inject(BasketFragment fragment);
 
     void inject(ShowcaseFragment fragment);
+
 }

@@ -8,6 +8,8 @@
     <string name="LOCALE_KEY" translatable="false">user_locale</string>
     <string name="FIRST_START_KEY" translatable="false">isFirstStart</string>
     <string name="SHOW_HINTS_KEY" translatable="false">showHints</string>
+    <string name="IS_SHOWCASE_VIEW_MODE_KEY" translatable="false">key_is_showcase_view_mode</string>
+    <string name="SELECTED_CATEGORY_KEY" translatable="false">saved_category</string>
 
     <string name="ad_app_id" translatable="false">ca-app-pub-8494698839376344~8059955012</string>
     <string name="ad_test_app_id" translatable="false">ca-app-pub-3940256099942544~3347511713</string>

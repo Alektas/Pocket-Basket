@@ -17,7 +17,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import alektas.pocketbasket.App;
-import alektas.pocketbasket.R;
+import alektas.pocketbasket.data.AppPreferences;
 import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.usecases.AddItem;
@@ -31,7 +31,6 @@ import alektas.pocketbasket.guide.domain.GuideCase;
 import alektas.pocketbasket.guide.domain.GuideCaseImpl;
 import alektas.pocketbasket.guide.domain.Requirement;
 import alektas.pocketbasket.ui.utils.LiveEvent;
-import alektas.pocketbasket.utils.ResourcesUtils;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -39,7 +38,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
-import static alektas.pocketbasket.di.StorageModule.APP_PREFERENCES_NAME;
 import static alektas.pocketbasket.di.StorageModule.GUIDE_PREFERENCES_NAME;
 import static alektas.pocketbasket.di.UseCasesModule.ADD_ITEM;
 import static alektas.pocketbasket.di.UseCasesModule.DELETE_SELECTED_SHOWCASE_ITEMS;
@@ -98,7 +96,7 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
 
     @Inject
     ActivityViewModel(
-            @Named(APP_PREFERENCES_NAME) SharedPreferences appPrefs,
+            AppPreferences appPrefs,
             @Named(GUIDE_PREFERENCES_NAME) SharedPreferences guidePrefs,
             @Named(ADD_ITEM) UseCase<String, Single<Integer>> addItemUseCase,
             @Named(SET_DEL_MODE) UseCase<Boolean, Void> delModeUseCase,
@@ -149,7 +147,7 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
 
         mGuide = buildGuide(guidePrefs); // TODO: Replace with injection after the guide refactoring
 
-        if (appPrefs.getBoolean(ResourcesUtils.getString(R.string.SHOW_HINTS_KEY), false)) {
+        if (appPrefs.isHintsTurnedOn()) {
             mGuide.observe(this);
             mGuide.start();
         }
@@ -204,8 +202,8 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
         return viewModeData.getValue();
     }
 
-    public void setShowcaseMode(boolean showcaseMode) {
-        mSetViewModeUseCase.execute(showcaseMode);
+    public void setViewMode(boolean isShowcaseMode) {
+        mSetViewModeUseCase.execute(isShowcaseMode);
         mGuide.onUserEvent(GuideContract.GUIDE_CHANGE_MODE);
     }
 

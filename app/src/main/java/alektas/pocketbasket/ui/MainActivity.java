@@ -53,6 +53,7 @@ import javax.inject.Named;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
+import alektas.pocketbasket.data.AppPreferences;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.ui.DisposableGuideCaseListener;
@@ -67,7 +68,6 @@ import alektas.pocketbasket.ui.utils.SmoothDecelerateInterpolator;
 import alektas.pocketbasket.utils.ResourcesUtils;
 import alektas.pocketbasket.widget.BasketWidget;
 
-import static alektas.pocketbasket.di.StorageModule.APP_PREFERENCES_NAME;
 import static alektas.pocketbasket.di.StorageModule.GUIDE_PREFERENCES_NAME;
 
 public class MainActivity extends AppCompatActivity implements
@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity implements
         ItemSizeProvider {
 
     private static final String TAG = "MainActivity";
-    private static final String SAVED_CATEGORY_KEY = "saved_category";
     private static final long CHANGE_MODE_TIME = 250;
     private static final float CHANGE_MODE_MIN_VELOCITY = 150;
     /**
@@ -109,8 +108,7 @@ public class MainActivity extends AppCompatActivity implements
     @Named(GUIDE_PREFERENCES_NAME)
     SharedPreferences mGuidePrefs;
     @Inject
-    @Named(APP_PREFERENCES_NAME)
-    SharedPreferences mPrefs;
+    AppPreferences mPrefs;
 
     @Inject
     ViewModelProvider.Factory mViewModelFactory;
@@ -143,31 +141,28 @@ public class MainActivity extends AppCompatActivity implements
 
         /* Update items in the database when other app version is launched or locale is changed.
          * It allow to display correct correct item names */
-        String curLang = ResourcesUtils.getCurrentLocale().getLanguage();
-        String savedLang = mPrefs.getString(getString(R.string.LOCALE_KEY), "lang");
+        String curLang = ResourcesUtils.getCurrentLanguage();
+        String savedLang = mPrefs.getLanguage();
 
         int vc = ResourcesUtils.getVersionCode();
-        boolean isVersionChanged =
-                mPrefs.getInt(getString(R.string.VERSION_CODE_KEY), 1) != vc;
+        boolean isVersionChanged = mPrefs.getVersionCode() != vc;
 
         if (!savedLang.equals(curLang) || isVersionChanged) {
-            mPrefs.edit()
-                    .putString(getString(R.string.LOCALE_KEY), curLang)
-                    .putInt(getString(R.string.VERSION_CODE_KEY), vc)
-                    .apply();
+            mPrefs.saveLanguage(curLang);
+            mPrefs.saveVersionCode(vc);
             mViewModel.updateLocaleNames();
         }
 
         // If it is the first app launch offer to start the guide
-        if (mPrefs.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
-            mPrefs.edit().putBoolean(getString(R.string.FIRST_START_KEY), false).apply();
+        if (mPrefs.isFirstLaunch()) {
+            mPrefs.unsetFirstLaunch();
             showHintsAcceptDialog();
         }
     }
 
     @Override
     protected void onStop() {
-        mPrefs.edit().putInt(SAVED_CATEGORY_KEY, getSelectedCategoryId()).apply();
+        mPrefs.saveSelectedCategory(getSelectedCategoryId());
         BasketWidget.updateItems(this);
         super.onStop();
     }
@@ -282,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements
         subscribeOnModel(mViewModel, mGuidePrefs, guidePresenter);
 
         RadioGroup rg = mCategoriesContainer.findViewById(R.id.categories_radiogroup);
-        initCategorySelection(mPrefs, rg);
+        initCategorySelection(rg);
 
         if (isLandscape()) {
             applyLandscapeLayout();
@@ -499,8 +494,8 @@ public class MainActivity extends AppCompatActivity implements
         return guidePresenter;
     }
 
-    private void initCategorySelection(SharedPreferences prefs, RadioGroup rg) {
-        int catId = prefs.getInt(SAVED_CATEGORY_KEY, 0);
+    private void initCategorySelection(RadioGroup rg) {
+        int catId = mPrefs.getSelectedCategoryId();
         if (catId == 0) return;
         rg.check(catId);
         onFilterClick(rg.findViewById(catId));
@@ -531,7 +526,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void setBasketMode() {
         if (isLandscape()) return;
-        mViewModel.setShowcaseMode(false);
+        mViewModel.setViewMode(false);
     }
 
     /**
@@ -556,7 +551,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private void setShowcaseMode() {
         if (isLandscape()) return;
-        mViewModel.setShowcaseMode(true);
+        mViewModel.setViewMode(true);
     }
 
     /**
@@ -617,7 +612,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDialogAcceptHints() {
-        mPrefs.edit().putBoolean(getString(R.string.SHOW_HINTS_KEY), true).apply();
+        mPrefs.setHintsShown(true);
         mGuidePrefs.edit().clear().apply();
         mViewModel.startGuide(mGuidePrefs);
 
@@ -627,7 +622,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onDialogRejectHints() {
-        mPrefs.edit().putBoolean(getString(R.string.SHOW_HINTS_KEY), false).apply();
+        mPrefs.setHintsShown(false);
         mGuidePrefs.edit().clear().apply();
         mViewModel.stopGuide();
 

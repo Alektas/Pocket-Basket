@@ -20,7 +20,7 @@ import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.domain.Guide;
 import alektas.pocketbasket.ui.ActivityViewModel;
-import alektas.pocketbasket.ui.UiContract;
+import alektas.pocketbasket.ui.PrefDefaults;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -43,7 +43,7 @@ public class ShowcaseViewModel extends ViewModel {
     private MutableLiveData<List<ShowcaseItem>> mShowcaseData = new MutableLiveData<>();
     private MutableLiveData<Boolean> delModeState = new MutableLiveData<>();
     private MutableLiveData<Boolean> showcaseModeData = new MutableLiveData<>();
-    private boolean isShowcaseMode = UiContract.IS_DEFAULT_MODE_SHOWCASE;
+    private boolean isShowcaseMode = PrefDefaults.IS_SHOWCASE_VIEW_MODE;
 
     @Inject
     public ShowcaseViewModel(

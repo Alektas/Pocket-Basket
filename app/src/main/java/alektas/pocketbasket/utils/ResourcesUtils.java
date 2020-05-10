@@ -60,8 +60,8 @@ public class ResourcesUtils {
         return null;
     }
 
-    public static Locale getCurrentLocale() {
-        return Locale.getDefault();
+    public static String getCurrentLanguage() {
+        return Locale.getDefault().getLanguage();
     }
 
 }
