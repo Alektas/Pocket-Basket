@@ -57,7 +57,7 @@ public class StorageModule {
     @Singleton
     AppDatabase providesAppDatabase(Context context) {
         return Room.databaseBuilder(context, AppDatabase.class, DATABASE_NAME)
-                .createFromAsset("databases/" + DATABASE_NAME)
+                .createFromAsset("databases/" + DATABASE_NAME + ".db")
                 .fallbackToDestructiveMigration()
                 .build();
     }
