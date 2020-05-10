@@ -16,10 +16,10 @@ public interface ShowcaseRepository {
      */
     Observable<List<ShowcaseItem>> getShowcaseData();
     /**
-     * Show in Showcase only items with specified tag
-     * @param tag name of the category
+     * Show in Showcase only items of the specified category
+     * @param key unique key of the category
      */
-    void setCategory(String tag);
+    void setCategory(String key);
     /**
      * Restore items deleted by user from the showcase and delete user items.
      * If it's neccessary to only restore deleted items use {@link #restoreShowcase}.

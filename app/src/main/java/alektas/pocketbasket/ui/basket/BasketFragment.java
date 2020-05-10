@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -46,8 +47,9 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        App.getComponent().inject(this);
 
         // Verify that the host activity implements the callback interface
         try {
@@ -58,12 +60,6 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
             throw new ClassCastException(getContext().toString()
                     + " must implement ItemSizeProvider");
         }
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        App.getComponent().inject(this);
     }
 
     @Override

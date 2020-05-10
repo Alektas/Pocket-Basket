@@ -66,17 +66,17 @@ public class ShowcaseRepositoryImpl implements ShowcaseRepository {
 
     @SuppressLint("CheckResult")
     @Override
-    public void setCategory(String tag) {
-        if (tag == null) return;
+    public void setCategory(String key) {
+        if (key == null) return;
 
         mShowcaseDisposable.clear();
-        if (tag.equals(ResourcesUtils.getResIdName(R.string.all))) {
+        if (key.equals(ResourcesUtils.getResIdName(R.string.all))) {
             mShowcaseDisposable.add(mShowcaseDao.getShowcaseItems()
                     .subscribeOn(Schedulers.io())
                     .subscribe(this::updateShowcase));
             return;
         }
-        mShowcaseDisposable.add(mShowcaseDao.getShowcaseItems(tag)
+        mShowcaseDisposable.add(mShowcaseDao.getShowcaseItems(key)
                 .subscribeOn(Schedulers.io())
                 .subscribe(this::updateShowcase));
     }

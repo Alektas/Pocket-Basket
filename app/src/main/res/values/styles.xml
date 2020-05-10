@@ -77,7 +77,6 @@
         <item name="android:buttonTint">@color/colorOnPrimary</item>
         <item name="android:background">@drawable/bg_categ</item>
         <item name="android:stateListAnimator">@animator/anim_category_selection</item>
-        <item name="android:onClick">onFilterClick</item>
     </style>
 
     <style name="Widget.Hint" parent="Widget.MaterialComponents.Button.Icon">

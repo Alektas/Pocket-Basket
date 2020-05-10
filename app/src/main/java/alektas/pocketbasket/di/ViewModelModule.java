@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import alektas.pocketbasket.ui.ActivityViewModel;
 import alektas.pocketbasket.ui.basket.BasketViewModel;
+import alektas.pocketbasket.ui.categories.CategoriesViewModel;
 import alektas.pocketbasket.ui.showcase.ShowcaseViewModel;
 import dagger.Binds;
 import dagger.Module;
@@ -27,6 +28,11 @@ public abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(BasketViewModel.class)
     abstract ViewModel bindsBasketViewModel(BasketViewModel viewModel);
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(CategoriesViewModel.class)
+    abstract ViewModel bindsCategoriesViewModel(CategoriesViewModel viewModel);
 
     @Binds
     abstract ViewModelProvider.Factory bindsViewModelFactory(ViewModelFactory factory);

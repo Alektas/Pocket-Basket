@@ -117,9 +117,9 @@ public class MainActivity extends AppCompatActivity implements
     private ShareActionProvider mShareActionProvider;
     private ViewGroup mRootLayout;
     private View mBottomAppBar;
+    private View mCategoriesContainer;
     private View mBasketContainer;
     private View mShowcaseContainer;
-    private View mCategoriesContainer;
     private RecyclerView mShowcase;
     private RecyclerView mBasket;
     private SearchView mSearchView;
@@ -130,10 +130,10 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        App.getComponent().inject(this);
         setTheme(R.style.Theme_Main); // Remove splash screen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        App.getComponent().inject(this);
         BottomAppBar bar = findViewById(R.id.appbar);
         setSupportActionBar(bar);
 
@@ -162,7 +162,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onStop() {
-        mPrefs.saveSelectedCategory(getSelectedCategoryId());
         BasketWidget.updateItems(this);
         super.onStop();
     }
@@ -275,9 +274,6 @@ public class MainActivity extends AppCompatActivity implements
         GuidePresenter guidePresenter = buildGuide();
 
         subscribeOnModel(mViewModel, mGuidePrefs, guidePresenter);
-
-        RadioGroup rg = mCategoriesContainer.findViewById(R.id.categories_radiogroup);
-        initCategorySelection(rg);
 
         if (isLandscape()) {
             applyLandscapeLayout();
@@ -494,19 +490,6 @@ public class MainActivity extends AppCompatActivity implements
         return guidePresenter;
     }
 
-    private void initCategorySelection(RadioGroup rg) {
-        int catId = mPrefs.getSelectedCategoryId();
-        if (catId == 0) return;
-        rg.check(catId);
-        onFilterClick(rg.findViewById(catId));
-    }
-
-    private int getSelectedCategoryId() {
-        if (mCategoriesContainer == null) return 0;
-        RadioGroup rg = mCategoriesContainer.findViewById(R.id.categories_radiogroup);
-        return rg.getCheckedRadioButtonId();
-    }
-
 
     /* Layout changes (size and visibility) methods */
 
@@ -661,80 +644,6 @@ public class MainActivity extends AppCompatActivity implements
                 mViewModel.onCloseDelMode();
                 break;
         }
-    }
-
-    public void onFilterClick(View view) {
-        if (view == null) {
-            setFilter(R.string.all);
-            return;
-        }
-
-        // Is the button now checked?
-        boolean checked = ((RadioButton) view).isChecked();
-
-        // Check which radio button was clicked
-        switch (view.getId()) {
-            case R.id.all_rb:
-                if (checked)
-                    setFilter(R.string.all);
-                break;
-            case R.id.drink_rb:
-                if (checked)
-                    setFilter(R.string.drink);
-                break;
-            case R.id.fruits_rb:
-                if (checked)
-                    setFilter(R.string.fruit);
-                break;
-            case R.id.veg_rb:
-                if (checked)
-                    setFilter(R.string.vegetable);
-                break;
-            case R.id.groats_rb:
-                if (checked)
-                    setFilter(R.string.groats);
-                break;
-            case R.id.milky_rb:
-                if (checked)
-                    setFilter(R.string.milky);
-                break;
-            case R.id.floury_rb:
-                if (checked)
-                    setFilter(R.string.floury);
-                break;
-            case R.id.sweets_rb:
-                if (checked)
-                    setFilter(R.string.sweets);
-                break;
-            case R.id.meat_rb:
-                if (checked)
-                    setFilter(R.string.meat);
-                break;
-            case R.id.seafood_rb:
-                if (checked)
-                    setFilter(R.string.seafood);
-                break;
-            case R.id.semis_rb:
-                if (checked)
-                    setFilter(R.string.semis);
-                break;
-            case R.id.sauce_n_oil_rb:
-                if (checked)
-                    setFilter(R.string.sauce_n_oil);
-                break;
-            case R.id.household_rb:
-                if (checked)
-                    setFilter(R.string.household);
-                break;
-            case R.id.other_rb:
-                if (checked)
-                    setFilter(R.string.other);
-                break;
-        }
-    }
-
-    private void setFilter(int tag) {
-        mViewModel.setFilter(ResourcesUtils.getResIdName(tag));
     }
 
     public void onLinkClick(View view) {

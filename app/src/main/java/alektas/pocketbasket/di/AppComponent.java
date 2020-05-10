@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 
 import alektas.pocketbasket.ui.MainActivity;
 import alektas.pocketbasket.ui.basket.BasketFragment;
+import alektas.pocketbasket.ui.categories.CategoriesFragment;
 import alektas.pocketbasket.ui.searching.ItemsProvider;
 import alektas.pocketbasket.ui.showcase.ShowcaseFragment;
 import alektas.pocketbasket.widget.BasketWidget;
@@ -32,5 +33,7 @@ public interface AppComponent {
     void inject(BasketFragment fragment);
 
     void inject(ShowcaseFragment fragment);
+
+    void inject(CategoriesFragment fragment);
 
 }

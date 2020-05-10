@@ -43,8 +43,9 @@ public class ShowcaseFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Context context) {
+    public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+        App.getComponent().inject(this);
 
         // Verify that the host activity implements the callback interface
         try {
@@ -55,12 +56,6 @@ public class ShowcaseFragment extends Fragment {
             throw new ClassCastException(getContext()
                     + " must implement ItemSizeProvider");
         }
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        App.getComponent().inject(this);
     }
 
     @Override
