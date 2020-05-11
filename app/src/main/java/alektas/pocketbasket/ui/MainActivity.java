@@ -912,17 +912,6 @@ public class MainActivity extends AppCompatActivity implements
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.SEARCH, search);
     }
 
-    private void toggleSearchView() {
-        if (mSearchView.hasFocus()) {
-            if (!TextUtils.isEmpty(mSearchView.getQuery())) {
-                onSearch(mSearchView.getQuery().toString());
-            }
-            cancelSearch();
-        } else {
-            mSearchView.setIconified(false); // give focus
-        }
-    }
-
     /**
      * Rewrite shared basket items in the share intent.
      * If there are items, share selector is shown, else alert dialog is shown.
