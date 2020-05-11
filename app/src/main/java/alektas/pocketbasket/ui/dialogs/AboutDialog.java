@@ -1,6 +1,8 @@
 package alektas.pocketbasket.ui.dialogs;
 
 import android.app.Dialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -9,7 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
@@ -42,33 +46,32 @@ public class AboutDialog extends DialogFragment {
     }
 
     private void initAboutMenuLinks() {
-        TextView tv = mView.findViewById(R.id.jeff_link);
-        makeLinkable(tv, getString(R.string.jeff_link));
-
-        tv = mView.findViewById(R.id.bom_link);
-        makeLinkable(tv, getString(R.string.bom_link));
-
-        tv = mView.findViewById(R.id.google_link);
-        makeLinkable(tv, getString(R.string.google_material_link));
-
-        tv = mView.findViewById(R.id.apache2_link);
-        makeLinkable(tv, getString(R.string.apache_license_link));
-
-        tv = mView.findViewById(R.id.apache_link);
-        makeLinkable(tv, getString(R.string.apache_license_link));
-
-        tv = mView.findViewById(R.id.cc_link);
-        makeLinkable(tv, getString(R.string.cc_license_link));
-
-        tv = mView.findViewById(R.id.privacy_policy_link);
-        makeLinkable(tv, getString(R.string.privacy_policy_link));
+        setupLink(R.id.jeff_link, R.string.jeff_link);
+        setupLink(R.id.bom_link, R.string.bom_link);
+        setupLink(R.id.google_link, R.string.google_material_link);
+        setupLink(R.id.apache_link, R.string.apache_license_link);
+        setupLink(R.id.apache2_link, R.string.apache_license_link);
+        setupLink(R.id.cc_link, R.string.cc_license_link);
+        setupLink(R.id.privacy_policy_link, R.string.privacy_policy_link);
     }
 
-    private void makeLinkable(TextView tv, String link) {
+    private void setupLink(@IdRes int viewId, @StringRes int linkId) {
+        TextView tv = mView.findViewById(viewId);
+        String link = getString(linkId);
+        makeLinkableDecoration(tv, link);
+        tv.setOnClickListener(v -> browseLink(link));
+    }
+
+    private void makeLinkableDecoration(TextView tv, String link) {
         SpannableString ss = new SpannableString(tv.getText());
         ss.setSpan(new URLSpan(link), 0, tv.getText().length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         tv.setText(ss);
+    }
+
+    private void browseLink(String link) {
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+        startActivity(browserIntent);
     }
 
 }
