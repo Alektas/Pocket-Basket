@@ -7,29 +7,17 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.transition.ChangeBounds;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
-import android.transition.TransitionSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.VelocityTracker;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.Interpolator;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -39,8 +27,6 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -64,7 +50,6 @@ import alektas.pocketbasket.ui.dialogs.AboutDialog;
 import alektas.pocketbasket.ui.dialogs.GuideAcceptDialog;
 import alektas.pocketbasket.ui.dialogs.ResetDialog;
 import alektas.pocketbasket.ui.dialogs.ShareUnsuccessfulDialog;
-import alektas.pocketbasket.ui.utils.SmoothDecelerateInterpolator;
 import alektas.pocketbasket.utils.ResourcesUtils;
 import alektas.pocketbasket.widget.BasketWidget;
 
@@ -76,54 +61,18 @@ public class MainActivity extends AppCompatActivity implements
         DisposableGuideCaseListener,
         ItemSizeProvider {
 
-    private static final String TAG = "MainActivity";
-    private static final long CHANGE_MODE_TIME = 250;
-    private static final float CHANGE_MODE_MIN_VELOCITY = 150;
-    /**
-     * Affect to interpolator selection for the mode change.
-     * The smaller the divider, the easier faster interpolator is selecting.
-     */
-    private static final float CHANGE_MODE_VELOCITY_DIVIDER = 1000;
-
-    private int mStatusBarHeight;
-    private int mCategNarrowWidth;
-    private int mCategWideWidth;
-    private int mShowcaseWideWidth;
-    private int mShowcaseNarrowWidth;
-    private int mBasketNarrowWidth;
-    private int mBasketWideWidth;
-
-    private int initX;
-    private int initY;
-    private int movX;
-    private float mMaxVelocity;
-    private float protectedInterval;
-    private float changeModeDistance;
-    private int changeModeStartDistance;
-
-    private boolean allowChangeMode = true;
-    private boolean isChangeModeHandled = false;
-
     @Inject
     @Named(GUIDE_PREFERENCES_NAME)
     SharedPreferences mGuidePrefs;
     @Inject
     AppPreferences mPrefs;
-
     @Inject
     ActivityViewModel mViewModel;
-    private VelocityTracker mVelocityTracker;
+    private ViewModeDelegate mViewModeDelegate;
+    private DimensionsProvider mDimens;
     private ShareActionProvider mShareActionProvider;
     private ViewGroup mRootLayout;
-    private View mBottomAppBar;
-    private View mCategoriesContainer;
-    private View mBasketContainer;
-    private View mShowcaseContainer;
-    private RecyclerView mShowcase;
-    private RecyclerView mBasket;
     private SearchView mSearchView;
-    private TransitionSet mChangeModeTransition;
-    private Transition mChangeBounds;
     private Transition mDelToolbarTransition;
     private boolean isDelMode;
 
@@ -133,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements
         setTheme(R.style.Theme_Main); // Remove splash screen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        BottomAppBar bar = findViewById(R.id.appbar);
+        BottomAppBar bar = findViewById(R.id.bottom_appbar);
         setSupportActionBar(bar);
 
         init();
@@ -260,64 +209,18 @@ public class MainActivity extends AppCompatActivity implements
         initTransitions();
 
         mRootLayout = findViewById(R.id.root_layout);
-        mBottomAppBar = findViewById(R.id.appbar);
-        mCategoriesContainer = findViewById(R.id.fragment_categories);
-        mShowcaseContainer = findViewById(R.id.fragment_showcase);
-        mShowcase = mShowcaseContainer.findViewById(R.id.showcase_list);
-        mBasketContainer = findViewById(R.id.fragment_basket);
-        mBasket = mBasketContainer.findViewById(R.id.basket_list);
-        initDimensions();
 
-        mViewModel.setOrientationState(isLandscape());
         GuidePresenter guidePresenter = buildGuide();
 
         subscribeOnModel(mViewModel, mGuidePrefs, guidePresenter);
 
-        if (isLandscape()) {
-            applyLandscapeLayout();
-        }
+        mDimens = new DimensionsProvider(this);
+        mViewModeDelegate = new ViewModeDelegate(this, mViewModel, mDimens);
     }
 
     private void initTransitions() {
         mDelToolbarTransition = TransitionInflater.from(this)
                 .inflateTransition(R.transition.transition_del_toolbar);
-
-        mChangeBounds = new ChangeBounds();
-
-        mChangeModeTransition = new TransitionSet();
-        mChangeModeTransition.setDuration(CHANGE_MODE_TIME)
-                .setOrdering(TransitionSet.ORDERING_TOGETHER)
-                .addTransition(mChangeBounds);
-    }
-
-    private void initDimensions() {
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            mStatusBarHeight = getResources().getDimensionPixelSize(resourceId);
-        }
-
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int screenWidth = displaymetrics.widthPixels;
-        int screenHeight = displaymetrics.heightPixels;
-        int minDisplaySize = Math.min(screenHeight, screenWidth);
-        mCategNarrowWidth = (int) getResources().getDimension(R.dimen.width_categ_narrow);
-        mShowcaseNarrowWidth = (int) getResources().getDimension(R.dimen.width_showcase_narrow);
-        mBasketNarrowWidth = (int) getResources().getDimension(R.dimen.width_basket_narrow);
-        mCategWideWidth = (int) getResources().getDimension(R.dimen.width_categ_wide);
-        mShowcaseWideWidth = minDisplaySize - mCategWideWidth - mBasketNarrowWidth;
-        if (isLandscape()) {
-            mBasketWideWidth = screenWidth - mCategWideWidth - mShowcaseWideWidth;
-        } else {
-            mBasketWideWidth = screenWidth - mCategNarrowWidth - mShowcaseNarrowWidth;
-        }
-
-        changeModeDistance = getResources().getDimension(R.dimen.change_mode_distance);
-        protectedInterval = getResources().getDimension(R.dimen.protected_interval);
-        changeModeStartDistance =
-                (int) getResources().getDimension(R.dimen.change_mode_start_distance);
-
-        mMaxVelocity = ViewConfiguration.get(this).getScaledMaximumFlingVelocity();
     }
 
     private void initSearch() {
@@ -375,16 +278,6 @@ public class MainActivity extends AppCompatActivity implements
         TextView counter = findViewById(R.id.toolbar_del_mode_counter);
         viewModel.deleteItemsCountData().observe(this, delCount -> {
             counter.setText(String.valueOf(delCount));
-        });
-
-        viewModel.showcaseModeState().observe(this, isShowcase -> {
-            // Change mode enabled only if it's not a landscape layout
-            if (isLandscape()) return;
-            if (isShowcase) {
-                applyShowcaseModeLayout();
-            } else {
-                applyBasketModeLayout();
-            }
         });
     }
 
@@ -489,96 +382,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    /* Layout changes (size and visibility) methods */
-
-    /**
-     * Set Landscape Mode: categories, showcase and basket expanded
-     */
-    private void applyLandscapeLayout() {
-        changeLayoutSize(mCategWideWidth,
-                mShowcaseWideWidth,
-                0);
-    }
-
-    /**
-     * Set current mode to the Basket mode.
-     * Mode state is observed, so this method also invoke {@link #applyBasketModeLayout()}
-     * which actually resize views to consist the mode.
-     */
-    private void setBasketMode() {
-        if (isLandscape()) return;
-        mViewModel.setViewMode(false);
-    }
-
-    /**
-     * Apply sizes of the layout parts in consist of the Basket Mode:
-     * categories and showcase narrowed, basket expanded.
-     * Warning! This method don't change global mode state and it should be
-     * invoked only when the mode is not changed, but it's necessary to apply appropriate sizes.
-     * <p>
-     * To actually change mode invoke {@link #setBasketMode() setBasketMode} instead.
-     */
-    private void applyBasketModeLayout() {
-        TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
-        changeLayoutSize(mCategNarrowWidth,
-                mShowcaseNarrowWidth,
-                0);
-    }
-
-    /**
-     * Set current mode to the Showcase mode.
-     * Mode state is observed, so this method also invoke {@link #applyShowcaseModeLayout()}
-     * which actually resize views to consist the mode.
-     */
-    private void setShowcaseMode() {
-        if (isLandscape()) return;
-        mViewModel.setViewMode(true);
-    }
-
-    /**
-     * Apply sizes of the layout parts in consist of the Showcase Mode:
-     * categories and showcase expanded, basket narrowed.
-     * Warning! This method don't change global mode state and it should be
-     * invoked only when the mode is not changed, but it's necessary to apply appropriate sizes.
-     * <p>
-     * To actually change mode invoke {@link #setShowcaseMode() setShowcaseMode} instead.
-     */
-    private void applyShowcaseModeLayout() {
-        TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
-        changeLayoutSize(mCategWideWidth,
-                0,
-                mBasketNarrowWidth);
-    }
-
-    /**
-     * Change size of the layout parts: Categories, Showcase and Basket.
-     * If one of the width equal '0' then the corresponding layout part fills in the free space.
-     *
-     * @param categWidth    width of the Categories in pixels
-     * @param showcaseWidth width of the Showcase in pixels
-     * @param basketWidth   width of the Basket in pixels
-     */
-    private void changeLayoutSize(int categWidth, int showcaseWidth, int basketWidth) {
-        changeViewWidth(mCategoriesContainer, categWidth);
-        changeViewWidth(mShowcaseContainer, showcaseWidth);
-        changeViewWidth(mBasketContainer, basketWidth);
-    }
-
-    /**
-     * Change size of the view.
-     * If width equal '0' then view fills in the free space.
-     *
-     * @param view  view which width need change
-     * @param width width of the view in pixels
-     */
-    private void changeViewWidth(View view, int width) {
-        ViewGroup.LayoutParams params = view.getLayoutParams();
-        if (params.width == width) return;
-        params.width = width;
-        view.setLayoutParams(params);
-    }
-
-
     /* Interfaces methods */
 
     @Override
@@ -618,12 +421,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public int getItemWidth() {
-        return mShowcaseWideWidth;
+        return mDimens.getShowcaseWideWidth();
     }
 
     @Override
     public int getBasketItemWidth() {
-        return mBasketWideWidth;
+        return mDimens.getBasketWideWidth();
     }
 
 
@@ -649,237 +452,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        // Do not allow a mode change in the landscape orientation
-        if (!isLandscape()) {
-            handleChangeModeByTouch(event);
-            // When changing mode is active cancel all other actions to avoid fake clicks
-            // Also stop scrolling to avoid crashing
-            if (isModeChanging()) {
-                mShowcase.stopScroll();
-                mBasket.stopScroll();
-                event.setAction(MotionEvent.ACTION_CANCEL);
-            }
-        }
-
+        mViewModeDelegate.onTouch(event);
         return super.dispatchTouchEvent(event);
-    }
-
-    private boolean isModeChanging() {
-        return allowChangeMode && isChangeModeHandled;
-    }
-
-    private void handleChangeModeByTouch(MotionEvent event) {
-        if (mVelocityTracker == null) {
-            mVelocityTracker = VelocityTracker.obtain();
-        }
-        mVelocityTracker.addMovement(event);
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN: {
-                initX = (int) (event.getX() + 0.5f);
-                initY = (int) (event.getY() + 0.5f);
-
-                /* Disable the change mode from the basket in the basket mode
-                 * because direction of the swipe is match to direction of the item delete swipe.
-                 * Also disable if it's a touch on the bottom app bar.
-                 */
-                if (!mViewModel.isShowcaseMode()
-                        && initX > (mCategNarrowWidth + mShowcaseNarrowWidth)
-                        || isInteractionWithSystemBars(initY)) {
-                    allowChangeMode = false;
-                    isChangeModeHandled = true;
-                }
-                break;
-            }
-
-            case MotionEvent.ACTION_MOVE: {
-                // Do not handle change mode if it didn't allowed
-                if (!allowChangeMode && isChangeModeHandled) {
-                    return;
-                }
-
-                movX = (int) (event.getX() + 0.5f - initX);
-                int movY = (int) (event.getY() + 0.5f - initY);
-
-                // Allow or disallow changing mode
-                if (!isChangeModeHandled) {
-                    if (Math.abs(movY) > Math.abs(movX)) {
-                        // Vertical direction is dominate so change mode is not allowed
-                        isChangeModeHandled = true;
-                        allowChangeMode = false;
-                        return;
-                    }
-                    if (Math.abs(movX) < changeModeStartDistance) {
-                        isChangeModeHandled = false;
-                        return; // gesture length is not enough to start change mode handling
-                    }
-                    isChangeModeHandled = true;
-                    allowChangeMode = true;
-                }
-
-                changeLayoutSizeByTouch(movX);
-                break;
-            }
-
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL: {
-                finishModeChange();
-                break;
-            }
-        }
-    }
-
-    private boolean isInteractionWithSystemBars(int touchDownY) {
-        return touchDownY - mStatusBarHeight > mBottomAppBar.getY();
-    }
-
-    /**
-     * Set size of the layout parts in depends of touch moving distance
-     *
-     * @param movX touch moving distance
-     */
-    private void changeLayoutSizeByTouch(int movX) {
-        int showcaseOffset;
-        int categOffset;
-        if (mViewModel.isShowcaseMode()) {
-            showcaseOffset = mShowcaseWideWidth - mShowcaseNarrowWidth + movX / 2 + changeModeStartDistance;
-            categOffset = mCategWideWidth - mCategNarrowWidth + movX / 2 + changeModeStartDistance;
-        } else {
-            showcaseOffset = movX / 2 - changeModeStartDistance;
-            categOffset = movX / 2 - changeModeStartDistance;
-        }
-
-        int showcaseWidth = calculateLayoutSize(showcaseOffset,
-                mShowcaseNarrowWidth,
-                mShowcaseWideWidth);
-        int categWidth = calculateLayoutSize(categOffset,
-                mCategNarrowWidth,
-                mCategWideWidth);
-
-        changeLayoutSize(categWidth, showcaseWidth, 0);
-    }
-
-    /**
-     * Calculate layout size according to touch gesture distance.
-     *
-     * @param movX    touch distance in pixels
-     * @param minSize minimum size of the layout
-     * @param maxSize maximum size of the layout
-     * @return value for size of layout between minSize and maxSize according to movX
-     */
-    private int calculateLayoutSize(int movX, int minSize, int maxSize) {
-        if (movX <= 0) {
-            return minSize;
-        } else if (movX < maxSize - minSize) {
-            return minSize + movX;
-        } else {
-            return maxSize;
-        }
-    }
-
-    /**
-     * Set appropriate mode (Basket or Showcase), cancel touch handling and clear the state
-     */
-    private void finishModeChange() {
-        if (isChangeModeHandled && allowChangeMode) {
-            mVelocityTracker.computeCurrentVelocity(1000, mMaxVelocity);
-            float velocity = mVelocityTracker.getXVelocity();
-            Interpolator interpolator = getInterpolator(velocity);
-            mChangeBounds.setInterpolator(interpolator);
-            setMode(movX, velocity);
-        }
-
-        if (mVelocityTracker != null) {
-            mVelocityTracker.recycle();
-            mVelocityTracker = null;
-        }
-        allowChangeMode = true;
-        isChangeModeHandled = false;
-        initX = 0;
-        movX = 0;
-    }
-
-    /**
-     * Gives appropriate animation interpolator according to the gesture velocity
-     *
-     * @param velocity speed of the user gesture
-     * @return appropriate decelerate interpolator
-     */
-    private Interpolator getInterpolator(float velocity) {
-        int factor = (int) (Math.abs(velocity) / CHANGE_MODE_VELOCITY_DIVIDER);
-        switch (factor) {
-            case 0: {
-                return new AccelerateDecelerateInterpolator();
-            }
-            case 1: {
-                // through it
-            }
-            case 2: {
-                return new SmoothDecelerateInterpolator();
-            }
-            case 3: {
-                return new DecelerateInterpolator(1.5f);
-            }
-            default: {
-                return new DecelerateInterpolator(2.5f);
-            }
-        }
-    }
-
-    /**
-     * Set basket or showcase mode in depends of the touch moving distance and velocity
-     *
-     * @param velocity touch moving velocity
-     */
-    private void setMode(int movX, float velocity) {
-        if (mViewModel.isShowcaseMode()) {
-            trySetBasketMode(movX, velocity);
-        } else {
-            trySetShowcaseMode(movX, velocity);
-        }
-    }
-
-    private void trySetBasketMode(int movX, float velocity) {
-        if (velocity < CHANGE_MODE_MIN_VELOCITY && movX < -changeModeDistance) {
-            setBasketMode();
-        } else {
-            recoverShowcaseMode(movX);
-        }
-    }
-
-    private void trySetShowcaseMode(int movX, float velocity) {
-        if (velocity > -CHANGE_MODE_MIN_VELOCITY && movX > changeModeDistance) {
-            setShowcaseMode();
-        } else {
-            recoverBasketMode(movX);
-        }
-    }
-
-    private void recoverShowcaseMode(int movX) {
-        if (movX < -protectedInterval) {
-            TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
-        }
-        changeLayoutSize(mCategWideWidth,
-                0,
-                mBasketNarrowWidth);
-    }
-
-    private void recoverBasketMode(int movX) {
-        if (movX > protectedInterval) {
-            TransitionManager.beginDelayedTransition(mRootLayout, mChangeModeTransition);
-        }
-        changeLayoutSize(mCategNarrowWidth,
-                mShowcaseNarrowWidth,
-                0);
     }
 
 
     /* Other methods */
-
-    private boolean isLandscape() {
-        return getResources().getConfiguration().orientation
-                == Configuration.ORIENTATION_LANDSCAPE;
-    }
 
     private void handleSearch(Intent intent) {
         /* Intent.ACTION_SEARCH - on enter text typed in search view
@@ -941,7 +519,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.d("MainActivity", "show snack: " + isSuccess);
         String msg = getString(isSuccess ? successMsg : failMsg);
         Snackbar.make(mRootLayout, msg, Snackbar.LENGTH_SHORT)
-                .setAnchorView(findViewById(R.id.appbar))
+                .setAnchorView(findViewById(R.id.bottom_appbar))
                 .show();
     }
 
