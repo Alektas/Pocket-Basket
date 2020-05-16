@@ -39,19 +39,19 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 
 import static alektas.pocketbasket.di.StorageModule.GUIDE_PREFERENCES_NAME;
-import static alektas.pocketbasket.di.UseCasesModule.ADD_ITEM;
-import static alektas.pocketbasket.di.UseCasesModule.DELETE_SELECTED_SHOWCASE_ITEMS;
-import static alektas.pocketbasket.di.UseCasesModule.SET_DEL_MODE;
-import static alektas.pocketbasket.di.UseCasesModule.GET_BASKET;
-import static alektas.pocketbasket.di.UseCasesModule.GET_SELECTED_SHOWCASE_ITEM_COUNT;
-import static alektas.pocketbasket.di.UseCasesModule.GET_DEL_MODE;
 import static alektas.pocketbasket.di.UseCasesModule.GET_VIEW_MODE;
-import static alektas.pocketbasket.di.UseCasesModule.TOGGLE_BASKET_CHECK;
-import static alektas.pocketbasket.di.UseCasesModule.REMOVE_CHECKED_BASKET_ITEMS;
-import static alektas.pocketbasket.di.UseCasesModule.RESET_SHOWCASE;
-import static alektas.pocketbasket.di.UseCasesModule.SELECT_CATEGORY;
 import static alektas.pocketbasket.di.UseCasesModule.SET_VIEW_MODE;
-import static alektas.pocketbasket.di.UseCasesModule.UPDATE_ITEMS;
+import static alektas.pocketbasket.di.basket.BasketUseCasesModule.GET_BASKET;
+import static alektas.pocketbasket.di.basket.BasketUseCasesModule.REMOVE_CHECKED_BASKET_ITEMS;
+import static alektas.pocketbasket.di.basket.BasketUseCasesModule.TOGGLE_BASKET_CHECK;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.ADD_ITEM;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.DELETE_SELECTED_SHOWCASE_ITEMS;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.GET_DEL_MODE;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.GET_SELECTED_SHOWCASE_ITEM_COUNT;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.RESET_SHOWCASE;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.SELECT_CATEGORY;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.SET_DEL_MODE;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.UPDATE_ITEMS;
 
 public class ActivityViewModel extends ViewModel implements GuideObserver {
     private static final String TAG = "ActivityViewModel";

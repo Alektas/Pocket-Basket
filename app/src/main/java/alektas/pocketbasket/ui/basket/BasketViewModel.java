@@ -20,11 +20,11 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
-import static alektas.pocketbasket.di.UseCasesModule.CHANGE_BASKET_POSITIONS;
-import static alektas.pocketbasket.di.UseCasesModule.GET_BASKET;
-import static alektas.pocketbasket.di.UseCasesModule.TOGGLE_BASKET_ITEM_CHECK;
-import static alektas.pocketbasket.di.UseCasesModule.MOVE_BASKET_ITEM_TO_TOP;
-import static alektas.pocketbasket.di.UseCasesModule.REMOVE_BASKET_ITEM_BY_KEY;
+import static alektas.pocketbasket.di.basket.BasketUseCasesModule.CHANGE_BASKET_POSITIONS;
+import static alektas.pocketbasket.di.basket.BasketUseCasesModule.GET_BASKET;
+import static alektas.pocketbasket.di.basket.BasketUseCasesModule.MOVE_BASKET_ITEM_TO_TOP;
+import static alektas.pocketbasket.di.basket.BasketUseCasesModule.REMOVE_BASKET_ITEM_BY_KEY;
+import static alektas.pocketbasket.di.basket.BasketUseCasesModule.TOGGLE_BASKET_ITEM_CHECK;
 
 public class BasketViewModel extends ViewModel {
     private Guide mGuide;

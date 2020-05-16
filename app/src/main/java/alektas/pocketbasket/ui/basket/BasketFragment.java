@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,9 +18,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.data.db.entities.BasketItem;
+import alektas.pocketbasket.ui.ComponentProvider;
 import alektas.pocketbasket.ui.ItemSizeProvider;
 
 /**
@@ -30,6 +29,7 @@ import alektas.pocketbasket.ui.ItemSizeProvider;
 public class BasketFragment extends Fragment implements OnStartDragListener {
     @Inject
     BasketViewModel mViewModel;
+    private ComponentProvider mComponentProvider;
     private BasketRvAdapter mBasketAdapter;
     private ItemTouchHelper mTouchHelper;
     private RecyclerView mBasket;
@@ -48,15 +48,18 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        App.getComponent().inject(this);
 
-        // Verify that the host activity implements the callback interface
         try {
-            // Instantiate the interface so we can get data from the host
-            mItemSizeProvider = (ItemSizeProvider) getContext();
+            mComponentProvider = (ComponentProvider) context;
         } catch (ClassCastException e) {
-            // The activity doesn't implement the interface, throw exception
-            throw new ClassCastException(getContext().toString()
+            throw new ClassCastException(context.toString()
+                    + " must implement ComponentProvider");
+        }
+
+        try {
+            mItemSizeProvider = (ItemSizeProvider) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
                     + " must implement ItemSizeProvider");
         }
     }
@@ -77,6 +80,7 @@ public class BasketFragment extends Fragment implements OnStartDragListener {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mComponentProvider.getComponent().inject(this);
 
         mBasketAdapter = new BasketRvAdapter(getContext(), mViewModel,this, mItemSizeProvider);
         mBasket.setAdapter(mBasketAdapter);

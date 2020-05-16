@@ -5,7 +5,6 @@ import android.transition.ChangeBounds;
 import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.transition.TransitionSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -47,13 +46,17 @@ public class ViewModeDelegate {
     private boolean isChangeModeHandled = false;
     private boolean isLandscapeMode;
 
-    public ViewModeDelegate(MainActivity activity, ActivityViewModel viewModel, DimensionsProvider dimensProvider) {
+    public ViewModeDelegate(
+            MainActivity activity,
+            ActivityViewModel viewModel,
+            DimensionsProvider dimensProvider
+    ) {
         mActivity = activity;
         mViewModel = viewModel;
         mDimens = dimensProvider;
         isLandscapeMode = activity.getResources().getConfiguration().orientation
                 == Configuration.ORIENTATION_LANDSCAPE;
-        
+
         initViews();
         initTransitions();
 
@@ -142,8 +145,6 @@ public class ViewModeDelegate {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
-                Log.d(TAG, "handleChangeModeByTouch: ACTION_DOWN");
-
                 initX = (int) (event.getX() + 0.5f);
                 initY = (int) (event.getY() + 0.5f);
 
@@ -161,7 +162,6 @@ public class ViewModeDelegate {
             }
 
             case MotionEvent.ACTION_MOVE: {
-                Log.d(TAG, "handleChangeModeByTouch: ACTION_MOVE");
                 // Do not handle change mode if it didn't allowed
                 if (!allowChangeMode && isChangeModeHandled) {
                     return;
@@ -192,7 +192,6 @@ public class ViewModeDelegate {
 
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL: {
-                Log.d(TAG, "handleChangeModeByTouch: ACTION_UP/CANCEL");
                 finishModeChange();
                 break;
             }

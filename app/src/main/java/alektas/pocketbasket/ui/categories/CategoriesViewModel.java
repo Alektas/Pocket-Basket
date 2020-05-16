@@ -9,7 +9,7 @@ import alektas.pocketbasket.data.AppPreferences;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.ui.utils.LiveEvent;
 
-import static alektas.pocketbasket.di.UseCasesModule.SELECT_CATEGORY;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.SELECT_CATEGORY;
 
 public class CategoriesViewModel extends ViewModel {
     private UseCase<String, Void> mSelectCategory;

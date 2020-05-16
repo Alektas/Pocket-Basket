@@ -40,6 +40,8 @@ import javax.inject.Named;
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.data.AppPreferences;
+import alektas.pocketbasket.di.activity.ActivityComponent;
+import alektas.pocketbasket.di.activity.ActivityModule;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.ui.DisposableGuideCaseListener;
@@ -59,7 +61,8 @@ public class MainActivity extends AppCompatActivity implements
         ResetDialog.ResetDialogListener,
         GuideAcceptDialog.GuideAcceptDialogListener,
         DisposableGuideCaseListener,
-        ItemSizeProvider {
+        ItemSizeProvider,
+        ComponentProvider {
 
     @Inject
     @Named(GUIDE_PREFERENCES_NAME)
@@ -68,8 +71,11 @@ public class MainActivity extends AppCompatActivity implements
     AppPreferences mPrefs;
     @Inject
     ActivityViewModel mViewModel;
-    private ViewModeDelegate mViewModeDelegate;
-    private DimensionsProvider mDimens;
+    @Inject
+    ViewModeDelegate mViewModeDelegate;
+    @Inject
+    DimensionsProvider mDimens;
+    private ActivityComponent mComponent;
     private ShareActionProvider mShareActionProvider;
     private ViewGroup mRootLayout;
     private SearchView mSearchView;
@@ -78,10 +84,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        App.getComponent().inject(this);
         setTheme(R.style.Theme_Main); // Remove splash screen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mComponent = App.getComponent()
+                .activityComponentFactory()
+                .create(new ActivityModule(this));
+        mComponent.inject(this);
         BottomAppBar bar = findViewById(R.id.bottom_appbar);
         setSupportActionBar(bar);
 
@@ -106,6 +115,10 @@ public class MainActivity extends AppCompatActivity implements
             mPrefs.unsetFirstLaunch();
             showHintsAcceptDialog();
         }
+    }
+
+    public ActivityComponent getComponent() {
+        return mComponent;
     }
 
     @Override
@@ -213,9 +226,6 @@ public class MainActivity extends AppCompatActivity implements
         GuidePresenter guidePresenter = buildGuide();
 
         subscribeOnModel(mViewModel, mGuidePrefs, guidePresenter);
-
-        mDimens = new DimensionsProvider(this);
-        mViewModeDelegate = new ViewModeDelegate(this, mViewModel, mDimens);
     }
 
     private void initTransitions() {

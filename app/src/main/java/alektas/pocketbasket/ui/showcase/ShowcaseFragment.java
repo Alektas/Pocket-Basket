@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,10 +17,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.ads.AdManager;
 import alektas.pocketbasket.data.db.entities.ShowcaseItem;
+import alektas.pocketbasket.ui.ComponentProvider;
 import alektas.pocketbasket.ui.ItemSizeProvider;
 import alektas.pocketbasket.utils.NetworkMonitor;
 
@@ -32,6 +31,7 @@ public class ShowcaseFragment extends Fragment {
     AdManager mAdManager;
     @Inject
     ShowcaseViewModel mViewModel;
+    private ComponentProvider mComponentProvider;
     private ShowcaseRvAdapter mShowcaseAdapter;
     private ItemSizeProvider mItemSizeProvider;
     private RecyclerView mShowcase;
@@ -44,14 +44,17 @@ public class ShowcaseFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        App.getComponent().inject(this);
 
-        // Verify that the host activity implements the callback interface
         try {
-            // Instantiate the interface so we can get data from the host
+            mComponentProvider = (ComponentProvider) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement ComponentProvider");
+        }
+
+        try {
             mItemSizeProvider = (ItemSizeProvider) getContext();
         } catch (ClassCastException e) {
-            // The activity doesn't implement the interface, throw exception
             throw new ClassCastException(getContext()
                     + " must implement ItemSizeProvider");
         }
@@ -72,6 +75,8 @@ public class ShowcaseFragment extends Fragment {
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        mComponentProvider.getComponent().inject(this);
+
         mShowcaseAdapter = new ShowcaseRvAdapter(mViewModel, mItemSizeProvider);
         mShowcase.setAdapter(mShowcaseAdapter);
         subscribeOnModel();

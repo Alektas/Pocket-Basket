@@ -17,11 +17,13 @@ import javax.inject.Named;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.di.UseCasesModule;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.ui.MainActivity;
 import io.reactivex.Completable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+
+import static alektas.pocketbasket.di.UseCasesModule.CLEAN_BASKET;
+import static alektas.pocketbasket.di.UseCasesModule.REMOVE_BASKET_ITEM_BY_NAME;
 
 public class BasketWidget extends AppWidgetProvider {
     public static final String ACTION_UPDATE_ITEMS = "alektas.pocketbasket.action.ACTION_UPDATE_ITEMS";
@@ -35,10 +37,10 @@ public class BasketWidget extends AppWidgetProvider {
     public static final int MIDDLE_MAX_WIDTH = 150;
     public static String REMOVAL_ITEM = "";
     @Inject
-    @Named(UseCasesModule.CLEAN_BASKET)
+    @Named(CLEAN_BASKET)
     UseCase<Void, Completable> cleanBasketUseCase;
     @Inject
-    @Named(UseCasesModule.REMOVE_BASKET_ITEM_BY_NAME)
+    @Named(REMOVE_BASKET_ITEM_BY_NAME)
     UseCase<String, Completable> removeByNameUseCase;
 
     public BasketWidget() {

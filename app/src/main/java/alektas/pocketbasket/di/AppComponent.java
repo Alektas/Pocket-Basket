@@ -4,11 +4,8 @@ import android.content.Context;
 
 import javax.inject.Singleton;
 
-import alektas.pocketbasket.ui.MainActivity;
-import alektas.pocketbasket.ui.basket.BasketFragment;
-import alektas.pocketbasket.ui.categories.CategoriesFragment;
+import alektas.pocketbasket.di.activity.ActivityComponent;
 import alektas.pocketbasket.ui.searching.ItemsProvider;
-import alektas.pocketbasket.ui.showcase.ShowcaseFragment;
 import alektas.pocketbasket.widget.BasketWidget;
 import alektas.pocketbasket.widget.BasketWidgetService;
 import dagger.Component;
@@ -22,18 +19,12 @@ public interface AppComponent {
 
     Context context();
 
-    void inject(MainActivity activity);
+    ActivityComponent.Factory activityComponentFactory();
 
     void inject(ItemsProvider provider);
 
-    void inject(BasketWidget widget);
-
     void inject(BasketWidgetService widgetService);
 
-    void inject(BasketFragment fragment);
-
-    void inject(ShowcaseFragment fragment);
-
-    void inject(CategoriesFragment fragment);
+    void inject(BasketWidget widget);
 
 }

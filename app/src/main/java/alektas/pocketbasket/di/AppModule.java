@@ -12,13 +12,14 @@ import alektas.pocketbasket.data.BasketRepositoryImpl;
 import alektas.pocketbasket.data.ShowcaseRepositoryImpl;
 import alektas.pocketbasket.data.db.dao.BasketDao;
 import alektas.pocketbasket.data.db.dao.ShowcaseDao;
+import alektas.pocketbasket.di.activity.ActivityComponent;
 import alektas.pocketbasket.domain.AppRepository;
 import alektas.pocketbasket.domain.BasketRepository;
 import alektas.pocketbasket.domain.ShowcaseRepository;
 import dagger.Module;
 import dagger.Provides;
 
-@Module
+@Module(subcomponents = ActivityComponent.class)
 public class AppModule {
     private Context mContext;
 

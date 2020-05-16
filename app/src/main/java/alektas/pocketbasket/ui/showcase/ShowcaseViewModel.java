@@ -26,12 +26,12 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
-import static alektas.pocketbasket.di.UseCasesModule.GET_DEL_MODE;
-import static alektas.pocketbasket.di.UseCasesModule.GET_SHOWCASE;
 import static alektas.pocketbasket.di.UseCasesModule.GET_VIEW_MODE;
-import static alektas.pocketbasket.di.UseCasesModule.SET_DEL_MODE;
-import static alektas.pocketbasket.di.UseCasesModule.SELECT_SHOWCASE_ITEM;
-import static alektas.pocketbasket.di.UseCasesModule.TOGGLE_SHOWCASE_ITEM_SELECTION;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.GET_DEL_MODE;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.GET_SHOWCASE;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.SELECT_SHOWCASE_ITEM;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.SET_DEL_MODE;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.TOGGLE_SHOWCASE_ITEM_SELECTION;
 
 public class ShowcaseViewModel extends ViewModel {
     private static final String TAG = "ShowcaseViewModel";
