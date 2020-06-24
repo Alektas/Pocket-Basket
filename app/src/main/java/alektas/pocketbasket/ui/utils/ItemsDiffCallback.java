@@ -5,8 +5,8 @@ import androidx.recyclerview.widget.DiffUtil;
 import java.util.List;
 
 import alektas.pocketbasket.ads.NativeAdWrapper;
-import alektas.pocketbasket.data.db.entities.BasketItem;
-import alektas.pocketbasket.data.db.entities.ShowcaseItem;
+import alektas.pocketbasket.domain.entities.BasketItem;
+import alektas.pocketbasket.domain.entities.ShowcaseItem;
 
 class ItemsDiffCallback extends DiffUtil.Callback {
     private final List<Object> mOldList;
@@ -43,13 +43,13 @@ class ItemsDiffCallback extends DiffUtil.Callback {
             // New item also is BasketItem, because the basket don't have ads
             BasketItem newBasketItem = (BasketItem) newItem;
             return oldBasketItem.getName().equals(newBasketItem.getName())
-                    && oldBasketItem.isMarked() == newBasketItem.isMarked();
+                    && oldBasketItem.isChecked() == newBasketItem.isChecked();
         } else if (oldItem instanceof ShowcaseItem && newItem instanceof ShowcaseItem) {
             ShowcaseItem oldShowcaseItem = (ShowcaseItem) oldItem;
             ShowcaseItem newShowcaseItem = (ShowcaseItem) newItem;
             return oldShowcaseItem.getName().equals(newShowcaseItem.getName())
-                    && oldShowcaseItem.isRemoval() == newShowcaseItem.isRemoval()
-                    && oldShowcaseItem.getExistInBasket() == newShowcaseItem.getExistInBasket();
+                    && oldShowcaseItem.isSelected() == newShowcaseItem.isSelected()
+                    && oldShowcaseItem.isInBasket() == newShowcaseItem.isInBasket();
         } else if (oldItem instanceof NativeAdWrapper && newItem instanceof NativeAdWrapper) {
             NativeAdWrapper oldAd = (NativeAdWrapper) oldItem;
             NativeAdWrapper newAd = (NativeAdWrapper) newItem;

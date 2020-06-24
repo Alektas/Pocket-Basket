@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alektas.pocketbasket.BuildConfig;
-import alektas.pocketbasket.data.db.entities.ShowcaseItem;
+import alektas.pocketbasket.domain.entities.ShowcaseItem;
 
 public class AdManager {
     private static final int MIN_OFFSET_OF_ADS = 8;

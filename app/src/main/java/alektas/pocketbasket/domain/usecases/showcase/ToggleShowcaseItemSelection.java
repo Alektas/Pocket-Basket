@@ -2,8 +2,8 @@ package alektas.pocketbasket.domain.usecases.showcase;
 
 import javax.inject.Inject;
 
-import alektas.pocketbasket.data.db.entities.ShowcaseItem;
 import alektas.pocketbasket.domain.ShowcaseRepository;
+import alektas.pocketbasket.domain.entities.ShowcaseItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
 
 public class ToggleShowcaseItemSelection implements UseCase<ShowcaseItem, Void> {

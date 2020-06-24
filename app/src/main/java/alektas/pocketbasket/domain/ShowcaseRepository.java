@@ -3,8 +3,8 @@ package alektas.pocketbasket.domain;
 import java.util.List;
 import java.util.Set;
 
-import alektas.pocketbasket.data.db.entities.Item;
-import alektas.pocketbasket.data.db.entities.ShowcaseItem;
+import alektas.pocketbasket.domain.entities.Item;
+import alektas.pocketbasket.domain.entities.ShowcaseItem;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
@@ -17,9 +17,9 @@ public interface ShowcaseRepository {
     Observable<List<ShowcaseItem>> getShowcaseData();
     /**
      * Show in Showcase only items of the specified category
-     * @param key unique key of the category
+     * @param categoryKey unique key of the category
      */
-    void setCategory(String key);
+    void setCategory(String categoryKey);
     /**
      * Restore items deleted by user from the showcase and delete user items.
      * If it's neccessary to only restore deleted items use {@link #restoreShowcase}.
@@ -53,7 +53,7 @@ public interface ShowcaseRepository {
      */
     Maybe<Item> getItemByName(String name);
 
-    void updateDisplayedNames();
+    Maybe<List<Item>> search(String query);
 
-
+    void changeLanguage(String language);
 }

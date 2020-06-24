@@ -6,10 +6,10 @@ import java.util.List;
 import javax.inject.Inject;
 
 import alektas.pocketbasket.domain.BasketRepository;
-import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.BasketItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
 
-public class ChangeBasketPositions implements UseCase<List<ItemModel>, Void> {
+public class ChangeBasketPositions implements UseCase<List<BasketItem>, Void> {
     private BasketRepository mRepository;
 
     @Inject
@@ -18,10 +18,10 @@ public class ChangeBasketPositions implements UseCase<List<ItemModel>, Void> {
     }
 
     @Override
-    public Void execute(List<ItemModel> items) {
+    public Void execute(List<BasketItem> items) {
         if (items == null || items.isEmpty()) return null;
         List<String> keys = new ArrayList<>();
-        for (ItemModel item : items) {
+        for (BasketItem item : items) {
             keys.add(item.getKey());
         }
         mRepository.updateBasketPositions(keys);

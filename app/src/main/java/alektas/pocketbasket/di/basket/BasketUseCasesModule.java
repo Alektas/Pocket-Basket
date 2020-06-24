@@ -4,10 +4,9 @@ import java.util.List;
 
 import javax.inject.Named;
 
-import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.domain.BasketRepository;
 import alektas.pocketbasket.domain.ShowcaseRepository;
-import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.BasketItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.domain.usecases.basket.ChangeBasketPositions;
 import alektas.pocketbasket.domain.usecases.basket.GetBasket;
@@ -43,7 +42,7 @@ public abstract class BasketUseCasesModule {
 
     @Binds
     @Named(CHANGE_BASKET_POSITIONS)
-    abstract UseCase<List<ItemModel>, Void> changeBasketPositions(ChangeBasketPositions useCase);
+    abstract UseCase<List<BasketItem>, Void> changeBasketPositions(ChangeBasketPositions useCase);
 
     @Binds
     @Named(TOGGLE_BASKET_CHECK)

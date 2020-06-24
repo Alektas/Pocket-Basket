@@ -19,7 +19,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.data.db.entities.BasketItem;
+import alektas.pocketbasket.domain.entities.BasketItem;
 import alektas.pocketbasket.ui.ComponentProvider;
 import alektas.pocketbasket.ui.ItemSizeProvider;
 

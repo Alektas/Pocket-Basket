@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import alektas.pocketbasket.data.db.entities.ShowcaseItem;
 import alektas.pocketbasket.domain.ShowcaseRepository;
+import alektas.pocketbasket.domain.entities.ShowcaseItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import io.reactivex.Observable;
 

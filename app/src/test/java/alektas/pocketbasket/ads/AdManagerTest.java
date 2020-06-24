@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.ArrayList;
 import java.util.List;
 
-import alektas.pocketbasket.data.db.entities.ShowcaseItem;
+import alektas.pocketbasket.data.db.models.ShowcaseItemDbo;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -19,12 +19,12 @@ import static org.mockito.Mockito.mock;
 class AdManagerTest {
     private AdManager mAdManager;
     private NativeAdWrapper mAd;
-    private ShowcaseItem mProduct;
+    private ShowcaseItemDbo mProduct;
 
     @BeforeEach
     void setUp() {
         mAd = mock(NativeAdWrapper.class);
-        mProduct = mock(ShowcaseItem.class);
+        mProduct = mock(ShowcaseItemDbo.class);
         mAdManager = mock(AdManager.class);
         doCallRealMethod().when(mAdManager).combine(anyList(), anyList(), anyInt());
     }
@@ -88,13 +88,13 @@ class AdManagerTest {
     }
 
     private List<Object> combine(int productCount, int adCount, int minAdOffset) {
-        List<ShowcaseItem> products = getProducts(productCount);
+        List<ShowcaseItemDbo> products = getProducts(productCount);
         List<NativeAdWrapper> ads = getAds(adCount);
         return mAdManager.combine(products, ads, minAdOffset);
     }
 
-    private List<ShowcaseItem> getProducts(int count) {
-        List<ShowcaseItem> products = new ArrayList<>();
+    private List<ShowcaseItemDbo> getProducts(int count) {
+        List<ShowcaseItemDbo> products = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             products.add(mProduct);
         }

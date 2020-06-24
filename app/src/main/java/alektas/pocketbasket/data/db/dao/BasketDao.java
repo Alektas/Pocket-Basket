@@ -9,8 +9,8 @@ import androidx.room.Transaction;
 import java.util.Collection;
 import java.util.List;
 
-import alektas.pocketbasket.data.db.entities.BasketItem;
-import alektas.pocketbasket.data.db.entities.BasketMeta;
+import alektas.pocketbasket.data.db.models.BasketItemDbo;
+import alektas.pocketbasket.data.db.entities.BasketMetaEntity;
 import io.reactivex.Completable;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
@@ -18,14 +18,17 @@ import io.reactivex.Observable;
 @Dao
 public abstract class BasketDao {
 
-    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, basket_meta.marked, deleted " +
-            "FROM items INNER JOIN basket_meta " +
-            "ON items._key = basket_meta.item_key " +
+    @Query("SELECT i._key, it.name, i.img, i.category_key, i.hidden, i.custom, basket_meta.checked " +
+            "FROM items i, item_translations it, languages l " +
+            "INNER JOIN basket_meta ON i._key = basket_meta.item_key " +
+            "WHERE i._key = it.item_key " +
+                "AND l.code = it.lang_code " +
+                "AND l.code = :language " +
             "ORDER BY basket_meta.position")
-    public abstract Observable<List<BasketItem>> getItems();
+    public abstract Observable<List<BasketItemDbo>> getItems(String language);
 
-    @Query("SELECT _id, item_key, position, marked FROM basket_meta WHERE item_key = :key")
-    public abstract Maybe<BasketMeta> getItemMeta(String key);
+    @Query("SELECT item_key, position, checked FROM basket_meta WHERE item_key = :itemKey")
+    public abstract Maybe<BasketMetaEntity> getItemMeta(String itemKey);
 
     @Query("SELECT item_key FROM basket_meta ORDER BY basket_meta.position")
     protected abstract List<String> getItemKeys();
@@ -35,21 +38,20 @@ public abstract class BasketDao {
 
     @Transaction
     public void toggleItemCheck(String key) {
-        BasketMeta meta = getItemMeta(key).blockingGet();
+        BasketMetaEntity meta = getItemMeta(key).blockingGet();
         if (meta == null) return;
-        int state = meta.isMarked() ? 0 : 1;
-        toggleItemCheck(key, state);
+        toggleItemCheck(key, meta.isChecked());
 
         // Move marked item to the end of the basket list
-        if (state != 0) {
+        if (meta.isChecked()) {
             List<String> keys = getItemKeys();
             if (keys.remove(key)) keys.add(key);
             updatePositionsInOrderOf(keys);
         }
     }
 
-    @Query("UPDATE basket_meta SET marked = :state WHERE item_key = :key")
-    protected abstract void toggleItemCheck(String key, int state);
+    @Query("UPDATE basket_meta SET checked = :state WHERE item_key = :itemKey")
+    protected abstract void toggleItemCheck(String itemKey, boolean state);
 
 
     /* Mark all items queries */
@@ -59,11 +61,11 @@ public abstract class BasketDao {
         toggleBasketCheck(findUnchecked() == null ? 0 : 1);
     }
 
-    @Query("UPDATE basket_meta SET marked = :checked ")
+    @Query("UPDATE basket_meta SET checked = :checked ")
     protected abstract void toggleBasketCheck(int checked);
 
-    @Query("SELECT item_key FROM basket_meta WHERE marked = 0 LIMIT 1")
-    public abstract String findUnchecked();
+    @Query("SELECT item_key, position, checked FROM basket_meta WHERE checked = 0 LIMIT 1")
+    public abstract BasketMetaEntity findUnchecked();
 
 
     /* Update item positions queries */
@@ -78,8 +80,8 @@ public abstract class BasketDao {
         }
     }
 
-    @Query("UPDATE basket_meta SET position = :position WHERE item_key = :key")
-    protected abstract void setPosition(String key, int position);
+    @Query("UPDATE basket_meta SET position = :position WHERE item_key = :itemKey")
+    protected abstract void setPosition(String itemKey, int position);
 
     @Transaction
     public void updateItemPosition(String key, int position) {
@@ -93,15 +95,15 @@ public abstract class BasketDao {
 
     @Transaction
     public void normalizePositions() {
-        List<BasketMeta> metas = getMeta();
+        List<BasketMetaEntity> metas = getMeta();
         int position = 1;
-        for (BasketMeta meta : metas) {
+        for (BasketMetaEntity meta : metas) {
             setPosition(meta.getItemKey(), position++);
         }
     }
 
     @Query("SELECT * FROM basket_meta ORDER BY position")
-    protected abstract List<BasketMeta> getMeta();
+    protected abstract List<BasketMetaEntity> getMeta();
 
 
     /* Delete checked items queries */
@@ -114,10 +116,10 @@ public abstract class BasketDao {
         return true;
     }
 
-    @Query("SELECT _id, item_key, position, marked FROM basket_meta WHERE marked = 1 LIMIT 1")
-    protected abstract BasketMeta anyCheckedItem();
+    @Query("SELECT item_key, position, checked FROM basket_meta WHERE checked = 1 LIMIT 1")
+    protected abstract BasketMetaEntity anyCheckedItem();
 
-    @Query("DELETE FROM basket_meta WHERE marked = 1")
+    @Query("DELETE FROM basket_meta WHERE checked = 1")
     protected abstract void deleteCheckedItems();
 
 
@@ -139,11 +141,11 @@ public abstract class BasketDao {
         onItemDeleted(position);
     }
 
-    @Query("SELECT position FROM basket_meta WHERE item_key = :key")
-    protected abstract int getPosition(String key);
+    @Query("SELECT position FROM basket_meta WHERE item_key = :itemKey")
+    protected abstract int getPosition(String itemKey);
 
-    @Query("DELETE FROM basket_meta WHERE item_key = :key")
-    protected abstract void deleteMeta(String key);
+    @Query("DELETE FROM basket_meta WHERE item_key = :itemKey")
+    protected abstract void deleteMeta(String itemKey);
 
     @Query("UPDATE basket_meta SET position = (position - 1) " +
             "WHERE position > :position")
@@ -157,25 +159,25 @@ public abstract class BasketDao {
 
     @Transaction
     public void putToBasket(String key) {
-        BasketMeta meta = getItemMeta(key).blockingGet();
+        BasketMetaEntity meta = getItemMeta(key).blockingGet();
         if (meta != null) return;
         createMeta(key);
     }
 
     @Transaction
     protected void createMeta(String key) {
-        BasketMeta basketMeta = new BasketMeta(key);
-        basketMeta.setPosition(0); // put it to the buffer position
+        // Put new item to the buffer position (0)
+        BasketMetaEntity basketMeta = new BasketMetaEntity(key, 0, false);
         putBasketMeta(basketMeta);
 
-        List<String> keys = getItemKeys();
-        updatePositionsInOrderOf(keys);
+        List<String> Keys = getItemKeys();
+        updatePositionsInOrderOf(Keys);
     }
 
 
     /* Default Insert, Update, Delete methods */
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void putBasketMeta(BasketMeta meta);
+    protected abstract void putBasketMeta(BasketMetaEntity meta);
 
 }

@@ -9,8 +9,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import alektas.pocketbasket.data.db.entities.BasketItem;
-import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.BasketItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.domain.Guide;
@@ -28,7 +27,7 @@ import static alektas.pocketbasket.di.basket.BasketUseCasesModule.TOGGLE_BASKET_
 
 public class BasketViewModel extends ViewModel {
     private Guide mGuide;
-    private UseCase<List<ItemModel>, Void> mChangePositionsUseCase;
+    private UseCase<List<BasketItem>, Void> mChangePositionsUseCase;
     private UseCase<String, Void> mMarkBasketItemUseCase;
     private UseCase<String, Completable> mRemoveBasketItemUseCase;
     private UseCase<String, Void> mMoveItemToTopUseCase;
@@ -38,7 +37,7 @@ public class BasketViewModel extends ViewModel {
     @Inject
     public BasketViewModel(
             Guide guide,
-            @Named(CHANGE_BASKET_POSITIONS) UseCase<List<ItemModel>, Void> changePositionsUseCase,
+            @Named(CHANGE_BASKET_POSITIONS) UseCase<List<BasketItem>, Void> changePositionsUseCase,
             @Named(TOGGLE_BASKET_ITEM_CHECK) UseCase<String, Void> markBasketItemUseCase,
             @Named(REMOVE_BASKET_ITEM_BY_KEY) UseCase<String, Completable> removeBasketItemUseCase,
             @Named(MOVE_BASKET_ITEM_TO_TOP) UseCase<String, Void> moveItemToTopUseCase,
@@ -76,7 +75,7 @@ public class BasketViewModel extends ViewModel {
      *
      * @param names names of all basket items
      */
-    public void updatePositions(List<ItemModel> names) {
+    public void updatePositions(List<BasketItem> names) {
         mChangePositionsUseCase.execute(names);
         mGuide.onUserEvent(GuideContract.GUIDE_MOVE_ITEM);
     }

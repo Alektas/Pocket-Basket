@@ -56,7 +56,7 @@ public class ShowcaseRvAdapter extends BaseRecyclerAdapter {
                 itemView.requestLayout();
                 ItemShowcaseBinding binding = DataBindingUtil.bind(itemView);
                 binding.setModel(mModel);
-                return new ItemHolder(binding);
+                return new ShowcaseItemHolder(binding);
         }
     }
 

@@ -11,10 +11,12 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import alektas.pocketbasket.data.db.LanguageCode;
 import alektas.pocketbasket.data.db.dao.BasketDao;
-import alektas.pocketbasket.data.db.entities.BasketItem;
+import alektas.pocketbasket.data.mappers.BasketItemMapper;
 import alektas.pocketbasket.domain.BasketRepository;
-import alektas.pocketbasket.domain.entities.CompletionException;
+import alektas.pocketbasket.domain.entities.BasketItem;
+import alektas.pocketbasket.domain.exceptions.CompletionException;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -24,6 +26,7 @@ import io.reactivex.schedulers.Schedulers;
 @Singleton
 public class BasketRepositoryImpl implements BasketRepository {
     private static final String TAG = "BasketRepositoryImpl";
+    private LanguageCode mCurrentLanguage = LanguageCode.ENGLISH;
     private BasketDao mBasketDao;
 
     @Inject
@@ -33,7 +36,8 @@ public class BasketRepositoryImpl implements BasketRepository {
 
     @Override
     public Observable<List<BasketItem>> getBasketData() {
-        return mBasketDao.getItems()
+        return mBasketDao.getItems(mCurrentLanguage.getCode())
+                .map((i) -> new BasketItemMapper().convert(i) )
                 .subscribeOn(Schedulers.io());
     }
 

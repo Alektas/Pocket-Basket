@@ -1,0 +1,421 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 13,
+    "identityHash": "e744cc44e7066188feab004c9124263a",
+    "entities": [
+      {
+        "tableName": "items",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_key` TEXT NOT NULL, `img` TEXT, `category_key` TEXT NOT NULL, `hidden` INTEGER NOT NULL DEFAULT 0, `custom` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`_key`), FOREIGN KEY(`category_key`) REFERENCES `categories`(`_key`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "key",
+            "columnName": "_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "imgRef",
+            "columnName": "img",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "categoryKey",
+            "columnName": "category_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDeleted",
+            "columnName": "hidden",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "isCustom",
+            "columnName": "custom",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "_key"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_items__key",
+            "unique": false,
+            "columnNames": [
+              "_key"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_items__key` ON `${TABLE_NAME}` (`_key`)"
+          },
+          {
+            "name": "index_items_category_key",
+            "unique": false,
+            "columnNames": [
+              "category_key"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_items_category_key` ON `${TABLE_NAME}` (`category_key`)"
+          },
+          {
+            "name": "index_items_hidden",
+            "unique": false,
+            "columnNames": [
+              "hidden"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_items_hidden` ON `${TABLE_NAME}` (`hidden`)"
+          },
+          {
+            "name": "index_items_custom",
+            "unique": false,
+            "columnNames": [
+              "custom"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_items_custom` ON `${TABLE_NAME}` (`custom`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "categories",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "category_key"
+            ],
+            "referencedColumns": [
+              "_key"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "item_translations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`item_key` TEXT NOT NULL, `lang_code` TEXT NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY(`item_key`, `lang_code`), FOREIGN KEY(`item_key`) REFERENCES `items`(`_key`) ON UPDATE CASCADE ON DELETE CASCADE , FOREIGN KEY(`lang_code`) REFERENCES `languages`(`code`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "itemKey",
+            "columnName": "item_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "langCode",
+            "columnName": "lang_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "item_key",
+            "lang_code"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_item_translations_lang_code_item_key",
+            "unique": true,
+            "columnNames": [
+              "lang_code",
+              "item_key"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_item_translations_lang_code_item_key` ON `${TABLE_NAME}` (`lang_code`, `item_key`)"
+          },
+          {
+            "name": "index_item_translations_item_key",
+            "unique": false,
+            "columnNames": [
+              "item_key"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_item_translations_item_key` ON `${TABLE_NAME}` (`item_key`)"
+          },
+          {
+            "name": "index_item_translations_lang_code",
+            "unique": false,
+            "columnNames": [
+              "lang_code"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_item_translations_lang_code` ON `${TABLE_NAME}` (`lang_code`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "items",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "item_key"
+            ],
+            "referencedColumns": [
+              "_key"
+            ]
+          },
+          {
+            "table": "languages",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "lang_code"
+            ],
+            "referencedColumns": [
+              "code"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "basket_meta",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`item_key` TEXT NOT NULL, `position` INTEGER NOT NULL DEFAULT 0, `checked` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`item_key`), FOREIGN KEY(`item_key`) REFERENCES `items`(`_key`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "itemKey",
+            "columnName": "item_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "isChecked",
+            "columnName": "checked",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "item_key"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_basket_meta_item_key",
+            "unique": true,
+            "columnNames": [
+              "item_key"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_basket_meta_item_key` ON `${TABLE_NAME}` (`item_key`)"
+          },
+          {
+            "name": "index_basket_meta_position",
+            "unique": false,
+            "columnNames": [
+              "position"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_basket_meta_position` ON `${TABLE_NAME}` (`position`)"
+          },
+          {
+            "name": "index_basket_meta_checked",
+            "unique": false,
+            "columnNames": [
+              "checked"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_basket_meta_checked` ON `${TABLE_NAME}` (`checked`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "items",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "item_key"
+            ],
+            "referencedColumns": [
+              "_key"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "categories",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `_key` TEXT NOT NULL, PRIMARY KEY(`id`, `_key`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "key",
+            "columnName": "_key",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id",
+            "_key"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_categories__key_id",
+            "unique": true,
+            "columnNames": [
+              "_key",
+              "id"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_categories__key_id` ON `${TABLE_NAME}` (`_key`, `id`)"
+          },
+          {
+            "name": "index_categories__key",
+            "unique": true,
+            "columnNames": [
+              "_key"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_categories__key` ON `${TABLE_NAME}` (`_key`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "category_translations",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`category_key` TEXT NOT NULL, `lang_code` TEXT NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY(`category_key`, `lang_code`), FOREIGN KEY(`category_key`) REFERENCES `categories`(`_key`) ON UPDATE CASCADE ON DELETE CASCADE , FOREIGN KEY(`lang_code`) REFERENCES `languages`(`code`) ON UPDATE CASCADE ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "categoryKey",
+            "columnName": "category_key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "langCode",
+            "columnName": "lang_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "category_key",
+            "lang_code"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_category_translations_category_key_lang_code",
+            "unique": true,
+            "columnNames": [
+              "category_key",
+              "lang_code"
+            ],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_category_translations_category_key_lang_code` ON `${TABLE_NAME}` (`category_key`, `lang_code`)"
+          },
+          {
+            "name": "index_category_translations_category_key",
+            "unique": false,
+            "columnNames": [
+              "category_key"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_category_translations_category_key` ON `${TABLE_NAME}` (`category_key`)"
+          },
+          {
+            "name": "index_category_translations_lang_code",
+            "unique": false,
+            "columnNames": [
+              "lang_code"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_category_translations_lang_code` ON `${TABLE_NAME}` (`lang_code`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "categories",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "category_key"
+            ],
+            "referencedColumns": [
+              "_key"
+            ]
+          },
+          {
+            "table": "languages",
+            "onDelete": "CASCADE",
+            "onUpdate": "CASCADE",
+            "columns": [
+              "lang_code"
+            ],
+            "referencedColumns": [
+              "code"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "languages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`code` TEXT NOT NULL, `default` INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(`code`))",
+        "fields": [
+          {
+            "fieldPath": "code",
+            "columnName": "code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDefault",
+            "columnName": "default",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "code"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_languages_code",
+            "unique": false,
+            "columnNames": [
+              "code"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_languages_code` ON `${TABLE_NAME}` (`code`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e744cc44e7066188feab004c9124263a')"
+    ]
+  }
+}

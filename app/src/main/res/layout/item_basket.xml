@@ -8,7 +8,7 @@
 
         <variable
             name="item"
-            type="alektas.pocketbasket.data.db.entities.BasketItem" />
+            type="alektas.pocketbasket.domain.entities.BasketItem" />
 
         <variable
             name="model"
@@ -47,13 +47,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="@dimen/padding_ic"
-                android:src="@{ResourcesUtils.getImgId(item.imgRes)}" />
+                android:src="@{ResourcesUtils.getImgId(item.imgRef)}" />
 
             <ImageView
                 android:id="@+id/check_image"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@{item.isMarked ? @drawable/ic_item_checked : null}" />
+                android:src="@{item.checked ? @drawable/ic_item_checked : null}" />
 
             <TextView
                 android:id="@+id/info_text"
@@ -61,7 +61,7 @@
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:maxLines="3"
-                android:text="@{ResourcesUtils.getImgId(item.imgRes) == 0 ? item.name : null}"
+                android:text="@{ResourcesUtils.getImgId(item.imgRef) == 0 ? item.name : null}"
                 android:textSize="@dimen/textsize_item_icon" />
         </androidx.cardview.widget.CardView>
 

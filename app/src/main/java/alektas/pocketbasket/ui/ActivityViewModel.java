@@ -18,8 +18,7 @@ import javax.inject.Named;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.data.AppPreferences;
-import alektas.pocketbasket.data.db.entities.BasketItem;
-import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.BasketItem;
 import alektas.pocketbasket.domain.usecases.AddItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.GuideContract;
@@ -51,7 +50,7 @@ import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.GET_SELECT
 import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.RESET_SHOWCASE;
 import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.SELECT_CATEGORY;
 import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.SET_DEL_MODE;
-import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.UPDATE_ITEMS;
+import static alektas.pocketbasket.di.showcase.ShowcaseUseCasesModule.CHANGE_LANGUAGE;
 
 public class ActivityViewModel extends ViewModel implements GuideObserver {
     private static final String TAG = "ActivityViewModel";
@@ -62,7 +61,7 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
     private UseCase<Void, Completable> mRemoveMarkedBasketItemsUseCase;
     private UseCase<Boolean, Completable> mResetItemsUseCase;
     private UseCase<String, Void> mSelectCategoryUseCase;
-    private UseCase<Void, Void> mUpdateItemsUseCase;
+    private UseCase<String, Void> mChangeLanguageUseCase;
     private UseCase<Void, Completable> mDeleteSelectedShowcaseItemsUseCase;
     private UseCase<Void, Observable<List<BasketItem>>> mGetBasketItemsUseCase;
     private UseCase<Boolean, Void> mSetViewModeUseCase;
@@ -104,7 +103,7 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
             @Named(REMOVE_CHECKED_BASKET_ITEMS) UseCase<Void, Completable> removeMarkedBasketItemsUseCase,
             @Named(RESET_SHOWCASE) UseCase<Boolean, Completable> resetItemsUseCase,
             @Named(SELECT_CATEGORY) UseCase<String, Void> selectCategoryUseCase,
-            @Named(UPDATE_ITEMS) UseCase<Void, Void> updateItemsUseCase,
+            @Named(CHANGE_LANGUAGE) UseCase<String, Void> changeLanguageUseCase,
             @Named(GET_VIEW_MODE) UseCase<Void, Observable<Boolean>> getViewModeUseCase,
             @Named(GET_DEL_MODE) UseCase<Void, Observable<Boolean>> getDelModeUseCase,
             @Named(GET_SELECTED_SHOWCASE_ITEM_COUNT) UseCase<Void, Observable<Integer>> delItemsCountUseCase,
@@ -118,7 +117,7 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
         mRemoveMarkedBasketItemsUseCase = removeMarkedBasketItemsUseCase;
         mResetItemsUseCase = resetItemsUseCase;
         mSelectCategoryUseCase = selectCategoryUseCase;
-        mUpdateItemsUseCase = updateItemsUseCase;
+        mChangeLanguageUseCase = changeLanguageUseCase;
         mGetBasketItemsUseCase = getBasketItemsUseCase;
         mSetViewModeUseCase = setViewModeUseCase;
         mDeleteSelectedShowcaseItemsUseCase = deleteSelectedShowcaseItemsUseCase;
@@ -189,8 +188,8 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
     /**
      * Update displayed item names that were changed with localization (exclude user items)
      */
-    public void updateLocaleNames() {
-        mUpdateItemsUseCase.execute(null);
+    public void changeLanguage(String language) {
+        mChangeLanguageUseCase.execute(language);
     }
 
     public LiveData<Boolean> showcaseModeState() {
@@ -207,7 +206,7 @@ public class ActivityViewModel extends ViewModel implements GuideObserver {
         mGuide.onUserEvent(GuideContract.GUIDE_CHANGE_MODE);
     }
 
-    public List<? extends ItemModel> getBasketItems() {
+    public List<BasketItem> getBasketItems() {
         return mGetBasketItemsUseCase.execute(null).blockingFirst();
     }
 

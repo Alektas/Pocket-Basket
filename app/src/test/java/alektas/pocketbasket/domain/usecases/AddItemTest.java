@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import alektas.pocketbasket.data.BasketRepositoryImpl;
 import alektas.pocketbasket.data.ShowcaseRepositoryImpl;
-import alektas.pocketbasket.data.db.entities.Item;
+import alektas.pocketbasket.data.db.entities.ItemEntity;
 import alektas.pocketbasket.domain.BasketRepository;
 import alektas.pocketbasket.domain.ShowcaseRepository;
 import io.reactivex.Maybe;
@@ -65,7 +65,7 @@ class AddItemTest {
     @Test
     @DisplayName("existing item name -> invoke putting existing item, not adding new one")
     void execute_existingItemRequest_existingItemAdded() {
-        Item item = mock(Item.class);
+        ItemEntity item = mock(ItemEntity.class);
         when(item.getKey()).thenReturn("Key");
         when(mShowcaseRepository.getItemByName("Item")).thenReturn(Maybe.just(item));
 
@@ -80,7 +80,7 @@ class AddItemTest {
     @Test
     @DisplayName("existing item name with lower case -> invoke putting existing item, not adding new one")
     void execute_existingItemLowerCaseRequest_existingItemAdded() {
-        Item item = mock(Item.class);
+        ItemEntity item = mock(ItemEntity.class);
         when(item.getKey()).thenReturn("Key");
         when(mShowcaseRepository.getItemByName("Item")).thenReturn(Maybe.just(item));
 

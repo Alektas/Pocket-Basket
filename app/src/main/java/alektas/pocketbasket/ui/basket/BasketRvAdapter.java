@@ -12,16 +12,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.Collections;
 
 import alektas.pocketbasket.R;
+import alektas.pocketbasket.data.mappers.BasketItemMapper;
 import alektas.pocketbasket.databinding.ItemBasketBinding;
-import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.BasketItem;
 import alektas.pocketbasket.ui.ItemSizeProvider;
 import alektas.pocketbasket.ui.utils.BaseRecyclerAdapter;
-import alektas.pocketbasket.ui.utils.ItemsConverter;
 
 public class BasketRvAdapter extends BaseRecyclerAdapter
         implements ItemTouchAdapter {
 
-    private static final String TAG = "BasketAdapter";
     private Context mContext;
     private BasketViewModel mModel;
     private OnStartDragListener mDragListener;
@@ -46,7 +45,7 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
 
     @NonNull
     @Override
-    public ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public BasketItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(mContext)
                 .inflate(R.layout.item_basket, parent, false);
         itemView.getLayoutParams().width = mSizeProvider.getBasketItemWidth();
@@ -54,14 +53,14 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
         ItemBasketBinding binding = DataBindingUtil.bind(itemView);
         binding.setModel(mModel);
         binding.setDragListener(mDragListener);
-        return new ItemHolder(binding);
+        return new BasketItemHolder(binding);
     }
 
     @Override
     public void onItemDismiss(int position) {
         Object o = getItems().get(position);
-        if (o instanceof ItemModel) {
-            mModel.removeFromBasket(((ItemModel) o).getKey());
+        if (o instanceof BasketItem) {
+            mModel.removeFromBasket(((BasketItem) o).getKey());
         }
     }
 
@@ -74,6 +73,6 @@ public class BasketRvAdapter extends BaseRecyclerAdapter
 
     @Override
     public void onItemMoveEnd(RecyclerView.ViewHolder viewHolder) {
-        mModel.updatePositions(ItemsConverter.convert(getItems()));
+        mModel.updatePositions(new BasketItemMapper().convertObjects(getItems()));
     }
 }

@@ -11,73 +11,94 @@ import androidx.room.Update;
 import java.util.Collection;
 import java.util.List;
 
-import alektas.pocketbasket.data.db.entities.Item;
-import alektas.pocketbasket.data.db.entities.ShowcaseItem;
+import alektas.pocketbasket.data.db.entities.CategoryEntity;
+import alektas.pocketbasket.data.db.models.CategoryDbo;
+import alektas.pocketbasket.data.db.models.ItemDbo;
+import alektas.pocketbasket.data.db.entities.ItemEntity;
+import alektas.pocketbasket.data.db.entities.ItemTranslationEntity;
+import alektas.pocketbasket.data.db.models.ShowcaseItemDbo;
 import io.reactivex.Maybe;
 import io.reactivex.Observable;
 
 @Dao
 public abstract class ShowcaseDao {
 
-    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, deleted, " +
+    @Query("SELECT i._key, it.name, i.img, i.category_key, i.hidden, i.custom, " +
             "(CASE WHEN EXISTS " +
-            "(SELECT 1 FROM basket_meta WHERE items._key = basket_meta.item_key) " +
+                "(SELECT 1 FROM basket_meta WHERE i._key = basket_meta.item_key) " +
             "THEN 1 ELSE 0 END) AS in_basket " +
-            "FROM items WHERE deleted = 0 AND tag_res = :tag " +
-            "ORDER BY displayed_name")
-    public abstract Observable<List<ShowcaseItem>> getShowcaseItems(String tag);
+            "FROM items i, item_translations it, languages l " +
+            "WHERE i.hidden = 0 " +
+                "AND i.category_key = :categoryKey " +
+                "AND i._key = it.item_key " +
+                "AND l.code = it.lang_code " +
+                "AND l.code = :language " +
+            "ORDER BY it.name")
+    public abstract Observable<List<ShowcaseItemDbo>> getShowcaseItems(String categoryKey, String language);
 
-    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, deleted, " +
+    @Query("SELECT i._key, it.name, i.img, i.category_key, i.hidden, i.custom, " +
             "(CASE WHEN EXISTS " +
-            "(SELECT 1 FROM basket_meta WHERE items._key = basket_meta.item_key) " +
+                "(SELECT 1 FROM basket_meta WHERE i._key = basket_meta.item_key) " +
             "THEN 1 ELSE 0 END) AS in_basket " +
-            "FROM items WHERE deleted = 0 " +
-            "ORDER BY CASE " +
-            "WHEN tag_res = 'drink' THEN 1 " +
-            "WHEN tag_res = 'fruit' THEN 2 " +
-            "WHEN tag_res = 'vegetable' THEN 3 " +
-            "WHEN tag_res = 'floury' THEN 4 " +
-            "WHEN tag_res = 'milky' THEN 5 " +
-            "WHEN tag_res = 'groats' THEN 6 " +
-            "WHEN tag_res = 'sweets' THEN 7 " +
-            "WHEN tag_res = 'meat' THEN 8 " +
-            "WHEN tag_res = 'seafood' THEN 9 " +
-            "WHEN tag_res = 'semis' THEN 10 " +
-            "WHEN tag_res = 'sauce_n_oil' THEN 11 " +
-            "WHEN tag_res = 'household' THEN 12 " +
-            "WHEN tag_res = 'other' THEN 13 " +
-            "ELSE 14 " +
-            "END, displayed_name")
-    public abstract Observable<List<ShowcaseItem>> getShowcaseItems();
+            "FROM items i, item_translations it, languages l, categories c " +
+            "WHERE i.hidden = 0 " +
+                "AND i._key = it.item_key " +
+                "AND l.code = it.lang_code " +
+                "AND l.code = :language " +
+            "ORDER BY c.id, it.name")
+    public abstract Observable<List<ShowcaseItemDbo>> getShowcaseItems(String language);
 
-    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, deleted FROM items")
-    public abstract Maybe<List<Item>> getAllItems();
+    @Query("SELECT i._key, it.name, i.img, i.category_key, i.hidden, i.custom " +
+            "FROM items i, item_translations it, languages l " +
+            "WHERE i.hidden = 0 " +
+            "AND i._key = it.item_key " +
+            "AND l.code = it.lang_code " +
+            "AND l.code = :language " +
+            "AND it.name = :name")
+    public abstract Maybe<ItemDbo> getItemByName(String name, String language);
 
-    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, deleted " +
-            "FROM items WHERE displayed_name = :name AND deleted = 0")
-    public abstract Maybe<Item> getItemByName(String name);
+    @Query("SELECT i._key, it.name, i.img, i.category_key, i.hidden, i.custom " +
+            "FROM items i, item_translations it, languages l " +
+            "WHERE it.name LIKE :query " +
+            "AND i._key = it.item_key " +
+            "AND l.code = it.lang_code " +
+            "AND l.code = :language " +
+            "AND hidden = 0")
+    public abstract Maybe<List<ItemDbo>> search(String query, String language);
 
-    @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, deleted " +
-            "FROM items WHERE displayed_name LIKE :query AND deleted = 0")
-    public abstract Maybe<List<Item>> search(String query);
+    @Query("SELECT c.id, c._key, ct.name " +
+            "FROM categories c, category_translations ct, languages l " +
+            "WHERE c._key = ct.category_key " +
+            "AND l.code = ct.lang_code " +
+            "AND l.code = :language " +
+            "ORDER BY c.id")
+    public abstract Observable<List<CategoryDbo>> getCategories(String language);
 
     @Transaction
-    public void createItem(String key) {
-        Item item = new Item(key);
+    public void createItem(String name, String categoryKey, String language) {
+        ItemEntity item = new ItemEntity(name, null, categoryKey, false, true);
         insert(item);
+        ItemTranslationEntity trans = new ItemTranslationEntity(name, language, name);
+        insert(trans);
     }
 
     @Transaction
-    public void deleteItems(Collection<ShowcaseItem> items) {
-        for (Item item : items) {
-            if (item.getNameRes() == null) {
-                delete(item);
+    public void deleteItems(Collection<String> keys) {
+        for (String key : keys) {
+            ItemEntity entity = getItemEntity(key);
+            if (entity.isCustom()) {
+                delete(entity);
                 continue;
             }
-            item.setDeleted(1);
-            update(item);
+            hideItem(key);
         }
     }
+
+    @Query("SELECT * FROM items WHERE _key = :key")
+    protected abstract ItemEntity getItemEntity(String key);
+
+    @Query("UPDATE items SET hidden = 1 WHERE _key = :key")
+    protected abstract void hideItem(String key);
 
     @Transaction
     public void resetShowcase() {
@@ -85,22 +106,25 @@ public abstract class ShowcaseDao {
         restoreShowcase();
     }
 
-    @Query("DELETE FROM items WHERE name_res IS NULL")
+    @Query("DELETE FROM items WHERE custom = 1")
     protected abstract void deleteUserItems();
 
-    @Query("UPDATE items SET deleted = 0")
+    @Query("UPDATE items SET hidden = 0")
     public abstract void restoreShowcase();
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    protected abstract void update(Item item);
+    protected abstract void update(ItemEntity item);
 
     @Delete
-    protected abstract void delete(Item item);
+    protected abstract void delete(ItemEntity item);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    protected abstract void insert(Item item);
+    protected abstract void insert(ItemEntity item);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    protected abstract void insert(ItemTranslationEntity translation);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    public abstract void update(List<Item> items);
+    public abstract void update(List<ItemEntity> items);
 
 }

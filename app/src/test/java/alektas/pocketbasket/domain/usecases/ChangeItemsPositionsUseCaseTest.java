@@ -10,7 +10,7 @@ import java.util.List;
 
 import alektas.pocketbasket.data.BasketRepositoryImpl;
 import alektas.pocketbasket.domain.BasketRepository;
-import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.IItemModel;
 import alektas.pocketbasket.domain.usecases.basket.ChangeBasketPositions;
 
 import static org.mockito.Mockito.*;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.*;
 @DisplayName("Use case of item position updating")
 class ChangeItemsPositionsUseCaseTest {
     private BasketRepository mRepository;
-    private UseCase<List<ItemModel>, Void> changePositionUseCase;
+    private UseCase<List<IItemModel>, Void> changePositionUseCase;
 
     @BeforeEach
     void setUp() {
@@ -45,7 +45,7 @@ class ChangeItemsPositionsUseCaseTest {
     @Test
     @DisplayName("single item -> invoke changing position if item")
     void execute_singleItem_invokeUpdatingPosition() {
-        ItemModel item1 = mock(ItemModel.class);
+        IItemModel item1 = mock(IItemModel.class);
         when(item1.getKey()).thenReturn("Key1");
         changePositionUseCase.execute(Collections.singletonList(item1));
 
@@ -55,9 +55,9 @@ class ChangeItemsPositionsUseCaseTest {
     @Test
     @DisplayName("item list -> invoke updating positions in correct order")
     void execute_listOfItems_correctUpdateKeysOrder() {
-        ItemModel item1 = mock(ItemModel.class);
+        IItemModel item1 = mock(IItemModel.class);
         when(item1.getKey()).thenReturn("Key1");
-        ItemModel item2 = mock(ItemModel.class);
+        IItemModel item2 = mock(IItemModel.class);
         when(item2.getKey()).thenReturn("Key2");
         changePositionUseCase.execute(Arrays.asList(item1, item2));
 

@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.inject.Named;
 
-import alektas.pocketbasket.data.db.entities.ShowcaseItem;
+import alektas.pocketbasket.domain.entities.ShowcaseItem;
 import alektas.pocketbasket.domain.usecases.AddItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.domain.usecases.showcase.DeleteSelectedShowcaseItems;
@@ -16,7 +16,7 @@ import alektas.pocketbasket.domain.usecases.showcase.SelectCategory;
 import alektas.pocketbasket.domain.usecases.showcase.SelectShowcaseItem;
 import alektas.pocketbasket.domain.usecases.showcase.SetDelMode;
 import alektas.pocketbasket.domain.usecases.showcase.ToggleShowcaseItemSelection;
-import alektas.pocketbasket.domain.usecases.showcase.UpdateItems;
+import alektas.pocketbasket.domain.usecases.showcase.ChangeLanguage;
 import dagger.Binds;
 import dagger.Module;
 import io.reactivex.Completable;
@@ -29,7 +29,7 @@ public interface ShowcaseUseCasesModule {
     String RESET_SHOWCASE = "RESET_SHOWCASE";
     String SELECT_CATEGORY = "SELECT_CATEGORY";
     String SELECT_SHOWCASE_ITEM = "SELECT_SHOWCASE_ITEM";
-    String UPDATE_ITEMS = "UPDATE_ITEMS";
+    String CHANGE_LANGUAGE = "CHANGE_LANGUAGE";
     String SET_DEL_MODE = "SET_DEL_MODE";
     String GET_DEL_MODE = "GET_DEL_MODE";
     String GET_SELECTED_SHOWCASE_ITEM_COUNT = "GET_SELECTED_SHOWCASE_ITEM_COUNT";
@@ -54,8 +54,8 @@ public interface ShowcaseUseCasesModule {
     UseCase<String, Single<Integer>> selectShowcaseItem(SelectShowcaseItem useCase);
 
     @Binds
-    @Named(UPDATE_ITEMS)
-    UseCase<Void, Void> updateItems(UpdateItems useCase);
+    @Named(CHANGE_LANGUAGE)
+    UseCase<String, Void> changeLanguage(ChangeLanguage useCase);
 
     @Binds
     @Named(DELETE_SELECTED_SHOWCASE_ITEMS)

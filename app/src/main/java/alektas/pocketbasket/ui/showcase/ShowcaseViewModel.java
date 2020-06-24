@@ -14,7 +14,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import alektas.pocketbasket.App;
-import alektas.pocketbasket.data.db.entities.ShowcaseItem;
+import alektas.pocketbasket.data.db.models.ShowcaseItemDbo;
+import alektas.pocketbasket.domain.entities.ShowcaseItem;
 import alektas.pocketbasket.domain.usecases.showcase.SelectShowcaseItem;
 import alektas.pocketbasket.domain.usecases.UseCase;
 import alektas.pocketbasket.guide.GuideContract;
@@ -127,7 +128,7 @@ public class ShowcaseViewModel extends ViewModel {
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.ITEM_ID, item.getKey());
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, item.getName());
-        bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, item.getTagRes());
+//        bundle.putString(FirebaseAnalytics.Param.ITEM_CATEGORY, item.getCategory());
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.ADD_TO_CART, bundle);
     }
 

@@ -42,7 +42,7 @@ import alektas.pocketbasket.R;
 import alektas.pocketbasket.data.AppPreferences;
 import alektas.pocketbasket.di.activity.ActivityComponent;
 import alektas.pocketbasket.di.activity.ActivityModule;
-import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.BasketItem;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.ui.DisposableGuideCaseListener;
 import alektas.pocketbasket.guide.ui.GuideCaseView;
@@ -101,14 +101,19 @@ public class MainActivity extends AppCompatActivity implements
         String curLang = ResourcesUtils.getCurrentLanguage();
         String savedLang = mPrefs.getLanguage();
 
-        int vc = ResourcesUtils.getVersionCode();
-        boolean isVersionChanged = mPrefs.getVersionCode() != vc;
-
-        if (!savedLang.equals(curLang) || isVersionChanged) {
+        if (!savedLang.equals(curLang)) {
             mPrefs.saveLanguage(curLang);
-            mPrefs.saveVersionCode(vc);
-            mViewModel.updateLocaleNames();
+            mViewModel.changeLanguage(curLang);
         }
+
+        // TODO: Check if it's necessary yet
+//        int vc = ResourcesUtils.getVersionCode();
+//        boolean isVersionChanged = mPrefs.getVersionCode() != vc;
+//
+//        if (isVersionChanged) {
+//            mPrefs.saveVersionCode(vc);
+//            mViewModel.updateItems(curLang);
+//        }
 
         // If it is the first app launch offer to start the guide
         if (mPrefs.isFirstLaunch()) {
@@ -506,11 +511,11 @@ public class MainActivity extends AppCompatActivity implements
      *
      * @param items shared basket items
      */
-    private void onShareBasketItems(List<? extends ItemModel> items) {
+    private void onShareBasketItems(List<BasketItem> items) {
         if (mShareActionProvider != null && items != null && !items.isEmpty()) {
 
             StringBuilder sb = new StringBuilder(getString(R.string.share_intro));
-            for (ItemModel item : items) {
+            for (BasketItem item : items) {
                 sb.append("\n - ").append(item.getName());
             }
 

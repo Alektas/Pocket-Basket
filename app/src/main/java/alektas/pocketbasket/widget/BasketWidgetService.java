@@ -15,8 +15,8 @@ import javax.inject.Inject;
 
 import alektas.pocketbasket.App;
 import alektas.pocketbasket.R;
-import alektas.pocketbasket.data.db.entities.BasketItem;
 import alektas.pocketbasket.domain.BasketRepository;
+import alektas.pocketbasket.domain.entities.BasketItem;
 import alektas.pocketbasket.utils.ResourcesUtils;
 
 public class BasketWidgetService extends RemoteViewsService {
@@ -60,7 +60,7 @@ class BasketWidgetFactory implements RemoteViewsService.RemoteViewsFactory {
         widgetItems.clear();
         List<BasketItem> items = mRepository.getBasketData().blockingFirst(new ArrayList<>());
         for (BasketItem item : items) {
-            WidgetBasketItem widgetItem = new WidgetBasketItem(item.getName(), item.getImgRes());
+            WidgetBasketItem widgetItem = new WidgetBasketItem(item.getName(), item.getImgRef());
             if (item.getName().equals(BasketWidget.REMOVAL_ITEM)) {
                 widgetItem.setRemoval(true);
             }

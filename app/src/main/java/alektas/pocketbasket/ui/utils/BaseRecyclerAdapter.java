@@ -11,11 +11,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-import alektas.pocketbasket.data.db.entities.BasketItem;
-import alektas.pocketbasket.data.db.entities.ShowcaseItem;
+import alektas.pocketbasket.data.db.models.BasketItemDbo;
+import alektas.pocketbasket.data.db.models.ShowcaseItemDbo;
 import alektas.pocketbasket.databinding.ItemBasketBinding;
 import alektas.pocketbasket.databinding.ItemShowcaseBinding;
-import alektas.pocketbasket.domain.entities.ItemModel;
+import alektas.pocketbasket.domain.entities.BasketItem;
+import alektas.pocketbasket.domain.entities.IItemModel;
+import alektas.pocketbasket.domain.entities.ShowcaseItem;
 
 public abstract class BaseRecyclerAdapter
         extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -26,27 +28,39 @@ public abstract class BaseRecyclerAdapter
         setHasStableIds(true);
     }
 
-    public static class ItemHolder extends RecyclerView.ViewHolder {
-        private static final String TAG = "ItemHolder";
-        private ViewDataBinding mBinding;
+    public static class ShowcaseItemHolder extends RecyclerView.ViewHolder {
+        private ItemShowcaseBinding mBinding;
 
-        private ItemHolder(@NonNull View itemView) {
+        private ShowcaseItemHolder(@NonNull View itemView) {
             super(itemView);
         }
 
-        public ItemHolder(ViewDataBinding binding) {
+        public ShowcaseItemHolder(ItemShowcaseBinding binding) {
             this(binding.getRoot());
             mBinding = binding;
         }
 
-        void bind(alektas.pocketbasket.domain.entities.ItemModel item, RecyclerView.ViewHolder holder) {
-            if (mBinding instanceof ItemShowcaseBinding) {
-                ((ItemShowcaseBinding) mBinding).setItem((ShowcaseItem) item);
-            }
-            if (mBinding instanceof ItemBasketBinding) {
-                ((ItemBasketBinding) mBinding).setItem((BasketItem) item);
-                ((ItemBasketBinding) mBinding).setHolder(holder);
-            }
+        void bind(ShowcaseItem item) {
+            mBinding.setItem(item);
+            mBinding.executePendingBindings();
+        }
+    }
+
+    public static class BasketItemHolder extends RecyclerView.ViewHolder {
+        private ItemBasketBinding mBinding;
+
+        private BasketItemHolder(@NonNull View itemView) {
+            super(itemView);
+        }
+
+        public BasketItemHolder(ItemBasketBinding binding) {
+            this(binding.getRoot());
+            mBinding = binding;
+        }
+
+        void bind(BasketItem item) {
+            mBinding.setItem(item);
+            mBinding.setHolder(this);
             mBinding.executePendingBindings();
         }
     }
@@ -60,8 +74,8 @@ public abstract class BaseRecyclerAdapter
     @Override
     public long getItemId(int position) {
         Object obj = mItems.get(position);
-        if (obj instanceof ItemModel) {
-            return ((ItemModel) obj).getKey().hashCode();
+        if (obj instanceof IItemModel) {
+            return ((IItemModel) obj).getKey().hashCode();
         }
         return obj.hashCode();
     }
@@ -73,9 +87,13 @@ public abstract class BaseRecyclerAdapter
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         Object obj = mItems.get(position);
-        if (obj instanceof ItemModel) {
-            ItemHolder vh = (ItemHolder) viewHolder;
-            vh.bind((ItemModel) obj, viewHolder);
+        if (obj instanceof BasketItem) {
+            BasketItemHolder vh = (BasketItemHolder) viewHolder;
+            vh.bind((BasketItem) obj);
+        }
+        if (obj instanceof ShowcaseItem) {
+            ShowcaseItemHolder vh = (ShowcaseItemHolder) viewHolder;
+            vh.bind((ShowcaseItem) obj);
         }
     }
 

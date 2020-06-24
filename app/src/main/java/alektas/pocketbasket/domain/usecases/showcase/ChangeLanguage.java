@@ -5,17 +5,17 @@ import javax.inject.Inject;
 import alektas.pocketbasket.domain.ShowcaseRepository;
 import alektas.pocketbasket.domain.usecases.UseCase;
 
-public class UpdateItems implements UseCase<Void, Void> {
+public class ChangeLanguage implements UseCase<String, Void> {
     private ShowcaseRepository mRepository;
 
     @Inject
-    public UpdateItems(ShowcaseRepository repository) {
+    public ChangeLanguage(ShowcaseRepository repository) {
         mRepository = repository;
     }
 
     @Override
-    public Void execute(Void v) {
-        mRepository.updateDisplayedNames();
+    public Void execute(String language) {
+        mRepository.changeLanguage(language);
         return null;
     }
 }

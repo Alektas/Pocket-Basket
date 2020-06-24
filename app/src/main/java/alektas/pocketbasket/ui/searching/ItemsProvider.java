@@ -16,14 +16,13 @@ import java.util.List;
 import javax.inject.Inject;
 
 import alektas.pocketbasket.App;
-import alektas.pocketbasket.data.db.dao.ShowcaseDao;
-import alektas.pocketbasket.data.db.entities.Item;
+import alektas.pocketbasket.domain.ShowcaseRepository;
+import alektas.pocketbasket.domain.entities.Item;
 import alektas.pocketbasket.utils.ResourcesUtils;
 
 public class ItemsProvider extends ContentProvider {
-    private static final String TAG = "ItemsProvider";
     @Inject
-    ShowcaseDao mShowcaseDao;
+    ShowcaseRepository mShowcaseRepository;
 
     @Override
     public boolean onCreate() { return true; }
@@ -46,10 +45,10 @@ public class ItemsProvider extends ContentProvider {
         } else {
             // query contains the users search
             // return a cursor with appropriate data
-            if (mShowcaseDao == null) {
+            if (mShowcaseRepository == null) {
                 App.getComponent().inject(this);
             }
-            List<Item> items = mShowcaseDao.search("%" + query + "%")
+            List<Item> items = mShowcaseRepository.search("%" + query + "%")
                     .blockingGet(new ArrayList<>());
 
             return fillCursor(cursor, items);
@@ -62,7 +61,7 @@ public class ItemsProvider extends ContentProvider {
             // Cursor fields assigned in the ItemsContract.
             cursor.addRow(new Object[]{i,                      // ID
                     item.getName(),                             // visible text
-                    ResourcesUtils.getImgId(item.getImgRes()),  // image resource ID
+                    ResourcesUtils.getImgId(item.getImgRef()),  // image resource ID
                     item.getKey()});                           // data(key = name)
             i++;
         }
