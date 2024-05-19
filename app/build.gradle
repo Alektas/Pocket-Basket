@@ -19,8 +19,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 34
 
-        versionName "0.10.1"
-        versionCode 13
+        versionName "1.1.0"
+        versionCode 14
         resourceConfigurations += ['en', 'ru']
         project.ext.set("archivesBaseName", "PocketBasket-" + defaultConfig.versionName)
 
