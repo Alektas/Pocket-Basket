@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements
      */
     private static final float CHANGE_MODE_VELOCITY_DIVIDER = 1000;
 
+    private int mStatusBarHeight;
     private int mCategNarrowWidth;
     private int mCategWideWidth;
     private int mShowcaseWideWidth;
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements
     private VelocityTracker mVelocityTracker;
     private ShareActionProvider mShareActionProvider;
     private ViewGroup mRootLayout;
+    private View mBottomAppBar;
     private View mBasketContainer;
     private View mShowcaseContainer;
     private View mCategoriesContainer;
@@ -256,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements
         initTransitions();
 
         mRootLayout = findViewById(R.id.root_layout);
+        mBottomAppBar = findViewById(R.id.appbar);
         mCategoriesContainer = findViewById(R.id.fragment_categories);
         mShowcaseContainer = findViewById(R.id.fragment_showcase);
         mShowcase = mShowcaseContainer.findViewById(R.id.showcase_list);
@@ -290,6 +293,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initDimensions() {
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            mStatusBarHeight = getResources().getDimensionPixelSize(resourceId);
+        }
+
         DisplayMetrics displaymetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         int screenWidth = displaymetrics.widthPixels;
@@ -575,7 +583,7 @@ public class MainActivity extends AppCompatActivity implements
      * Change size of the view.
      * If width equal '0' then view fills in the free space.
      *
-     * @param view view which width need change
+     * @param view  view which width need change
      * @param width width of the view in pixels
      */
     private void changeViewWidth(View view, int width) {
@@ -594,7 +602,7 @@ public class MainActivity extends AppCompatActivity implements
 
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "reset showcase");
-        bundle.putString(FirebaseAnalytics.Param.CHECKOUT_OPTION, "is full reset: " + fullReset);
+        bundle.putString(FirebaseAnalytics.Param.CONTENT, "is full reset: " + fullReset);
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
     }
 
@@ -802,9 +810,12 @@ public class MainActivity extends AppCompatActivity implements
                 initY = (int) (event.getY() + 0.5f);
 
                 /* Disable the change mode from the basket in the basket mode
-                 * because direction of the swipe is match to direction of the item delete swipe */
+                 * because direction of the swipe is match to direction of the item delete swipe.
+                 * Also disable if it's a touch on the bottom app bar.
+                 */
                 if (!mViewModel.isShowcaseMode()
-                        && initX > (mCategNarrowWidth + mShowcaseNarrowWidth)) {
+                        && initX > (mCategNarrowWidth + mShowcaseNarrowWidth)
+                        || isInteractionWithSystemBars(initY)) {
                     allowChangeMode = false;
                     isChangeModeHandled = true;
                 }
@@ -846,6 +857,10 @@ public class MainActivity extends AppCompatActivity implements
                 break;
             }
         }
+    }
+
+    private boolean isInteractionWithSystemBars(int touchDownY) {
+        return touchDownY - mStatusBarHeight > mBottomAppBar.getY();
     }
 
     /**

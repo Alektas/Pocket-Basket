@@ -15,8 +15,10 @@ import alektas.pocketbasket.domain.entities.BasketItemModel;
 import alektas.pocketbasket.domain.entities.ItemModel;
 import alektas.pocketbasket.domain.usecases.ChangeItemsPositions;
 import alektas.pocketbasket.domain.usecases.MarkBasketItem;
+import alektas.pocketbasket.domain.usecases.MoveItemToTopUseCase;
 import alektas.pocketbasket.domain.usecases.RemoveItemFromBasket;
 import alektas.pocketbasket.domain.usecases.UseCase;
+import alektas.pocketbasket.domain.utils.Event;
 import alektas.pocketbasket.guide.GuideContract;
 import alektas.pocketbasket.guide.domain.ContextualGuide;
 import alektas.pocketbasket.guide.domain.Guide;
@@ -26,6 +28,7 @@ public class BasketViewModel extends AndroidViewModel {
     private Repository mRepository;
     private Guide mGuide;
     private MutableLiveData<List<BasketItemModel>> mBasketData = new MutableLiveData<>();
+    private MutableLiveData<Event<Boolean>> scrollToTopEvent = new MutableLiveData<>();
 
     public BasketViewModel(@NonNull Application application) {
         super(application);
@@ -46,6 +49,10 @@ public class BasketViewModel extends AndroidViewModel {
 
     public LiveData<List<BasketItemModel>> getBasketData() {
         return mBasketData;
+    }
+
+    public LiveData<Event<Boolean>> getScrollToTopEvent() {
+        return scrollToTopEvent;
     }
 
     /**
@@ -72,6 +79,10 @@ public class BasketViewModel extends AndroidViewModel {
         new RemoveItemFromBasket(mRepository).execute(key, null);
         ActivityViewModel.removeCountState.setState(ActivityViewModel.removeCountState.getState() + 1);
         mGuide.onUserEvent(GuideContract.GUIDE_SWIPE_REMOVE_ITEM);
+    }
+
+    public void onItemDoubleClick(String key) {
+        new MoveItemToTopUseCase(mRepository).execute(key, null);
     }
 
 }

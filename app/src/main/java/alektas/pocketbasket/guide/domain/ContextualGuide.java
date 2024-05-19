@@ -7,15 +7,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
-import javax.annotation.Nullable;
-
 import alektas.pocketbasket.guide.GuideObserver;
 
 public class ContextualGuide implements Guide {
-    private static ContextualGuide INSTANCE;
-    private List<GuideObserver> mListeners;
+    private static volatile ContextualGuide INSTANCE;
+    private final List<GuideObserver> mListeners;
     private List<GuideCase> mCases;
-    private Queue<GuideCase> mShowingQueue;
+    private final Queue<GuideCase> mShowingQueue;
     private GuideCase mCurrentCase;
     private boolean isStarted;
 
@@ -43,8 +41,8 @@ public class ContextualGuide implements Guide {
     }
 
     public static class Builder {
-        private List<GuideCase> cases;
-        private Map<GuideCase, Requirement> requirementsCases;
+        private final List<GuideCase> cases;
+        private final Map<GuideCase, Requirement> requirementsCases;
         private GuideCase customCase;
 
         public Builder() {
@@ -212,7 +210,6 @@ public class ContextualGuide implements Guide {
         }
     }
 
-    @Nullable
     private GuideCase getCase(String caseKey) {
         for (GuideCase guideCase : mCases) {
             if (guideCase.getKey().equals(caseKey)) return guideCase;

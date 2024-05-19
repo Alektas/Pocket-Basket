@@ -59,7 +59,7 @@ public abstract class ItemsDao {
     @Query("SELECT _key, displayed_name, name_res, img_res, tag_res, basket_meta.marked, deleted " +
             "FROM items INNER JOIN basket_meta " +
             "ON items._key = basket_meta.item_key " +
-            "GROUP BY basket_meta.position")
+            "ORDER BY basket_meta.position")
     public abstract List<BasketItem> getBasketItems();
 
     @Query("SELECT _id, item_key, position, marked FROM basket_meta WHERE item_key = :key")
@@ -68,7 +68,7 @@ public abstract class ItemsDao {
     @Query("SELECT _key FROM items " +
             "INNER JOIN basket_meta " +
             "ON items._key = basket_meta.item_key " +
-            "GROUP BY basket_meta.position")
+            "ORDER BY basket_meta.position")
     protected abstract List<String> getBasketItemKeys();
 
     @Query("SELECT _id, item_key, position, marked FROM basket_meta WHERE marked = 1 LIMIT 1")
@@ -79,7 +79,15 @@ public abstract class ItemsDao {
 
     @Transaction
     public void mark(String key) {
-        mark(key, getItemMeta(key).isMarked() ? 0 : 1);
+        int state = getItemMeta(key).isMarked() ? 0 : 1;
+        mark(key, state);
+
+        // Move marked item to the end of the basket list
+        if (state != 0) {
+            List<String> keys = getBasketItemKeys();
+            if (keys.remove(key)) keys.add(key);
+            updatePositions(keys);
+        }
     }
 
     @Query("UPDATE basket_meta SET marked = :state WHERE item_key = :key")
@@ -110,6 +118,16 @@ public abstract class ItemsDao {
             setPosition(key, i);
             i++;
         }
+    }
+
+    @Transaction
+    public void updatePosition(String key, int position) {
+        List<String> keys = getBasketItemKeys();
+        int i = keys.indexOf(key);
+        if (i < 0 || i == position) return;
+        keys.remove(i);
+        keys.add(position, key);
+        updatePositions(keys);
     }
 
     @Query("UPDATE basket_meta SET position = :position WHERE item_key = :key")
@@ -187,21 +205,24 @@ public abstract class ItemsDao {
     public void addNewItem(String key) {
         Item item = new Item(key);
         insert(item);
-        BasketMeta basketMeta = new BasketMeta(key);
-        basketMeta.setPosition(getMaxPosition() + 1);
-        putBasketMeta(basketMeta);
+        createBasketMeta(key);
     }
 
     @Transaction
     public void putItemToBasket(String key) {
         if (getItemMeta(key) != null) return;
-        BasketMeta basketMeta = new BasketMeta(key);
-        basketMeta.setPosition(getMaxPosition() + 1);
-        putBasketMeta(basketMeta);
+        createBasketMeta(key);
     }
 
-    @Query("SELECT MAX(position) FROM basket_meta")
-    public abstract int getMaxPosition();
+    @Transaction
+    protected void createBasketMeta(String key) {
+        BasketMeta basketMeta = new BasketMeta(key);
+        basketMeta.setPosition(0);
+        putBasketMeta(basketMeta);
+
+        List<String> keys = getBasketItemKeys();
+        updatePositions(keys);
+    }
 
 
     /* Default Insert, Update, Delete queries */

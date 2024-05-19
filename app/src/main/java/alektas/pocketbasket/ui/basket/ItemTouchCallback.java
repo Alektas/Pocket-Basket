@@ -13,22 +13,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import alektas.pocketbasket.R;
 
 public class ItemTouchCallback extends ItemTouchHelper.Callback {
-    private static final String TAG = "ItemTouchCallback";
     private ItemTouchAdapter mAdapter;
-    private boolean isSwipe = false;
-    private boolean isDeletion = false;
     private boolean isMove = false;
     private Animator mRemoveOnAnimator;
-    private Animator mRemoveOffAnimator;
+    private Animator mClearViewAnimator;
     private Animator mMoveOnAnimator;
-    private Animator mMoveOffAnimator;
 
     public ItemTouchCallback(Context context, ItemTouchAdapter adapter) {
         mAdapter = adapter;
         mRemoveOnAnimator = AnimatorInflater.loadAnimator(context, R.animator.anim_item_remove_on);
-        mRemoveOffAnimator = AnimatorInflater.loadAnimator(context, R.animator.anim_item_remove_off);
+        mClearViewAnimator = AnimatorInflater.loadAnimator(context, R.animator.anim_item_clear_view);
         mMoveOnAnimator = AnimatorInflater.loadAnimator(context, R.animator.anim_item_move_on);
-        mMoveOffAnimator = AnimatorInflater.loadAnimator(context, R.animator.anim_item_move_off);
     }
 
     @Override
@@ -50,7 +45,6 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
     @Override
     public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
         mAdapter.onItemDismiss(viewHolder.getAdapterPosition());
-        isDeletion = true;
     }
 
     @Override
@@ -67,11 +61,11 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
     @Override
     public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
         super.onSelectedChanged(viewHolder, actionState);
+        if (viewHolder == null) return;
 
         if (ItemTouchHelper.ACTION_STATE_SWIPE == actionState) {
             mRemoveOnAnimator.setTarget(viewHolder.itemView);
             mRemoveOnAnimator.start();
-            isSwipe = true;
         } else if (ItemTouchHelper.ACTION_STATE_DRAG == actionState) {
             mMoveOnAnimator.setTarget(viewHolder.itemView);
             mMoveOnAnimator.start();
@@ -84,25 +78,19 @@ public class ItemTouchCallback extends ItemTouchHelper.Callback {
                           @NonNull RecyclerView.ViewHolder viewHolder) {
         super.clearView(recyclerView, viewHolder);
 
-        if (isSwipe) {
-            if (isDeletion) {
-                isDeletion = false;
-            } else {
-                mRemoveOffAnimator.setTarget(viewHolder.itemView);
-                mRemoveOffAnimator.start();
-            }
-            isSwipe = false;
-        } else if (isMove) {
-            mMoveOffAnimator.setTarget(viewHolder.itemView);
-            mMoveOffAnimator.start();
+        mRemoveOnAnimator.cancel();
+        mMoveOnAnimator.cancel();
+
+        // If method is called too frequently it's need to finish
+        // previous view clearing before setting a new target
+        mClearViewAnimator.end();
+        mClearViewAnimator.setTarget(viewHolder.itemView);
+        mClearViewAnimator.start();
+
+        if (isMove) {
             mAdapter.onItemMoveEnd(viewHolder);
             isMove = false;
-            return;
         }
-
-        viewHolder.itemView.setAlpha(1f);
-        viewHolder.itemView.setScaleX(1f);
-        viewHolder.itemView.setScaleY(1f);
     }
 
     @Override

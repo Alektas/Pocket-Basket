@@ -2,6 +2,7 @@ package alektas.pocketbasket.data;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
@@ -156,6 +157,11 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     @Override
     public void updatePositions(List<String> keys) {
         new updatePositionsAsync(mItemsDao, this).execute(keys);
+    }
+
+    @Override
+    public void updatePosition(String key, int position) {
+        new updatePositionAsync(mItemsDao, this).execute(new Pair<>(key, position));
     }
 
     // Change item state in "Basket"
@@ -343,6 +349,34 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         @Override
         protected final Void doInBackground(List<String>... names) {
             mDao.updatePositions(names[0]);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (mUpdater != null) {
+                mUpdater.updateBasket();
+            }
+        }
+    }
+
+    private static class updatePositionAsync extends AsyncTask<Pair<String, Integer>, Void, Void> {
+        private ItemsDao mDao;
+        private ItemsUpdater mUpdater;
+
+        updatePositionAsync(ItemsDao dao) {
+            mDao = dao;
+        }
+
+        updatePositionAsync(ItemsDao dao, ItemsUpdater updater) {
+            mDao = dao;
+            mUpdater = updater;
+        }
+
+        @SafeVarargs
+        @Override
+        protected final Void doInBackground(Pair<String, Integer>... request) {
+            mDao.updatePosition(request[0].first, request[0].second);
             return null;
         }
 

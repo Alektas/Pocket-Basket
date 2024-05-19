@@ -97,4 +97,13 @@ public abstract class BaseRecyclerAdapter
         result.dispatchUpdatesTo(this);
     }
 
+    public interface ViewRenderListener {
+        void onRenderComplete();
+    }
+
+    public void setItems(List<Object> newItems, ViewRenderListener renderListener) {
+        setItems(newItems);
+        if (renderListener != null) renderListener.onRenderComplete();
+    }
+
 }
