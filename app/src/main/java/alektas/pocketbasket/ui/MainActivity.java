@@ -602,7 +602,7 @@ public class MainActivity extends AppCompatActivity implements
 
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "reset showcase");
-        bundle.putString(FirebaseAnalytics.Param.CHECKOUT_OPTION, "is full reset: " + fullReset);
+        bundle.putString(FirebaseAnalytics.Param.CONTENT, "is full reset: " + fullReset);
         App.getAnalytics().logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
     }
 

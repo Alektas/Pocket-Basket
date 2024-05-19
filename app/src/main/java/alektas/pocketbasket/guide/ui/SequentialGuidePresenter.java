@@ -5,24 +5,14 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
-
 public class SequentialGuidePresenter implements GuidePresenter, GuideViewListener {
     private static final String TAG = "GuidePresenter";
     private DisposableGuideCaseListener mListener;
-    private List<GuideCaseView> mCaseViews;
+    private final List<GuideCaseView> mCaseViews;
     private GuideCaseView mCurCaseView;
-
-    public SequentialGuidePresenter() {
-        mCaseViews = new ArrayList<>();
-    }
 
     public SequentialGuidePresenter(DisposableGuideCaseListener listener) {
         mCaseViews = new ArrayList<>();
-        mListener = listener;
-    }
-
-    public void setGuideViewListener(DisposableGuideCaseListener listener) {
         mListener = listener;
     }
 
@@ -63,7 +53,6 @@ public class SequentialGuidePresenter implements GuidePresenter, GuideViewListen
         }
     }
 
-    @Nullable
     private GuideCaseView getCaseView(String key) {
         for (GuideCaseView caseView : mCaseViews) {
             if (caseView.getKey().equals(key)) return caseView;

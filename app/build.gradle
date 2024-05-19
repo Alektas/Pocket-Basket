@@ -18,9 +18,10 @@ android {
         applicationId "alektas.pocketbasket"
         minSdkVersion 21
         targetSdkVersion 34
+        compileSdkVersion = "android-34"
 
         versionName "1.1.0"
-        versionCode 14
+        versionCode 16
         resourceConfigurations += ['en', 'ru']
         project.ext.set("archivesBaseName", "PocketBasket-" + defaultConfig.versionName)
 
@@ -51,7 +52,6 @@ android {
             ext.alwaysUpdateBuildId = false
             ext.enableCrashlytics = false
             splits.abi.enable = false
-            splits.density.enable = false
 
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
@@ -60,6 +60,7 @@ android {
             resValue 'string', 'search_authority', 'alektas.pocketbasket.debug.ItemsProvider'
         }
     }
+    android.buildFeatures.buildConfig true
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8
@@ -92,7 +93,6 @@ dependencies {
 
     // Firebase
     implementation 'com.google.firebase:firebase-core:21.1.1'
-    implementation 'com.google.firebase:firebase-ads:23.1.0'
     implementation 'com.google.firebase:firebase-inappmessaging-display:21.0.0'
 
     implementation 'com.google.dagger:dagger:2.48.1'
