@@ -66,20 +66,24 @@ public class BasketWidget extends AppWidgetProvider {
         String itemName = bundle.getString(EXTRA_ITEM_NAME);
         String action = bundle.getString(EXTRA_ACTION);
         if (TextUtils.isEmpty(action) && TextUtils.isEmpty(itemName)) return;
-        switch (action) {
-            case ACTION_ITEM_DEL:
-                new RemoveItemFromBasket(RepositoryImpl.getInstance(context), true)
-                        .execute(itemName, successfully -> {
-                            notifyWidgets(context);
-                            String prefix = context.getResources().getString(R.string.widget_item_removed);
-                            Toast.makeText(context, prefix + itemName, Toast.LENGTH_SHORT).show();
-                            REMOVAL_ITEM = "";
-                        });
-                break;
-            case ACTION_ITEM_TOUCH:
-                REMOVAL_ITEM = itemName.equals(REMOVAL_ITEM) ? "" : itemName;
-                notifyWidgets(context);
-                break;
+        if (action != null) {
+            switch (action) {
+                case ACTION_ITEM_DEL:
+                    new RemoveItemFromBasket(RepositoryImpl.getInstance(context), true)
+                            .execute(itemName, successfully -> {
+                                notifyWidgets(context);
+                                String prefix = context.getResources().getString(R.string.widget_item_removed);
+                                Toast.makeText(context, prefix + itemName, Toast.LENGTH_SHORT).show();
+                                REMOVAL_ITEM = "";
+                            });
+                    break;
+                case ACTION_ITEM_TOUCH:
+                    if (itemName != null) {
+                        REMOVAL_ITEM = itemName.equals(REMOVAL_ITEM) ? "" : itemName;
+                    }
+                    notifyWidgets(context);
+                    break;
+            }
         }
     }
 
@@ -117,7 +121,7 @@ public class BasketWidget extends AppWidgetProvider {
         // Intent for opening the app by click on header
         Intent openIntent = new Intent(context, MainActivity.class);
         PendingIntent openPending =
-                PendingIntent.getActivity(context, 0, openIntent, 0);
+                PendingIntent.getActivity(context, 0, openIntent, PendingIntent.FLAG_IMMUTABLE);
         widget.setOnClickPendingIntent(R.id.widget_header, openPending);
 
         // Intent for cleaning the basket by click on del button in header
@@ -154,6 +158,6 @@ public class BasketWidget extends AppWidgetProvider {
         touchIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId);
         touchIntent.setData(Uri.parse(touchIntent.toUri(Intent.URI_INTENT_SCHEME)));
         return PendingIntent.getBroadcast( context, 0, touchIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT + PendingIntent.FLAG_IMMUTABLE);
     }
 }
