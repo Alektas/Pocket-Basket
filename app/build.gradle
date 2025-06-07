@@ -17,11 +17,11 @@ android {
     defaultConfig {
         applicationId "alektas.pocketbasket"
         minSdkVersion 21
-        targetSdkVersion 34
+        targetSdkVersion 35
         compileSdkVersion = "android-34"
 
-        versionName "1.1.0"
-        versionCode 16
+        versionName "1.1.1"
+        versionCode 17
         resourceConfigurations += ['en', 'ru']
         project.ext.set("archivesBaseName", "PocketBasket-" + defaultConfig.versionName)
 
