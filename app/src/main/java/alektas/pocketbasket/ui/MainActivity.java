@@ -38,7 +38,10 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
+import androidx.core.graphics.Insets;
 import androidx.core.view.MenuItemCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.Lifecycle;
@@ -351,12 +354,15 @@ public class MainActivity extends AppCompatActivity implements
 
         mRootLayout = findViewById(R.id.root_layout);
         mBottomAppBar = findViewById(R.id.appbar);
+        View delModeToolbar = findViewById(R.id.toolbar_del_mode);
         mCategoriesContainer = findViewById(R.id.fragment_categories);
+        View categoriesList = mCategoriesContainer.findViewById(R.id.categories_wrapper);
         mShowcaseContainer = findViewById(R.id.fragment_showcase);
         mShowcase = mShowcaseContainer.findViewById(R.id.showcase_list);
         mBasketContainer = findViewById(R.id.fragment_basket);
         mBasket = mBasketContainer.findViewById(R.id.basket_list);
         initDimensions();
+        applySystemWindowInsets(categoriesList, mShowcase, mBasket, mBottomAppBar, delModeToolbar);
 
         mViewModel = ViewModelProviders.of(this).get(ActivityViewModel.class);
         mViewModel.setOrientationState(isLandscape());
@@ -369,6 +375,71 @@ public class MainActivity extends AppCompatActivity implements
 
         if (isLandscape()) {
             applyLandscapeLayout();
+        }
+    }
+
+    private void applySystemWindowInsets(View categoriesList,
+                                         View showcaseList,
+                                         View basketList,
+                                         View appBar,
+                                         View delModeToolbar) {
+        setClipToPadding(categoriesList, false);
+        setClipToPadding(showcaseList, false);
+        setClipToPadding(basketList, false);
+
+        final int categoriesListPaddingLeft = categoriesList.getPaddingLeft();
+        final int categoriesListPaddingTop = categoriesList.getPaddingTop();
+        final int categoriesListPaddingRight = categoriesList.getPaddingRight();
+        final int categoriesListPaddingBottom = categoriesList.getPaddingBottom();
+        final int showcaseListPaddingLeft = showcaseList.getPaddingLeft();
+        final int showcaseListPaddingTop = showcaseList.getPaddingTop();
+        final int showcaseListPaddingRight = showcaseList.getPaddingRight();
+        final int showcaseListPaddingBottom = showcaseList.getPaddingBottom();
+        final int basketListPaddingLeft = basketList.getPaddingLeft();
+        final int basketListPaddingTop = basketList.getPaddingTop();
+        final int basketListPaddingRight = basketList.getPaddingRight();
+        final int basketListPaddingBottom = basketList.getPaddingBottom();
+        final int appBarPaddingBottom = appBar.getPaddingBottom();
+        final int delModeToolbarPaddingBottom = delModeToolbar.getPaddingBottom();
+
+        ViewCompat.setOnApplyWindowInsetsListener(mRootLayout, (view, windowInsets) -> {
+            Insets statusBars = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars());
+            Insets navigationBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            mStatusBarHeight = statusBars.top;
+
+            categoriesList.setPadding(
+                    categoriesListPaddingLeft,
+                    categoriesListPaddingTop + statusBars.top,
+                    categoriesListPaddingRight,
+                    categoriesListPaddingBottom + navigationBars.bottom);
+            showcaseList.setPadding(
+                    showcaseListPaddingLeft,
+                    showcaseListPaddingTop + statusBars.top,
+                    showcaseListPaddingRight,
+                    showcaseListPaddingBottom + navigationBars.bottom);
+            basketList.setPadding(
+                    basketListPaddingLeft,
+                    basketListPaddingTop + statusBars.top,
+                    basketListPaddingRight,
+                    basketListPaddingBottom + navigationBars.bottom);
+            appBar.setPadding(
+                    appBar.getPaddingLeft(),
+                    appBar.getPaddingTop(),
+                    appBar.getPaddingRight(),
+                    appBarPaddingBottom + navigationBars.bottom);
+            delModeToolbar.setPadding(
+                    delModeToolbar.getPaddingLeft(),
+                    delModeToolbar.getPaddingTop(),
+                    delModeToolbar.getPaddingRight(),
+                    delModeToolbarPaddingBottom + navigationBars.bottom);
+            return windowInsets;
+        });
+        ViewCompat.requestApplyInsets(mRootLayout);
+    }
+
+    private void setClipToPadding(View view, boolean clipToPadding) {
+        if (view instanceof ViewGroup) {
+            ((ViewGroup) view).setClipToPadding(clipToPadding);
         }
     }
 
