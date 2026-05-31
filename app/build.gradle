@@ -17,8 +17,8 @@ android {
     defaultConfig {
         applicationId "alektas.pocketbasket"
         minSdkVersion 21
-        targetSdkVersion 35
-        compileSdkVersion = "android-34"
+        targetSdkVersion 36
+        compileSdkVersion = "android-36"
 
         versionName "1.1.2"
         versionCode 18
