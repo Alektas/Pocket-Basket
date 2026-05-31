@@ -131,8 +131,8 @@ public class ActivityViewModel extends AndroidViewModel implements GuideObserver
     /**
      * Update displayed item names that were changed with localization (exclude user items)
      */
-    public void updateLocaleNames() {
-        new UpdateItemsUseCase(mRepository).execute(null, null);
+    public void updateLocaleNames(UseCase.Callback<Boolean> callback) {
+        new UpdateItemsUseCase(mRepository).execute(null, callback);
     }
 
     public LiveData<Boolean> showcaseModeState() {

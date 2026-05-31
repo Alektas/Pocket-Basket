@@ -149,11 +149,16 @@ public class MainActivity extends AppCompatActivity implements
                 mPrefs.getInt(getString(R.string.VERSION_CODE_KEY), 1) != vc;
 
         if (!savedLang.equals(curLang) || isVersionChanged) {
-            mPrefs.edit()
-                    .putString(getString(R.string.LOCALE_KEY), curLang)
-                    .putInt(getString(R.string.VERSION_CODE_KEY), vc)
-                    .apply();
-            mViewModel.updateLocaleNames();
+            mViewModel.updateLocaleNames(isUpdated -> {
+                if (isUpdated) {
+                    mPrefs.edit()
+                            .putString(getString(R.string.LOCALE_KEY), curLang)
+                            .putInt(getString(R.string.VERSION_CODE_KEY), vc)
+                            .apply();
+                } else {
+                    Log.w(TAG, "Unable to update localized item names");
+                }
+            });
         }
 
         // If it is the first app launch offer to start the guide

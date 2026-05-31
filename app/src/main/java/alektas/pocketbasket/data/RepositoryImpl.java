@@ -2,6 +2,7 @@ package alektas.pocketbasket.data;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
@@ -228,8 +229,8 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
     }
 
     @Override
-    public void updateNames() {
-        new updateDisplayedNamesAsync(mItemsDao, this).execute();
+    public void updateNames(UseCase.Callback<Boolean> callback) {
+        new updateDisplayedNamesAsync(mItemsDao, this, callback).execute();
     }
 
     // Set value to Showcase Data to notify observers
@@ -704,9 +705,10 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
         }
     }
 
-    private static class updateDisplayedNamesAsync extends AsyncTask<Void, Void, Void> {
+    private static class updateDisplayedNamesAsync extends AsyncTask<Void, Void, Boolean> {
         private ItemsDao mDao;
         private ItemsUpdater mUpdater;
+        private UseCase.Callback<Boolean> mCallback;
 
         updateDisplayedNamesAsync(ItemsDao dao) {
             mDao = dao;
@@ -717,29 +719,41 @@ public class RepositoryImpl implements Repository, ItemsUpdater {
             mUpdater = updater;
         }
 
-        @Override
-        protected final Void doInBackground(Void... voids) {
-            List<Item> items = new ArrayList<>(mDao.getShowcaseItems());
-            for (Item item : items) {
-                if (item.getNameRes() == null) continue;
-                item.setName(ResourcesUtils.getString(item.getNameRes()));
-            }
-
-            mDao.update(items);
-            return null;
+        updateDisplayedNamesAsync(ItemsDao dao, ItemsUpdater updater, UseCase.Callback<Boolean> callback) {
+            this(dao, updater);
+            mCallback = callback;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
-            if (mUpdater != null) {
+        protected final Boolean doInBackground(Void... voids) {
+            try {
+                List<Item> items = new ArrayList<>(mDao.getShowcaseItems());
+                for (Item item : items) {
+                    if (item.getNameRes() == null) continue;
+                    item.setName(ResourcesUtils.getString(item.getNameRes(), item.getName()));
+                }
+
+                mDao.update(items);
+                return true;
+            } catch (RuntimeException e) {
+                Log.e(TAG, "Unable to update localized item names", e);
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean updated) {
+            if (updated && mUpdater != null) {
                 mUpdater.updateShowcase();
                 mUpdater.updateBasket();
+            }
+            if (mCallback != null) {
+                mCallback.onResponse(updated);
+                mCallback = null;
             }
         }
     }
 }
-
-
 
 
 

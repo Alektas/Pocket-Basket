@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="soda">Лимонад</string>
+    <string name="soda">Газировка</string>
     <string name="juice">Сок</string>
     <string name="tea">Чай</string>
     <string name="coffee">Кофе</string>

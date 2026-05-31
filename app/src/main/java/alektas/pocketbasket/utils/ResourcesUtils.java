@@ -4,6 +4,8 @@ import android.content.res.Resources;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 
 import java.util.Locale;
 
@@ -23,12 +25,34 @@ public class ResourcesUtils {
         return BuildConfig.VERSION_NAME;
     }
 
-    public static String getString(int stringResId) {
-        return mResources.getString(stringResId);
+    @NonNull
+    public static String getString(@StringRes int stringResId) {
+        if (stringResId == 0) {
+            Log.e(TAG, "getString: string resource id is 0");
+            return "";
+        }
+        try {
+            return mResources.getString(stringResId);
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "getString: resource not found: " + stringResId, e);
+            return "";
+        }
     }
 
+    @NonNull
     public static String getString(@NonNull String stringResName) {
-        return getString(getStringId(stringResName));
+        return getString(stringResName, stringResName);
+    }
+
+    @NonNull
+    public static String getString(@NonNull String stringResName, @NonNull String fallback) {
+        int stringResId = getStringId(stringResName);
+        if (stringResId == 0) {
+            Log.e(TAG, "getString: resource not found: " + stringResName);
+            return fallback;
+        }
+        String value = getString(stringResId);
+        return value.isEmpty() ? fallback : value;
     }
 
     public static int getResId(String resName, String type) {
@@ -53,6 +77,7 @@ public class ResourcesUtils {
     }
 
 
+    @Nullable
     public static String getResIdName(int resId) {
         try {
             return mResources.getResourceEntryName(resId);
@@ -64,9 +89,10 @@ public class ResourcesUtils {
 
     public static String getDisplayName(@NonNull ItemModel item) {
         if (item.getNameRes() == null) return item.getName();
-        return getString(item.getNameRes());
+        return getString(item.getNameRes(), item.getName());
     }
 
+    @NonNull
     public static Locale getCurrentLocale(){
         return Locale.getDefault();
     }

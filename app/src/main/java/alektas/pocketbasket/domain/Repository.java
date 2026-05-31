@@ -33,7 +33,7 @@ public interface Repository {
     void setFilter(String tag);
     void resetShowcase(UseCase.Callback<Boolean> callback);
     void returnDeletedItems(UseCase.Callback<Boolean> callback);
-    void updateNames();
+    void updateNames(UseCase.Callback<Boolean> callback);
     /**
      * Find item by name in all categories.
      * Case sensitive.
