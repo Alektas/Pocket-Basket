@@ -11,12 +11,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
 
 import alektas.pocketbasket.R;
 import alektas.pocketbasket.utils.ResourcesUtils;
 
-public class AboutDialog extends DialogFragment {
+public class AboutDialog extends SafeDialogFragment {
     private View mView;
 
     @NonNull

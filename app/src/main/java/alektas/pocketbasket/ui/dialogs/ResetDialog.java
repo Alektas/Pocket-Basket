@@ -6,11 +6,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.DialogFragment;
 
 import alektas.pocketbasket.R;
 
-public class ResetDialog extends DialogFragment {
+public class ResetDialog extends SafeDialogFragment {
     /* The activity that creates an instance of this dialog fragment must
      * implement this interface in order to receive event callbacks.
      * Each method passes the DialogFragment in case the host needs to query it. */

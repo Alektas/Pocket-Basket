@@ -17,6 +17,7 @@ import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.transition.TransitionSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -24,6 +25,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
@@ -38,6 +40,8 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.ShareActionProvider;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -71,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements
         ItemSizeProvider {
 
     private static final String TAG = "MainActivity";
+    private static final long DIALOG_SHOW_RETRY_DELAY_MS = 300;
+    private static final int DIALOG_SHOW_MAX_ATTEMPTS = 20;
+    private static final String GUIDE_ACCEPT_DIALOG_TAG = "GuideAcceptDialog";
     private static final String SAVED_CATEGORY_KEY = "saved_category";
     private static final long CHANGE_MODE_TIME = 250;
     private static final float CHANGE_MODE_MIN_VELOCITY = 150;
@@ -117,6 +124,9 @@ public class MainActivity extends AppCompatActivity implements
     private Transition mChangeBounds;
     private Transition mDelToolbarTransition;
     private boolean isDelMode;
+    private boolean mShowHintsAcceptDialogOnResume;
+    private int mShowHintsAcceptDialogAttempts;
+    private final Runnable mShowHintsAcceptDialogRunnable = this::showPendingHintsAcceptDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,13 +158,23 @@ public class MainActivity extends AppCompatActivity implements
 
         // If it is the first app launch offer to start the guide
         if (mPrefs.getBoolean(getString(R.string.FIRST_START_KEY), true)) {
-            mPrefs.edit().putBoolean(getString(R.string.FIRST_START_KEY), false).apply();
-            showHintsAcceptDialog();
+            mShowHintsAcceptDialogOnResume = true;
+        }
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        if (mShowHintsAcceptDialogOnResume) {
+            schedulePendingHintsAcceptDialog();
         }
     }
 
     @Override
     protected void onStop() {
+        if (mRootLayout != null) {
+            mRootLayout.removeCallbacks(mShowHintsAcceptDialogRunnable);
+        }
         mPrefs.edit().putInt(SAVED_CATEGORY_KEY, getSelectedCategoryId()).apply();
         BasketWidget.updateItems(this);
         super.onStop();
@@ -205,8 +225,7 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
 
             case R.id.menu_reset:
-                DialogFragment resetDialog = new ResetDialog();
-                resetDialog.show(getSupportFragmentManager(), "ResetDialog");
+                showDialog(new ResetDialog(), "ResetDialog");
                 return true;
 
             case R.id.menu_guide:
@@ -214,8 +233,7 @@ public class MainActivity extends AppCompatActivity implements
                 return true;
 
             case R.id.menu_about:
-                DialogFragment aboutDialog = new AboutDialog();
-                aboutDialog.show(getSupportFragmentManager(), "AboutDialog");
+                showDialog(new AboutDialog(), "AboutDialog");
                 // Log analytic event
                 Bundle bundle = new Bundle();
                 bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "read about app");
@@ -226,9 +244,78 @@ public class MainActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-    private void showHintsAcceptDialog() {
-        DialogFragment dialog = new GuideAcceptDialog();
-        dialog.show(getSupportFragmentManager(), "GuideAcceptDialog");
+    private boolean showHintsAcceptDialog() {
+        return showDialog(new GuideAcceptDialog(), GUIDE_ACCEPT_DIALOG_TAG);
+    }
+
+    private void schedulePendingHintsAcceptDialog() {
+        if (mRootLayout == null) {
+            return;
+        }
+        mRootLayout.removeCallbacks(mShowHintsAcceptDialogRunnable);
+        mRootLayout.postDelayed(mShowHintsAcceptDialogRunnable, DIALOG_SHOW_RETRY_DELAY_MS);
+    }
+
+    private void showPendingHintsAcceptDialog() {
+        if (!mShowHintsAcceptDialogOnResume) {
+            return;
+        }
+
+        if (!isDialogWindowReady()) {
+            retryPendingHintsAcceptDialog();
+            return;
+        }
+
+        if (showHintsAcceptDialog()) {
+            mPrefs.edit().putBoolean(getString(R.string.FIRST_START_KEY), false).apply();
+            mShowHintsAcceptDialogOnResume = false;
+            mShowHintsAcceptDialogAttempts = 0;
+        } else {
+            retryPendingHintsAcceptDialog();
+        }
+    }
+
+    private void retryPendingHintsAcceptDialog() {
+        mShowHintsAcceptDialogAttempts++;
+        if (mShowHintsAcceptDialogAttempts <= DIALOG_SHOW_MAX_ATTEMPTS) {
+            schedulePendingHintsAcceptDialog();
+        } else {
+            Log.w(TAG, "Unable to show guide dialog: activity window is not ready");
+        }
+    }
+
+    private boolean showDialog(DialogFragment dialog, String tag) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if (!isDialogWindowReady()) {
+            return false;
+        }
+        if (fragmentManager.findFragmentByTag(tag) != null) {
+            return true;
+        }
+        try {
+            dialog.showNow(fragmentManager, tag);
+            return true;
+        } catch (RuntimeException e) {
+            if (!(e instanceof IllegalStateException)
+                    && !(e instanceof WindowManager.BadTokenException)) {
+                throw e;
+            }
+            Log.w(TAG, "Unable to show dialog: " + tag, e);
+            return false;
+        }
+    }
+
+    private boolean isDialogWindowReady() {
+        View decorView = getWindow().getDecorView();
+        return getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)
+                && !isFinishing()
+                && !isDestroyed()
+                && !getSupportFragmentManager().isStateSaved()
+                && mRootLayout != null
+                && mRootLayout.isAttachedToWindow()
+                && mRootLayout.getWindowToken() != null
+                && decorView.isAttachedToWindow()
+                && decorView.getWindowToken() != null;
     }
 
     // Used for search handle
@@ -1073,8 +1160,7 @@ public class MainActivity extends AppCompatActivity implements
 
             mShareActionProvider.setShareIntent(shareIntent);
         } else {
-            DialogFragment dialog = new ShareUnsuccessfulDialog();
-            dialog.show(getSupportFragmentManager(), "ShareUnsuccessfulDialog");
+            showDialog(new ShareUnsuccessfulDialog(), "ShareUnsuccessfulDialog");
         }
     }
 

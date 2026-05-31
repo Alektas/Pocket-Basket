@@ -6,11 +6,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
 
 import alektas.pocketbasket.R;
 
-public class ShareUnsuccessfulDialog extends DialogFragment {
+public class ShareUnsuccessfulDialog extends SafeDialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
